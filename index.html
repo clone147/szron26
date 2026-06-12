@@ -12,13 +12,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,300..700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&text=SZRON&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 
 <header class="nav" id="nav">
   <div class="container nav__inner">
-    <a class="nav__logo" href="index.html" aria-label="SZRON — strona główna">SZRON<sup>●</sup></a>
+    <a class="logo" href="index.html" aria-label="SZRON — strona główna">
+      <svg class="logo__mark" width="30" height="30" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <path d="M46 14 H24 a8 8 0 0 0 0 16 h16 a8 8 0 0 1 0 16 H18" stroke="var(--color-brand-soft)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="46" cy="14" r="3.5" fill="var(--color-brand-soft)"/>
+        <circle cx="18" cy="50" r="3.5" fill="var(--color-brand-soft)"/>
+      </svg>
+      <span class="logo__wm"><span>SZRON</span><span class="logo__dot" aria-hidden="true"></span></span>
+    </a>
     <nav aria-label="Nawigacja główna">
       <ul class="nav__links">
         <li><a href="#metoda">Metoda</a></li>
@@ -551,6 +560,14 @@
     <div class="container">
       <div class="footer__grid">
         <div class="footer__col">
+          <a class="logo logo--light" href="index.html" aria-label="SZRON — strona główna" style="margin-bottom: var(--space-lg)">
+            <svg class="logo__mark" width="34" height="34" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+              <path d="M46 14 H24 a8 8 0 0 0 0 16 h16 a8 8 0 0 1 0 16 H18" stroke="var(--color-brand)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="46" cy="14" r="3.5" fill="var(--color-brand)"/>
+              <circle cx="18" cy="50" r="3.5" fill="var(--color-brand)"/>
+            </svg>
+            <span class="logo__wm"><span>SZRON</span><span class="logo__dot" aria-hidden="true"></span></span>
+          </a>
           <p class="footer__tagline">Transformacja zespołów IT i programowanie agentowe dla dużych firm.</p>
         </div>
         <div class="footer__col">

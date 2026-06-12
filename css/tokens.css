@@ -29,6 +29,14 @@
   --color-grid-line:    oklch(100% 0 0 / 0.05);      /* siatka panelu hero */
   --color-scrim:        oklch(17% 0.01 240 / 0.82);  /* przyciemnienie pod tekstem na zdjęciu */
 
+  /* ── brand (logo SZRON — wartości hex z brand booka) ── */
+  --color-brand:        #3c56f4;  /* primary brand blue */
+  --color-brand-2:      #6678f6;  /* gradient stop / dot na ciemnym */
+  --color-brand-soft:   #8b9cf7;  /* znak na ciemnym tle */
+  --brand-gradient:     linear-gradient(90deg, #3c56f4, #6678f6);
+
+  --font-logo: "Inter", "Albert Sans", system-ui, sans-serif;
+
   /* ── typografia ───────────────────────────────────── */
   --font-display: "Bricolage Grotesque", "Albert Sans", system-ui, sans-serif;
   --font-body:    "Albert Sans", system-ui, sans-serif;
