@@ -27,6 +27,7 @@
   --color-focus:        oklch(70.5% 0.187 45);
   --color-glass:        oklch(17% 0.01 240 / 0.85);  /* tło navu po scrollu */
   --color-grid-line:    oklch(100% 0 0 / 0.05);      /* siatka panelu hero */
+  --color-scrim:        oklch(17% 0.01 240 / 0.82);  /* przyciemnienie pod tekstem na zdjęciu */
 
   /* ── typografia ───────────────────────────────────── */
   --font-display: "Bricolage Grotesque", "Albert Sans", system-ui, sans-serif;

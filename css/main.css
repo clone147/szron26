@@ -327,7 +327,7 @@ h1, h2, h3, h4 {
   position: sticky;
   top: var(--nav-h);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 0.8fr);
   gap: clamp(1.5rem, 4vw, 4rem);
   padding-block: clamp(1.75rem, 3.5vw, 3rem);
   border-top: 1px solid var(--color-line);
@@ -812,6 +812,77 @@ h1, h2, h3, h4 {
   transform: translateY(8%);
 }
 
+/* ── placeholdery obrazów ────────────────────────────── */
+/* gdy plik z img/ istnieje, <img> zakrywa wzór i etykietę (onload → .has-img) */
+.ph {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  aspect-ratio: var(--ph-ar, 4 / 3);
+  border: 1px dashed var(--color-line);
+  background:
+    repeating-linear-gradient(45deg, transparent 0 14px, var(--color-line) 14px 15px),
+    var(--color-paper-2);
+}
+.ph--dark {
+  border-color: var(--color-line-dark);
+  background:
+    repeating-linear-gradient(45deg, transparent 0 14px, var(--color-line-dark) 14px 15px),
+    var(--color-ink-2);
+}
+.ph > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ph__label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-btn);
+  background: var(--color-paper);
+  color: var(--color-text-2);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.ph--dark .ph__label, .hero__panel .ph__label { background: var(--color-ink); color: var(--color-text-inv-2); }
+.has-img .ph__label { display: none; }
+
+.hero__panel > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hero__panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(200deg, transparent 35%, var(--color-scrim) 78%);
+  opacity: 0;
+}
+.hero__panel.has-img::after { opacity: 1; }
+.hero__panel-num, .hero__panel-cap { position: relative; z-index: 1; }
+.hero__panel .ph__label { left: auto; top: var(--space-lg); right: var(--space-lg); transform: none; }
+
+.person__avatar { position: relative; overflow: hidden; }
+.person__avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.path > .ph { margin-bottom: var(--space-xl); }
+.case-card .ph { margin-top: var(--space-xl); }
+
 /* ── reveals (scroll) ────────────────────────────────── */
 .rv {
   opacity: 0;
@@ -861,6 +932,8 @@ h1, h2, h3, h4 {
   }
 
   .hero__grid, .case-card, .contact__grid, .path__cols { grid-template-columns: minmax(0, 1fr); }
+  .problem-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
+  .problem-row .ph { grid-column: 1 / -1; max-width: 26rem; }
   .benefits, .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .industries__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
