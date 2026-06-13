@@ -988,6 +988,44 @@ h1, h2, h3, h4 {
   .def-rows > div { grid-template-columns: minmax(0, 1fr); gap: var(--space-xs); }
 }
 
+/* ── formularze (Netlify Forms) ──────────────────────── */
+form .field, form > div:has(> label) { display: flex; flex-direction: column; gap: var(--space-2xs); }
+form label { font-size: var(--text-caption); font-weight: 600; letter-spacing: 0.04em; }
+form { display: grid; gap: var(--space-lg); max-width: 42rem; }
+form input:not([type="hidden"]):not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+form select,
+form textarea {
+  font: inherit; width: 100%;
+  padding: 0.75rem 0.95rem;
+  border-radius: var(--radius-btn);
+  background: var(--color-paper);
+  color: var(--color-text);
+  border: 1px solid var(--color-line);
+  transition: border-color var(--dur-1) var(--ease-out);
+}
+.sect--dark form input:not([type="hidden"]):not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+.sect--dark form select,
+.sect--dark form textarea {
+  background: oklch(100% 0 0 / 0.06);
+  color: var(--color-text-inv);
+  border-color: var(--color-line-dark);
+}
+form input::placeholder, form textarea::placeholder { color: var(--color-text-2); }
+.sect--dark form input::placeholder, .sect--dark form textarea::placeholder { color: var(--color-text-inv-3); }
+form input:focus-visible, form select:focus-visible, form textarea:focus-visible {
+  outline: none; border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+form textarea { min-height: 7rem; resize: vertical; }
+form select {
+  appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%23ff7a00' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 0.9rem center; padding-right: 2.4rem;
+}
+form button[type="submit"] { justify-self: start; margin-top: var(--space-xs); }
+/* honeypot Netlify — ukryty przed użytkownikiem */
+form [name="bot-field"], form label:has([name="bot-field"]), p.hidden, .hidden-field { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
 /* ── prose: długie treści techniczne (Akademia, blog, prawne) ── */
 .prose { max-width: 50rem; }
 .prose > * + * { margin-top: var(--space-lg); }
@@ -1042,6 +1080,27 @@ h1, h2, h3, h4 {
 .link-card h3::after { content: "→"; color: var(--color-accent); transition: transform var(--dur-1) var(--ease-out); }
 .link-card:hover h3::after { transform: translateX(4px); }
 .link-card p { color: var(--color-text-2); font-size: var(--text-s); }
+
+/* ── poprawki kontrastu (QA): jawne kolory zamiast dziedziczenia ── */
+/* karty na jasnym tle paper-2 ZAWSZE ciemny tekst (niezależnie od sekcji) */
+.link-card, .link-card h3 { color: var(--color-text); }
+.quote-card blockquote { color: var(--color-text); }
+.quote-card figcaption { color: var(--color-text-2); }
+.card-tile, .card-tile h3 { color: var(--color-text); }
+.sect--dark .card-tile, .sect--dark .card-tile h3 { color: var(--color-text-inv); }
+
+/* prose w ciemnych sekcjach — czytelny jasny tekst */
+.sect--dark .prose p, .sect--dark .prose li { color: var(--color-text-inv-2); }
+.sect--dark .prose strong, .sect--dark .prose h2, .sect--dark .prose h3, .sect--dark .prose a, .sect--dark .prose blockquote { color: var(--color-text-inv); }
+.sect--dark .prose :not(pre) > code { background: oklch(100% 0 0 / 0.1); color: var(--color-text-inv); }
+.sect--dark .prose th, .sect--dark .prose td { border-color: var(--color-line-dark); }
+.sect--dark .prose thead th { color: var(--color-text-inv-3); }
+.sect--dark .callout { background: oklch(70.5% 0.187 45 / 0.16); }
+.sect--dark .callout strong { color: var(--color-text-inv); }
+.sect--dark .callout p { color: var(--color-text-inv-2); }
+
+/* tabele w prose: przewijalne zamiast ucinania na wąskich ekranach */
+.prose table { display: block; max-width: 100%; overflow-x: auto; }
 
 /* ── reveals (scroll) ────────────────────────────────── */
 .rv {
@@ -1132,9 +1191,9 @@ h1, h2, h3, h4 {
   .nav__inner > .btn { display: none; } /* CTA zostaje w menu mobilnym */
   .btn { padding-inline: 1rem; letter-spacing: 0.06em; font-size: 0.75rem; }
   .results-table { table-layout: fixed; }
-  .results-table th:first-child { width: 38%; }
-  .results-table thead th { font-size: 0.75rem; letter-spacing: 0.03em; }
-  .results-table td { hyphens: auto; overflow-wrap: anywhere; }
+  .results-table th:first-child { width: 34%; }
+  .results-table thead th { font-size: 0.7rem; letter-spacing: 0.02em; }
+  .results-table th, .results-table td { hyphens: auto; overflow-wrap: anywhere; word-break: break-word; padding-inline: 0.5rem; }
   .steps, .industries__grid, .footer__grid { grid-template-columns: minmax(0, 1fr); }
   .hero__proof { grid-template-columns: minmax(0, 1fr); }
   .hero__proof > div:nth-child(odd) { padding-right: 0; }

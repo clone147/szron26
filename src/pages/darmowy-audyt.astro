@@ -71,8 +71,9 @@ import Interior from '../layouts/Interior.astro';
         <h2 class="sect-title ws" id="formularz">Zostaw kontakt — odezwę się w ciągu 24h.</h2>
         <p class="sect-lead rv">Na nic się nie zapisujesz. Po prostu pogadamy i ustalimy termin.</p>
       </div>
-      <form name="darmowy-audyt" method="POST" data-netlify="true" class="prose rv">
+      <form name="darmowy-audyt" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="prose rv">
         <input type="hidden" name="form-name" value="darmowy-audyt" />
+        <p class="hidden-field"><label>Nie wypełniaj tego pola: <input name="bot-field" /></label></p>
         <p>
           <label for="name">Imię<span aria-hidden="true"> *</span></label><br />
           <input type="text" id="name" name="name" required placeholder="Jan" />
