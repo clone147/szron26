@@ -1,0 +1,198 @@
+---
+import Interior from '../layouts/Interior.astro';
+import { akademia } from '../data/akademia.mjs';
+const related = akademia.filter((a) => ['lm-studio', 'claude-code-bezpieczenstwo', 'serwery-mcp'].includes(a.slug));
+---
+<Interior
+  title="Lokalny LLM w firmie — llama-server z pełną współbieżnością | Akademia SZRON"
+  description="Przewodnik po llama-server z projektu llama.cpp: kompilacja z CUDA/Metal/ROCm, modele GGUF, continuous batching, flagi uruchomienia, WebUI i API zgodne z OpenAI. Własny serwer modeli w firmie."
+  eyebrow="Akademia · Lokalne modele"
+  heading="Lokalny LLM w firmie — llama-server od podstaw."
+  lead="Jeśli szukasz maksymalnej wydajności, elastyczności i prawdziwej współbieżności na własnym sprzęcie, odpowiedzią jest llama-server z projektu llama.cpp. Poniżej kompilacja, modele GGUF, flagi uruchomienia i dostęp przez API zgodne z OpenAI."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>Continuous batching</strong><span>wiele zapytań równolegle, domyślnie</span></div>
+        <div><strong>GGUF + GPU</strong><span>CUDA, Metal lub ROCm</span></div>
+        <div><strong>OpenAI API</strong><span>endpoint /v1/ na localhost:8080</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 dlaczego -->
+  <section class="sect" aria-labelledby="dlaczego">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Wprowadzenie · Dlaczego llama-server</p>
+        <h2 class="sect-title sect-title--s ws" id="dlaczego">Prawdziwa współbieżność, nie obsługa po kolei.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Na rynku istnieje wiele narzędzi do uruchamiania lokalnych modeli językowych. Jeśli jednak zależy Ci na maksymalnej wydajności, elastyczności i — co najważniejsze — prawdziwej współbieżności, odpowiedź jest jedna: llama-server z projektu llama.cpp.</p>
+        <div class="callout">
+          <p><strong>Kluczowa przewaga — continuous batching:</strong> w przeciwieństwie do serwerów przetwarzających zapytania sekwencyjnie (jedno po drugim), llama-server obsługuje wiele zapytań jednocześnie i równolegle. Pozwala to w pełni wysycić moc GPU i obsłużyć wielu użytkowników lub procesów naraz.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 sprzet (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="sprzet">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Sprzęt · GPU i format GGUF</p>
+        <h2 class="sect-title ws" id="sprzet">Wydajność zależy od akceleracji GPU.</h2>
+      </div>
+      <div class="prose rv">
+        <h3>1. Sprzęt (GPU)</h3>
+        <ul>
+          <li><strong>Nvidia</strong> — najlepsze wsparcie dzięki CUDA.</li>
+          <li><strong>Apple Silicon (M1/M2/M3/M4)</strong> — doskonała wydajność dzięki akceleracji Metal.</li>
+          <li><strong>AMD</strong> — wsparcie przez ROCm (wymaga dodatkowej konfiguracji).</li>
+          <li><strong>CPU</strong> — możliwe, ale bardzo powolne do celów serwerowych.</li>
+        </ul>
+        <h3>2. Modele w formacie GGUF</h3>
+        <p>Serwer działa wyłącznie z modelami w formacie GGUF — to plik zawierający „skwantyzowany" model. Kwantyzacja to zmniejszenie precyzji wag (np. z 16-bitowej do 4-bitowej), co drastycznie redukuje rozmiar pliku i wymagania VRAM przy niewielkiej utracie jakości.</p>
+        <ul>
+          <li>Szukaj oznaczeń <strong>Q4_K_M</strong>, <strong>Q5_K_M</strong> lub <strong>Q8_0</strong>.</li>
+          <li><strong>Q4_K_M</strong> jest powszechnie uważany za najlepszy kompromis między wydajnością a jakością.</li>
+          <li>Modele znajdziesz na Hugging Face — filtruj po „GGUF"; wiele osób kwantyzuje popularne modele.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 kompilacja -->
+  <section class="sect" aria-labelledby="kompilacja">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Instalacja · Klonowanie i kompilacja</p>
+        <h2 class="sect-title sect-title--s ws" id="kompilacja">Budujemy ze źródła pod własny sprzęt.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Budujemy oprogramowanie bezpośrednio ze źródła, aby zapewnić maksymalną optymalizację dla sprzętu. Potrzebujesz <code>git</code>, <code>cmake</code> i odpowiedniego zestawu narzędzi deweloperskich.</p>
+        <h3>1. Klonowanie repozytorium</h3>
+        <pre><code>git clone https://github.com/ggerganov/llama.cpp.git
+cd llama.cpp</code></pre>
+        <h3>2. Kompilacja</h3>
+        <p>Proces różni się w zależności od posiadanego GPU.</p>
+        <p>Apple Silicon (Metal):</p>
+        <pre><code>cmake -B build -DGGML_METAL=ON
+cmake --build build --config Release -j</code></pre>
+        <p>Nvidia (CUDA):</p>
+        <pre><code>cmake -B build -DGGML_CUDA=ON
+cmake --build build --config Release -j</code></pre>
+        <p>AMD (ROCm):</p>
+        <pre><code>cmake -B build -DGGML_HIP=ON
+cmake --build build --config Release -j</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 uruchomienie (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="uruchomienie">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>04 / Konfiguracja · Uruchomienie serwera</p>
+        <h2 class="sect-title ws" id="uruchomienie">Najważniejsze flagi i przykład pełnego polecenia.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Minimalnie musisz wskazać model:</p>
+        <pre><code>./build/bin/llama-server -m /sciezka/do/modelu.gguf -c 4096 -ngl 99</code></pre>
+        <h3>Najważniejsze flagi</h3>
+        <ul>
+          <li><code>-m, --model [SCIEZKA]</code> — <strong>wymagane:</strong> ścieżka do pliku modelu GGUF.</li>
+          <li><code>-ngl, --n-gpu-layers [LICZBA]</code> — <strong>krytyczne:</strong> ile warstw modelu trafia do VRAM GPU. Ustawiaj wysoko (np. 99 lub 1000), aby załadować jak najwięcej na GPU.</li>
+          <li><code>--parallel [LICZBA]</code> — ile zapytań (slotów) może być przetwarzanych równolegle.</li>
+          <li><code>--host</code> / <code>--port</code> — adres i port nasłuchu (np. <code>0.0.0.0</code> i <code>8080</code>).</li>
+        </ul>
+        <div class="callout">
+          <p><strong>Continuous batching domyślnie włączone:</strong> nie musisz już podawać <code>--cont-batching</code>. Aby wyłączyć, użyj <code>-nocb</code> lub <code>--no-cont-batching</code>.</p>
+        </div>
+        <h3>Przykład pełnego polecenia</h3>
+        <pre><code>./build/bin/llama-server \
+  -m ./modele/Mistral-7B-v0.1.Q4_K_M.gguf \
+  -c 4096 \
+  -ngl 99 \
+  --host 0.0.0.0 \
+  --port 8080 \
+  --parallel 4</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 uzycie -->
+  <section class="sect" aria-labelledby="uzycie">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>05 / Użycie · WebUI i API</p>
+        <h2 class="sect-title sect-title--s ws" id="uzycie">Interfejs w przeglądarce i API zgodne z OpenAI.</h2>
+      </div>
+      <div class="prose rv">
+        <h3>1. Wbudowany interfejs WebUI</h3>
+        <p>Otwórz przeglądarkę i wejdź na <code>http://127.0.0.1:8080</code>. Dostaniesz: rozmowę z modelem, statystyki na żywo (tokeny/s) oraz ustawienia (temperatura, top-k).</p>
+        <h3>2. Prawdziwa współbieżność</h3>
+        <p>Dzięki continuous batching i fladze <code>--parallel</code> serwer nie blokuje się na jednym zapytaniu. Możesz otworzyć wiele kart w przeglądarce lub wysłać wiele zapytań API jednocześnie — serwer inteligentnie rozdzieli zasoby GPU i przetworzy wszystkie równolegle.</p>
+        <h3>3. API zgodne z OpenAI</h3>
+        <p>llama-server automatycznie udostępnia API zgodne ze standardem OpenAI (endpoint <code>/v1/</code>). Oznacza to, że podłączysz setki narzędzi (LangChain, Open WebUI, skrypty Python) do lokalnego serwera — wystarczy ustawić adres API na <code>http://127.0.0.1:8080/v1/</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 dobre praktyki (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="praktyki">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>06 / Best practices · Dobre praktyki</p>
+        <h2 class="sect-title ws" id="praktyki">VRAM to wszystko, a projekt rozwija się szybko.</h2>
+      </div>
+      <div class="prose rv">
+        <h3>Pamięć VRAM to wszystko</h3>
+        <p>Wydajność zależy od flagi <code>-ngl</code>. Jeśli serwer działa wolno, prawdopodobnie część modelu została przeniesiona do RAM zamiast VRAM.</p>
+        <h3>Aktualizacje</h3>
+        <p>Projekt llama.cpp rozwija się bardzo szybko. Co tydzień uruchamiaj:</p>
+        <pre><code>git pull
+cmake --build build --config Release -j</code></pre>
+        <h3>Dokumentacja</h3>
+        <p>Wszystkie dostępne endpointy (<code>/completion</code>, <code>/chat/completions</code>) znajdziesz w oficjalnej dokumentacji projektu na <a href="https://github.com/ggerganov/llama.cpp">github.com/ggerganov/llama.cpp</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- powiazane szkolenia -->
+  <section class="sect" aria-labelledby="powiazane" style="padding-top:0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>Powiązane szkolenia</p>
+        <h2 class="sect-title sect-title--s ws" id="powiazane">Czytaj dalej w Akademii.</h2>
+      </div>
+      <div class="link-cards rv">
+        {related.map((a) => (
+          <a class="link-card" href={`/${a.slug}`}>
+            <h3>{a.title}</h3>
+            <p>{a.desc}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie własny serwer modeli na infrastrukturze firmy?</h2>
+      <p class="rv">Akademia to materiały. Projekt i wdrożenie lokalnego serwera LLM prowadzimy z Waszym zespołem — od doboru sprzętu po produkcję. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+</Interior>

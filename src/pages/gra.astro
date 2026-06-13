@@ -1,0 +1,253 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="Gra Snake — przerwa od ekranu kodu | SZRON"
+  description="Klasyczny Snake prosto w przeglądarce. Steruj strzałkami lub przyciskami, zjedz jak najwięcej jabłek i pobij swój rekord. Mała przerwa między commitami."
+  eyebrow="Narzędzie · mała przerwa"
+  heading="Snake. Krótka przerwa od ekranu kodu."
+  lead="Klasyczna gra w przeglądarce. Steruj strzałkami na klawiaturze albo przyciskami na ekranie, zbieraj jabłka i pobij własny rekord. Rekord zapisuje się lokalnie u Ciebie — nigdzie go nie wysyłamy."
+>
+  <!-- gra -->
+  <section class="sect" aria-labelledby="game">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>Gra · Steruj strzałkami</p>
+        <h2 class="sect-title sect-title--s ws" id="game">Zjedz jak najwięcej jabłek. Nie wpadnij w ścianę ani we własny ogon.</h2>
+      </div>
+
+      <div class="snake rv">
+        <div class="snake__hud">
+          <div class="snake__scores">
+            <span>Wynik: <strong id="snake-score">0</strong></span>
+            <span>Rekord: <strong id="snake-high">0</strong></span>
+          </div>
+          <button type="button" class="btn btn--accent" id="snake-toggle">Start</button>
+        </div>
+
+        <div class="snake__board">
+          <canvas id="snake-canvas" width="400" height="400" aria-label="Plansza gry Snake"></canvas>
+          <div class="snake__overlay" id="snake-overlay">
+            <p class="snake__overlay-title" id="snake-overlay-title">Naciśnij Start, aby zagrać</p>
+            <p class="snake__overlay-sub" id="snake-overlay-sub">Sterowanie: strzałki lub przyciski poniżej</p>
+          </div>
+        </div>
+
+        <!-- sterowanie dotykowe -->
+        <div class="snake__dpad" aria-label="Sterowanie dotykowe">
+          <button type="button" data-dir="UP" aria-label="W górę">↑</button>
+          <div class="snake__dpad-mid">
+            <button type="button" data-dir="LEFT" aria-label="W lewo">←</button>
+            <button type="button" data-dir="DOWN" aria-label="W dół">↓</button>
+            <button type="button" data-dir="RIGHT" aria-label="W prawo">→</button>
+          </div>
+        </div>
+
+        <p class="snake__hint">Wskazówka: zaplanuj zakręt zanim dojedziesz do krawędzi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- przerwa w pracy (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="przerwa">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>Na marginesie · Po co to</p>
+        <h2 class="sect-title ws" id="przerwa">Najlepsze pomysły przychodzą między commitami.</h2>
+      </div>
+      <p class="sect-lead rv">Krótka przerwa czyści głowę lepiej niż kolejna kawa. Pograj chwilę, a gdy wrócisz do realnych problemów z AI i kodem — pogadajmy.</p>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Kontakt</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Koniec przerwy? Wróćmy do konkretów.</h2>
+      <p class="rv">Jeśli zamiast Snake'a chcesz przyspieszyć swój zespół z AI — umów rozmowę. Konkretne pytania, zero sprzedaży.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .snake { max-width: 30rem; }
+    .snake__hud { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); margin-bottom: var(--space-lg); }
+    .snake__scores { display: flex; gap: var(--space-xl); font-size: var(--text-s); color: var(--color-text-2); }
+    .snake__scores strong { color: var(--color-text); font-variant-numeric: tabular-nums; }
+    .snake__board {
+      position: relative; aspect-ratio: 1; width: 100%;
+      border: 1px solid var(--color-line); border-radius: var(--radius-card);
+      overflow: hidden; background: var(--color-paper-2);
+    }
+    .snake__board canvas { display: block; width: 100%; height: 100%; }
+    .snake__overlay {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center; gap: var(--space-sm);
+      background: var(--color-scrim); color: var(--color-text-inv); padding: var(--space-lg);
+    }
+    .snake__overlay[hidden] { display: none; }
+    .snake__overlay-title { font-family: var(--font-display); font-weight: 600; font-size: var(--text-h4); }
+    .snake__overlay-sub { font-size: var(--text-s); color: var(--color-text-inv-2); }
+    .snake__dpad { margin-top: var(--space-lg); display: grid; justify-items: center; gap: var(--space-2xs); }
+    .snake__dpad-mid { display: flex; gap: var(--space-2xs); }
+    .snake__dpad button {
+      width: 3rem; height: 3rem; font-size: 1.25rem; cursor: pointer;
+      border: 1px solid var(--color-line); border-radius: var(--radius-sm);
+      background: var(--color-paper); color: var(--color-text);
+      transition: background var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out);
+    }
+    .snake__dpad button:hover { border-color: var(--color-accent); }
+    .snake__dpad button:active { background: var(--color-accent-soft); }
+    .snake__hint { margin-top: var(--space-lg); font-size: var(--text-caption); color: var(--color-text-2); }
+  </style>
+
+  <script is:inline>
+    (function () {
+      var GRID = 20;          // 20 x 20, jak w źródle
+      var SPEED = 150;        // ms na ruch, jak w źródle (GAME_SPEED)
+      var canvas = document.getElementById('snake-canvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var cell = canvas.width / GRID;
+
+      // Kolory z tokenów
+      var css = getComputedStyle(document.documentElement);
+      var COLOR_HEAD = css.getPropertyValue('--color-accent').trim() || '#e8762d';
+      var COLOR_BODY = css.getPropertyValue('--color-ink').trim() || '#1d2329';
+      var COLOR_FOOD = css.getPropertyValue('--color-brand').trim() || '#3c56f4';
+
+      var snake, dir, nextDir, food, score, playing, gameOver, loop;
+      var high = parseInt(localStorage.getItem('szron-snake-high') || '0', 10) || 0;
+
+      var scoreOut = document.getElementById('snake-score');
+      var highOut = document.getElementById('snake-high');
+      var toggle = document.getElementById('snake-toggle');
+      var overlay = document.getElementById('snake-overlay');
+      var overlayTitle = document.getElementById('snake-overlay-title');
+      var overlaySub = document.getElementById('snake-overlay-sub');
+
+      highOut.textContent = high;
+
+      function placeFood() {
+        var f;
+        do {
+          f = { x: Math.floor(Math.random() * GRID), y: Math.floor(Math.random() * GRID) };
+        } while (snake.some(function (s) { return s.x === f.x && s.y === f.y; }));
+        return f;
+      }
+
+      function reset() {
+        snake = [{ x: 10, y: 10 }];
+        dir = 'RIGHT'; nextDir = 'RIGHT';
+        food = placeFood();
+        score = 0; gameOver = false;
+        scoreOut.textContent = '0';
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = COLOR_FOOD;
+        roundRect(food.x * cell, food.y * cell, cell, true);
+        snake.forEach(function (s, i) {
+          ctx.fillStyle = i === 0 ? COLOR_HEAD : COLOR_BODY;
+          roundRect(s.x * cell, s.y * cell, cell, false);
+        });
+      }
+
+      function roundRect(x, y, size, circle) {
+        var pad = 1, r = circle ? (size - pad * 2) / 2 : 4;
+        var w = size - pad * 2;
+        ctx.beginPath();
+        if (circle) {
+          ctx.arc(x + size / 2, y + size / 2, r, 0, Math.PI * 2);
+        } else if (ctx.roundRect) {
+          ctx.roundRect(x + pad, y + pad, w, w, r);
+        } else {
+          ctx.rect(x + pad, y + pad, w, w);
+        }
+        ctx.fill();
+      }
+
+      function step() {
+        if (!playing || gameOver) return;
+        dir = nextDir;
+        var head = snake[0];
+        var nx = head.x, ny = head.y;
+        if (dir === 'UP') ny--;
+        else if (dir === 'DOWN') ny++;
+        else if (dir === 'LEFT') nx--;
+        else if (dir === 'RIGHT') nx++;
+
+        // kolizja ze ścianą
+        if (nx < 0 || nx >= GRID || ny < 0 || ny >= GRID) return end();
+        // kolizja z ogonem
+        if (snake.some(function (s) { return s.x === nx && s.y === ny; })) return end();
+
+        var newHead = { x: nx, y: ny };
+        snake.unshift(newHead);
+
+        if (nx === food.x && ny === food.y) {
+          score += 10;
+          scoreOut.textContent = score;
+          food = placeFood();
+        } else {
+          snake.pop();
+        }
+        draw();
+      }
+
+      function start() {
+        reset();
+        playing = true;
+        overlay.hidden = true;
+        toggle.textContent = 'Restart';
+        clearInterval(loop);
+        loop = setInterval(step, SPEED);
+        draw();
+      }
+
+      function end() {
+        gameOver = true; playing = false;
+        clearInterval(loop);
+        if (score > high) { high = score; highOut.textContent = high; localStorage.setItem('szron-snake-high', String(high)); }
+        overlayTitle.textContent = 'Koniec gry · wynik ' + score;
+        overlaySub.textContent = (score > 0 && score === high) ? 'Nowy rekord! Naciśnij Start, aby zagrać ponownie.' : 'Naciśnij Start, aby zagrać ponownie.';
+        overlay.hidden = false;
+      }
+
+      function setDir(d) {
+        if (!playing) return;
+        if (d === 'UP' && dir !== 'DOWN') nextDir = 'UP';
+        else if (d === 'DOWN' && dir !== 'UP') nextDir = 'DOWN';
+        else if (d === 'LEFT' && dir !== 'RIGHT') nextDir = 'LEFT';
+        else if (d === 'RIGHT' && dir !== 'LEFT') nextDir = 'RIGHT';
+      }
+
+      toggle.addEventListener('click', start);
+
+      document.addEventListener('keydown', function (e) {
+        var map = { ArrowUp: 'UP', ArrowDown: 'DOWN', ArrowLeft: 'LEFT', ArrowRight: 'RIGHT' };
+        if (map[e.key]) {
+          if (playing) e.preventDefault();
+          setDir(map[e.key]);
+        }
+      });
+
+      Array.prototype.forEach.call(document.querySelectorAll('.snake__dpad button'), function (b) {
+        b.addEventListener('click', function () { setDir(b.getAttribute('data-dir')); });
+      });
+
+      // stan początkowy: pusta plansza z jednym segmentem
+      reset();
+      draw();
+    })();
+  </script>
+</Interior>

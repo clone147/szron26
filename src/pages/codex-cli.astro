@@ -1,0 +1,226 @@
+---
+import Interior from '../layouts/Interior.astro';
+import { akademia } from '../data/akademia.mjs';
+const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mcp'].includes(a.slug));
+---
+<Interior
+  title="OpenAI Codex CLI — instalacja, konfiguracja i komendy agenta | Akademia SZRON"
+  description="Przewodnik po OpenAI Codex CLI: instalacja przez npm, plik config.toml, tryby zatwierdzania, komendy sesji, MCP i kontrola przeglądarki. Autonomiczny agent kodujący w terminalu."
+  eyebrow="Akademia · Narzędzia agentowe"
+  heading="OpenAI Codex CLI — autonomiczny agent w terminalu."
+  lead="Codex CLI to open-source agent kodujący napędzany modelem o3: buduje projekty od zera, refaktoryzuje, debuguje i integruje się z MCP. Poniżej instalacja, plik konfiguracyjny, tryby zatwierdzania i komendy, które realnie wykorzystujemy."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>Model o3</strong><span>GA od kwietnia 2025</span></div>
+        <div><strong>Open-source</strong><span>licencja Apache 2.0</span></div>
+        <div><strong>128K tokenów</strong><span>kontekstu w sesji</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 czym jest -->
+  <section class="sect" aria-labelledby="czym">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Wprowadzenie · Czym jest</p>
+        <h2 class="sect-title sect-title--s ws" id="czym">Agent, który prowadzi projekt od zera po produkcję.</h2>
+      </div>
+      <div class="prose rv">
+        <p>OpenAI Codex CLI to zaawansowane narzędzie agentowe do autonomicznego kodowania w terminalu, napędzane modelem o3 i dedykowanymi modelami kodującymi. Jest open-source (Apache 2.0), działa na macOS, Linux i Windows przez WSL. Wersja GA z kwietnia 2025 dodała pełne wsparcie macOS i Linux, SDK TypeScript oraz integrację z serwerami MCP.</p>
+        <p>Kluczowe możliwości:</p>
+        <ul>
+          <li>Budowanie projektów od zera.</li>
+          <li>Refaktoryzacja i debugowanie kodu.</li>
+          <li>Quality gates na żądanie.</li>
+          <li>Integracja z MCP (Model Context Protocol).</li>
+          <li>Dynamiczne alokowanie czasu „myślenia" — od sekund do długich sesji, zależnie od złożoności zadania.</li>
+        </ul>
+        <div class="callout">
+          <p><strong>Uwaga historyczna:</strong> oryginalne Codex API zostało zamknięte w marcu 2023. Obecny Codex CLI (2025) to całkowicie nowy produkt o innych możliwościach.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 model (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="model">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Model · o3 (2025)</p>
+        <h2 class="sect-title ws" id="model">Model zoptymalizowany pod inżynierię oprogramowania.</h2>
+      </div>
+      <div class="prose rv">
+        <ul>
+          <li>Zoptymalizowany pod kątem długich sesji kodowania.</li>
+          <li>Dedykowane modele Codex dostrojone do zadań inżynieryjnych.</li>
+          <li>Wspiera kontekst do 128K tokenów.</li>
+        </ul>
+        <p>Model dynamicznie alokuje czas „myślenia" i automatycznie dostosowuje zasoby do skomplikowania problemu — od krótkich odpowiedzi po długie sesje nad złożonym zadaniem.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 instalacja -->
+  <section class="sect" aria-labelledby="instalacja">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Instalacja · macOS, Linux, WSL</p>
+        <h2 class="sect-title sect-title--s ws" id="instalacja">Node.js 20+, a potem jedna komenda npm.</h2>
+      </div>
+      <div class="prose rv">
+        <h3>Wymagania systemowe</h3>
+        <ul>
+          <li><strong>Node.js 20+</strong> — wymagana nowsza wersja.</li>
+          <li><strong>npm</strong> lub <strong>npx</strong> (instalowane razem z Node.js).</li>
+          <li><strong>System:</strong> macOS, Linux lub Windows (przez WSL).</li>
+          <li><strong>Git 2.23+</strong>, min. 4 GB RAM (8 GB rekomendowane).</li>
+        </ul>
+
+        <h3>1. Instalacja Node.js</h3>
+        <p>Windows: pobierz instalator Node.js 22 ze strony nodejs.org. Linux (Ubuntu/Debian):</p>
+        <pre><code>curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs</code></pre>
+        <p>macOS (Homebrew):</p>
+        <pre><code>brew install node</code></pre>
+        <p>Po instalacji zweryfikuj wersję: <code>node --version</code>.</p>
+
+        <h3>2. Instalacja Codex CLI</h3>
+        <pre><code>npm install -g &#64;openai/codex</code></pre>
+        <p>Po instalacji komenda <code>codex</code> działa z dowolnego miejsca w systemie. Paczka <code>&#64;openai/codex</code> jest aktywnie rozwijana.</p>
+        <div class="callout">
+          <p><strong>Windows — eksperymentalnie:</strong> natywne wsparcie Windows jest wciąż eksperymentalne. Zalecany WSL: uruchom <code>wsl --install</code>, a następnie zainstaluj Node.js i Codex CLI wewnątrz WSL.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 konfiguracja (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="konfiguracja">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>04 / Konfiguracja · config.toml</p>
+        <h2 class="sect-title ws" id="konfiguracja">Jeden plik TOML: model, tryb i serwery MCP.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Plik konfiguracyjny: <code>~/.codex/config.toml</code>.</p>
+        <h3>1. Domyślny model</h3>
+        <pre><code>[model]
+default = "codex-mini-latest"  # lub "o3-mini"</code></pre>
+        <h3>2. Tryby zatwierdzania</h3>
+        <pre><code>[approvals]
+mode = "suggest"  # "suggest", "auto-edit", "full-auto"</code></pre>
+        <ul>
+          <li><strong>suggest</strong> — domyślny: pyta o pozwolenie przy każdej akcji.</li>
+          <li><strong>auto-edit</strong> — automatyczne tworzenie i edycja plików.</li>
+          <li><strong>full-auto</strong> — pełna automatyzacja (wykonywanie wszystkich poleceń).</li>
+        </ul>
+        <h3>3. Serwery MCP</h3>
+        <pre><code>[[mcp.servers]]
+type = "remote"
+url = "https://example.com/mcp"
+
+[[mcp.servers]]
+type = "local"
+command = "/path/to/mcp-server"</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 komendy -->
+  <section class="sect" aria-labelledby="komendy">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>05 / Komendy · Uruchamianie i sesja</p>
+        <h2 class="sect-title sect-title--s ws" id="komendy">Od trybu interaktywnego po konkretny prompt.</h2>
+      </div>
+      <div class="prose rv">
+        <h3>Uruchamianie</h3>
+        <pre><code>codex                                  # tryb interaktywny
+codex "Zbuduj aplikacje todo w React"  # z konkretnym promptem
+codex -i screenshot.png "Wyjasnij ten blad"  # z zalacznikiem obrazu
+codex resume                           # wznowienie sesji</code></pre>
+        <h3>Komendy wbudowane w sesji</h3>
+        <table>
+          <thead><tr><th>Komenda</th><th>Działanie</th></tr></thead>
+          <tbody>
+            <tr><td><code>/init</code></td><td>Tworzy AGENTS.md z instrukcjami projektu.</td></tr>
+            <tr><td><code>/status</code></td><td>Pokazuje konfigurację i zużycie tokenów.</td></tr>
+            <tr><td><code>/diff</code></td><td>Pokazuje git diff bieżących zmian.</td></tr>
+            <tr><td><code>/model</code></td><td>Przełącza model.</td></tr>
+            <tr><td><code>/review</code></td><td>Quality check na żądanie.</td></tr>
+          </tbody>
+        </table>
+        <h3>Praktyczne przykłady</h3>
+        <p>Budowanie strony ze screenshota:</p>
+        <pre><code>codex -i wireframe.png "Zbuduj responsywna strone landing page zgodnie z tym wireframem, uzyj Tailwind CSS"</code></pre>
+        <p>Debugowanie i testy:</p>
+        <pre><code>codex "Znajdz wszystkie memory leaks w tym projekcie, napraw je i dodaj unit testy"</code></pre>
+        <p>Duża refaktoryzacja:</p>
+        <pre><code>codex "Zrefaktoryzuj caly projekt aby uzywac TypeScript strict mode, zaktualizuj wszystkie komponenty i testy"</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 MCP (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="mcp">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>06 / MCP · Kontrola przeglądarki</p>
+        <h2 class="sect-title ws" id="mcp">ChromeDevTools MCP — Codex steruje Chrome.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Model Context Protocol to otwarty standard stworzony przez Anthropic, który pozwala agentom AI na bezpieczną integrację z narzędziami zewnętrznymi. ChromeDevTools MCP daje Codex pełną kontrolę przeglądarki Chrome — nawigację, wypełnianie formularzy, testowanie UI, screenshoty, debugowanie i wykonywanie JavaScript.</p>
+        <h3>Instalacja MCP</h3>
+        <pre><code>codex mcp add chrome-devtools -- npx chrome-devtools-mcp&#64;latest</code></pre>
+        <p>Konfiguracja zapisze się w <code>~/.codex/config.toml</code>. Alternatywnie dodaj ją ręcznie:</p>
+        <pre><code>[mcp_servers.chrome-devtools]
+command = "npx"
+args = ["chrome-devtools-mcp&#64;latest"]</code></pre>
+        <p>Po instalacji możesz dawać komendy w języku naturalnym, np.:</p>
+        <pre><code>Otworz localhost:3000, sprawdz czy sa bledy w konsoli i napraw je w kodzie</code></pre>
+        <div class="callout">
+          <p><strong>Podgląd:</strong> komenda <code>/status</code> w sesji Codex pokazuje wszystkie zainstalowane serwery MCP i ich status. Pełną listę serwerów MCP znajdziesz na <a href="https://github.com/modelcontextprotocol/servers">github.com/modelcontextprotocol/servers</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- powiazane szkolenia -->
+  <section class="sect" aria-labelledby="powiazane" style="padding-top:0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>Powiązane szkolenia</p>
+        <h2 class="sect-title sect-title--s ws" id="powiazane">Czytaj dalej w Akademii.</h2>
+      </div>
+      <div class="link-cards rv">
+        {related.map((a) => (
+          <a class="link-card" href={`/${a.slug}`}>
+            <h3>{a.title}</h3>
+            <p>{a.desc}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie tak pracować całym zespołem?</h2>
+      <p class="rv">Akademia to materiały. Wdrożenie to kwartał na Waszym kodzie — z pomiarem efektu w DEVLens. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+</Interior>

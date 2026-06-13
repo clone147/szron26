@@ -1,0 +1,137 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="Claude Code i Git — automatyczne commity i workflow agentowy | SZRON"
+  description="Jak Claude Code prowadzi kontrolę wersji za Ciebie: automatyczne commity, porządkowanie historii, rozwiązywanie konfliktów, Pull Requesty i bisect. Praktyczne komendy i pułapki."
+  eyebrow="Akademia · Claude Code i Git"
+  heading="Claude Code i Git: kontrola wersji prowadzona przez agenta."
+  lead="Claude Code to nie tylko asystent do pisania kodu — to także ekspert od Gita, który ogarnia cały workflow kontroli wersji. Od automatycznych commitów, przez porządkowanie historii, po rozwiązywanie konfliktów i tworzenie Pull Requestów — w naturalnym języku."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>Auto-commity</strong><span>logiczne, sensowne komunikaty podczas pracy</span></div>
+        <div><strong>Porządek w historii</strong><span>scalanie i opisy bez interaktywnego rebase</span></div>
+        <div><strong>Konflikty i PR-y</strong><span>scalanie zmian i opisy zmian z kontekstu</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 treść techniczna -->
+  <section class="sect" aria-labelledby="intro">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Workflow · Git z agentem</p>
+        <h2 class="sect-title sect-title--s ws" id="intro">Jak Claude Code ogarnia Git za Ciebie.</h2>
+      </div>
+
+      <div class="prose rv">
+        <p>Claude Code potrafi zarządzać całym przepływem kontroli wersji: tworzyć commity, sprzątać historię, rozwiązywać konflikty, przygotowywać Pull Requesty i znajdować commit, który wprowadził błąd. Najczęściej wystarczy mówić naturalnie, na przykład „posprzątaj commity" albo „zrób porządek przed code review".</p>
+
+        <h2>Automatyczne commitowanie</h2>
+        <p>Claude może commitować zmiany w trakcie pracy nad kodem. Wystarczy wspomnieć o tym w promptcie — agent sam podzieli pracę na logiczne commity i napisze sensowne komunikaty.</p>
+        <pre><code># Claude robi commity podczas pracy
+claude "dodaj system autoryzacji i zacommituj kazda czesc osobno"
+
+# Claude sam:
+# - tworzy pliki
+# - wykonuje git add
+# - pisze sensowne komunikaty commitow
+# - dzieli prace na logiczne commity</code></pre>
+        <div class="callout"><p><strong>Wskazówka:</strong> Claude automatycznie wykrywa konwencję commitów w projekcie (np. Conventional Commits czy commity z emoji) na podstawie historii i jej przestrzega. Konwencje możesz też opisać wprost w pliku CLAUDE.md.</p></div>
+
+        <h2>Przegląd i naprawa historii</h2>
+        <p>Agent analizuje historię commitów i porządkuje ją — łączy powiązane commity, poprawia opisy, reorganizuje zmiany.</p>
+        <pre><code># Scalenie powiazanych commitow
+claude "przejrzyj ostatnie 5 commitow i polacz te, ktore dotycza tego samego"
+
+# Poprawa opisow
+claude "popraw nazwy commitow w tej galezi, zeby byly bardziej opisowe"</code></pre>
+        <div class="callout"><p><strong>Aktualizacja:</strong> Claude Code nie korzysta z interaktywnego trybu <code>git rebase -i</code> — zamiast tego wykonuje sekwencję nieinteraktywnych poleceń Gita, by osiągnąć ten sam efekt.</p></div>
+
+        <h2>Rozwiązywanie konfliktów</h2>
+        <p>Przy scalaniu z konfliktami Claude analizuje obie wersje kodu i proponuje rozwiązanie, które zachowuje logikę biznesową z obu gałęzi.</p>
+        <pre><code># 1. Rozpocznij scalanie
+git merge main
+
+# 2. Popros agenta o rozwiazanie konfliktow
+claude "rozwiaz konflikty w plikach i zachowaj najlepsze rozwiazania z obu wersji"</code></pre>
+        <div class="callout"><p><strong>Wskazówka:</strong> Możesz wskazać priorytet, np. „zachowaj zmiany z gałęzi feature". Agent uwzględni go przy łączeniu.</p></div>
+
+        <h2>Operacje zaawansowane</h2>
+        <h3>Tworzenie Pull Requestów</h3>
+        <p>Claude analizuje commity i generuje opis PR z listą zmian, informacją o testach i breaking changes.</p>
+        <pre><code>claude "stworz PR z opisem zmian"</code></pre>
+
+        <h3>Git bisect — szukanie commita z błędem</h3>
+        <p>Agent pomaga przeszukać historię, by znaleźć commit, który wprowadził regresję.</p>
+        <pre><code># Szukanie blednego commita
+git bisect start
+claude "pomoz mi znalezc commit, ktory wprowadzil blad w autoryzacji"</code></pre>
+
+        <h3>Szybkie operacje w naturalnym języku</h3>
+        <ul>
+          <li>„sprawdź, czy nie zepsułem historii" — weryfikacja czystości commitów.</li>
+          <li>„cofnij zmiany, które psują testy" — znalezienie i cofnięcie problematycznych commitów.</li>
+          <li>„wydziel zmiany z User.js do osobnego commita" — reorganizacja historii.</li>
+          <li>„zrób porządek przed code review" — kompleksowe czyszczenie gałęzi.</li>
+        </ul>
+
+        <h3>Przykład pełnej sesji</h3>
+        <pre><code># Start projektu
+claude "zainicjuj nowy projekt Node.js z Express, skonfiguruj Git i zrob pierwszy commit"
+
+# Rozwoj funkcji
+claude "dodaj endpoint /api/users z CRUD, commituj kazda operacje osobno"
+
+# Refactoring
+claude "zrefaktoruj kod na bardziej modularny i uporzadkuj historie commitow"
+
+# Przygotowanie do scalenia
+claude "sprawdz, czy galaz jest gotowa do scalenia, wyczysc historie jesli trzeba"</code></pre>
+
+        <h2>Pro tipy</h2>
+        <ul>
+          <li><strong>Mów naturalnie.</strong> Claude rozumie kontekst projektu — działają zwroty typu „posprzątaj ten bałagan w commitach".</li>
+          <li><strong>CLAUDE.md dla konwencji Git.</strong> Dodaj sekcję z konwencjami commitów — agent automatycznie będzie ich przestrzegał.</li>
+          <li><strong>Claude i git hooks.</strong> Agent potrafi tworzyć i edytować git hooks: automatyczne formatowanie, testy przed commitem, sprawdzanie konwencji.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 powiązane szkolenia (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="powiazane">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Akademia · Czytaj dalej</p>
+        <h2 class="sect-title sect-title--s ws" id="powiazane">Powiązane szkolenia.</h2>
+      </div>
+      <div class="link-cards rv">
+        <a class="link-card" href="/claude-code"><h3>Claude Code</h3><p>Instalacja, poziomy myślenia, workflow agentowy od podstaw.</p></a>
+        <a class="link-card" href="/serwery-mcp"><h3>Serwery MCP</h3><p>Chrome DevTools MCP i ekosystem serwerów MCP w codziennej pracy.</p></a>
+        <a class="link-card" href="/tips-and-tricks"><h3>Tips &amp; Tricks</h3><p>Praktyki, skróty i wzorce, które realnie przyspieszają pracę z AI.</p></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie, żeby tak pracował cały Wasz zespół?</h2>
+      <p class="rv">Akademia to materiały. Wdrożenie to kwartał na Waszym kodzie — z pomiarem efektu w DEVLens. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+</Interior>

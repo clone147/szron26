@@ -1,0 +1,269 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="Zabezpieczanie Claude Code przed wyciekiem — deny rules, sandbox, hooki | Akademia SZRON"
+  description="Jak chronić dane firmowe, tokeny API i sekrety przy pracy z Claude Code. Co działa, co nie: deny rules w settings.json, sandbox OS-level, PreToolUse hooki i checklista nowego projektu."
+  eyebrow="Akademia · Bezpieczeństwo AI"
+  heading="Zabezpieczanie Claude Code przed wyciekiem danych."
+  lead="Praca z agentem na firmowym kodzie wymaga warstw ochrony. Pokazujemy, co realnie działa, a co jest tylko sugestią dla modelu — i jak złożyć deny rules, sandbox oraz hooki w jedną, niezawodną konfigurację."
+  headingSmall={true}
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>Twarde blokady</strong><span>deny rules egzekwowane runtime</span></div>
+        <div><strong>Sandbox OS-level</strong><span>izolacja obejmująca subprocesy</span></div>
+        <div><strong>Hooki PreToolUse</strong><span>skrypt przed każdą operacją</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 co działa -->
+  <section class="sect" aria-labelledby="tldr">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>01 / TL;DR · Co działa, co nie</p>
+        <h2 id="tldr">Macierz skuteczności warstw zabezpieczeń.</h2>
+        <table>
+          <thead><tr><th scope="col">Warstwa</th><th scope="col">Typ</th><th scope="col">Skuteczność</th></tr></thead>
+          <tbody>
+            <tr><td>Instrukcje w CLAUDE.md</td><td>Miękka</td><td>Niska — model może zignorować</td></tr>
+            <tr><td>.claudeignore / .gitignore</td><td>Miękka</td><td><strong>Zerowa — pliki ignorowane przez agenta</strong></td></tr>
+            <tr><td>settings.json — deny rules</td><td>Twarda</td><td>Wysoka, ale znane bypassy</td></tr>
+            <tr><td>Sandbox mode</td><td>OS-level</td><td>Wysoka (Linux/WSL2)</td></tr>
+            <tr><td>PreToolUse hooks</td><td>Deterministyczna</td><td><strong>Najwyższa — exit 2 = twarda blokada</strong></td></tr>
+          </tbody>
+        </table>
+        <div class="callout">
+          <p><strong>Uwaga:</strong> nie polegaj wyłącznie na deny rules. Udokumentowano bypassy (m.in. system reminders ujawniające zawartość zablokowanych plików oraz niespójne egzekwowanie reguł dla <code>.env</code>). Jedyne niezawodne zabezpieczenie to połączenie: sandbox + deny rules + hooki.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 deny rules (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="deny">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>02 / Warstwa 1 · Deny rules</p>
+        <h2 id="deny">settings.json — twarde blokady odczytu i zapisu.</h2>
+        <p>Blokada jest aplikowana <strong>przed</strong> wywołaniem narzędzia, więc agent nie widzi zawartości. W hierarchii <code>deny</code> zawsze wygrywa nad <code>allow</code> i <code>ask</code>. Lokalizacje pliku:</p>
+        <table>
+          <thead><tr><th scope="col">Zakres</th><th scope="col">Linux / macOS</th><th scope="col">Windows</th></tr></thead>
+          <tbody>
+            <tr><td>Globalnie</td><td><code>~/.claude/settings.json</code></td><td><code>%APPDATA%\Claude\settings.json</code></td></tr>
+            <tr><td>Projekt (współdzielony)</td><td><code>.claude/settings.json</code></td><td><code>.claude\settings.json</code></td></tr>
+            <tr><td>Projekt (lokalny)</td><td><code>.claude/settings.local.json</code></td><td><code>.claude\settings.local.json</code></td></tr>
+          </tbody>
+        </table>
+        <h3>Reguły uniwersalne</h3>
+        <pre><code>&#123;
+  "permissions": &#123;
+    "deny": [
+      "Read(./.env)", "Read(./.env.*)",
+      "Read(./secrets/**)", "Read(./config/credentials.*)",
+      "Read(**/*.pem)", "Read(**/*.key)",
+      "Bash(ping *)", "Bash(nslookup *)"
+    ]
+  &#125;,
+  "cleanupPeriodDays": 7
+&#125;</code></pre>
+        <div class="callout">
+          <p><strong>Dlaczego blokować ping i nslookup:</strong> CVE-2025-55284 pokazał eksfiltrację sekretów przez zapytania DNS, a te komendy bywały auto-zatwierdzane. Deny rules blokują narzędzia agenta, <strong>nie blokują sieci</strong> — dlatego zawsze dorzuć też blokadę <code>curl</code> i <code>wget</code>.</p>
+        </div>
+        <h3>Reguły specyficzne dla systemu</h3>
+        <p>Na Windows narzędzie nadal nazywa się <code>Bash</code>, ale pod spodem uruchamia PowerShell — blokuj komendy właściwe dla platformy:</p>
+        <pre><code>// Linux / macOS
+"Read(~/.ssh/**)", "Read(~/.aws/**)", "Read(~/.kube/**)",
+"Bash(curl *)", "Bash(wget *)", "Bash(nc *)"
+
+// Windows (PowerShell pod Bash)
+"Bash(curl *)", "Bash(Invoke-WebRequest *)",
+"Bash(Invoke-RestMethod *)", "Bash(iwr *)", "Bash(nc *)"</code></pre>
+        <p>W ścieżkach Windows w JSON ukośniki wsteczne muszą być podwojone.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 sandbox -->
+  <section class="sect" aria-labelledby="sandbox">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>03 / Warstwa 1b · Sandbox mode</p>
+        <h2 id="sandbox">Izolacja OS-level — obejmuje też subprocesy.</h2>
+        <p>Sandbox to najsilniejsza praktyczna ochrona dla komend powłoki: izoluje narzędzie <code>Bash</code> na poziomie systemu operacyjnego, łącznie z procesami potomnymi. W testach Anthropic zredukował liczbę monitów o ok. 84%.</p>
+        <table>
+          <thead><tr><th scope="col">System</th><th scope="col">Technologia</th><th scope="col">Status</th></tr></thead>
+          <tbody>
+            <tr><td>Linux</td><td>bubblewrap</td><td>Pełne wsparcie</td></tr>
+            <tr><td>WSL2</td><td>bubblewrap</td><td>Pełne wsparcie</td></tr>
+            <tr><td>Windows natywny</td><td>—</td><td><strong>Nieobsługiwany (planowane, brak ETA)</strong></td></tr>
+          </tbody>
+        </table>
+        <h3>Konfiguracja</h3>
+        <pre><code>&#123;
+  "sandbox": &#123;
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "allowUnsandboxedCommands": false,
+    "network": &#123;
+      "allowedDomains": ["github.com", "*.npmjs.org"]
+    &#125;
+  &#125;
+&#125;</code></pre>
+        <div class="callout">
+          <p><strong>Ograniczenia:</strong> sandbox dotyczy tylko narzędzia <code>Bash</code> — Read, Write, Edit i WebFetch są poza nim (rządzi nimi <code>permissions.deny</code>). Ustaw <code>allowUnsandboxedCommands: false</code>, inaczej agent może sam wyłączyć sandbox, gdy komenda zawiedzie. Na natywnym Windows używaj WSL2 (<code>sudo apt-get install bubblewrap socat</code>) albo Dockera.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 hooki (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="hooks">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>04 / Warstwa 2 · PreToolUse hook</p>
+        <h2 id="hooks">Skrypt przed każdą operacją — wykrywa sekrety zanim trafią do pliku.</h2>
+        <p>Hook to skrypt powłoki uruchamiany przed wybranymi narzędziami. Kod wyjścia decyduje, co się stanie:</p>
+        <ul>
+          <li><strong>exit 0</strong> — operacja przechodzi normalnie.</li>
+          <li><strong>exit 1</strong> — błąd hooka (operacja może przejść).</li>
+          <li><strong>exit 2</strong> — twarda blokada: operacja anulowana, agent widzi komunikat.</li>
+        </ul>
+        <h3>Rejestracja hooka skanującego Write i Edit</h3>
+        <pre><code>&#123;
+  "hooks": &#123;
+    "PreToolUse": [
+      &#123;
+        "matcher": "Write|Edit",
+        "hooks": [
+          &#123; "type": "command", "command": ".claude/hooks/detect-secrets.sh" &#125;
+        ]
+      &#125;
+    ]
+  &#125;
+&#125;</code></pre>
+        <p>Skrypt skanuje generowaną treść pod kątem wzorców sekretów (klucze AWS, tokeny GitHub, klucze Stripe, hasła, connection stringi). Instalacja:</p>
+        <pre><code>mkdir -p .claude/hooks
+# skopiuj detect-secrets.sh do .claude/hooks/
+chmod +x .claude/hooks/detect-secrets.sh</code></pre>
+        <h3>PostToolUse — audit log komend Bash</h3>
+        <pre><code>// Linux — dopisuje kazda komende do logu
+"PostToolUse": [&#123;
+  "matcher": "Bash",
+  "hooks": [&#123; "type": "command",
+    "command": "jq -r '.tool_input.command' >> ~/.claude/command-audit-log.txt" &#125;]
+&#125;]</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 CLAUDE.md i .env.example -->
+  <section class="sect" aria-labelledby="miekkie">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>05 / Warstwy 3 i 4 · Warstwy miękkie</p>
+        <h2 id="miekkie">CLAUDE.md i .env.example — uzupełniają, nie zastępują.</h2>
+        <p>Instrukcje w <code>CLAUDE.md</code> to warstwa miękka — agent może je zignorować, więc nie traktuj ich jak zabezpieczenia. Mimo to warto je dodać jako pierwszą linię świadomości:</p>
+        <pre><code>## Bezpieczenstwo — sekrety i hasla
+- NIGDY nie umieszczaj hasel, tokenow i kluczy w kodzie
+- Uzywaj zmiennych srodowiskowych: process.env.SECRET_KEY
+- Nie czytaj pliku .env, nie echo-uj sekretow na konsole</code></pre>
+        <p>Plik <code>.env</code> z prawdziwymi sekretami <strong>nigdy</strong> nie trafia do repozytorium. Zamiast niego commituj <code>.env.example</code> z taką samą strukturą, ale z placeholderami:</p>
+        <pre><code># .env.example — commituj do repo
+DATABASE_URL=postgresql://user:password@localhost/mydb
+STRIPE_SECRET_KEY=sk_live_your_key_here
+GITHUB_TOKEN=ghp_your_token_here
+
+# .gitignore — zawsze
+.env
+.env.local
+*.pem
+*.key</code></pre>
+        <p>Nawet jeśli agent odczyta <code>.env.example</code>, prawdziwe sekrety nie wyciekną.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 audit + checklist (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="checklist">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>06 / Wdrożenie · Audit i checklista</p>
+        <h2 id="checklist">Self-audit prompt i checklista nowego projektu.</h2>
+        <p>Wklej ten prompt, gdy chcesz sprawdzić projekt pod kątem bezpieczeństwa:</p>
+        <pre><code>Zrob audyt bezpieczenstwa tego projektu. Znajdz i zgłos:
+1. Zahardkodowane hasla, klucze API, tokeny w kodzie
+2. Sekrety w komentarzach
+3. Slabe hasla (mniej niz 12 znakow, slowa ze slownika)
+4. Pliki .env przypadkiem zacommitowane (sprawdz historie git)
+5. Connection stringi z osadzonymi danymi logowania
+6. Klucze prywatne i certyfikaty w repozytorium
+7. Dane wrazliwe w logach
+
+Dla kazdego znaleziska: plik, numer linii, waga, rekomendacja.
+NIE wypisuj prawdziwych wartosci sekretow — tylko wskaz ich obecnosc.</code></pre>
+        <h3>Checklista — nowy projekt z Claude Code</h3>
+        <ul>
+          <li><code>.claude/settings.json</code> z deny rules — dodaj <code>ping</code> i <code>nslookup</code> (CVE-2025-55284).</li>
+          <li>Sandbox z <code>allowUnsandboxedCommands: false</code> (Linux/WSL2); na natywnym Windows: deny rules + hooki.</li>
+          <li>Hook <code>detect-secrets</code> zainstalowany i wykonywalny.</li>
+          <li><code>.env</code> w <code>.gitignore</code>, a w repo tylko <code>.env.example</code> z placeholderami.</li>
+          <li>Sprawdź historię: <code>git log --all --full-history -- .env</code></li>
+          <li>Nigdy nie uruchamiaj agenta jako root, sudo ani Administrator.</li>
+          <li><code>cleanupPeriodDays: 7</code> w settings.json.</li>
+        </ul>
+        <h3>Test, czy blokady działają</h3>
+        <pre><code># Zapytaj agenta: "pokaz zawartosc pliku .env"
+# Oczekiwane: odmowa z powodu uprawnien
+
+# Zapytaj: "zapisz do app.py: password = 'test123abc'"
+# Oczekiwane: operacja zablokowana przez hook</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- powiązane szkolenia -->
+  <section class="sect" aria-labelledby="powiazane">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>Powiązane szkolenia</p>
+        <h2 class="sect-title sect-title--s ws" id="powiazane">Kolejne kroki w Akademii.</h2>
+      </div>
+      <div class="link-cards rv">
+        <a class="link-card" href="/claude-code">
+          <h3>Claude Code</h3>
+          <p>Instalacja, poziomy myślenia i workflow agentowy od podstaw.</p>
+        </a>
+        <a class="link-card" href="/serwery-mcp">
+          <h3>Serwery MCP</h3>
+          <p>Łączenie agenta z bazami, API i narzędziami — i jak robić to bezpiecznie.</p>
+        </a>
+        <a class="link-card" href="/tips-and-tricks">
+          <h3>Tips &amp; Tricks</h3>
+          <p>Praktyki i skróty, w tym świadome zarządzanie uprawnieniami i kontekstem.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie, żeby cały zespół pracował z AI bezpiecznie?</h2>
+      <p class="rv">Skonfigurujemy warstwy ochrony na Waszym repozytorium i wdrożymy je w zespole. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+</Interior>

@@ -1,0 +1,132 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="AI w sektorze regulowanym — obronność, płatności, R&D | SZRON"
+  description="Wdrażamy AI w sektorach regulowanych: obronność, systemy płatnicze, R&D. Lokalne modele AI, air-gapped deployments, NDA przed startem. PCI-DSS, ITAR, AI Act — bez kompromisów."
+  eyebrow="Sektor regulowany · lokalnie i air-gapped"
+  heading="AI w sektorach z wymogami compliance — obronność, płatności, R&D."
+  lead="Kod nie opuszcza Waszej infrastruktury. NDA podpisujemy przed startem. Lokalne modele AI — zero danych w chmurze."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>NDA przed startem</strong><span>lokalne modele AI, air-gapped deployments</span></div>
+        <div><strong>Zero danych w chmurze</strong><span>kod nie opuszcza Waszej infrastruktury</span></div>
+        <div><strong>AI Act i NIS2</strong><span>compliant — 25 lat doświadczenia</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 światy -->
+  <section class="sect" aria-labelledby="swiaty">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Segmenty · Trzy światy, jedno podejście</p>
+        <h2 class="sect-title sect-title--s ws" id="swiaty">Trzy światy, jedno podejście.</h2>
+      </div>
+      <div class="grid-cards">
+        <article class="card-tile rv">
+          <p class="eyebrow">01 / Obronność</p>
+          <h3>Obronność i automotive.</h3>
+          <p>Systemy embedded, gdzie wyciek kodu to ryzyko. Środowiska air-gapped, świadomość ITAR/EAR, AUTOSAR, MISRA, DO-178B. Pracujemy na Waszym sprzęcie, z Waszymi ograniczeniami.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.1s">
+          <p class="eyebrow">02 / Płatności</p>
+          <h3>Systemy płatnicze i POS.</h3>
+          <p>Terminale, systemy fiskalne, przetwarzanie transakcji. PCI-DSS, certyfikacja EMV. AI przyspiesza development bez naruszania standardów bezpieczeństwa.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.2s">
+          <p class="eyebrow">03 / R&D</p>
+          <h3>R&D, uczelnie, PCB, EMS.</h3>
+          <p>Małe zespoły R&D, gdzie jeden programista z AI zastępuje 3–4-osobowy team. Granty, reprodukowalność wyników, automatyzacja projektowania PCB, tooling EMS.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 case studies (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="cases">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Realizacje · Sektory regulowane</p>
+        <h2 class="sect-title ws" id="cases">Case studies z sektorów regulowanych.</h2>
+      </div>
+      <table class="results-table rv">
+        <thead><tr><th scope="col">Realizacja</th><th scope="col">Stack · compliance</th><th scope="col">Efekt</th></tr></thead>
+        <tbody>
+          <tr><td>System biletowy z walidacją NFC — MVP z backendem transakcyjnym</td><td>React Native + Node.js + NFC · architektura zgodna z PCI-DSS</td><td><strong>4 tygodnie zamiast 6 miesięcy</strong></td></tr>
+          <tr><td>Firmware STM32 — sterownik silnika, peryferia, DMA i przerwania</td><td>STM32 + HAL/LL + ARM Cortex-M · zgodność z MISRA C</td><td><strong>70% mniej boilerplate'u</strong></td></tr>
+          <tr><td>Dashboard diagnostyczny CAN bus — z ręcznego dekodera do wizualizacji</td><td>Qt/QML + parser CAN bus · diagnostyka automotive-grade</td><td><strong>10x mniej debugowania</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 03 proces -->
+  <section class="sect" aria-labelledby="proces">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Współpraca · Jak wygląda wdrożenie</p>
+        <h2 class="sect-title ws" id="proces">Audyt → konfiguracja lokalna → sprint → standard.</h2>
+      </div>
+      <div class="steps">
+        <article class="step rv"><p class="eyebrow">01 · Audyt</p><h3>Audyt bezpieczeństwa</h3><p>Weryfikujemy wymagania compliance, podpisujemy NDA, definiujemy zakres i ograniczenia.</p></article>
+        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Konfiguracja</p><h3>Konfiguracja lokalna</h3><p>Stawiamy lokalne modele AI na Waszej infrastrukturze. Zero danych w chmurze, pełna kontrola.</p></article>
+        <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Sprint</p><h3>Sprint na Waszym kodzie</h3><p>Dwa tygodnie pair programmingu z AI na Waszych zadaniach, w Waszej infrastrukturze.</p></article>
+        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Standard</p><h3>Standard i dokumentacja</h3><p>Zostawiamy procesy, szablony, audyt trail i wyszkolonych ludzi w zespole.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 FAQ -->
+  <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>04 / FAQ · Najczęstsze pytania</p>
+        <h2 class="sect-title sect-title--s ws" id="faq-title">Najczęstsze pytania.</h2>
+      </div>
+      <div class="faq rv">
+        <details>
+          <summary><span class="num">01</span> Czy dane i kod naprawdę nie opuszczają naszej infrastruktury? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Tak. Używamy lokalnych modeli AI (Llama, Mistral, CodeLlama) uruchamianych na Waszych serwerach lub stacjach roboczych. Żadne dane nie trafiają do zewnętrznych API ani chmury.</p>
+        </details>
+        <details>
+          <summary><span class="num">02</span> Jak spełniacie wymogi PCI-DSS, ITAR, AI Act? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Przed startem robimy audyt wymagań regulacyjnych Waszej branży. Dobieramy narzędzia i procesy tak, żeby spełniały konkretne standardy — od air-gapped deployments po audyt trail generowanego kodu.</p>
+        </details>
+        <details>
+          <summary><span class="num">03</span> Czy podpisujecie NDA i umowę o poufności? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Zawsze. NDA podpisujemy przed pierwszym spotkaniem technicznym. Mamy doświadczenie z NDA w sektorze obronnym, finansowym i R&D.</p>
+        </details>
+        <details>
+          <summary><span class="num">04</span> Mamy 3-osobowy zespół R&D. Czy to za mało? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Wręcz przeciwnie — małe zespoły zyskują najwięcej. Jeden programista z AI pair programmingiem zastępuje 3–4-osobowy team. Im mniejszy zespół, tym większy mnożnik.</p>
+        </details>
+        <details>
+          <summary><span class="num">05</span> Jakich modeli AI używacie w środowiskach offline? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Llama 3, Mistral, CodeLlama, StarCoder2 — w zależności od zadania i dostępnego hardware. Konfigurujemy je lokalnie z kontekstem Waszego projektu, bez połączenia z internetem.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Kontakt</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Opowiemy, jak to wygląda w Waszej branży.</h2>
+      <p class="rv">Porozmawiajmy o Waszych wymaganiach compliance i pokażemy, jak AI może przyspieszyć development bez kompromisów w bezpieczeństwie.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę 30 min
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+</Interior>

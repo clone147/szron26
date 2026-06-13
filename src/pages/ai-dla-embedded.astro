@@ -1,0 +1,123 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="AI dla embedded i hard-tech — Qt, C++, STM32, ARM | SZRON"
+  description="Wdrażamy AI w zespołach embedded i hard-tech: Qt/QML, C++, STM32, ARM Linux, CAN bus, protokoły przemysłowe. Case studies z automotive, transportu i IoT."
+  eyebrow="Embedded / hard-tech · firmware i HMI"
+  heading="Wdrażamy AI w zespołach Qt, C++, embedded i industrial."
+  lead="Tam, gdzie standardowe narzędzia AI nie wystarczają. Znamy hardware, protokoły i ograniczenia embedded — i wiemy, jak AI może tu realnie pomóc."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>Firmware i HMI</strong><span>od konfiguracji peryferiów po nowoczesny interfejs</span></div>
+        <div><strong>Protokoły przemysłowe</strong><span>CAN bus, OBD-II, Modbus, RS232/485</span></div>
+        <div><strong>Wasz toolchain</strong><span>AI działa obok niego, nie zamiast</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 dlaczego -->
+  <section class="sect" aria-labelledby="dlaczego">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Kontekst · Dlaczego embedded inaczej</p>
+        <h2 class="sect-title sect-title--s ws" id="dlaczego">Dlaczego embedded potrzebuje innego podejścia.</h2>
+      </div>
+      <div class="grid-cards">
+        <article class="card-tile rv">
+          <p class="eyebrow">a</p>
+          <h3>Standardowe narzędzia nie znają hardware.</h3>
+          <p>Copilot czy ChatGPT nie znają HAL, QML ani protokołów przemysłowych — potrzebują dobrego kontekstu.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.1s">
+          <p class="eyebrow">b</p>
+          <h3>Boilerplate to większość kodu.</h3>
+          <p>W embedded boilerplate to 60–70% kodu — idealny target dla AI, która zostawia czas na logikę.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.2s">
+          <p class="eyebrow">c</p>
+          <h3>Dokumentacja hardware jest fragmentaryczna.</h3>
+          <p>AI potrzebuje dobrego kontekstu projektowego, żeby skutecznie wspierać pracę z układem.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.3s">
+          <p class="eyebrow">d</p>
+          <h3>Bezpieczeństwo kodu jest krytyczne.</h3>
+          <p>Nie można „wygenerować i zapomnieć" — generowany kod przechodzi review i testy jak każdy inny.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 stacki (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="stacki">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Stack · Obszary pracy</p>
+        <h2 class="sect-title ws" id="stacki">Stacki i obszary, w których pracujemy.</h2>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Qt / QML<small>Interfejsy</small></dt><dd>Panele HMI, aplikacje desktop, embedded UI.</dd></div>
+        <div><dt>C++ / STM32<small>Firmware</small></dt><dd>Firmware, sterowniki, HAL/LL, RTOS.</dd></div>
+        <div><dt>ARM Linux<small>Edge</small></dt><dd>Daemony systemd, telemetria, edge computing.</dd></div>
+        <div><dt>Protokoły<small>Komunikacja</small></dt><dd>CAN bus, OBD-II, Modbus, RS232/485.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 03 case studies -->
+  <section class="sect" aria-labelledby="cases">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Realizacje · Embedded i hard-tech</p>
+        <h2 class="sect-title sect-title--s ws" id="cases">Case studies embedded i hard-tech.</h2>
+      </div>
+      <table class="results-table rv">
+        <thead><tr><th scope="col">Realizacja</th><th scope="col">Stack</th><th scope="col">Efekt</th></tr></thead>
+        <tbody>
+          <tr><td>Dashboard diagnostyczny CAN bus — z ręcznego dekodera ramek do wizualizacji</td><td>Qt/QML + parser CAN bus</td><td><strong>10x mniej debugowania</strong></td></tr>
+          <tr><td>System biletowy dla transportu — MVP z aplikacją mobilną i backendem walidacji</td><td>React Native + Node.js + NFC</td><td><strong>4 tygodnie zamiast 6 miesięcy</strong></td></tr>
+          <tr><td>Firmware STM32 — sterownik silnika, generowanie peryferiów, DMA i przerwań</td><td>STM32 + HAL/LL + ARM Cortex-M</td><td><strong>70% mniej boilerplate'u</strong></td></tr>
+          <tr><td>Panel HMI w Qt/QML — nowy interfejs z animacjami i responsywnym layoutem</td><td>Qt 6 + QML + backend C++</td><td><strong>2 tygodnie zamiast 2 miesięcy</strong></td></tr>
+          <tr><td>Diagnostyka floty autobusowej — telemetria z pojazdów, daemon, parser, dashboard</td><td>ARM Linux + systemd + OBD-II</td><td><strong>1 inżynier zamiast zespołu 3 osób</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 04 proces -->
+  <section class="sect" aria-labelledby="proces" style="padding-top:0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>04 / Współpraca · Jak wygląda wdrożenie</p>
+        <h2 class="sect-title ws" id="proces">Audyt → konfiguracja → sprint → standard.</h2>
+      </div>
+      <div class="steps">
+        <article class="step rv"><p class="eyebrow">01 · Audyt</p><h3>Audyt stacku</h3><p>Sprawdzamy Wasz toolchain, IDE i flow pracy. Szukamy, gdzie AI da największy efekt.</p></article>
+        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Konfiguracja</p><h3>Konfiguracja AI</h3><p>Stawiamy kontekst projektowy — CLAUDE.md, reguły dla hardware, szablony generowania.</p></article>
+        <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Sprint</p><h3>Sprint na Waszym kodzie</h3><p>Dwa tygodnie pair programmingu z AI na Waszych taskach: firmware, HMI, diagnostyka.</p></article>
+        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Standard</p><h3>Standard i dokumentacja</h3><p>Zostawiamy procesy, szablony i wyszkolonych ludzi w zespole.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Kontakt</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Pracujesz z embedded lub hard-tech?</h2>
+      <p class="rv">Porozmawiajmy o Waszym stacku. Powiemy, gdzie AI da Wam największy efekt.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+</Interior>

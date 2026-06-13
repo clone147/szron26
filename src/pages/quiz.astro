@@ -1,0 +1,275 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="Quiz: AI Readiness Assessment — sprawdź gotowość firmy na AI | SZRON"
+  description="Odpowiedz na 8 pytań o procesach, narzędziach i zespole, a poznasz orientacyjną ocenę gotowości Twojej firmy na wdrożenie AI. Quiz działa w przeglądarce."
+  eyebrow="Narzędzie · 8 pytań, ~3 minuty"
+  heading="AI Readiness Assessment."
+  lead="Osiem pytań o procesach, narzędziach i zespole. Na końcu zobaczysz orientacyjną ocenę gotowości Twojej firmy na AI — liczoną od razu w przeglądarce. To punkt wyjścia do rozmowy, nie wyrok."
+>
+  <!-- quiz -->
+  <section class="sect" aria-labelledby="quiz">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>Quiz · Procesy · Narzędzia · Zespół</p>
+        <h2 class="sect-title sect-title--s ws" id="quiz">Wybierz odpowiedź najbliższą rzeczywistości.</h2>
+      </div>
+
+      <div class="quiz rv" id="quiz">
+        <!-- ekran pytań -->
+        <div id="quiz-stage">
+          <div class="quiz__meta">
+            <span class="quiz__section" id="quiz-section">PROCESY</span>
+            <span class="quiz__count" id="quiz-count">1 / 8</span>
+          </div>
+          <div class="quiz__bar"><span id="quiz-progress" style="width:12.5%"></span></div>
+
+          <h3 class="quiz__q" id="quiz-question">—</h3>
+          <div class="quiz__options" id="quiz-options" role="group" aria-label="Odpowiedzi"></div>
+
+          <div class="quiz__nav">
+            <button type="button" class="btn btn--ghost btn--dark-on-light" id="quiz-prev" disabled>Wstecz</button>
+            <button type="button" class="btn btn--accent" id="quiz-next" disabled>Następne</button>
+          </div>
+          <p class="quiz__hint">Skróty: A / B / C / D wybór, Enter lub → dalej, ← wstecz.</p>
+        </div>
+
+        <!-- ekran wyniku -->
+        <div id="quiz-result" hidden>
+          <p class="eyebrow" id="quiz-band-label">Wynik</p>
+          <h3 class="quiz__score" id="quiz-score">—</h3>
+          <p class="quiz__verdict" id="quiz-verdict">—</p>
+          <table class="results-table" id="quiz-breakdown"></table>
+          <div class="quiz__nav" style="margin-top:var(--space-2xl)">
+            <button type="button" class="btn btn--ghost btn--dark-on-light" id="quiz-restart">Wypełnij ponownie</button>
+            <a class="btn btn--accent" href="/umow-rozmowe">Omów wynik z nami
+              <span class="btn__arr" aria-hidden="true">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+                <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- co dalej (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="codalej">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>Po wyniku · Co dalej</p>
+        <h2 class="sect-title ws" id="codalej">Quiz to początek rozmowy, nie audyt.</h2>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Procesy<small>Pytania 1–3</small></dt><dd>Jak identyfikujecie zadania do automatyzacji, ile czasu zżerają powtarzalne zadania i jak szybko dostarczacie projekty IT.</dd></div>
+        <div><dt>Narzędzia<small>Pytania 4–6</small></dt><dd>Z jakich narzędzi AI korzysta zespół, jak są zintegrowane z systemami i jak podchodzicie do compliance (AI Act, NIS2).</dd></div>
+        <div><dt>Zespół<small>Pytania 7–8</small></dt><dd>Jakie umiejętności AI ma zespół i co jest największą barierą adopcji w Waszej firmie.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Kontakt</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Przeanalizujemy Wasze odpowiedzi razem.</h2>
+      <p class="rv">Pokaż nam wynik i kontekst — odpowiemy, od czego konkretnie zacząć w Waszej firmie. Bez sprzedaży, z konkretnymi rekomendacjami.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .quiz {
+      max-width: 48rem;
+      border: 1px solid var(--color-line);
+      border-radius: var(--radius-card);
+      padding: var(--space-2xl);
+      background: var(--color-paper-2);
+    }
+    .quiz__meta {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: var(--text-caption); letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: var(--space-sm);
+    }
+    .quiz__section { color: var(--color-accent); font-weight: 700; }
+    .quiz__count { color: var(--color-text-2); }
+    .quiz__bar { height: 4px; border-radius: 999px; background: var(--color-line); overflow: hidden; }
+    .quiz__bar > span { display: block; height: 100%; background: var(--color-accent); transition: width var(--dur-1) var(--ease-out); }
+    .quiz__q { font-size: var(--text-h4); line-height: 1.3; margin: var(--space-2xl) 0 var(--space-xl); }
+    .quiz__options { display: grid; gap: var(--space-sm); }
+    .quiz__opt {
+      display: flex; align-items: center; gap: var(--space-md);
+      width: 100%; text-align: left; cursor: pointer;
+      padding: var(--space-md) var(--space-lg);
+      border: 2px solid var(--color-line); border-radius: var(--radius-sm);
+      background: var(--color-paper); color: var(--color-text);
+      font: inherit; font-size: var(--text-s);
+      transition: border-color var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out);
+    }
+    .quiz__opt:hover { border-color: var(--color-accent); }
+    .quiz__opt[aria-pressed="true"] { border-color: var(--color-accent); background: var(--color-accent-soft); }
+    .quiz__opt-key {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 2rem; height: 2rem; flex: none;
+      border-radius: var(--radius-btn); background: var(--color-paper-3);
+      font-weight: 700;
+    }
+    .quiz__opt[aria-pressed="true"] .quiz__opt-key { background: var(--color-accent); color: var(--color-ink); }
+    .quiz__nav { display: flex; justify-content: space-between; gap: var(--space-md); margin-top: var(--space-2xl); }
+    .btn--dark-on-light {
+      border: 1px solid var(--color-line); background: transparent; color: var(--color-text);
+    }
+    .btn--dark-on-light:hover { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-text-inv); }
+    .btn:disabled { opacity: 0.4; pointer-events: none; }
+    .quiz__hint { margin-top: var(--space-lg); font-size: var(--text-caption); color: var(--color-text-2); text-align: center; }
+    .quiz__score { font-family: var(--font-display); font-weight: 600; font-size: var(--text-stat); color: var(--color-accent); margin: var(--space-md) 0; }
+    .quiz__verdict { color: var(--color-text-2); max-width: 40rem; margin-bottom: var(--space-2xl); }
+  </style>
+
+  <script is:inline>
+    (function () {
+      // Pytania 1:1 ze źródła Quiz.tsx. A=1 ... D=4 (wyżej = dojrzalej).
+      var questions = [
+        { id: 1, section: 'PROCESY', question: 'Jak identyfikujecie procesy do automatyzacji w firmie?',
+          options: [ { value: 'A', label: 'Nie analizujemy' }, { value: 'B', label: 'Sporadycznie' }, { value: 'C', label: 'Zidentyfikowane, brak roadmapy' }, { value: 'D', label: 'Udokumentowane z priorytetami' } ] },
+        { id: 2, section: 'PROCESY', question: 'Ile czasu zespół spędza na powtarzalnych zadaniach (raporty, testy)?',
+          options: [ { value: 'A', label: 'Ponad 60%' }, { value: 'B', label: '40–60%' }, { value: 'C', label: '20–40%' }, { value: 'D', label: 'Poniżej 20% (zautomatyzowane)' } ] },
+        { id: 3, section: 'PROCESY', question: 'Jak szybko realizujecie projekty IT?',
+          options: [ { value: 'A', label: 'Miesiące / kwartały' }, { value: 'B', label: 'Tygodnie' }, { value: 'C', label: 'Dni' }, { value: 'D', label: 'Szybko — mamy AI w workflow' } ] },
+        { id: 4, section: 'NARZĘDZIA', question: 'Jakie narzędzia AI używa Wasz zespół deweloperski?',
+          options: [ { value: 'A', label: 'Żadne' }, { value: 'B', label: 'ChatGPT / Claude do pytań' }, { value: 'C', label: 'GitHub Copilot / Cursor' }, { value: 'D', label: 'AI Agents + MCP' } ] },
+        { id: 5, section: 'NARZĘDZIA', question: 'Jak AI jest zintegrowane z Waszymi systemami?',
+          options: [ { value: 'A', label: 'Brak integracji' }, { value: 'B', label: 'Podstawowe API' }, { value: 'C', label: 'Integracje z bazami danych' }, { value: 'D', label: 'MCP / RAG pipeline' } ] },
+        { id: 6, section: 'NARZĘDZIA', question: 'Jak podchodzicie do compliance (AI Act, NIS2)?',
+          options: [ { value: 'A', label: 'Nie wiem co to' }, { value: 'B', label: 'Świadomi, brak planu' }, { value: 'C', label: 'Wstępna strategia' }, { value: 'D', label: 'Gotowi / lokalne modele' } ] },
+        { id: 7, section: 'ZESPÓŁ', question: 'Jakie umiejętności AI ma Wasz zespół?',
+          options: [ { value: 'A', label: 'Brak' }, { value: 'B', label: 'Podstawowe' }, { value: 'C', label: 'Średnie' }, { value: 'D', label: 'Context Engineering' } ] },
+        { id: 8, section: 'ZESPÓŁ', question: 'Jaka jest największa bariera adopcji AI w Waszej firmie?',
+          options: [ { value: 'A', label: 'Brak wiedzy' }, { value: 'B', label: 'Brak czasu' }, { value: 'C', label: 'Obawy compliance' }, { value: 'D', label: 'Brak lidera AI' } ] }
+      ];
+      var SCORE = { A: 1, B: 2, C: 3, D: 4 };
+
+      var answers = {};       // id -> 'A'|'B'|...
+      var current = 0;
+
+      var el = {
+        stage: document.getElementById('quiz-stage'),
+        result: document.getElementById('quiz-result'),
+        section: document.getElementById('quiz-section'),
+        count: document.getElementById('quiz-count'),
+        progress: document.getElementById('quiz-progress'),
+        question: document.getElementById('quiz-question'),
+        options: document.getElementById('quiz-options'),
+        prev: document.getElementById('quiz-prev'),
+        next: document.getElementById('quiz-next'),
+        score: document.getElementById('quiz-score'),
+        verdict: document.getElementById('quiz-verdict'),
+        bandLabel: document.getElementById('quiz-band-label'),
+        breakdown: document.getElementById('quiz-breakdown'),
+        restart: document.getElementById('quiz-restart')
+      };
+
+      function render() {
+        var q = questions[current];
+        el.section.textContent = q.section;
+        el.count.textContent = (current + 1) + ' / ' + questions.length;
+        el.progress.style.width = (((current + 1) / questions.length) * 100) + '%';
+        el.question.textContent = q.question;
+
+        el.options.innerHTML = '';
+        q.options.forEach(function (opt) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'quiz__opt';
+          btn.setAttribute('aria-pressed', String(answers[q.id] === opt.value));
+          btn.innerHTML = '<span class="quiz__opt-key">' + opt.value + '</span><span>' + opt.label + '</span>';
+          btn.addEventListener('click', function () { select(opt.value); });
+          el.options.appendChild(btn);
+        });
+
+        el.prev.disabled = current === 0;
+        el.next.disabled = !answers[q.id];
+        el.next.textContent = current === questions.length - 1 ? 'Zobacz wynik' : 'Następne';
+      }
+
+      function select(value) {
+        answers[questions[current].id] = value;
+        render();
+      }
+
+      function next() {
+        if (!answers[questions[current].id]) return;
+        if (current < questions.length - 1) { current++; render(); }
+        else showResult();
+      }
+      function prev() { if (current > 0) { current--; render(); } }
+
+      function bandFor(pct) {
+        if (pct < 35) return { label: 'Poziom · Start', verdict: 'Jesteście na początku drogi z AI. Największe zyski przyniosą tu podstawy: identyfikacja powtarzalnych zadań i pierwsze narzędzia w zespole. Warto zacząć od pilotażu jednego procesu.' };
+        if (pct < 60) return { label: 'Poziom · Rozwój', verdict: 'AI już u Was zaistniało, ale działa wyspowo. Brakuje roadmapy i integracji z systemami. Kolejny krok to spięcie narzędzi w spójny workflow i plan kompetencji w zespole.' };
+        if (pct < 85) return { label: 'Poziom · Dojrzałość', verdict: 'Macie solidne fundamenty: narzędzia, integracje i świadomość compliance. Teraz liczy się skalowanie — agenci, RAG i mierzenie efektu w danych.' };
+        return { label: 'Poziom · Lider', verdict: 'Działacie jak organizacja gotowa na AI: udokumentowane procesy, integracje MCP/RAG i kompetencje w zespole. Skupcie się na utrzymaniu przewagi i pełnym compliance.' };
+      }
+
+      function showResult() {
+        var max = questions.length * 4;
+        var total = questions.reduce(function (sum, q) { return sum + (SCORE[answers[q.id]] || 0); }, 0);
+        var pct = Math.round((total / max) * 100);
+        var band = bandFor(pct);
+
+        el.bandLabel.textContent = band.label;
+        el.score.textContent = total + ' / ' + max + '  ·  ' + pct + '%';
+        el.verdict.textContent = band.verdict;
+
+        // Rozbicie wg sekcji
+        var bySection = {};
+        questions.forEach(function (q) {
+          if (!bySection[q.section]) bySection[q.section] = { got: 0, max: 0 };
+          bySection[q.section].got += SCORE[answers[q.id]] || 0;
+          bySection[q.section].max += 4;
+        });
+        var rows = '<thead><tr><th scope="col">Obszar</th><th scope="col">Wynik</th></tr></thead><tbody>';
+        Object.keys(bySection).forEach(function (s) {
+          var b = bySection[s];
+          rows += '<tr><td>' + s + '</td><td><strong>' + b.got + ' / ' + b.max + '</strong></td></tr>';
+        });
+        rows += '</tbody>';
+        el.breakdown.innerHTML = rows;
+
+        el.stage.hidden = true;
+        el.result.hidden = false;
+      }
+
+      function restart() {
+        answers = {}; current = 0;
+        el.result.hidden = true;
+        el.stage.hidden = false;
+        render();
+      }
+
+      el.next.addEventListener('click', next);
+      el.prev.addEventListener('click', prev);
+      el.restart.addEventListener('click', restart);
+
+      document.addEventListener('keydown', function (e) {
+        if (!el.result.hidden) return;
+        var k = e.key;
+        if ((k === 'Enter' || k === 'ArrowRight') && answers[questions[current].id]) { e.preventDefault(); next(); }
+        else if (k === 'ArrowLeft' && current > 0) { e.preventDefault(); prev(); }
+        else if (['a','b','c','d','A','B','C','D'].indexOf(k) !== -1) { e.preventDefault(); select(k.toUpperCase()); }
+      });
+
+      render();
+    })();
+  </script>
+</Interior>

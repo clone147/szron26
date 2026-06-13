@@ -1,0 +1,149 @@
+---
+import Interior from '../layouts/Interior.astro';
+import { akademia } from '../data/akademia.mjs';
+const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczenstwo', 'serwery-mcp'].includes(a.slug));
+---
+<Interior
+  title="LM Studio — lokalne modele LLM na własnym komputerze | Akademia SZRON"
+  description="LM Studio: darmowa aplikacja do uruchamiania lokalnych modeli AI z pełną prywatnością. Instalacja, API zgodne z OpenAI na localhost:1234, modele GLM 4.6/4.7 i MiniMax M2/M2.1."
+  eyebrow="Akademia · Lokalne modele"
+  heading="LM Studio — modele LLM bez chmury, na Twoim sprzęcie."
+  lead="Darmowa aplikacja desktop do uruchamiania zaawansowanych modeli językowych lokalnie: pełna prywatność, zgodność z RODO, API zgodne z OpenAI na localhost. Poniżej instalacja, korzyści dla firm oraz modele, które warto znać."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>100% lokalnie</strong><span>zero zbierania danych, działa offline</span></div>
+        <div><strong>OpenAI API</strong><span>localhost:1234 dla istniejących narzędzi</span></div>
+        <div><strong>1000+ modeli</strong><span>pre-konfigurowanych do pobrania</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 czym jest -->
+  <section class="sect" aria-labelledby="czym">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Wprowadzenie · Czym jest</p>
+        <h2 class="sect-title sect-title--s ws" id="czym">Aplikacja desktop do lokalnych LLM-ów na prywatnym komputerze.</h2>
+      </div>
+      <div class="prose rv">
+        <p>LM Studio to darmowa aplikacja na macOS, Windows i Linux, która umożliwia uruchamianie zaawansowanych modeli językowych AI bezpośrednio na Twoim komputerze. Instalator waży około 400 MB i pobierasz go z <code>lmstudio.ai</code>.</p>
+        <ul>
+          <li><strong>Prywatność first</strong> — zero zbierania danych, wszystkie obliczenia lokalnie, brak wymogu internetu, zgodność z RODO.</li>
+          <li><strong>Kluczowe możliwości</strong> — ponad 1000 pre-konfigurowanych modeli, Model Context Protocol (MCP), API zgodne z OpenAI na <code>localhost:1234</code>, kontrola wielu GPU i zarządzanie pamięcią VRAM.</li>
+          <li><strong>Dla developerów</strong> — REST API oraz SDK TypeScript/Python, wbudowany RAG dla dokumentów, długie okna kontekstu. Biblioteki <code>lmstudio-js</code> i <code>lmstudio-python</code> na licencji MIT.</li>
+          <li><strong>Korzyści biznesowe</strong> — brak vendor lock-in, pełna kontrola i customizacja, działa na sprzęcie konsumenckim (16 GB RAM oraz 4 GB+ VRAM).</li>
+        </ul>
+        <div class="callout">
+          <p><strong>W skrócie:</strong> LM Studio demokratyzuje dostęp do LLM i sprawdza się w branżach z wymogami prywatności — dane nie opuszczają komputera, a istniejące narzędzia podłączasz przez API zgodne z OpenAI.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 instalacja (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="instalacja">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Instalacja · Szybki start</p>
+        <h2 class="sect-title ws" id="instalacja">Pobierz, zainstaluj, wybierz model.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Przejdź na <a href="https://lmstudio.ai">lmstudio.ai</a> i pobierz wersję dla swojego systemu (macOS, Windows lub Linux).</p>
+        <ul>
+          <li><strong>Rozmiar instalatora:</strong> około 400 MB.</li>
+          <li><strong>Wymagania rekomendowane:</strong> 16 GB RAM oraz 4 GB+ VRAM.</li>
+          <li><strong>Po instalacji:</strong> wybierz model z wbudowanej biblioteki, pobierz go i uruchom lokalnie.</li>
+          <li><strong>API:</strong> serwer udostępnia endpoint zgodny z OpenAI na <code>localhost:1234</code>.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 GLM -->
+  <section class="sect" aria-labelledby="glm">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Model · GLM (kodowanie)</p>
+        <h2 class="sect-title sect-title--s ws" id="glm">GLM 4.6 i GLM 4.7 — mistrzowie kodowania.</h2>
+      </div>
+      <div class="prose rv">
+        <p>GLM 4.6 (open-weight model od Zhipu AI) został wydany 30 września 2025, oferuje kontekst 200K tokenów i wynik 82,8% na LiveCodeBench. Nowszy <strong>GLM 4.7</strong> (22 grudnia 2025) osiąga <strong>84,9%</strong> na LiveCodeBench — to aktualny lider kodowania, również przy kontekście 200K tokenów.</p>
+        <div class="callout">
+          <p><strong>Kompatybilność:</strong> sprawdź status uruchamiania w LM Studio (zgłoszenie #1061). Alternatywy: <code>vLLM</code>, <code>SGLang</code> lub API z <code>docs.z.ai</code>. Model ma też natywną integrację w Claude Code.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 MiniMax (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="minimax">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>04 / Model · MiniMax (agenty)</p>
+        <h2 class="sect-title ws" id="minimax">MiniMax M2 i M2.1 — mistrzowie agentów.</h2>
+      </div>
+      <div class="prose rv">
+        <p>MiniMax M2 został wydany 27 października 2025. To architektura MoE: <strong>230B parametrów total, 10B aktywnych</strong>, na licencji MIT, w czołówce rankingu Artificial Analysis. Koszt rzędu $0.30/$1.20 za milion tokenów to ułamek ceny modeli komercyjnych. Nowsza wersja <strong>MiniMax M2.1</strong> ukazała się 23 grudnia 2025.</p>
+        <div class="callout">
+          <p><strong>Status LM Studio:</strong> wsparcie dla MiniMax M2 zostało dodane w wersji 0.3.31 — działa od tego wydania w górę. Dla starszych wersji alternatywy to <code>vLLM</code> oraz <code>SGLang</code> (zalecany dla parsowania wywołań narzędzi).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 podsumowanie -->
+  <section class="sect" aria-labelledby="podsumowanie">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>05 / Podsumowanie · Wnioski</p>
+        <h2 class="sect-title sect-title--s ws" id="podsumowanie">Co wybrać i do czego.</h2>
+      </div>
+      <div class="prose rv">
+        <ul>
+          <li><strong>LM Studio</strong> — demokratyzuje dostęp do LLM, idealne dla branż z wymogami prywatności; API zgodne z OpenAI na <code>localhost:1234</code>.</li>
+          <li><strong>GLM 4.7</strong> — aktualny lider kodowania (84,9% LiveCodeBench), kontekst 200K tokenów.</li>
+          <li><strong>MiniMax M2 / M2.1</strong> — mistrz zadań agentowych, MoE 230B/10B, działa w LM Studio 0.3.31+, ułamek ceny modeli komercyjnych.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- powiazane szkolenia -->
+  <section class="sect" aria-labelledby="powiazane" style="padding-top:0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>Powiązane szkolenia</p>
+        <h2 class="sect-title sect-title--s ws" id="powiazane">Czytaj dalej w Akademii.</h2>
+      </div>
+      <div class="link-cards rv">
+        {related.map((a) => (
+          <a class="link-card" href={`/${a.slug}`}>
+            <h3>{a.title}</h3>
+            <p>{a.desc}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie modele AI u siebie, bez wycieku danych?</h2>
+      <p class="rv">Akademia to materiały. Wdrożenie lokalnego modelu na infrastrukturze firmy projektujemy i prowadzimy z Waszym zespołem. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+</Interior>

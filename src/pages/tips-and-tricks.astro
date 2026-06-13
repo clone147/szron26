@@ -1,0 +1,203 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="Claude Code — Tips & Tricks dla programistów | Akademia SZRON"
+  description="Praktyczne wskazówki do Claude Code: powiadomienia dźwiękowe przez hooki, pomijanie uprawnień, status line, wyłączenie auto-compact, tryb planowania i optymalizacja promptów."
+  eyebrow="Akademia · Praktyka pracy z AI"
+  heading="Claude Code — Tips & Tricks dla programistów."
+  lead="Zestaw praktyk, skrótów i wzorców, które realnie przyspieszają codzienną pracę z agentem. Od powiadomień dźwiękowych po świadome zarządzanie kontekstem i optymalizację promptów — wszystko z naszej własnej praktyki."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>Mniej czekania</strong><span>powiadomienia i pomijanie uprawnień</span></div>
+        <div><strong>Więcej kontekstu</strong><span>auto-compact pod kontrolą</span></div>
+        <div><strong>Lepsze plany</strong><span>tryb planowania i budżet myślenia</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 powiadomienia -->
+  <section class="sect" aria-labelledby="powiadomienia">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>01 / Powiadomienia · Dźwięk po zadaniu</p>
+        <h2 id="powiadomienia">Dźwięk po zakończeniu każdego zadania.</h2>
+        <p>Gdy agent pracuje w tle, łatwo przegapić moment, w którym kończy. Hook na zdarzeniu zakończenia odpowiedzi zagra dźwięk i zwróci Twoją uwagę.</p>
+        <ol>
+          <li>Skopiuj plik dźwiękowy i prosty skrypt odtwarzacza do <code>~/.claude/</code>.</li>
+          <li>Przetestuj odtwarzanie z terminala.</li>
+          <li>Zarejestruj hook na zdarzeniu Stop przez komendę <code>/hooks</code>.</li>
+        </ol>
+        <pre><code># skopiuj pliki do ~/.claude/
+cp ~/Downloads/finish.wav ~/.claude/
+cp ~/Downloads/play.js ~/.claude/
+
+# test odtwarzania
+node ~/.claude/play.js ~/.claude/finish.wav</code></pre>
+        <p>Następnie w agencie wpisz <code>/hooks</code>, wybierz zdarzenie „Stop" (tuż przed zakończeniem odpowiedzi), dodaj nowy hook i jako komendę podaj:</p>
+        <pre><code>node ~/.claude/play.js ~/.claude/finish.wav</code></pre>
+        <div class="callout">
+          <p><strong>Wskazówka:</strong> jeśli <code>play.js</code> nie odtwarza dźwięku, zleć rozwiązanie problemu samemu agentowi — poda komendę właściwą dla Twojego systemu (wymaga zainstalowanego Node.js).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 uprawnienia (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="uprawnienia">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>02 / Uprawnienia · Mniej potwierdzeń</p>
+        <h2 id="uprawnienia">Pomijanie uprawnień — tylko w izolacji.</h2>
+        <p>Ciągłe potwierdzanie każdej operacji spowalnia pracę. Flaga pomijająca pytania daje duży przyrost prędkości, ale wyłącza wszystkie kontrole:</p>
+        <pre><code>claude --dangerously-skip-permissions</code></pre>
+        <div class="callout">
+          <p><strong>Uwaga:</strong> ta flaga pomija WSZYSTKIE kontrole bezpieczeństwa — agent wykona dowolną operację bez pytania. Używaj wyłącznie w izolowanych środowiskach (np. Docker), na maszynach testowych albo gdy masz pewność co do bezpieczeństwa skryptów.</p>
+        </div>
+        <p>Jeśli używasz jej często, schowaj ją za aliasem powłoki:</p>
+        <pre><code>alias claude-fast='claude --dangerously-skip-permissions'</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 status line -->
+  <section class="sect" aria-labelledby="statusline">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>03 / Status line · Monitoring w terminalu</p>
+        <h2 id="statusline">Status line — model i tokeny w czasie rzeczywistym.</h2>
+        <p>Status line pokazuje na bieżąco model, zużycie tokenów, czas i status operacji wprost w terminalu. Instalacja w katalogu projektu to jedna komenda:</p>
+        <pre><code>npx @chongdashu/cc-statusline@latest init</code></pre>
+        <p>Instalator przeprowadzi przez wybór elementów do wyświetlania:</p>
+        <ul>
+          <li><strong>Model</strong> — aktualnie używany model i moment przełączenia między Opus a Sonnet.</li>
+          <li><strong>Licznik tokenów</strong> — kontrola kosztów i wczesne ostrzeżenie przed limitem.</li>
+          <li><strong>Czas</strong> — długość trwania konwersacji.</li>
+          <li><strong>Status</strong> — stan bieżącej operacji.</li>
+        </ul>
+        <p>Po instalacji odświeża się automatycznie podczas pracy agenta. Źródło: <code>github.com/chongdashu/cc-statusline</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 auto-compact (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="autocompact">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>04 / Kontekst · Auto-compact</p>
+        <h2 id="autocompact">Wyłącz auto-compact, przejmij kontrolę nad kontekstem.</h2>
+        <p>Auto-compact automatycznie kompresuje historię konwersacji przy zbliżaniu się do limitu kontekstu (zwykle ok. 95% zapełnienia). W praktyce częściej szkodzi niż pomaga:</p>
+        <ul>
+          <li><strong>Zjada kontekst przed startem</strong> — bufor potrafi zająć dużą część okna, zanim napiszesz pierwszą linię.</li>
+          <li><strong>Przerywa workflow</strong> — kompaktowanie może wystartować w najgorszym momencie i zepsuć setup.</li>
+          <li><strong>Brak kontroli</strong> — nie wiesz, co zostało usunięte, i nie możesz tego naprawić.</li>
+        </ul>
+        <p>Wyłącz go przez <code>/config</code>: znajdź opcję „Auto-compact" i przełącz na <code>false</code> (spacją).</p>
+        <div class="callout">
+          <p><strong>Strategia kontekstu:</strong> gdy okno się zapełni, zamiast <code>/compact</code> użyj <code>/clear</code> i rozplanuj zadanie na nowo. Świeży start z lepszym planem daje znacznie wyższą skuteczność niż kompaktowanie. Po wyłączeniu auto-compact odzyskujesz około 20% kontekstu i agent nie gubi istotnych informacji.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 plan mode -->
+  <section class="sect" aria-labelledby="planmode">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>05 / Tryb planowania · Plan Mode</p>
+        <h2 id="planmode">Tryb planowania — plan przed jakąkolwiek zmianą.</h2>
+        <p>W trybie planowania agent <strong>tylko analizuje i planuje</strong> — nie edytuje plików i nie uruchamia komend. To faza read-only przed właściwymi zmianami. Aktywujesz ją skrótem <code>Shift+Tab</code> (dwukrotnie); ponowne naciśnięcie wychodzi z trybu.</p>
+        <ul>
+          <li><strong>Dostępne:</strong> Read, Glob, Grep, WebSearch, WebFetch, lista zadań do wykonania, agenci pomocniczy do głębszego researchu.</li>
+          <li><strong>Zablokowane:</strong> Write, Edit, Bash — wyłącznie planowanie.</li>
+        </ul>
+        <p>Po wejściu w tryb opisz problem szczegółowo. Przykład:</p>
+        <pre><code>Zaplanuj implementacje systemu autentykacji z OAuth2,
+JWT, refresh tokenami i rate limitingiem dla REST API.</code></pre>
+        <h3>Budżet myślenia: think, megathink, ultrathink</h3>
+        <p>Głębokość analizy sterujesz frazami w prompcie. Im wyższy poziom, tym większy budżet rozumowania — i wyższy koszt czasu oraz tokenów.</p>
+        <table>
+          <thead><tr><th scope="col">Poziom</th><th scope="col">Budżet (orientacyjnie)</th><th scope="col">Frazy aktywujące</th></tr></thead>
+          <tbody>
+            <tr><td><strong>think</strong></td><td>~4K tokenów</td><td>„think"</td></tr>
+            <tr><td><strong>megathink</strong></td><td>~10K tokenów</td><td>„think hard", „think harder", „megathink"</td></tr>
+            <tr><td><strong>ultrathink</strong></td><td>~32K tokenów</td><td>„ultrathink", „think really hard", „think intensely", „think longer"</td></tr>
+          </tbody>
+        </table>
+        <div class="callout">
+          <p><strong>Aktualizacja:</strong> poziomy myślenia są nadal sterowalne frazami. Najwyższy (ultrathink) to budżet rzędu ~32K tokenów, aktywowany m.in. przez „think harder", „think intensely", „think longer", „think really hard". Rezerwuj go na decyzje architektoniczne, duży refactoring i integracje wymagające researchu — tam, gdzie dokładność jest ważniejsza niż koszt tokenów.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 optymalizacja promptów (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="prompty">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>06 / Prompty · Feedback loop</p>
+        <h2 id="prompty">Optymalizacja promptów — ucz się wprost od agenta.</h2>
+        <p>Krótszy, precyzyjny prompt to mniej tokenów i celniejsza odpowiedź. Cztery zasady, które robią największą różnicę:</p>
+        <ul>
+          <li><strong>Precyzja</strong> — odwołuj się do tras i ścieżek (np. <code>/trainings</code>), nie do nazw tabel czy szczegółów implementacji.</li>
+          <li><strong>Zwięzłość</strong> — usuń zbędne słowa; agent rozumie kontekst, gramatyka może ucierpieć.</li>
+          <li><strong>Kontekst</strong> — podaj tylko istotne tło, nie całą historię projektu; reszta jest w CLAUDE.md.</li>
+          <li><strong>Konkretność</strong> — „dodaj przełącznik trybu ciemnego" zamiast „zrób coś z motywem".</li>
+        </ul>
+        <h3>Przed i po</h3>
+        <pre><code>ZLE: "Hej, moglbys mi pomoc zeby w aplikacji byla funkcja
+      wysylania maili do uzytkownikow z tabeli szron_training_participants"
+DOBRZE: "Dodaj funkcje wysylki maili do uczestnikow w /trainings"
+
+ZLE: "Czy moglbys sprawdzic baze i powiedziec jakie sa wszystkie tabele i co robia?"
+DOBRZE: "Lista tabel w DB z opisami"</code></pre>
+        <p>Możesz też poprosić agenta, by po każdym zadaniu sam podpowiadał lepszą wersję Twojego promptu — wpisz tę zasadę do <code>CLAUDE.md</code>, a każde zadanie stanie się darmową lekcją prompt engineeringu. Z czasem Twoje pierwsze prompty zbliżą się do tych zoptymalizowanych.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- powiązane szkolenia -->
+  <section class="sect" aria-labelledby="powiazane">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>Powiązane szkolenia</p>
+        <h2 class="sect-title sect-title--s ws" id="powiazane">Kolejne kroki w Akademii.</h2>
+      </div>
+      <div class="link-cards rv">
+        <a class="link-card" href="/claude-code">
+          <h3>Claude Code</h3>
+          <p>Instalacja, poziomy myślenia i workflow agentowy od podstaw.</p>
+        </a>
+        <a class="link-card" href="/claude-code-bezpieczenstwo">
+          <h3>Claude Code — bezpieczeństwo</h3>
+          <p>Deny rules, sandbox i hooki — zanim włączysz pomijanie uprawnień.</p>
+        </a>
+        <a class="link-card" href="/szkolenie-git">
+          <h3>Claude Code i Git</h3>
+          <p>Automatyczne commity i git workflow prowadzone przez agenta.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie, żeby tak pracował cały Wasz zespół?</h2>
+      <p class="rv">Te triki to dopiero początek. Wdrożenie to kwartał na Waszym kodzie — z pomiarem efektu w DEVLens. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+</Interior>

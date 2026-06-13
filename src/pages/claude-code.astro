@@ -1,0 +1,184 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="Claude Code — instalacja, poziomy myślenia, workflow agentowy | Akademia SZRON"
+  description="Praktyczne szkolenie z Claude Code: aktualna instalacja (curl/brew, nie npm), poziomy myślenia think/megathink/ultrathink, frazy aktywujące i workflow agentowy od podstaw."
+  eyebrow="Akademia · Programowanie agentowe"
+  heading="Claude Code — agent kodowania w terminalu, od pierwszej instalacji."
+  lead="Czym jest agent kodowania, jak go zainstalować w aktualny sposób i jak ułożyć z nim codzienny workflow. Uczymy tego, czego sami używamy w pracy z klientami — na realnych komendach, bez teorii dla teorii."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>Instalacja bez npm</strong><span>curl albo brew — natywny instalator</span></div>
+        <div><strong>Poziomy myślenia</strong><span>think, megathink, ultrathink</span></div>
+        <div><strong>Pamięć projektu</strong><span>CLAUDE.md i kontekst pod kontrolą</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 czym jest -->
+  <section class="sect" aria-labelledby="czym">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>01 / Podstawy · Czym jest agent kodowania</p>
+        <h2 id="czym">Agent w terminalu, nie podpowiadacz w edytorze.</h2>
+        <p>Claude Code to agent kodowania uruchamiany w terminalu. Nie podpowiada pojedynczych linii jak autouzupełnianie — czyta projekt, planuje, uruchamia komendy, edytuje wiele plików naraz i sam weryfikuje efekt. To zmienia sposób pracy: zamiast pisać kod ręcznie, opisujesz cel i prowadzisz agenta, a sam siadasz do kodu tylko tam, gdzie naprawdę trzeba.</p>
+        <h3>Kiedy AI pomaga, a kiedy przeszkadza</h3>
+        <ul>
+          <li><strong>Pomaga:</strong> powtarzalne zmiany w wielu plikach, refactoring, pisanie testów, migracje, eksploracja nieznanego kodu, commity i porządki w repozytorium.</li>
+          <li><strong>Przeszkadza:</strong> gdy zadanie jest niejasne, brakuje kontekstu, albo wymaga decyzji biznesowej, której agent nie zna. Wtedy najpierw doprecyzuj, potem deleguj.</li>
+        </ul>
+        <h3>Trzy zasady efektywnej współpracy</h3>
+        <ol>
+          <li><strong>Dawaj kontekst, nie tylko polecenie.</strong> Agent jest tak dobry, jak informacje, które dostaje.</li>
+          <li><strong>Pracuj iteracyjnie.</strong> Mały krok, weryfikacja, kolejny krok — zamiast jednego wielkiego promptu.</li>
+          <li><strong>Trzymaj wiedzę w repozytorium.</strong> Standardy i konwencje w pliku CLAUDE.md działają na każdą sesję.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 instalacja (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="instalacja">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>02 / Instalacja · macOS, Linux, Windows</p>
+        <h2 id="instalacja">Instalacja w aktualny sposób — bez npm.</h2>
+        <div class="callout">
+          <p><strong>Aktualizacja:</strong> instalacja przez <code>npm install -g @anthropic-ai/claude-code</code> jest przestarzała. Używaj natywnego instalatora (curl) albo menedżera pakietów. Node.js nie jest już wymagany do samej instalacji.</p>
+        </div>
+        <h3>macOS i Linux</h3>
+        <pre><code>curl -fsSL https://claude.ai/install.sh | bash</code></pre>
+        <p>Alternatywnie na macOS przez Homebrew:</p>
+        <pre><code>brew install --cask claude-code</code></pre>
+        <h3>Windows</h3>
+        <p>Na Windows zalecamy uruchamianie agenta z poziomu WSL2 (terminal Linux), co daje też dostęp do trybu sandbox. W natywnym PowerShell instalator dostarcza Anthropic w dokumentacji — sandbox tam jednak nie działa.</p>
+        <h3>Pierwsze uruchomienie</h3>
+        <p>Po instalacji przejdź do katalogu projektu i uruchom agenta. Pierwsze polecenie warto poświęcić na zbudowanie pamięci projektu:</p>
+        <pre><code>cd /sciezka/do/projektu
+claude
+/init</code></pre>
+        <p>Komenda <code>/init</code> analizuje repozytorium i tworzy plik <code>CLAUDE.md</code> z opisem stacku, skryptami i konwencjami — to fundament każdej kolejnej sesji.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 praca z agentem -->
+  <section class="sect" aria-labelledby="praca">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>03 / Workflow · Efektywna praca z agentem</p>
+        <h2 id="praca">Kontekst, promptowanie, pamięć projektu.</h2>
+        <h3>CLAUDE.md — pamięć projektu</h3>
+        <p>Plik <code>CLAUDE.md</code> w korzeniu projektu (lub globalnie w <code>~/.claude/CLAUDE.md</code>) agent czyta na starcie każdej sesji. Wpisz tam to, co inaczej musiałbyś powtarzać w kółko: stack, komendy build i test, konwencje nazewnicze, zasady bezpieczeństwa.</p>
+        <pre><code>## Stack
+- Astro + TypeScript, pnpm
+
+## Komendy
+- dev: pnpm dev
+- build: pnpm build
+- lint: pnpm lint
+
+## Zasady
+- Edytuj istniejace pliki, nie tworz nowych bez potrzeby
+- Po zmianie uruchom lint i build</code></pre>
+        <h3>Techniki promptowania dla programistów</h3>
+        <ul>
+          <li><strong>Odwołuj się do ścieżek i tras, nie do nazw tabel czy szczegółów implementacji.</strong> Krótszy, czytelniejszy prompt — i mniej tokenów.</li>
+          <li><strong>Jeden cel na prompt.</strong> Zamiast „zrób coś z motywem" napisz „dodaj przełącznik trybu ciemnego".</li>
+          <li><strong>Pozwól agentowi czytać kod.</strong> Nie wklejaj całych plików — agent sam je otworzy, jeśli wskażesz, gdzie szukać.</li>
+          <li><strong>Proś o plan przed zmianą</strong> przy większych zadaniach (tryb planowania), potem zatwierdzaj.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 poziomy myślenia (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="myslenie">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>04 / Zaawansowane · Poziomy myślenia</p>
+        <h2 id="myslenie">Budżet myślenia: think, megathink, ultrathink.</h2>
+        <p>Claude Code potrafi przeznaczyć więcej „myślenia" (rozumowania przed odpowiedzią) na trudniejsze zadania. Im większy budżet, tym głębsza analiza — kosztem czasu i tokenów. Sterujesz tym frazami w prompcie.</p>
+        <table>
+          <thead><tr><th scope="col">Poziom</th><th scope="col">Budżet (orientacyjnie)</th><th scope="col">Frazy aktywujące</th></tr></thead>
+          <tbody>
+            <tr><td><strong>think</strong></td><td>~4K tokenów</td><td>„think"</td></tr>
+            <tr><td><strong>megathink</strong></td><td>~10K tokenów</td><td>„think hard", „think harder", „megathink"</td></tr>
+            <tr><td><strong>ultrathink</strong></td><td>~32K tokenów</td><td>„ultrathink", „think really hard", „think intensely", „think longer"</td></tr>
+          </tbody>
+        </table>
+        <div class="callout">
+          <p><strong>Aktualizacja:</strong> najwyższy poziom (ultrathink) to budżet rzędu ~32K tokenów. Frazy aktywujące rozszerzono — dla ultrathink działają m.in. „think harder", „think intensely", „think longer", „think really hard". Większy budżet rezerwuj na realnie trudne decyzje: architektura, refactoring na dużą skalę, niejasne błędy.</p>
+        </div>
+        <h3>Inne techniki zaawansowane</h3>
+        <ul>
+          <li><strong>Promptowanie iteracyjne i role-playing:</strong> poproś agenta, by wcielił się w rolę (np. „jako recenzent bezpieczeństwa") i prowadził analizę krok po kroku.</li>
+          <li><strong>System skills i rozszerzenia:</strong> powtarzalne procedury można zamknąć w umiejętnościach (skills) i komendach, które agent wywołuje na żądanie.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 ekosystem -->
+  <section class="sect" aria-labelledby="ekosystem">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>05 / Ekosystem · Dokąd dalej</p>
+        <h2 id="ekosystem">Git, MCP i alternatywni agenci.</h2>
+        <p>Claude Code to punkt wyjścia. Wokół niego budujemy resztę workflow:</p>
+        <ul>
+          <li><strong>Git z agentem</strong> — inteligentne commity, code review i automatyzacja gałęzi prowadzona przez Claude Code.</li>
+          <li><strong>Serwery MCP</strong> — łączenie agenta z bazami danych, API, przeglądarką i narzędziami zespołu.</li>
+          <li><strong>Alternatywni agenci</strong> — Gemini CLI (Google), Codex CLI (OpenAI) oraz modele lokalne, gdy dane nie mogą opuścić firmy.</li>
+          <li><strong>Bezpieczeństwo</strong> — praca z AI na firmowym kodzie bez wycieku: deny rules, sandbox i hooki.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- powiązane szkolenia -->
+  <section class="sect sect--dark" aria-labelledby="powiazane">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>Powiązane szkolenia</p>
+        <h2 class="sect-title sect-title--s ws" id="powiazane">Kolejne kroki w Akademii.</h2>
+      </div>
+      <div class="link-cards rv">
+        <a class="link-card" href="/szkolenie-git">
+          <h3>Claude Code i Git</h3>
+          <p>Automatyczne commity, code review i git workflow prowadzone przez agenta.</p>
+        </a>
+        <a class="link-card" href="/tips-and-tricks">
+          <h3>Tips &amp; Tricks</h3>
+          <p>Praktyki, skróty i wzorce, które realnie przyspieszają pracę z Claude Code.</p>
+        </a>
+        <a class="link-card" href="/claude-code-bezpieczenstwo">
+          <h3>Claude Code — bezpieczeństwo</h3>
+          <p>Praca z AI na kodzie firmowym bez wycieku: deny rules, sandbox, hooki.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="sect sect--dark cta-band" style="padding-top:0" aria-labelledby="cta">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie, żeby tak pracował cały Wasz zespół?</h2>
+      <p class="rv">To szkolenie to materiał. Wdrożenie to kwartał na Waszym kodzie — z pomiarem efektu w DEVLens. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+</Interior>

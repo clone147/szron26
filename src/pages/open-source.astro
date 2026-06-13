@@ -1,0 +1,110 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="Open Source — narzędzia AI od SZRON | MIT License"
+  description="Narzędzia open source, które tworzymy przy wdrożeniach AI: serwer MCP dla IBM DB2, skille do Claude Code i więcej. Udostępniamy za darmo na licencji MIT."
+  eyebrow="Open Source · MIT License"
+  heading="Budujemy na otwarto."
+  lead="Narzędzia, które tworzymy przy wdrożeniach AI, udostępniamy za darmo. Używaj, kontrybuuj, rozwijaj. Cztery narzędzia, 37 wzorców i licencja MIT."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>4 narzędzia</strong><span>powstałe przy realnych wdrożeniach</span></div>
+        <div><strong>37 wzorców</strong><span>w humanizer-pl dla języka polskiego</span></div>
+        <div><strong>MIT License</strong><span>za darmo, do dowolnego użytku</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 narzędzia (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="narzedzia">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Narzędzia · Sprawdzone w boju</p>
+        <h2 class="sect-title ws" id="narzedzia">Każde powstało przy realnym projekcie wdrożeniowym.</h2>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>szron-db2-mcp<small>MCP Server · IBM DB2 · NEW</small></dt><dd>Serwer MCP, który podłącza agenta AI do bazy IBM DB2. Pytasz o dane zwykłym językiem — agent sam ułoży zapytanie, zaktualizuje rekord, w razie potrzeby stworzy tabelę, bez otwierania konsoli DB2. Pełen odczyt i zapis (SELECT, INSERT, UPDATE, DELETE), operacje DDL (CREATE, ALTER, DROP TABLE z constraintami) i ochrona przed SQL injection — wymóg WHERE, walidacja zapytań. TypeScript, Node.js.</dd></div>
+        <div><dt>skill-imagegen<small>Claude Code Skill · Generowanie obrazów · NEW</small></dt><dd>Generowanie obrazków AI z wbudowanym AI art directorem. Piszesz prosty prompt, a skill zamienia go w kinematograficzny opis i generuje profesjonalny obraz. Auto-enhancement z prostego promptu, edycja z referencjami (do 14 obrazków wejściowych), rozdzielczości 1K/2K/4K i dowolne proporcje. Gemini 3.1 Flash Image pod spodem.</dd></div>
+        <div><dt>humanizer-pl<small>Claude Code Skill · NLP · Polski</small></dt><dd>Skill do Claude Code, który wykrywa i usuwa ślady AI z polskich tekstów. 37 wzorców specyficznych dla języka polskiego — imiesłowy, anglicyzmy, strona bierna, formułkowe zdania. Instalacja jedną linijką, gotowy do użycia w minutę.</dd></div>
+        <div><dt>subtitle-downloader<small>Claude Code Skill · Napisy · Video · NEW</small></dt><dd>Mówisz, jaki film i jaki język — dostajesz napisy. Skill automatycznie wykrywa film z nazwy pliku i pobiera napisy z trzech źródeł: subliminal, napiprojekt i OpenSubtitles. Napiprojekt to najlepsza baza polskich napisów (hash MD5).</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 02 dlaczego open source -->
+  <section class="sect" aria-labelledby="dlaczego">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Dlaczego · Nasza logika</p>
+        <h2 class="sect-title sect-title--s ws" id="dlaczego">Dlaczego open source?</h2>
+      </div>
+      <div class="grid-cards">
+        <article class="card-tile rv">
+          <p class="eyebrow">a</p>
+          <h3>Powstaje przy pracy</h3>
+          <p>Każde narzędzie powstało przy realnym projekcie wdrożeniowym. Nie teoria — sprawdzone w boju.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.08s">
+          <p class="eyebrow">b</p>
+          <h3>Społeczność ponad marketing</h3>
+          <p>Feedback od developerów jest więcej wart niż kampanie reklamowe. Budujemy razem.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.16s">
+          <p class="eyebrow">c</p>
+          <h3>Standard budujemy razem</h3>
+          <p>Polski AI tooling jest młody. Im więcej osób kontrybuuje, tym lepsze narzędzia powstają.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 spis na GitHub (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="github">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Nasze repozytoria · GitHub</p>
+        <h2 class="sect-title ws" id="github">Zobacz kod, zainstaluj, kontrybuuj.</h2>
+      </div>
+      <div class="link-cards rv">
+        <a class="link-card" href="https://github.com/clone147/szron-db2-mcp" target="_blank" rel="noopener noreferrer">
+          <h3>szron-db2-mcp</h3>
+          <p>Serwer MCP do IBM DB2. Agent AI czyta i zapisuje dane, tworzy tabele — a walidacja blokuje SQL injection.</p>
+        </a>
+        <a class="link-card" href="https://github.com/clone147/skill-imagegen" target="_blank" rel="noopener noreferrer">
+          <h3>skill-imagegen</h3>
+          <p>Claude Code skill do generowania obrazków AI z automatycznym ulepszaniem promptów. Wbudowany AI art director plus Gemini 3.1 Flash Image.</p>
+        </a>
+        <a class="link-card" href="https://github.com/clone147/humanizer-pl" target="_blank" rel="noopener noreferrer">
+          <h3>humanizer-pl</h3>
+          <p>Claude Code skill usuwający ślady AI z polskich tekstów. 37 wzorców specyficznych dla języka polskiego.</p>
+        </a>
+        <a class="link-card" href="https://github.com/clone147/subtitle-downloader" target="_blank" rel="noopener noreferrer">
+          <h3>subtitle-downloader</h3>
+          <p>Claude Code skill do pobierania napisów do filmów i seriali. Subliminal, napiprojekt, OpenSubtitles — automatycznie.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Kontakt</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Masz pomysł na narzędzie?</h2>
+      <p class="rv">Budujemy narzędzia, które pomagają polskim zespołom pracować z AI. Jeśli masz pomysł — napisz. Zerknij też na nasz profil na GitHub.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Napisz do nas
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="https://github.com/clone147" target="_blank" rel="noopener noreferrer">Zobacz GitHub</a>
+      </div>
+    </div>
+  </section>
+</Interior>

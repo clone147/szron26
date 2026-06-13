@@ -1,0 +1,110 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="Darmowy audyt AI dla zespołu | SZRON"
+  description="Bezpłatna rozmowa o tym, jak AI może pomóc Waszemu zespołowi programistycznemu. Analiza narzędzi i procesów, wskazanie szans, konkretne rekomendacje na piśmie. Bez pitchu."
+  eyebrow="Bezpłatna rozmowa · zespoły dev"
+  heading="Pogadajmy, jak AI może pomóc Waszemu zespołowi."
+  lead="Nie robię prezentacji z 40 slajdami. Patrzę na Wasze narzędzia, procesy i stack — i mówię wprost, gdzie widzę potencjał, a gdzie nie. Dostajesz konkretne rekomendacje, które możecie wdrożyć od razu. Nawet jeśli nie ze mną."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>Rozmowa + notatka</strong><span>w 1–2 dni od spotkania</span></div>
+        <div><strong>Konkretne rekomendacje</strong><span>na piśmie, gotowe do wdrożenia</span></div>
+        <div><strong>Szczera ocena</strong><span>nie pitch sprzedażowy</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 o czym porozmawiamy (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="zakres">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Zakres · O czym porozmawiamy</p>
+        <h2 class="sect-title ws" id="zakres">Cztery tematy. Na koniec notatka z krokami.</h2>
+        <p class="sect-lead rv">Przejdziemy przez cztery tematy. Na koniec dostaniesz notatkę z konkretnymi krokami do wdrożenia.</p>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Jak pracujecie i co Was spowalnia<small>Narzędzia, procesy, typowy dzień</small></dt><dd>Pytam o Wasze narzędzia, procesy i typowy dzień pracy. Szukam miejsc, gdzie tracicie czas na rzeczy, które AI zrobi szybciej.</dd></div>
+        <div><dt>Gdzie AI da widoczny efekt<small>Nie wszędzie</small></dt><dd>Wskazuję dwa, trzy miejsca, gdzie naprawdę warto zacząć — i mówię dlaczego.</dd></div>
+        <div><dt>Jakie narzędzia pasują do stacku<small>Pod Wasze repo i workflow</small></dt><dd>Agenci AI (Opus, Sonnet), Claude Code, MCP Tools — a do tego Cursor czy Copilot tam, gdzie pasują. Dobieram pod Wasze repo i workflow.</dd></div>
+        <div><dt>Punkt wyjścia i realna ocena potencjału<small>Bez naciąganych prognoz</small></dt><dd>Ustalimy, gdzie jesteście teraz i co realistycznie możecie zyskać. Bez naciąganych prognoz.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 02 dlaczego ja -->
+  <section class="sect" aria-labelledby="dlaczego">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Dlaczego ja · Z czym przychodzę</p>
+        <h2 class="sect-title sect-title--s ws" id="dlaczego">Praktyka, nie slajdy z demo.</h2>
+      </div>
+      <div class="grid-cards">
+        <article class="card-tile rv">
+          <p class="eyebrow">a</p>
+          <h3>Robię to od dawna</h3>
+          <p>Embedded, mobile, enterprise — widziałem sporo stacków. Wiem, co się sprawdza w praktyce, nie tylko w teorii.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.08s">
+          <p class="eyebrow">b</p>
+          <h3>Pracuję na Waszym kodzie</h3>
+          <p>Nie pokazuję slajdów z demo. Biorę Wasze repo, Wasze taski i na nich pokazuję, co AI zmienia.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.16s">
+          <p class="eyebrow">c</p>
+          <h3>Różnicę widać od pierwszego dnia</h3>
+          <p>Mierzymy przed i po. Nie obiecuję cudów — ale konkretne wyniki widzisz od razu.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 formularz (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="formularz">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Zgłoszenie · Umów się na rozmowę</p>
+        <h2 class="sect-title ws" id="formularz">Zostaw kontakt — odezwę się w ciągu 24h.</h2>
+        <p class="sect-lead rv">Na nic się nie zapisujesz. Po prostu pogadamy i ustalimy termin.</p>
+      </div>
+      <form name="darmowy-audyt" method="POST" data-netlify="true" class="prose rv">
+        <input type="hidden" name="form-name" value="darmowy-audyt" />
+        <p>
+          <label for="name">Imię<span aria-hidden="true"> *</span></label><br />
+          <input type="text" id="name" name="name" required placeholder="Jan" />
+        </p>
+        <p>
+          <label for="email">Email<span aria-hidden="true"> *</span></label><br />
+          <input type="email" id="email" name="email" required placeholder="jan@firma.pl" />
+        </p>
+        <p>
+          <label for="company">Firma</label><br />
+          <input type="text" id="company" name="company" placeholder="Nazwa firmy" />
+        </p>
+        <p>
+          <label for="teamSize">Rozmiar zespołu</label><br />
+          <select id="teamSize" name="teamSize">
+            <option value="">Wybierz…</option>
+            <option value="1-5">1–5 osób</option>
+            <option value="6-15">6–15 osób</option>
+            <option value="16-30">16–30 osób</option>
+            <option value="31-50">31–50 osób</option>
+            <option value="50+">50+ osób</option>
+          </select>
+        </p>
+        <p>
+          <button class="btn btn--accent" type="submit">Umów rozmowę
+            <span class="btn__arr" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+              <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            </span>
+          </button>
+        </p>
+      </form>
+    </div>
+  </section>
+</Interior>

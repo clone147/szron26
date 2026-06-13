@@ -1,0 +1,192 @@
+---
+import Interior from '../../layouts/Interior.astro';
+---
+<Interior
+  title="Case study: system biletowy NFC RegioBus — 4 tygodnie zamiast 6 miesięcy | SZRON"
+  description="Nowy system biletowy NFC dla RegioBus Systems. Planowany na 6 miesięcy, działający produkt po 4 tygodniach. Z 4 programistów został jeden z asystentem AI — 0 odejść."
+  eyebrow="Case studies › RegioBus Systems · Transport · Backend + mobile · 2026"
+  heading="Sześć miesięcy planu. Cztery tygodnie do produktu."
+  lead="RegioBus Systems planował nowy system biletowy NFC na sześć miesięcy. Po czterech tygodniach mieli działający produkt w produkcji. Z czterech programistów dedykowanych do utrzymania starego systemu zostawili jednego — z asystentem AI, z większą prędkością niż dotychczasowy zespół. Skala pilota: tak wygląda pierwszy kwartał, gdy zespół ma 4 osoby. Przy 30+ pracujemy falami, zespół po zespole."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>6 mc → 4 tyg</strong><span>czas dostarczenia</span></div>
+        <div><strong>3 z 4 osób uwolnione</strong><span>0 odejść · Java · Kotlin · NFC</span></div>
+        <div><strong>setki tys. PLN</strong><span>roczne oszczędności</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 kontekst -->
+  <section class="sect" aria-labelledby="kontekst">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Kontekst klienta</p>
+        <h2 class="sect-title sect-title--s ws" id="kontekst">Monolit z 2008 roku, czteroosobowa drużyna i plan na pół roku.</h2>
+      </div>
+      <div class="prose rv">
+        <p>RegioBus Systems obsługuje regionalne linie autobusowe na południu Polski — dziesiątki tysięcy pasażerów dziennie, kilkaset pojazdów, ponad dwadzieścia lat na rynku. System biletowy, na którym jeżdżą, powstał w 2008 roku jako monolit napisany w Javie 6, z mobilną aplikacją w starym Androidzie z 2014. Wszystko utrzymywała czteroosobowa drużyna: dwóch starszych deweloperów, którzy znali kod na pamięć, i dwóch młodszych, którzy uczyli się pojmować, dlaczego nic nie ma testów.</p>
+        <p>Każda zmiana w kodzie zajmowała tygodnie — nie dlatego, że była trudna, ale dlatego, że nikt nie chciał ryzykować dotknięcia części, której nie rozumiał. Plan zarządu był ambitny: nowy system biletowy NFC, integracja z infrastrukturą operatorów płatności, otwarcie API dla aplikacji partnerskich. Czas: sześć miesięcy. Wycena od trzech zewnętrznych dostawców: 1.4–2.1 mln PLN.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 kto prowadził (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="kto">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Kto to prowadził</p>
+        <h2 class="sect-title ws" id="kto">Dwie osoby, jeden numer telefonu, code review we dwóch przez cały kwartał.</h2>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Maciej Stopa<small>Lead operacyjny</small></dt><dd>Backend Spring Boot 3, warstwa mobile NFC w Kotlinie wraz z UI dla kierowców, migracja Oracle 11 → PostgreSQL 16. 12 lat w mobile, 5 w fintechu i transporcie, wcześniej platform owner u operatora płatności (4M+ MAU).</dd></div>
+        <div><dt>Tomek Wojciechowski<small>AI workflow</small></dt><dd>Setup Claude Code, dwa custom MCP servery (DB read-only z białą listą + logi produkcyjne), CLAUDE.md (280 linii konwencji zespołu). Prowadził też wszystkie rozmowy z zarządem i CTO klienta.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 03 co bolało -->
+  <section class="sect" aria-labelledby="bol">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Problem · Co naprawdę bolało</p>
+        <h2 class="sect-title sect-title--s ws" id="bol">Pierwsze pytanie nie dotyczyło technologii.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Pierwsze pytanie podczas diagnozy nie dotyczyło technologii. Brzmiało: „Co się stanie z waszym zespołem, jak skończycie ten projekt?". Cisza w pokoju trwała kilkanaście sekund.</p>
+        <ul>
+          <li><strong>Po stronie biznesu:</strong> sześć miesięcy bez wpływów z nowego systemu, ryzyko, że operatorzy płatności pójdą do konkurencji.</li>
+          <li><strong>Po stronie IT:</strong> czterech ludzi, którzy wiedzą, że po wdrożeniu nowego systemu zostaną z aplikacją, której nie tworzyli i nie rozumieją. Dwóch z nich już rozmawiało z rekruterami.</li>
+          <li><strong>Po stronie zarządu:</strong> przekonanie, że można „zamówić" system biletowy jak meble. Brak doświadczenia z tym, jak modernizacja wygląda od środka.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 podejście (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="podejscie">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>04 / Podejście SZRON</p>
+        <h2 class="sect-title ws" id="podejscie">3 miesiące, stała opłata, modernizacja z ich zespołem.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Po dwóch dniach diagnozy zaproponowaliśmy alternatywę: 3 miesiące, stała opłata, modernizacja prowadzona z udziałem ich zespołu. Główne założenia, które wpisaliśmy do oferty:</p>
+        <ul>
+          <li><strong>Modernizujemy wspólnie z waszymi programistami.</strong> Każdy commit produkcyjny piszą oni — my obok. Po 3 miesiącach to oni mają ownership nowego kodu.</li>
+          <li><strong>Stała opłata, zamknięty zakres.</strong> Nie rozliczamy się godzinami — nie mamy interesu w przedłużaniu. Co jest w zakresie — robimy. Co nie jest — wpisujemy do listy następnych iteracji.</li>
+          <li><strong>Nowy stack, ale realistyczny.</strong> Spring Boot 3 (bo Java to ich język), Kotlin do warstwy NFC, PostgreSQL jako baza. Bez przepisywania na „modne" technologie, których ich zespół nie utrzyma.</li>
+          <li><strong>AI tooling z CLAUDE.md od dnia 1.</strong> Claude Code + dedykowane MCP servery do bazy i do logów. Konkretny workflow opisany w pliku, który zostaje w repo.</li>
+        </ul>
+      </div>
+      <figure class="quote-card rv">
+        <blockquote>Zarząd zaakceptował ofertę nie dlatego, że była najtańsza (nie była). Zaakceptowali ją, bo była jedyną, która adresowała „co zrobimy z zespołem". Ostatecznie wybrali ją wszyscy: zarząd, CTO i czterech programistów.</blockquote>
+        <figcaption><strong>Decyzja, która zmieniła wszystko</strong> — wniosek SZRON</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 05 przebieg -->
+  <section class="sect" aria-labelledby="przebieg">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>05 / Przebieg projektu · 4 tygodnie do produkcji</p>
+        <h2 class="sect-title ws" id="przebieg">Pierwsi pasażerowie w czwartym tygodniu.</h2>
+      </div>
+      <p class="rv">Plan kwartalny przewidywał 12 tygodni do pełnego wdrożenia z transferem wiedzy. Działający produkt zobaczył pierwszych pasażerów w czwartym tygodniu — pilotowo na jednej linii. Reszta kwartału to skalowanie, integracje i przekazanie.</p>
+      <div class="steps">
+        <article class="step rv"><p class="eyebrow">Tydzień 1</p><h3>Diagnoza i decyzje techniczne</h3><p>Czytanie istniejącego kodu, mapa zależności, pierwsze decyzje stack-owe. Setup CLAUDE.md, MCP serverów, parowanie z każdym z 4 programistów.</p></article>
+        <article class="step rv" style="--rv-d:.06s"><p class="eyebrow">Tydzień 2</p><h3>Core domeny</h3><p>Model bilet–trasa–pasażer. Pierwsze endpointy Spring Boot. Pierwszy moduł NFC w Kotlinie. Wszystko pisane parami programista RegioBus + SZRON.</p></article>
+        <article class="step rv" style="--rv-d:.12s"><p class="eyebrow">Tydzień 3</p><h3>Integracje i CI/CD</h3><p>Operator płatności, terminale w autobusach, GitHub Actions z testami. Pierwsze ćwiczenia code review prowadzone przez zespół RegioBus.</p></article>
+        <article class="step rv" style="--rv-d:.18s"><p class="eyebrow">Tydzień 4</p><h3>Pilot produkcyjny</h3><p>Linia 215 (mała, kontrolowana). 1 200 transakcji NFC pierwszego dnia, 0 błędów krytycznych. Zarząd zobaczył wpływy z nowego systemu.</p></article>
+        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">Tygodnie 5–10</p><h3>Skalowanie + uczenie zespołu</h3><p>Rolowanie na kolejne linie. Programiści RegioBus prowadzą feature'y samodzielnie, my robimy review.</p></article>
+        <article class="step rv" style="--rv-d:.3s"><p class="eyebrow">Tygodnie 11–12</p><h3>Przekazanie</h3><p>Dokumentacja, mapa „co dalej", finalna wersja CLAUDE.md. Decyzja zarządu: dwóch programistów przesunąć do innego projektu, jeden zostaje przy systemie biletowym z asystentem AI.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 wynik (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="wynik">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>06 / Wynik · W liczbach i w kulturze</p>
+        <h2 class="sect-title ws" id="wynik">W liczbach i w kulturze.</h2>
+      </div>
+      <div class="proof-strip rv">
+        <div><strong>~6× szybciej</strong><span>4 tygodnie zamiast 6 miesięcy do produktu</span></div>
+        <div><strong>0 odejść</strong><span>z 4 osób została 1 z AI, 3 przesunięto</span></div>
+        <div><strong>7% → 68%</strong><span>pokrycie testami (unit + integration)</span></div>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Czas do produktu<small>4 tygodnie</small></dt><dd>4 tygodnie zamiast 6 miesięcy (ok. 6× szybciej).</dd></div>
+        <div><dt>Zespół utrzymaniowy<small>z 4 osób — 1 z AI</small></dt><dd>Z 4 osób przy starym systemie została 1 z asystentem AI. Pozostałych trzech przesunięto do nowych inicjatyw — zachowali pracę, dostali nowe wyzwania. 0 odejść z firmy.</dd></div>
+        <div><dt>Roczne oszczędności<small>setki tysięcy złotych</small></dt><dd>Głównie na zmniejszeniu kosztu utrzymania i wcześniejszych przychodach z nowego systemu.</dd></div>
+        <div><dt>Pokrycie testami<small>7% → 68%</small></dt><dd>Z 7% do 68% (unit + integration). Każdy nowy moduł pisany z testami.</dd></div>
+        <div><dt>Wskaźnik change-rate<small>3 dni zamiast 14</small></dt><dd>Średnia zmiana wdrażana w 3 dni zamiast 14.</dd></div>
+      </dl>
+      <figure class="quote-card rv">
+        <blockquote>Zaplanowaliśmy 6 miesięcy na nowy system. Po czterech tygodniach mieliśmy działający produkt. Z czterech programistów zostawiliśmy jednego, z asystentem AI.</blockquote>
+        <figcaption><strong>Marek Zawadzki</strong> — CTO, RegioBus Systems · LinkedIn i pełne dane referencyjne na życzenie po NDA · współpraca z Maciejem Stopą i Tomkiem Wojciechowskim</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 07 stack -->
+  <section class="sect" aria-labelledby="stack">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>07 / Stack technologiczny</p>
+        <h2 class="sect-title sect-title--s ws" id="stack">Dokładnie to, co utrzymują dalej.</h2>
+      </div>
+      <p class="rv">Zasada „nie kupuj zespołowi narzędzi, których nie utrzyma" przekłada się na konkretne wybory:</p>
+      <dl class="def-rows rv">
+        <div><dt>Backend<small>Java 21 · Spring Boot 3.2</small></dt><dd>Java 21, Spring Boot 3.2, Spring Data JPA, Flyway. Ten sam język, ale współczesny — żaden z programistów nie musiał uczyć się od zera.</dd></div>
+        <div><dt>Mobilne / NFC<small>Kotlin + Android NFC API</small></dt><dd>Migracja z Javy do Kotlina zrobiona przez parowanie — w 3 tygodnie cały zespół pisał już w Kotlinie naturalnie.</dd></div>
+        <div><dt>Baza<small>PostgreSQL 16</small></dt><dd>PostgreSQL 16 z partycjonowaniem po dacie. Migracja z Oracle 11 zrobiona Flywayem, krok po kroku, bez downtime.</dd></div>
+        <div><dt>AI workflow<small>Claude Code + 2 MCP</small></dt><dd>Claude Code jako daily driver, dwa custom MCP servery — jeden do bazy (read-only z białą listą), drugi do logów produkcyjnych. CLAUDE.md liczy 280 linii — wszystkie konwencje zespołu.</dd></div>
+        <div><dt>Infrastruktura<small>AWS ECS Fargate + RDS</small></dt><dd>AWS ECS Fargate + RDS, terraform pisany razem z DevOps po stronie klienta. Nic, czego nie mogą sami zmienić.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 08 co zostało (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="zostalo">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>08 / Co zostało po nas</p>
+        <h2 class="sect-title ws" id="zostalo">Po wyjściu z projektu zostawiliśmy cztery rzeczy.</h2>
+      </div>
+      <div class="grid-cards">
+        <article class="card-tile rv"><p class="eyebrow">01</p><h3>Działający system biletowy NFC</h3><p>Obsługujący 100% pasażerów RegioBus.</p></article>
+        <article class="card-tile rv" style="--rv-d:.1s"><p class="eyebrow">02</p><h3>Programistę, który prowadzi rozwój samodzielnie</h3><p>Z asystentem AI jako narzędziem, nie jako zastępcą. Średnia: 3–4 mergowane PR-y dziennie, każdy z testami.</p></article>
+        <article class="card-tile rv" style="--rv-d:.2s"><p class="eyebrow">03</p><h3>CLAUDE.md + 2 MCP servery + dokumentacja</h3><p>Wzorzec, który da się powielić przy kolejnym module.</p></article>
+        <article class="card-tile rv" style="--rv-d:.3s"><p class="eyebrow">04</p><h3>Trzech programistów uwolnionych do nowych projektów</h3><p>Żaden z nich nie odszedł z firmy. To, czego najbardziej obawiali się we wstępnej rozmowie, nie nastąpiło.</p></article>
+      </div>
+      <p class="rv" style="margin-top:var(--space-xl)">30 dni po zakończeniu projektu byliśmy na „call when needed". Wpadliśmy raz — pomóc z migracją pierwszego dużego operatora płatności. To było 90 minut konsultacji, nie tydzień pracy.</p>
+      <div class="link-cards rv" style="margin-top:var(--space-xl)">
+        <a class="link-card" href="/case-studies/stm32"><h3>Następny case →</h3><p>Firmware STM32 — sterownik urządzenia przemysłowego</p></a>
+        <a class="link-card" href="/case-studies"><h3>Wszystkie case studies</h3><p>Trzy piloty w trzech branżach</p></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Macie podobny problem?</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Wasza aplikacja też planowana na pół roku?</h2>
+      <p class="rv">30-minutowa diagnoza wystarczy, żeby ocenić, czy taki sam skok jest możliwy u Was. Bez prezentacji, bez sprzedaży.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="/case-studies">Inne realizacje</a>
+      </div>
+    </div>
+  </section>
+</Interior>

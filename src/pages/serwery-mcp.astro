@@ -1,0 +1,110 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="Serwery MCP + Claude Code — Chrome DevTools MCP i ekosystem | SZRON"
+  description="Model Context Protocol rozszerza możliwości Claude Code o zewnętrzne narzędzia. Instalacja Chrome DevTools MCP krok po kroku: Node 20.19+, Chrome, flaga telemetrii i przykłady."
+  eyebrow="Akademia · Serwery MCP"
+  heading="Serwery MCP: rozszerz możliwości Claude Code."
+  lead="Model Context Protocol to standardowy sposób łączenia narzędzi AI z zewnętrznymi systemami. Dzięki serwerom MCP Claude Code kontroluje przeglądarkę, sięga do baz danych i automatyzuje złożone zadania. Na warsztat bierzemy Chrome DevTools MCP — agent testuje i debuguje aplikacje webowe wprost w Chrome."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>Rozszerzalność</strong><span>nowe możliwości dla agenta</span></div>
+        <div><strong>Chrome DevTools MCP</strong><span>testy, debug i wydajność w przeglądarce</span></div>
+        <div><strong>Node 20.19+</strong><span>i zainstalowany Google Chrome</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 treść techniczna -->
+  <section class="sect" aria-labelledby="intro">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / MCP · Czym jest i jak zacząć</p>
+        <h2 class="sect-title sect-title--s ws" id="intro">Model Context Protocol w codziennej pracy.</h2>
+      </div>
+
+      <div class="prose rv">
+        <p>Model Context Protocol to standardowy sposób łączenia narzędzi AI z zewnętrznymi systemami i usługami. Serwery MCP działają jako pomosty między agentem a narzędziami — dzięki nim Claude Code może kontrolować przeglądarki, łączyć się z bazami danych, zarządzać plikami i wykonywać zadania wykraczające poza podstawowe możliwości.</p>
+        <ul>
+          <li><strong>Rozszerzalność.</strong> Dodajesz nowe możliwości do Claude Code.</li>
+          <li><strong>Integracje.</strong> Łączysz agenta z zewnętrznymi narzędziami.</li>
+          <li><strong>Automatyzacja.</strong> Automatyzujesz złożone przepływy pracy.</li>
+          <li><strong>Monitoring.</strong> Śledzisz i debugujesz aplikacje w czasie rzeczywistym.</li>
+        </ul>
+
+        <h2>Chrome DevTools MCP</h2>
+        <p>Chrome DevTools MCP daje Claude Code bezpośrednią kontrolę nad przeglądarką Chrome. Agent testuje, debuguje i optymalizuje kod w rzeczywistym środowisku — analizuje błędy, mierzy wydajność i symuluje interakcje użytkownika.</p>
+
+        <h3>Wymagania</h3>
+        <ul>
+          <li>Node.js w wersji 20.19 lub nowszej (maintenance LTS).</li>
+          <li>Zainstalowany Google Chrome (wersja stable lub nowsza).</li>
+          <li>Claude Code — zamknij go przed instalacją serwera.</li>
+        </ul>
+        <pre><code># weryfikacja wersji Node.js
+node --version</code></pre>
+
+        <h3>Instalacja</h3>
+        <p>Zamknij Claude Code, a następnie uruchom w terminalu:</p>
+        <pre><code>claude mcp add chrome-devtools --scope user npx chrome-devtools-mcp@latest</code></pre>
+        <div class="callout"><p><strong>Aktualizacja:</strong> w aktualnej składni nie używaj separatora <code>--</code> przed <code>npx</code> — komenda to <code>claude mcp add chrome-devtools --scope user npx chrome-devtools-mcp@latest</code>. Wymagany jest Node.js 20.19 lub nowszy oraz zainstalowany Chrome.</p></div>
+        <p>Aby wyłączyć telemetrię, dołącz flagę serwera:</p>
+        <pre><code>claude mcp add chrome-devtools --scope user npx chrome-devtools-mcp@latest --no-usage-statistics</code></pre>
+        <div class="callout"><p><strong>Uwaga:</strong> po instalacji uruchom Claude Code ponownie, aby serwer MCP został wczytany.</p></div>
+
+        <h2>Przykłady użycia</h2>
+        <ul>
+          <li>„Przeanalizuj wydajność strony https://example.com".</li>
+          <li>„Sprawdź błędy JavaScript i wygeneruj poprawki".</li>
+          <li>„Przetestuj formularz kontaktowy".</li>
+          <li>„Zrób screenshot responsywności na różnych urządzeniach".</li>
+        </ul>
+
+        <h3>Możliwości Chrome DevTools MCP</h3>
+        <ul>
+          <li>Interakcja z elementami i wypełnianie formularzy.</li>
+          <li>Zarządzanie oknami i emulacja urządzeń.</li>
+          <li>Monitoring sieci i analiza wydajności.</li>
+          <li>Screenshoty i dostęp do konsoli JavaScript.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 powiązane szkolenia (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="powiazane">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Akademia · Czytaj dalej</p>
+        <h2 class="sect-title sect-title--s ws" id="powiazane">Powiązane szkolenia.</h2>
+      </div>
+      <div class="link-cards rv">
+        <a class="link-card" href="/szkolenie-context7"><h3>Context7 + Claude Code</h3><p>Aktualna dokumentacja bibliotek prosto w kontekście agenta (MCP).</p></a>
+        <a class="link-card" href="/szkolenie-supabase-mcp"><h3>MCP Supabase</h3><p>Połączenie agenta z bazą Supabase — tryb read-only i bezpieczeństwo.</p></a>
+        <a class="link-card" href="/szkolenie-mysql"><h3>MySQL MCP Server</h3><p>Agent na bazie MySQL: konfiguracja, operacje zapisu, pułapki wersji.</p></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie, żeby tak pracował cały Wasz zespół?</h2>
+      <p class="rv">Akademia to materiały. Wdrożenie to kwartał na Waszym kodzie — z pomiarem efektu w DEVLens. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+</Interior>

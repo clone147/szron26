@@ -1,0 +1,122 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="MCP Supabase + Claude Code — tryb read-only i bezpieczeństwo | SZRON"
+  description="Połącz bazę Supabase z Claude Code przez MCP: instalacja serwera, tryb read-only, project-ref scoping i zasady bezpieczeństwa. Nie łącz z produkcją — tylko development."
+  eyebrow="Akademia · MCP Supabase"
+  heading="MCP Supabase: agent na Waszej bazie — z trybem read-only."
+  lead="MCP Supabase daje Claude Code bezpośredni dostęp do bazy w naturalnym języku: listowanie tabel, zapytania, migracje, generowanie typów TypeScript. Klucz to bezpieczna konfiguracja — tryb read-only i ograniczenie do jednego projektu, nigdy na produkcji."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>Dostęp z promptu</strong><span>tabele, zapytania, migracje, typy</span></div>
+        <div><strong>Tryb read-only</strong><span>domyślnie tylko odczyt dla bezpieczeństwa</span></div>
+        <div><strong>Tylko development</strong><span>nie łącz agenta z produkcją</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 treść techniczna -->
+  <section class="sect" aria-labelledby="intro">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / MCP · Supabase krok po kroku</p>
+        <h2 class="sect-title sect-title--s ws" id="intro">Bezpieczny dostęp do bazy z naturalnego języka.</h2>
+      </div>
+
+      <div class="prose rv">
+        <p>Supabase to otwarta platforma oparta o PostgreSQL — z autentykacją, REST i GraphQL API, storage, Row Level Security i panelem zarządzania. Serwer MCP Supabase pozwala Claude Code sięgać do tej bazy bezpośrednio z promptu.</p>
+
+        <div class="callout"><p><strong>Uwaga (bezpieczeństwo):</strong> serwer MCP ma realny dostęp do bazy. Używaj go tylko na środowiskach deweloperskich — nie łącz agenta z produkcją. Domyślnie uruchamiaj w trybie read-only i ograniczaj zakres do jednego projektu przez project-ref.</p></div>
+
+        <h2>Wymagania</h2>
+        <ul>
+          <li>Node.js w wersji 20 lub nowszej (do uruchomienia serwera przez npx).</li>
+          <li>Personal access token z panelu Supabase: Settings → Access Tokens → Create new token.</li>
+          <li>Project ref bazy: Settings → General → Reference ID.</li>
+        </ul>
+        <pre><code># weryfikacja wersji Node.js
+node --version</code></pre>
+
+        <h2>Instalacja serwera</h2>
+        <p>Najprostsze podejście to dodanie serwera bezpośrednio w Claude Code z tokenem dostępu, w trybie tylko do odczytu i z ograniczeniem do jednego projektu:</p>
+        <pre><code>claude mcp add supabase -- npx -y @supabase/mcp-server-supabase@latest \
+  --access-token=TWOJ_TOKEN \
+  --read-only \
+  --project-ref=TWOJ_PROJECT_REF</code></pre>
+        <div class="callout"><p><strong>Aktualizacja:</strong> serwer uruchamiaj jako <code>npx -y @supabase/mcp-server-supabase@latest --access-token=&lt;token&gt;</code>. Flaga <code>--read-only</code> wymusza tylko odczyt, a <code>--project-ref</code> ogranicza dostęp do jednej bazy. Token możesz też przekazać przez zmienną środowiskową <code>SUPABASE_ACCESS_TOKEN</code> zamiast w argumencie.</p></div>
+
+        <h3>Alternatywa — przez Claude Desktop</h3>
+        <p>Możesz najpierw skonfigurować serwer w Claude Desktop, a potem zaimportować go do Claude Code. W pliku konfiguracyjnym Claude Desktop dodaj wpis serwera (klamry zakodowane encjami, w realnym pliku JSON użyj zwykłych nawiasów):</p>
+        <pre><code>&#123;
+  "mcpServers": &#123;
+    "supabase": &#123;
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--read-only",
+        "--project-ref=TWOJ_PROJECT_REF"
+      ],
+      "env": &#123;
+        "SUPABASE_ACCESS_TOKEN": "TWOJ_TOKEN"
+      &#125;
+    &#125;
+  &#125;
+&#125;</code></pre>
+        <p>Następnie zaimportuj konfigurację do Claude Code i wybierz z listy serwer „supabase":</p>
+        <pre><code>claude mcp add-from-claude-desktop</code></pre>
+
+        <h3>Weryfikacja</h3>
+        <p>Sprawdź, czy agent widzi bazę, prostym poleceniem:</p>
+        <pre><code>pokaz mi wszystkie tabele w bazie danych</code></pre>
+        <p>Claude Code powinno wyświetlić listę tabel z Twojego projektu Supabase.</p>
+
+        <h2>Przykładowe komendy</h2>
+        <ul>
+          <li>„Pokaż wszystkie tabele w bazie danych" — listowanie schematu.</li>
+          <li>„Sprawdź, czy istnieją duplikaty w tabeli X" — analiza i debugging (tylko odczyt).</li>
+          <li>„Wygeneruj typy TypeScript dla wszystkich tabel" — automatyczne generowanie typów.</li>
+          <li>„Utwórz migrację dodającą kolumnę created_at" — zarządzanie migracjami (poza trybem read-only).</li>
+        </ul>
+        <div class="callout"><p><strong>Wskazówka:</strong> operacje zapisu — tworzenie tabel, migracje, modyfikacje danych — wymagają wyłączenia trybu read-only. Włączaj go świadomie i wyłącznie na bazie deweloperskiej.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 powiązane szkolenia (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="powiazane">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Akademia · Czytaj dalej</p>
+        <h2 class="sect-title sect-title--s ws" id="powiazane">Powiązane szkolenia.</h2>
+      </div>
+      <div class="link-cards rv">
+        <a class="link-card" href="/szkolenie-mysql"><h3>MySQL MCP Server</h3><p>Agent na bazie MySQL: konfiguracja, operacje zapisu, pułapki wersji.</p></a>
+        <a class="link-card" href="/serwery-mcp"><h3>Serwery MCP</h3><p>Chrome DevTools MCP i ekosystem serwerów MCP w codziennej pracy.</p></a>
+        <a class="link-card" href="/claude-code-bezpieczenstwo"><h3>Claude Code — bezpieczeństwo</h3><p>Praca z AI na kodzie firmowym bez wycieku: VPC, modele lokalne, audit log.</p></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie, żeby tak pracował cały Wasz zespół?</h2>
+      <p class="rv">Akademia to materiały. Wdrożenie to kwartał na Waszym kodzie — z pomiarem efektu w DEVLens. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+</Interior>

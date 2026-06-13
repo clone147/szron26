@@ -1,0 +1,188 @@
+---
+import Interior from '../../layouts/Interior.astro';
+---
+<Interior
+  title="Case study: firmware STM32 — sterownik przemysłowy w 2 tygodnie | SZRON"
+  description="Nowy moduł komunikacji Modbus RTU + CANopen do sterownika STM32. Trzej inżynierowie klienta zamknęli go w dwa tygodnie zamiast 6–8, z testami HIL i pełną dokumentacją."
+  eyebrow="Case studies › Sterownik STM32 · Embedded · Hardware / IoT · 2026"
+  heading="Dwa miesiące pracy. Dwa tygodnie do odbioru."
+  lead="Producent urządzeń automatyki przemysłowej potrzebował nowego modułu komunikacji do istniejącego sterownika STM32. Wcześniej takie projekty zajmowały w ich zespole około dwóch miesięcy — łącznie z testami i odbiorem. Tym razem trzej inżynierowie klienta zamknęli moduł w dwa tygodnie, z testami HIL. My prowadziliśmy, kod pisali oni i dalszy rozwój też wzięli na siebie. Skala pilota: tak wygląda pierwszy kwartał przy zespole 3–4 osób. Przy 30+ pracujemy falami, zespół po zespole."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>2 mc → 2 tyg</strong><span>czas dostarczenia</span></div>
+        <div><strong>3 inż. z AI</strong><span>zespół po wdrożeniu</span></div>
+        <div><strong>unit + HIL</strong><span>pokrycie testami</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 kontekst -->
+  <section class="sect" aria-labelledby="kontekst">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Kontekst klienta</p>
+        <h2 class="sect-title sect-title--s ws" id="kontekst">Sterownik w produkcji od 2019. Nowy moduł komunikacji na termin.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Polski producent automatyki przemysłowej projektujący sterowniki dla maszyn pakujących i linii produkcyjnych. Trzon zespołu R&amp;D to trzech inżynierów embedded — dwóch seniorów z ponad 15-letnim stażem w C/C++ na ARM-y, jeden mid z 4 latami. Sam sterownik jest w produkcji od 2019 roku — sprawdzony, certyfikowany, w setkach instalacji.</p>
+        <p>Wymaganie od klienta końcowego (producent linii butelkowania): moduł komunikacji Modbus RTU + CANopen z mostkiem do nowszego protokołu OPC UA, kompatybilny z istniejącym sterownikiem, bez zmiany pinout-u. Termin: 8 tygodni. Wycena wewnętrzna w firmie: 6–8 tygodni inżyniera plus 2 tygodnie testów HIL.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 kto prowadził (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="kto">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Kto to prowadził</p>
+        <h2 class="sect-title ws" id="kto">Dwie osoby, dwa tygodnie, jeden odbiór.</h2>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Tomek Wojciechowski<small>Lead operacyjny</small></dt><dd>Bare-metal C/C++17 od 18 lat, embedded STM32 / AVR od pierwszej połowy lat 2000. Setup CI dla firmware-u, pisanie CLAUDE.md dla bare-metal (180 linii reguł — zakazy w ISR, lista funkcji thread-safe, konwencje memory-mapped IO).</dd></div>
+        <div><dt>Maciej Stopa<small>CI / DevOps dla firmware</small></dt><dd>GitHub Actions z arm-none-eabi, symulatory Modbus RTU i CANopen w Pythonie, integracja host-tests. Wcześniej prowadził pipeline-y dla embedded w jednym z fintech-ów.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 03 co bolało -->
+  <section class="sect" aria-labelledby="bol">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Problem · Co naprawdę bolało</p>
+        <h2 class="sect-title sect-title--s ws" id="bol">Problem nie był techniczny — był pojemnościowy.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Zespół znał stos. Znał sterownik. Znał protokoły. Problem nie był techniczny — problem był pojemnościowy.</p>
+        <ul>
+          <li><strong>Zbyt długi cykl iteracji.</strong> Każda zmiana w firmware = kompilacja + flashowanie + ręczne testy na ławce. Brak setupu CI dla firmware-u. Pętla feedbacku trwała 20–40 minut.</li>
+          <li><strong>Wąskie gardło testów HIL.</strong> Jedna ławka testowa, dzielona przez trzech inżynierów.</li>
+          <li><strong>Wiedza w głowach.</strong> Senior, który najlepiej znał warstwę CAN, miał urlop ojcowski w środku zaplanowanych 8 tygodni. Bez niego zespół ledwie szedł.</li>
+          <li><strong>Obawa przed AI w firmware.</strong> Inżynierowie domyślnie zakładali, że „LLM-y nie nadają się do bare-metal". Część prawda, część stereotyp.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 podejście (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="podejscie">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>04 / Podejście SZRON</p>
+        <h2 class="sect-title ws" id="podejscie">Najpierw cykl iteracji, dopiero potem kod modułu.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Diagnoza pokazała, że projekt da się zrobić w 2 tygodnie pod warunkiem, że zespół najpierw rozwiąże problem cyklu iteracji, a dopiero potem siądzie do kodu modułu. Większość zespołów próbuje od razu pisać feature — i traci tygodnie na test/build/flash.</p>
+        <ul>
+          <li><strong>Tydzień 0 — CI dla firmware-u.</strong> GitHub Actions z arm-none-eabi, automatyczne testy unit na PC (host) z mockami HAL, statyczna analiza. Pierwsza pętla feedbacku z 30 minut na 4 minuty.</li>
+          <li><strong>Symulacja zamiast ławki.</strong> Skrypty Pythonowe symulujące Modbus RTU master i CANopen NMT — większość ścieżek można sprawdzić bez fizycznego sprzętu.</li>
+          <li><strong>AI workflow dopasowany do embedded.</strong> CLAUDE.md z konkretnymi wytycznymi: nigdy nie generować kodu HAL bez referencji do datasheet, pull request musi zawierać memory map diff, każda funkcja przerwania ISR musi być oznaczona.</li>
+          <li><strong>Parowanie z każdym inżynierem.</strong> Pierwsze 3 dni: po pół dnia z każdym z trzech inżynierów na ich własnych modułach.</li>
+        </ul>
+      </div>
+      <figure class="quote-card rv">
+        <blockquote>AI w embedded to nie generowanie firmware-u od zera — to przyspieszenie wszystkiego, co nie jest „magicznym" kodem hardware'owym: testy, parsery protokołów, dokumentacja rejestrów, kod CRUD-owy na strukturach. Tam jest 70% czasu projektu, nie w ISR-ach.</blockquote>
+        <figcaption><strong>Dlaczego to się udało</strong> — wniosek SZRON</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 05 przebieg -->
+  <section class="sect" aria-labelledby="przebieg">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>05 / Przebieg projektu · 2 tygodnie do odbioru</p>
+        <h2 class="sect-title ws" id="przebieg">Od CI po HIL — dwa tygodnie do podpisu.</h2>
+      </div>
+      <div class="steps">
+        <article class="step rv"><p class="eyebrow">Tydzień 1</p><h3>CI + symulatory + Modbus</h3><p>GitHub Actions, host testy z mockami, kompletny stos Modbus RTU slave napisany pod testami unit. Pierwsza wersja na sprzęcie pod koniec tygodnia.</p></article>
+        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">Tydzień 2</p><h3>CANopen + integracja + HIL</h3><p>Warstwa CANopen z obsługą NMT, PDO i SDO. Integracja z istniejącym kodem sterownika. Pełen cykl testów HIL przeprowadzony przez senior + middle. Odbiór wewnętrzny w piątek.</p></article>
+        <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">Tydzień 3 · poza zakresem</p><h3>Wydanie u klienta końcowego</h3><p>Producent linii butelkowania podpisał odbiór. Zespół kontynuował rozbudowę o OPC UA samodzielnie — z AI workflow już zaadoptowanym do ich procesu.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 wynik (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="wynik">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>06 / Wynik · Mierzony w iteracjach</p>
+        <h2 class="sect-title ws" id="wynik">Mierzony w iteracjach, nie w deklaracjach.</h2>
+      </div>
+      <div class="proof-strip rv">
+        <div><strong>3–4× szybciej</strong><span>2 tygodnie zamiast 6–8 tygodni inżyniera</span></div>
+        <div><strong>30 → 4 min</strong><span>pętla feedback na CI host (20 → 12 min na HIL)</span></div>
+        <div><strong>3 z 3 inżynierów</strong><span>używa Claude Code w dzień 14 — sprawdzone w commitach</span></div>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Czas dostarczenia<small>2 tygodnie zamiast 6–8</small></dt><dd>Moduł zamknięty w dwa tygodnie zamiast 6–8 tygodni inżyniera (3–4× szybciej).</dd></div>
+        <div><dt>Czas pętli feedback<small>CI host i HIL</small></dt><dd>30 min → 4 min na CI host. 20 min → 12 min na HIL.</dd></div>
+        <div><dt>Pokrycie testami<small>protokoły</small></dt><dd>Warstwy protokołów 92% unit + 100% scenariuszy HIL. Wcześniej w tym repo testy istniały głównie „smoke".</dd></div>
+        <div><dt>Adopcja AI w zespole<small>mierzona w commitach</small></dt><dd>3 z 3 inżynierów używa Claude Code w dzień 14. Nie sprawdzaliśmy „zadowolenia", sprawdzaliśmy commity — wszyscy trzej pushowali z AI workflow w drugim tygodniu.</dd></div>
+      </dl>
+      <figure class="quote-card rv">
+        <blockquote>Myślałem, że AI to nie dla nas — siedzimy bliżej krzemu niż chmury. Po dwóch tygodniach mam jednoznaczne zdanie: nie generuje za nas firmware-u, ale ratuje cały kontekst dookoła. Testy, dokumentacja rejestrów, sklejanie parserów. Tam, gdzie zwykle ginęliśmy.</blockquote>
+        <figcaption><strong>Inżynier R&amp;D embedded</strong> — producent automatyki przemysłowej (NDA) · współpraca z Tomkiem Wojciechowskim i Maciejem Stopą</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 07 stack -->
+  <section class="sect" aria-labelledby="stack">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>07 / Stack technologiczny</p>
+        <h2 class="sect-title sect-title--s ws" id="stack">Bare-metal C/C++17 i FreeRTOS — bez migracji na siłę.</h2>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Mikrokontroler<small>STM32F4</small></dt><dd>ARM Cortex-M4 168 MHz, 1 MB Flash, 192 kB RAM.</dd></div>
+        <div><dt>Język<small>C17 / C++17</small></dt><dd>C17 dla warstw bliżej hardware'u, C++17 (bez wyjątków, bez RTTI) dla warstwy protokołów.</dd></div>
+        <div><dt>RTOS<small>FreeRTOS 10.5</small></dt><dd>Zachowany ze starego projektu, bez migracji.</dd></div>
+        <div><dt>Protokoły<small>Modbus RTU + CANopen</small></dt><dd>Modbus RTU slave (UART z DMA), CANopen (FlexCAN + NMT/PDO/SDO).</dd></div>
+        <div><dt>Build<small>CMake + arm-none-eabi</small></dt><dd>CMake + arm-none-eabi-gcc, ninja, statyczna analiza cppcheck + clang-tidy.</dd></div>
+        <div><dt>Testy<small>Unity + CMock</small></dt><dd>Unity (host + target), CMock dla mockowania HAL, własne fixtury HIL w Pythonie.</dd></div>
+        <div><dt>AI workflow<small>Claude Code</small></dt><dd>Claude Code z CLAUDE.md (180 linii — głównie reguły dla kodu bare-metal).</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 08 co zostało (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="zostalo">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>08 / Co zostało po nas</p>
+        <h2 class="sect-title ws" id="zostalo">Działający moduł, żywe CI i zespół, który przekonał się sam.</h2>
+      </div>
+      <div class="grid-cards">
+        <article class="card-tile rv"><p class="eyebrow">01</p><h3>Działający moduł komunikacji</h3><p>Podpisany odbiór klienta końcowego po 3 tygodniach od startu projektu.</p></article>
+        <article class="card-tile rv" style="--rv-d:.1s"><p class="eyebrow">02</p><h3>Działające CI dla firmware-u</h3><p>Pipeline, który zespół rozszerza na kolejne moduły.</p></article>
+        <article class="card-tile rv" style="--rv-d:.2s"><p class="eyebrow">03</p><h3>CLAUDE.md dopasowany do embedded</h3><p>Żywy dokument, do którego zespół dopisuje kolejne reguły.</p></article>
+        <article class="card-tile rv" style="--rv-d:.3s"><p class="eyebrow">04</p><h3>Zespół, który przekonał się sam</h3><p>Najmocniejszy efekt: dwóch seniorów, którzy szli w projekt z założeniem „to nie dla nas", po dwóch tygodniach prowadzi AI workflow dla młodszego kolegi.</p></article>
+      </div>
+      <div class="link-cards rv" style="margin-top:var(--space-xl)">
+        <a class="link-card" href="/case-studies/hmi"><h3>Następny case →</h3><p>Panel sterowania Qt/QML w energetyce</p></a>
+        <a class="link-card" href="/case-studies"><h3>Wszystkie case studies</h3><p>Trzy piloty w trzech branżach</p></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Wasze firmware'y leżą tygodniami?</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Embedded też się da. Tylko inaczej.</h2>
+      <p class="rv">30-minutowa rozmowa — pokażemy, gdzie konkretnie zespół embedded traci tempo i co AI naprawdę przyspiesza w bare-metal (a co nie).</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="/case-studies">Inne realizacje</a>
+      </div>
+    </div>
+  </section>
+</Interior>

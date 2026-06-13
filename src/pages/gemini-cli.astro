@@ -1,0 +1,234 @@
+---
+import Interior from '../layouts/Interior.astro';
+import { akademia } from '../data/akademia.mjs';
+const related = akademia.filter((a) => ['codex-cli', 'claude-code', 'serwery-mcp'].includes(a.slug));
+---
+<Interior
+  title="Gemini CLI — instalacja, autoryzacja i komendy w terminalu | Akademia SZRON"
+  description="Praktyczny przewodnik po Gemini CLI: instalacja przez npm, logowanie kontem Google, darmowe limity, komendy slash, kontekst plików, MCP i tryb shell. Aktualne komendy z naszych wdrożeń."
+  eyebrow="Akademia · Narzędzia agentowe"
+  heading="Gemini CLI — model Google w terminalu."
+  lead="Open-source narzędzie wiersza poleceń, które przenosi modele Gemini wprost do terminala: do 1M tokenów kontekstu, wbudowane wyszukiwanie Google i obsługa Model Context Protocol. Poniżej instalacja, autoryzacja i komendy, których używamy na co dzień."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>1M tokenów</strong><span>kontekstu w modelu Gemini</span></div>
+        <div><strong>Darmowy start</strong><span>logowanie kontem Google</span></div>
+        <div><strong>MCP i shell</strong><span>rozszerzasz o własne narzędzia</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 czym jest -->
+  <section class="sect" aria-labelledby="czym">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Wprowadzenie · Czym jest</p>
+        <h2 class="sect-title sect-title--s ws" id="czym">Asystent AI od Google bez wychodzenia z terminala.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Gemini CLI to open-source narzędzie wiersza poleceń, które daje dostęp do modeli Gemini bezpośrednio w terminalu. Oferuje do 1M tokenów kontekstu, wbudowane narzędzia (m.in. wyszukiwarkę Google) oraz obsługę Model Context Protocol (MCP). Sprawdza się u osób, które pracują głównie w terminalu i chcą szybkiego dostępu do AI bez przełączania się między aplikacjami.</p>
+        <ul>
+          <li><strong>Gemini 2.5 Pro</strong> — model z 1M tokenów kontekstu. Dostępne są też nowsze warianty (Gemini 3 Pro oraz Gemini Flash).</li>
+          <li><strong>Google Search</strong> — wbudowana integracja z wyszukiwarką.</li>
+          <li><strong>MCP</strong> — rozszerzanie o własne narzędzia i serwery.</li>
+          <li><strong>Szybkie odpowiedzi</strong> — interaktywny tryb czatu wprost z terminala.</li>
+        </ul>
+        <div class="callout">
+          <p><strong>Szybki start:</strong> zainstaluj Node.js 20+, uruchom <code>npm install -g @google/gemini-cli</code>, a następnie polecenie <code>gemini</code> i zaloguj się kontem Google.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 instalacja (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="instalacja">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Instalacja · Windows, Linux, macOS</p>
+        <h2 class="sect-title ws" id="instalacja">Node.js 20+, a potem jedna komenda npm.</h2>
+      </div>
+      <div class="prose rv">
+        <h3>Wymagania systemowe</h3>
+        <ul>
+          <li><strong>Node.js 20+</strong> — wymagana nowsza wersja, starsze nie zadziałają.</li>
+          <li><strong>npm</strong> lub <strong>npx</strong> (instalowane razem z Node.js).</li>
+          <li><strong>System:</strong> Windows 10 (21H2+), Windows 11, macOS lub Linux.</li>
+          <li><strong>Konto Google</strong> (darmowe) albo klucz API Gemini.</li>
+        </ul>
+
+        <h3>1. Instalacja Node.js</h3>
+        <p>Windows: pobierz wersję LTS (20+ lub 22 LTS) ze strony <a href="https://nodejs.org/en/download">nodejs.org/en/download</a>. Jeśli używasz menedżera wersji (nvm-windows):</p>
+        <pre><code>nvm install 22.11.0
+nvm use 22.11.0</code></pre>
+        <p>Linux (Ubuntu/Debian):</p>
+        <pre><code>curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs</code></pre>
+        <p>macOS (Homebrew):</p>
+        <pre><code>brew install node</code></pre>
+        <p>Po instalacji zweryfikuj wersję:</p>
+        <pre><code>node --version</code></pre>
+
+        <h3>2. Instalacja Gemini CLI</h3>
+        <pre><code>npm install -g @google/gemini-cli</code></pre>
+        <p>Po instalacji komenda <code>gemini</code> działa z dowolnego miejsca w systemie. Możesz też uruchomić CLI jednorazowo bez instalacji:</p>
+        <pre><code>npx https://github.com/google-gemini/gemini-cli</code></pre>
+        <p>Na macOS/Linux dostępny jest też Homebrew: <code>brew install gemini-cli</code>. Kanały wydań: <code>@latest</code> (stabilny), <code>@preview</code> (nowe funkcje), <code>@nightly</code> (build z gałęzi main).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 autoryzacja -->
+  <section class="sect" aria-labelledby="autoryzacja">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Autoryzacja · Pierwsze uruchomienie</p>
+        <h2 class="sect-title sect-title--s ws" id="autoryzacja">Logowanie kontem Google albo klucz API.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Najprostsza metoda to przeglądarkowy OAuth. Po uruchomieniu <code>gemini</code> wybierz „Login with Google", zaloguj się i potwierdź uprawnienia dla Gemini CLI — gotowe.</p>
+        <ol>
+          <li>Uruchom <code>gemini</code> i wybierz „Login with Google".</li>
+          <li>Otworzy się przeglądarka — zaloguj się kontem Google.</li>
+          <li>Potwierdź uprawnienia dla Gemini CLI.</li>
+          <li>(Code Assist) ustaw zmienną: <code>export GOOGLE_CLOUD_PROJECT="twoj-projekt"</code>.</li>
+        </ol>
+        <div class="callout">
+          <p><strong>Darmowe limity:</strong> logowanie kontem Google daje 60 zapytań na minutę i 1000 zapytań dziennie — to wyższy limit niż klucz API (100 zapytań dziennie). Vertex AI zależy od projektu i konta rozliczeniowego.</p>
+        </div>
+        <h3>Alternatywa: klucz Gemini API</h3>
+        <p>Daje pełną kontrolę nad modelem i rozliczeniami. Klucz pobierzesz z <a href="https://aistudio.google.com/app/apikey">Google AI Studio</a>:</p>
+        <pre><code>export GEMINI_API_KEY="XXXX"
+gemini</code></pre>
+        <h3>Alternatywa: Vertex AI</h3>
+        <p>Scenariusz enterprise z pełnym nadzorem GCP — limity i ceny wynikają z konta rozliczeniowego w Google Cloud:</p>
+        <pre><code>export GOOGLE_API_KEY="XXXX"
+export GOOGLE_GENAI_USE_VERTEXAI=true
+gemini</code></pre>
+        <div class="callout">
+          <p><strong>Izolacja:</strong> flaga <code>--sandbox</code> uruchamia narzędzia w izolowanym środowisku — przydatne, gdy nie chcesz, by agent działał wprost na systemie hosta.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 komendy (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="komendy">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>04 / Komendy · Slash, kontekst, shell</p>
+        <h2 class="sect-title ws" id="komendy">Slash, znak małpy i wykrzyknik — trzy tryby pracy.</h2>
+      </div>
+      <div class="prose rv">
+        <h3>Komendy slash (/)</h3>
+        <p>Zarządzają sesją CLI. Najważniejsze:</p>
+        <table>
+          <thead><tr><th>Komenda</th><th>Działanie</th></tr></thead>
+          <tbody>
+            <tr><td><code>/init</code></td><td>Generuje GEMINI.md — plik konfiguracyjny projektu.</td></tr>
+            <tr><td><code>/help</code></td><td>Pomoc i lista dostępnych komend.</td></tr>
+            <tr><td><code>/tools</code></td><td>Lista dostępnych narzędzi CLI.</td></tr>
+            <tr><td><code>/mcp</code></td><td>Lista serwerów Model Context Protocol.</td></tr>
+            <tr><td><code>/memory</code></td><td>Zarządzanie kontekstem z GEMINI.md.</td></tr>
+            <tr><td><code>/chat save</code></td><td>Zapis i wznowienie konwersacji.</td></tr>
+            <tr><td><code>/compress</code></td><td>Kompresja kontekstu (oszczędność tokenów).</td></tr>
+            <tr><td><code>/copy</code></td><td>Kopiuje ostatnią odpowiedź do schowka.</td></tr>
+            <tr><td><code>/restore</code></td><td>Przywraca stan plików sprzed edycji.</td></tr>
+            <tr><td><code>/stats</code></td><td>Wykres tokenów i limitów sesji.</td></tr>
+            <tr><td><code>/auth</code></td><td>Przełączanie metod logowania (OAuth / klucz API / Vertex).</td></tr>
+            <tr><td><code>/vim</code></td><td>Tryb vim w polu input.</td></tr>
+            <tr><td><code>/clear</code></td><td>Czyści ekran i kontekst (alias Ctrl+L).</td></tr>
+            <tr><td><code>/quit</code></td><td>Wyjście z Gemini CLI.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Kontekst plików (znak małpy)</h3>
+        <p>Dołączaj pliki i katalogi do kontekstu znakiem małpy:</p>
+        <pre><code>&#64;./src/main.js      # pojedynczy plik
+&#64;./image.png        # obrazek do analizy
+&#64;./src/            # cały katalog rekurencyjnie</code></pre>
+        <ul>
+          <li>CLI respektuje <code>.gitignore</code> i <code>GEMINI_IGNORE</code> — np. <code>node_modules/</code> nie trafi do kontekstu.</li>
+          <li>Ścieżki ze spacjami: <code>&#64;"My Folder/file.ts"</code> albo escaping ukośnikiem.</li>
+          <li>Wielkie katalogi i pliki binarne mogą zostać pominięte — CLI pokaże listę pominiętych plików.</li>
+        </ul>
+
+        <h3>Tryb shell (wykrzyknik)</h3>
+        <p>Wykonuj komendy systemowe wprost z Gemini CLI:</p>
+        <pre><code>!git status         # pojedyncza komenda shell
+!                   # wejście w tryb shell (! ponownie aby wyjść)</code></pre>
+        <div class="callout">
+          <p><strong>Bezpieczeństwo:</strong> komendy z trybu shell działają z takimi samymi uprawnieniami jak Twój terminal (bash na macOS/Linux, PowerShell na Windows). CLI ustawia zmienną <code>GEMINI_CLI=1</code>, więc skrypty mogą wykryć uruchomienie z Gemini.</p>
+        </div>
+
+        <h3>Skróty klawiszowe</h3>
+        <ul>
+          <li><code>Ctrl+L</code> — wyczyść ekran · <code>Ctrl+V</code> — wklej tekst lub obrazek.</li>
+          <li><code>Ctrl+Y</code> — YOLO mode (auto-zatwierdzanie) · <code>Ctrl+X</code> — otwórz edytor zewnętrzny.</li>
+          <li><code>Ctrl+C</code> / <code>Ctrl+D</code> — anuluj zapytanie lub wyjdź (dwuklik).</li>
+          <li><code>Shift+Tab</code> — auto-accept edycji narzędzi · <code>F12</code> — konsola debug (przydatne przy MCP).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 MCP -->
+  <section class="sect" aria-labelledby="mcp">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>05 / MCP · Kontrola przeglądarki</p>
+        <h2 class="sect-title sect-title--s ws" id="mcp">ChromeDevTools MCP — agent steruje przeglądarką.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Model Context Protocol to otwarty standard stworzony przez Anthropic, który pozwala agentom AI na bezpieczną integrację z narzędziami zewnętrznymi. ChromeDevTools MCP daje Gemini pełną kontrolę przeglądarki Chrome — nawigację po stronach, wypełnianie formularzy, testowanie UI, screenshoty, debugowanie i wykonywanie JavaScript.</p>
+        <h3>Instalacja dla bieżącego projektu</h3>
+        <pre><code>gemini mcp add chrome-devtools npx chrome-devtools-mcp&#64;latest</code></pre>
+        <h3>Instalacja globalna (wszystkie projekty)</h3>
+        <pre><code>gemini mcp add -s user chrome-devtools npx chrome-devtools-mcp&#64;latest</code></pre>
+        <p>Konfiguracja globalna zapisuje się w <code>~/.gemini/settings.json</code>. Po instalacji możesz dawać komendy w języku naturalnym, np.:</p>
+        <pre><code>Otworz localhost:3000, sprawdz czy sa bledy w konsoli i pokaz mi je</code></pre>
+        <div class="callout">
+          <p><strong>Podgląd:</strong> komenda <code>/mcp</code> pokazuje listę zainstalowanych serwerów MCP, a <code>/tools</code> — wszystkie dostępne narzędzia (łącznie z MCP). Pełną listę serwerów MCP znajdziesz na <a href="https://github.com/modelcontextprotocol/servers">github.com/modelcontextprotocol/servers</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- powiazane szkolenia -->
+  <section class="sect" aria-labelledby="powiazane" style="padding-top:0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>Powiązane szkolenia</p>
+        <h2 class="sect-title sect-title--s ws" id="powiazane">Czytaj dalej w Akademii.</h2>
+      </div>
+      <div class="link-cards rv">
+        {related.map((a) => (
+          <a class="link-card" href={`/${a.slug}`}>
+            <h3>{a.title}</h3>
+            <p>{a.desc}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie tak pracować całym zespołem?</h2>
+      <p class="rv">Akademia to materiały. Wdrożenie to kwartał na Waszym kodzie — z pomiarem efektu w DEVLens. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+</Interior>

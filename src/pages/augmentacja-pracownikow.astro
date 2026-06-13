@@ -1,0 +1,133 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="Coaching Sprinty AI — trening zespołu na waszym kodzie | SZRON"
+  description="Dwutygodniowy sprint treningowy: wchodzimy do waszego repozytorium, bierzemy prawdziwe taski i pokazujemy, jak robić je z agentami AI. Po miesiącu zespół pracuje z AI sam."
+  eyebrow="Coaching Sprinty · trening na żywym kodzie"
+  heading="Coaching Sprinty AI. Wasz zespół uczy się pracować z agentem."
+  lead="Po dwutygodniowym sprincie treningowym zespół zaczyna kodować zauważalnie szybciej — nie dlatego, że pracuje więcej, ale dlatego, że agent AI bierze na siebie rutynę. Wchodzimy do waszego repo, bierzemy prawdziwe taski i pokazujemy, jak robić je z AI. Cel jest prosty: po miesiącu pracujecie z AI pewnie i samodzielnie."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>Na waszym kodzie</strong><span>trening na prawdziwych taskach z Jiry, nie na slajdach</span></div>
+        <div><strong>Po miesiącu samodzielnie</strong><span>zostają championi, dokumentacja i szablony</span></div>
+        <div><strong>Builder, nie trener</strong><span>20 lat w produkcji, ponad 3 lata z modelami LLM</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 idea -->
+  <section class="sect" aria-labelledby="idea">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Idea · Agent jako drugi mózg programisty</p>
+        <h2 class="sect-title sect-title--s ws" id="idea">Programista myśli — agent pisze.</h2>
+      </div>
+      <div class="grid-cards">
+        <article class="card-tile rv">
+          <p class="eyebrow">a</p>
+          <h3>To nie jest zastępowanie programisty.</h3>
+          <p>Dev mówi „potrzebuję retry logic z exponential backoff". Agent pisze, testuje przypadki brzegowe, dodaje obsługę błędów. Dev robi przegląd przez kilka minut zamiast kodować przez kilka dni.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.1s">
+          <p class="eyebrow">b</p>
+          <h3>Uwolnienie od rutyny.</h3>
+          <p>Taski, które zajmowały dzień, idą w godziny. Agent pisze testy i dokumentację, łapie bugi zanim trafią na review, robi refactoring bez strachu, że coś się wysypie.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.2s">
+          <p class="eyebrow">c</p>
+          <h3>Junior dowozi jak mid, senior jak mały zespół.</h3>
+          <p>Zagrożeni nie są ci, którzy uczą się AI — tylko ci, którzy je ignorują. Po treningu ludzie nie tracą pracy, stają się trudniejsi do zastąpienia.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 proces (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="proces">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Proces · Jak wygląda sprint</p>
+        <h2 class="sect-title ws" id="proces">Cztery kroki: analiza → narzędzia → coaching → kompetencje.</h2>
+      </div>
+      <div class="steps">
+        <article class="step rv"><p class="eyebrow">01 · Analiza workflow</p><h3>Patrzymy, jak pracujecie</h3><p>Każdy zespół ma swoje nawyki — jedni tracą godziny na review, inni na konfigurację. Mapujemy codzienne zadania, szukamy największych blokerów, oceniamy stack i to, co da się zautomatyzować.</p></article>
+        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Dobór narzędzi</p><h3>Testujemy na waszym kodzie</h3><p>Wdrażamy agentów AI — Opusa i Sonnet — przez Claude Code i MCP Tools. Do tego Cursor czy Copilot tam, gdzie pasują. Testujemy na waszym kodzie i wybieramy to, co realnie robi różnicę. Setup lokalnych modeli opcjonalnie.</p></article>
+        <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Coaching na kodzie</p><h3>Robimy taski razem</h3><p>Bierzemy wasze prawdziwe taski z Jiry i robimy je razem. Nie ma lepszego sposobu niż zobaczyć na żywo, jak AI zmienia tempo pracy. Po kilku dniach ludzie sami zaczynają eksperymentować — warsztaty na repo, Context Engineering w praktyce, integracja MCP Tools.</p></article>
+        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Budujemy kompetencje</p><h3>Zostają u was</h3><p>Zostawiamy dokumentację, szablony i wewnętrznych championów. Po miesiącu zespół pewnie korzysta z AI, a my wracamy regularnie z nowymi narzędziami i strategiami. 30 dni wsparcia na wszelki wypadek.</p></article>
+      </div>
+      <div class="proof-strip rv">
+        <div><strong>2 dni szkolenia</strong><span>w pierwszym miesiącu, potem ok. 2h follow-up tygodniowo</span></div>
+        <div><strong>Cykl 2–8 tygodni</strong><span>zależnie od rozmiaru zespołu</span></div>
+        <div><strong>NDA przed startem</strong><span>szczegóły finansowe ustalamy indywidualnie</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 dla kogo -->
+  <section class="sect" aria-labelledby="role">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Dla kogo · Dobieramy podejście do roli</p>
+        <h2 class="sect-title sect-title--s ws" id="role">Dev potrzebuje czegoś innego niż tech lead.</h2>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Programiści<small>Opus, Sonnet, Claude Code, MCP Tools, Cursor, Copilot, Codex, Gemini CLI</small></dt><dd>Taski, które zajmowały dzień, idą w godziny. AI pisze testy i dokumentację, łapie bugi zanim trafią na review, pozwala robić refactoring bez strachu. Junior po dwóch tygodniach dowozi jak mid, a senior może w końcu skupić się na architekturze zamiast klepać boilerplate.</dd></div>
+        <div><dt>Tech leadzi<small>Context Engineering, quality gates AI, asystenci architektury, integracje MCP</small></dt><dd>Tech lead nie musi być wąskim gardłem. AI pilnuje standardów, łapie regresje i sprawdza architekturę — zespół dowozi szybciej, a jakość rośnie sama. Szybszy onboarding nowych devów i automatyzacja powtarzalnych decyzji.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 04 FAQ -->
+  <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>04 / FAQ · Pytania o Coaching Sprinty</p>
+        <h2 class="sect-title sect-title--s ws" id="faq-title">Jak przygotować zespół i czego oczekiwać.</h2>
+      </div>
+      <div class="faq rv">
+        <details>
+          <summary><span class="num">01</span> Co to znaczy „augmentacja pracownika" w praktyce? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Przychodzimy, patrzymy jak pracujecie, dobieramy narzędzia, konfigurujemy skille i integracje, trenujemy na waszych taskach i budujemy kompetencje w zespole. Cały cykl trwa 2–8 tygodni w zależności od rozmiaru zespołu. Po sprincie sprawdzamy postępy i planujemy, co dalej.</p>
+        </details>
+        <details>
+          <summary><span class="num">02</span> Co to są MCP Tools i jak przyspieszają development? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>MCP to standard, który pozwala AI sięgać do waszych systemów — GitHub, Jira, baza danych, Figma, przeglądarka. Agent nie tylko pisze kod — testuje, debuguje, deployuje. Przykład z praktyki: agent czyta design z Figmy, pisze komponent React, testuje w Playwright, wrzuca do bazy. Dev tylko nadzoruje.</p>
+        </details>
+        <details>
+          <summary><span class="num">03</span> Ile czasu mój zespół musi poświęcić na wdrożenie? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Pierwszy miesiąc to intensywność — 2 dni szkolenia, setup narzędzi, potem około 2h tygodniowo follow-up. Później godzina tygodniowo i tyle. Czasem potrzeba dodatkowego tygodnia, ale wyniki przychodzą.</p>
+        </details>
+        <details>
+          <summary><span class="num">04</span> Czy AI nie zabierze pracy moim programistom? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>To pytanie pada na każdym spotkaniu. Nie, AI nie zastąpi dobrych devów — zmieni ich rolę. Junior z AI dowozi jak mid, senior z AI robi robotę małego zespołu. Zagrożeni są ci, którzy ignorują AI, a nie ci, którzy się go uczą.</p>
+        </details>
+        <details>
+          <summary><span class="num">05</span> Dlaczego mówicie, że agent AI to „drugi mózg programisty"? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Dev myśli — agent pisze. Programista formułuje zadanie, agent pisze, testuje przypadki brzegowe, dodaje obsługę błędów. To uwolnienie człowieka od rutyny, żeby mógł robić to, co naprawdę wymaga głowy.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Kontakt</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">30 minut. Sprawdzimy, czy coaching ma sens u was.</h2>
+      <p class="rv">Pogadajmy szczerze — powiemy, czy sprint treningowy ma u was sens, czy nie. Trenujemy na waszym prawdziwym kodzie, mierzymy przed i po, a po miesiącu jedziecie dalej sami. Różnicę widać już w pierwszym sprincie.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Zarezerwuj termin
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+</Interior>

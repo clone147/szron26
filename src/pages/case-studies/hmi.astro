@@ -1,0 +1,190 @@
+---
+import Interior from '../../layouts/Interior.astro';
+---
+<Interior
+  title="Case study: panel HMI Qt/QML w energetyce — moduł w 2 tygodnie | SZRON"
+  description="Nowy moduł raportowania w panelu operatorskim Qt/QML dla operatora energetycznego. Dwa tygodnie do odbioru, wzorzec MVVM i zespół, który dorobił trzy kolejne widoki sam."
+  eyebrow="Case studies › Panel HMI w energetyce · Energetyka · HMI / SCADA · 2026"
+  heading="Nowy moduł. Dwa tygodnie. Klient kontynuuje sam."
+  lead="Operator infrastruktury energetycznej potrzebował nowego modułu raportowania w istniejącym panelu operatorskim Qt/QML. Od pierwszego szkicu interfejsu do podpisu odbioru — dwa tygodnie. Najistotniejszy efekt: zespół po stronie klienta przejął kod i bez naszego udziału dorobił już trzy kolejne widoki. Skala pilota: tak wygląda pierwszy kwartał przy zespole 3–4 osób. Przy 30+ pracujemy falami, zespół po zespole."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>nowy moduł → 2 tyg</strong><span>czas dostarczenia</span></div>
+        <div><strong>Pełny + dokumentacja</strong><span>transfer wiedzy</span></div>
+        <div><strong>Klient rozwija sam</strong><span>status po 3 mc · Qt 6 · QML · C++17</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 kontekst -->
+  <section class="sect" aria-labelledby="kontekst">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Kontekst klienta</p>
+        <h2 class="sect-title sect-title--s ws" id="kontekst">Panel operatorski w stacjach. Moduł raportowania odkładany od półtora roku.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Operator infrastruktury energetycznej średniego napięcia — kilkadziesiąt stacji rozdzielczych, dziesiątki tysięcy klientów końcowych. Panel operatorski na bazie Qt/QML, działający na lokalnych stanowiskach w stacjach. Wymaganie: nowy moduł raportowania zużycia z eksportem do CSV i wizualizacją trendów godzinowych — z integracją z OPC UA z istniejącego systemu SCADA.</p>
+        <p>Zespół po stronie klienta: dwóch programistów C++ z 10+ letnim stażem, jeden frontendowiec QML z 3 latami, jeden integrator SCADA. Wcześniej tworzyli aplikacje desktopowe na Qt 5, ale migracja na Qt 6 i nowy moduł raportowania były odkładane od półtora roku — „nikt nie ma czasu zacząć".</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 kto prowadził (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="kto">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Kto to prowadził</p>
+        <h2 class="sect-title ws" id="kto">Dwie osoby, 12 dni do odbioru, klient dorabia kolejne widoki sam.</h2>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Maciej Stopa<small>Lead operacyjny</small></dt><dd>Migracja Qt 5 → Qt 6, wzorzec MVVM z separacją logiki i widoku, ViewModel w C++17 (Catch2, dependency injection), integracja z OPC UA przez open62541.</dd></div>
+        <div><dt>Tomek Wojciechowski<small>AI workflow dopasowany do QML</small></dt><dd>QML jest słabo wspierany przez modele językowe out-of-the-box — Tomek napisał CLAUDE.md z listą anti-patternów (240 linii), których AI domyślnie nie zna. Do tego setup QML Tests i screenshotów regresyjnych.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 03 co bolało -->
+  <section class="sect" aria-labelledby="bol">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Problem · Co naprawdę bolało</p>
+        <h2 class="sect-title sect-title--s ws" id="bol">Dług architekturalny i AI, które proponowało anti-patterny QML.</h2>
+      </div>
+      <div class="prose rv">
+        <ul>
+          <li><strong>Wewnętrzny dług architekturalny.</strong> Aplikacja na Qt 5 z mieszanką QWidget i QML, bez wzorca MVVM, bez wyraźnego rozdziału logiki od widoku. Każdy nowy widok powielał błędy starych.</li>
+          <li><strong>Brak wzorca pracy dla nowych widoków.</strong> Każdy programista robił to po swojemu. Code review trwało tygodnie, bo nie było wspólnego punktu odniesienia.</li>
+          <li><strong>Migracja Qt 5 → Qt 6 odkładana w nieskończoność.</strong> Ze strachu, że „połamiemy to, co działa".</li>
+          <li><strong>QML słabo wspierany w narzędziach AI.</strong> Zespół próbował AI-coding, ale Claude/Copilot proponowały zwykle anti-patterny QML — kod, który działał, ale nie skalował się.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 podejście (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="podejscie">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>04 / Podejście SZRON</p>
+        <h2 class="sect-title ws" id="podejscie">Nie nowy moduł — wzorzec, który zespół powiela.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Diagnoza pokazała, że problem nie jest tym, co robić, tylko jak ustawić wzorzec, żeby zespół mógł powielać. Sam nowy moduł raportowania to było 3–4 dni pracy. Pozostałe 8 dni z 2-tygodniowego sprintu poświęciliśmy na to, co zostaje na stałe.</p>
+        <ul>
+          <li><strong>Migracja Qt 5 → Qt 6 jako warunek wstępny.</strong> Nie chcieliśmy budować nowego modułu w starym frameworku. Migracja zajęła 3 dni, wykonana wspólnie z zespołem klienta — ze szczegółowym opisem każdej różnicy w CLAUDE.md.</li>
+          <li><strong>Wzorzec MVVM z separacją logiki/widoku.</strong> ViewModel w C++17 (testowalny w Catch2), View w QML (deklaratywny, bez logiki biznesowej). Jeden konkretny przykład, który zespół potem powiela.</li>
+          <li><strong>CLAUDE.md dla QML.</strong> Lista anti-patternów (kiedy nie używać Connections, jak nie tworzyć cykli w property bindings, kiedy preferować deklaratywne nad imperatywne). To, czego AI nie wiedziało domyślnie.</li>
+          <li><strong>Test bench dla QML.</strong> Setup QML Tests + automatyczne screenshoty regresyjne — żeby zespół miał feedback szybciej niż „kompiluj i kliknij".</li>
+        </ul>
+      </div>
+      <figure class="quote-card rv">
+        <blockquote>Nie zbudowaliśmy „panelu raportów" — zbudowaliśmy wzorzec, który zespół powiela. Pierwszy widok zrobiliśmy razem. Drugi zrobili sami, po code review wewnątrz zespołu. Trzeci i czwarty — nie wiedzieliśmy nawet, że już powstały, dopóki nie zobaczyliśmy ich w raporcie po 3 miesiącach.</blockquote>
+        <figcaption><strong>Dlaczego to się udało</strong> — wniosek SZRON</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 05 przebieg -->
+  <section class="sect" aria-labelledby="przebieg">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>05 / Przebieg projektu · 2 tygodnie do odbioru</p>
+        <h2 class="sect-title ws" id="przebieg">Od migracji po handoff — w 14 dni.</h2>
+      </div>
+      <div class="steps">
+        <article class="step rv"><p class="eyebrow">Dni 1–3</p><h3>Migracja Qt 5 → Qt 6 + setup</h3><p>Pełna migracja istniejącej aplikacji. Setup nowego repo struktury MVVM, CLAUDE.md, QML Tests. Pierwsze parowania z zespołem.</p></article>
+        <article class="step rv" style="--rv-d:.06s"><p class="eyebrow">Dni 4–6</p><h3>Wzorzec pierwszego widoku</h3><p>Implementacja ViewModel-a i widoku QML „Raport zużycia godzinowego" — od stałej w C++ do kliknięcia w UI. Code review prowadzone razem z zespołem klienta.</p></article>
+        <article class="step rv" style="--rv-d:.12s"><p class="eyebrow">Dni 7–9</p><h3>Integracja z OPC UA</h3><p>Wpięcie do istniejącej warstwy SCADA. Eksport CSV, wizualizacja trendów. Drugi widok („Trendy tygodniowe") prowadzony już samodzielnie przez ich programistę QML.</p></article>
+        <article class="step rv" style="--rv-d:.18s"><p class="eyebrow">Dni 10–12</p><h3>Testy końcowe + dokumentacja</h3><p>Testy regresyjne na danych produkcyjnych z jednej stacji. Dokumentacja architektury i wzorca dla zespołu.</p></article>
+        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">Dni 13–14</p><h3>Odbiór + handoff</h3><p>Pokaz dla zarządu, podpisany odbiór. Sesja Q&amp;A z zespołem.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 wynik (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="wynik">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>06 / Wynik · Najlepszy widać po 3 miesiącach</p>
+        <h2 class="sect-title ws" id="wynik">Najlepszy efekt widać dopiero po trzech miesiącach.</h2>
+      </div>
+      <div class="proof-strip rv">
+        <div><strong>3–4× szybciej</strong><span>2 tygodnie zamiast 6–8 w zespole</span></div>
+        <div><strong>3 widoki samodzielnie</strong><span>dorobione przez zespół po naszym wyjściu</span></div>
+        <div><strong>0% → 41%</strong><span>pokrycie testami QML</span></div>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Czas dostarczenia<small>2 tygodnie</small></dt><dd>2 tygodnie zamiast szacowanych 6–8 tygodni w wewnętrznym zespole (3–4× szybciej).</dd></div>
+        <div><dt>Trzy kolejne widoki<small>bez naszego udziału</small></dt><dd>Dorobione przez zespół samodzielnie w 3 miesiące po naszym wyjściu. Zero kontaktu z SZRON-em poza jednym pytaniem o property binding.</dd></div>
+        <div><dt>Migracja Qt 5 → Qt 6<small>„w gratisie"</small></dt><dd>Zrobiona przy okazji. Wcześniej leżała półtora roku.</dd></div>
+        <div><dt>Czas code review<small>z tygodni na dni</small></dt><dd>Z tygodni na 1–2 dni. Dzięki wspólnemu wzorcowi i checkliście w CLAUDE.md zespół wie, czego szukać.</dd></div>
+        <div><dt>Pokrycie testami QML<small>pierwsze testy frontendowe</small></dt><dd>Z 0% do 41%. Pierwszy zespół w organizacji klienta, który ma testy frontendowe.</dd></div>
+      </dl>
+      <figure class="quote-card rv">
+        <blockquote>Najfajniejsze nie było to, że dostaliśmy działający moduł. Najfajniejsze jest to, że trzy miesiące później dorobiliśmy trzy kolejne — same, bez SZRON-u. I wiemy, że nie powstaną gorsze.</blockquote>
+        <figcaption><strong>Programista QML</strong> — operator energetyczny (NDA) · współpraca z Maciejem Stopą i Tomkiem Wojciechowskim</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 07 stack -->
+  <section class="sect" aria-labelledby="stack">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>07 / Stack technologiczny</p>
+        <h2 class="sect-title sect-title--s ws" id="stack">Qt 6 / QML, C++17 i MVVM ze ścisłym rozdziałem.</h2>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Framework UI<small>Qt 6.6 / QML</small></dt><dd>Qt 6.6 / QML, QtQuick 2, QtCharts.</dd></div>
+        <div><dt>Język<small>C++17 + QML</small></dt><dd>C++17 dla ViewModel-i, QML dla widoków.</dd></div>
+        <div><dt>Wzorzec<small>MVVM</small></dt><dd>MVVM ze ścisłym rozdziałem logiki i widoku, dependency injection przez konstruktor.</dd></div>
+        <div><dt>Komunikacja<small>OPC UA + CSV</small></dt><dd>OPC UA (open62541), CSV export, integracja z istniejącą bazą Postgres przez warstwę SCADA.</dd></div>
+        <div><dt>Platforma<small>Linux embedded</small></dt><dd>Linux embedded (Yocto custom), x86-64, ekrany dotykowe 19".</dd></div>
+        <div><dt>Testy<small>Catch2 + QML Tests</small></dt><dd>Catch2 dla C++ ViewModel-i, QML Tests + screenshoty regresyjne.</dd></div>
+        <div><dt>AI workflow<small>Claude Code</small></dt><dd>Claude Code z CLAUDE.md (240 linii — głównie reguły dla QML i wzorca MVVM).</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 08 co zostało (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="zostalo">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>08 / Co zostało po nas</p>
+        <h2 class="sect-title ws" id="zostalo">Działający moduł, żywy szablon MVVM i Qt 6 pod kolejną dekadę.</h2>
+      </div>
+      <div class="grid-cards">
+        <article class="card-tile rv"><p class="eyebrow">01</p><h3>Działający moduł raportowania zużycia</h3><p>Wdrożony na 12 stacjach, w produkcji od pierwszego dnia po odbiorze.</p></article>
+        <article class="card-tile rv" style="--rv-d:.1s"><p class="eyebrow">02</p><h3>Wzorzec MVVM jako żywy szablon</h3><p>Repo z przykładami, do których zespół wraca przy każdym nowym widoku.</p></article>
+        <article class="card-tile rv" style="--rv-d:.2s"><p class="eyebrow">03</p><h3>Aplikacja na Qt 6</h3><p>Wcześniej leżała półtora roku, teraz fundament pod kolejną dekadę rozwoju.</p></article>
+        <article class="card-tile rv" style="--rv-d:.3s"><p class="eyebrow">04</p><h3>CLAUDE.md dla AI w kontekście QML</h3><p>Żywy dokument, który zespół rozszerza, gdy znajduje nowy anti-pattern.</p></article>
+      </div>
+      <div class="link-cards rv" style="margin-top:var(--space-xl)">
+        <a class="link-card" href="/case-studies/stm32"><h3>← Poprzedni case</h3><p>Firmware STM32 — sterownik przemysłowy</p></a>
+        <a class="link-card" href="/case-studies"><h3>Wszystkie case studies</h3><p>Trzy piloty w trzech branżach</p></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Wasza aplikacja Qt też wymaga modernizacji?</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Qt/QML też się da. Z transferem wiedzy włącznie.</h2>
+      <p class="rv">30-minutowa rozmowa — pokażemy, czy migrację Qt 5 → Qt 6 da się ogarnąć przy okazji nowego feature'u, czy wymaga osobnego sprintu.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="/case-studies">Inne realizacje</a>
+      </div>
+    </div>
+  </section>
+</Interior>

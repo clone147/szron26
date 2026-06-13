@@ -1,0 +1,110 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="Case studies — trzy piloty w trzech branżach | SZRON"
+  description="Transport, embedded i energetyka. Trzy realizacje mierzone w tygodniach, nie w prezentacjach. Każda kończy się działającym produktem i zespołem, który rozwija go dalej sam."
+  eyebrow="Realizacje · trzy branże"
+  heading="Mierzymy w tygodniach. Nie w prezentacjach."
+  lead="Trzy piloty w trzech branżach. Każdy prowadzony tak, jak pierwszy kwartał u Was: zespół klienta plus nasza dwójka — Tomek i Maciej. Każdy kończy się dwoma rzeczami: działającym produktem i zespołem, który rozwija go dalej sam."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>3 branże · 3 stacki</strong><span>transport, embedded, energetyka</span></div>
+        <div><strong>3–6× szybciej</strong><span>skok tempa dostarczenia</span></div>
+        <div><strong>Samodzielne</strong><span>zespoły po wdrożeniu · stała opłata, kwartał</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 lista realizacji -->
+  <section class="sect" aria-labelledby="realizacje">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Case studies · Mierzalne efekty</p>
+        <h2 class="sect-title ws" id="realizacje">Sześć miesięcy planu. Cztery tygodnie do produktu.</h2>
+      </div>
+      <div class="link-cards rv">
+        <a class="link-card" href="/case-studies/regiobus">
+          <p class="eyebrow">01 · Transport — backend + mobile</p>
+          <h3>System biletowy NFC — RegioBus Systems</h3>
+          <p>Zaplanowany na 6 miesięcy. Po czterech tygodniach zespół klienta miał działający produkt. Czterech programistów zastąpił jeden z asystentem AI — bez utraty tempa rozwoju.</p>
+          <p>Java / Spring Boot · Kotlin (Android NFC) · PostgreSQL · Claude Code + custom MCP. Lead operacyjny: Maciej Stopa, z Tomkiem (AI workflow). Czas: 6 mc → 4 tyg. Zespół: 3 z 4 osób uwolnione, 0 odejść. Roczne oszczędności: setki tys. PLN.</p>
+          <span class="link-card__more">Czytaj case →</span>
+        </a>
+        <a class="link-card" href="/case-studies/stm32">
+          <p class="eyebrow">02 · Embedded — hardware / IoT</p>
+          <h3>Sterownik urządzenia przemysłowego — firmware STM32</h3>
+          <p>Nowy moduł komunikacji do istniejącego sterownika. Wcześniej takie zlecenia trwały u nich około dwóch miesięcy. Tym razem ich inżynierowie zamknęli go w dwa tygodnie — z testami HIL i dokumentacją, my obok.</p>
+          <p>STM32 · ARM Cortex-M4 · C / C++17 · FreeRTOS · Modbus RTU + CANopen. Lead operacyjny: Tomek Wojciechowski, z Maćkiem (CI dla firmware). Czas: 2 mc → 2 tyg. Zespół po wdrożeniu: 3 inżynierów z AI w workflow. Pokrycie testami: unit + HIL.</p>
+          <span class="link-card__more">Czytaj case →</span>
+        </a>
+        <a class="link-card" href="/case-studies/hmi">
+          <p class="eyebrow">03 · Energetyka — HMI / SCADA</p>
+          <h3>Panel sterowania w energetyce — Qt / QML</h3>
+          <p>Nowy moduł raportowania dla istniejącego panelu operatorskiego. Dwa tygodnie od projektu UI do podpisu odbioru. Zespół po stronie klienta przejął kod i samodzielnie dorabia kolejne widoki.</p>
+          <p>Qt 6 / QML · C++17 · Linux embedded · OPC UA. Lead operacyjny: Maciej Stopa, z Tomkiem (CLAUDE.md dla QML). Czas: nowy moduł → 2 tyg. Transfer wiedzy: pełny, z dokumentacją. Status: klient rozwija samodzielnie.</p>
+          <span class="link-card__more">Czytaj case →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 wzorzec wdrożenia (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="wzorzec">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Co łączy te projekty · Wzorzec wdrożenia</p>
+        <h2 class="sect-title ws" id="wzorzec">Każdy projekt prowadzony tak, żeby zespół klienta był po nim samodzielny.</h2>
+      </div>
+      <div class="steps">
+        <article class="step rv"><p class="eyebrow">i · Tydzień 1</p><h3>Diagnoza, nie audyt</h3><p>Nie kwestionariusze, nie spotkania z każdym zespołem. Czytanie kodu, obserwacja deploymentów, pytania do programistów. Konkretna lista 3 wąskich gardeł na koniec tygodnia. Prowadzi Tomek — Maciej dołącza na warstwę kodu, jeśli temat tego wymaga.</p></article>
+        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">ii · Tygodnie 3–10</p><h3>Trzy ścieżki równolegle</h3><p>Trening z AI na żywym kodzie (Tomek), agentowe programowanie i modernizacja backendu/mobile (Maciej). Każdy commit to lekcja — jak prowadzić AI, jak czytać sugestie, jak nie wpaść w pułapkę „magic prompt". Bez sztucznych warsztatów.</p></article>
+        <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">iii · Tygodnie 11–12</p><h3>Wyjście, nie uzależnienie</h3><p>CLAUDE.md ze standardami zespołu, dokumentacja modułów, lista kolejnych usprawnień. Zostajemy na 30-dniowy support w trybie „call when needed", ale celem jest, żeby nie był potrzebny.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 proof w tygodniach -->
+  <section class="sect" aria-labelledby="wyniki">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Wyniki · Mierzone w tygodniach</p>
+        <h2 class="sect-title sect-title--s ws" id="wyniki">Trzy piloty, trzy stacki, ten sam wzorzec.</h2>
+      </div>
+      <table class="results-table rv">
+        <thead><tr><th scope="col">Projekt</th><th scope="col">Plan wyjściowy</th><th scope="col">Efekt</th></tr></thead>
+        <tbody>
+          <tr><td>RegioBus — system biletowy NFC</td><td>6 miesięcy</td><td><strong>4 tygodnie do produktu</strong></td></tr>
+          <tr><td>Firmware STM32 — sterownik przemysłowy</td><td>6–8 tygodni inżyniera</td><td><strong>2 tygodnie do odbioru</strong></td></tr>
+          <tr><td>Panel Qt/QML — energetyka</td><td>6–8 tygodni w zespole</td><td><strong>2 tygodnie do odbioru</strong></td></tr>
+        </tbody>
+      </table>
+      <div class="proof-strip rv">
+        <div><strong>0 odejść</strong><span>RegioBus — 3 z 4 osób przesunięto, nikt nie odszedł</span></div>
+        <div><strong>3 widoki samodzielnie</strong><span>energetyka — dorobione po naszym wyjściu</span></div>
+        <div><strong>3 z 3 inżynierów z AI</strong><span>embedded — w dzień 14 wszyscy w workflow</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Mówcie konkretnie</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Macie podobny problem? 30 minut wystarczy, żeby to sprawdzić.</h2>
+      <p class="rv">Bez prezentacji. Pokażemy, czy Waszą aplikację można zmodernizować w jeden kwartał, czy potrzebujemy innego podejścia.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+</Interior>

@@ -1,0 +1,174 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="Kontakt — diagnoza 30 minut, mail, telefon | SZRON"
+  description="Skontaktuj się z SZRON: krótki formularz diagnozy (wracamy w 24h), mail tw@szron.tech albo telefon +48 505 091 200. Bez prezentacji i sprzedaży — konkretne pytania o stos i zespół."
+  eyebrow="Kontakt · diagnoza 30 minut"
+  heading="30 minut. Pokażemy, gdzie tracicie tempo."
+  lead="Bez prezentacji, bez sprzedaży. Konkretne pytania o stos technologiczny i zespół. Jeśli jest sens współpracy — dostaniecie stałą wycenę kwartału w ciągu 48h, zatwierdzoną przez nas obu."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>Czas: 30 minut</strong><span>wideo lub telefon</span></div>
+        <div><strong>Format do wyboru</strong><span>wideo albo telefon</span></div>
+        <div><strong>Po stronie SZRON</strong><span>Tomek Wojciechowski, w razie potrzeby Maciej</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 formularz (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="formularz">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Formularz · Wracamy w 24h</p>
+        <h2 class="sect-title ws" id="formularz">Krótki formularz — wracamy w 24h.</h2>
+      </div>
+      <p class="rv">Pracujemy z firmami, których zespół IT liczy 30+ osób. Jeśli Wasz jest mniejszy — napiszcie, ale uprzedzamy: program kwartalny projektujemy pod duże organizacje. Pięć pól. Wystarczy, żebyśmy się przygotowali do rozmowy i nie zmarnowali Waszego czasu na podstawowe pytania.</p>
+      <form name="kontakt" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="rv">
+        <input type="hidden" name="form-name" value="kontakt" />
+        <p hidden><label>Nie wypełniaj: <input name="bot-field" /></label></p>
+        <p>
+          <label for="firma">Firma</label>
+          <input type="text" id="firma" name="firma" required />
+        </p>
+        <p>
+          <label for="branza">Branża</label>
+          <select id="branza" name="branza" required>
+            <option value="">Wybierzcie branżę</option>
+            <option>Transport / mobilność</option>
+            <option>Przemysł / produkcja</option>
+            <option>Energetyka / utilities</option>
+            <option>Embedded / IoT / hardware</option>
+            <option>Fintech / regulowane</option>
+            <option>SaaS / produkt cyfrowy</option>
+            <option>Inna</option>
+          </select>
+        </p>
+        <p>
+          <label for="zespol">Zespół IT</label>
+          <select id="zespol" name="zespol" required>
+            <option value="">Wybierzcie wielkość zespołu</option>
+            <option>30–100 osób</option>
+            <option>100–300 osób</option>
+            <option>300+ osób</option>
+          </select>
+        </p>
+        <p>
+          <label for="opis">Jednym zdaniem — zespół i aplikacja</label>
+          <textarea id="opis" name="opis" rows="4" required placeholder="Ile osób, jaki stos, co Was spowalnia."></textarea>
+        </p>
+        <p>
+          <label for="email">Email kontaktowy</label>
+          <input type="email" id="email" name="email" required />
+        </p>
+        <button class="btn btn--accent" type="submit">Wyślij zgłoszenie
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </button>
+      </form>
+      <p class="rv"><small>Wysyłając formularz akceptujesz przetwarzanie danych zgodnie z <a href="/privacy-policy">polityką prywatności</a>. Nie zapisujemy na newsletter, nie sprzedajemy danych, nie dzwonimy bez umówienia.</small></p>
+    </div>
+  </section>
+
+  <!-- 02 co przygotować -->
+  <section class="sect" aria-labelledby="przygotowac">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Przygotowanie · Co przygotować</p>
+        <h2 class="sect-title sect-title--s ws" id="przygotowac">3 rzeczy, które przyspieszą rozmowę.</h2>
+      </div>
+      <div class="grid-cards">
+        <article class="card-tile rv">
+          <p class="eyebrow">i</p>
+          <h3>Stos technologiczny aplikacji.</h3>
+          <p>Język, framework, baza, deployment. Wystarczy nazwa — nie potrzebujemy diagramu.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.1s">
+          <p class="eyebrow">ii</p>
+          <h3>Najboleśniejszy problem.</h3>
+          <p>Jedno zdanie: co Was tu sprowadziło. „Nikt nie chce tego dalej rozwijać." „Każda zmiana to dwa tygodnie." „Nowy junior odpada po miesiącu."</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.2s">
+          <p class="eyebrow">iii</p>
+          <h3>Kto będzie na rozmowie.</h3>
+          <p>Najlepiej CTO lub lider zespołu — ktoś, kto zna kod i ograniczenia. Zarząd opcjonalnie.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 co dostaniecie (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="dostaniecie">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Efekt · Co dostaniecie</p>
+        <h2 class="sect-title sect-title--s ws" id="dostaniecie">Konkretną odpowiedź. Nie ofertę.</h2>
+      </div>
+      <div class="grid-cards">
+        <article class="card-tile rv">
+          <p class="eyebrow">i</p>
+          <h3>Gdzie zespół traci tempo.</h3>
+          <p>Po 30 minutach pokażemy 2–3 najbardziej kosztowne miejsca w Waszym procesie wytwórczym.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.1s">
+          <p class="eyebrow">ii</p>
+          <h3>Podsumowanie na jednej stronie.</h3>
+          <p>Tak, nie, albo wróćmy za kwartał — z uzasadnieniem, nie z formułkami. Mailem w 24h.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.2s">
+          <p class="eyebrow">iii</p>
+          <h3>Stała wycena w 48h.</h3>
+          <p>Jeśli widzimy sens współpracy, dostajecie konkretną cenę kwartału mailem.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 alternatywy: mail / telefon / adres -->
+  <section class="sect" aria-labelledby="napisac">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>04 / Alternatywa · Mail albo telefon</p>
+        <h2 class="sect-title sect-title--s ws" id="napisac">Wolicie napisać albo zadzwonić?</h2>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Email<small>tw@szron.tech</small></dt><dd>Odpowiadamy w 24h w dni robocze. Załączcie krótki opis aplikacji — odpowiemy już z pierwszymi pytaniami.</dd></div>
+        <div><dt>Telefon<small>+48 505 091 200</small></dt><dd>Wolimy zaplanowaną rozmowę przez formularz — wtedy jesteśmy przygotowani. Awaryjnie dzwońcie pn–pt 9–17.</dd></div>
+        <div><dt>Adres<small>Rzeszów · Polska</small></dt><dd>SZRON Tomek Wojciechowski, ul. Legionistów 12/1/B, 35-317 Rzeszów. Warszawa — spotkania na życzenie.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 05 FAQ -->
+  <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>05 / FAQ · Przed pierwszą rozmową</p>
+        <h2 class="sect-title sect-title--s ws" id="faq-title">Pytania, które padają przed pierwszą rozmową.</h2>
+      </div>
+      <div class="faq rv">
+        <details>
+          <summary><span class="num">01</span> Czy rozmowa zobowiązuje do współpracy? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Nie. 30 minut to diagnoza, nie umowa. Jeśli po rozmowie nie widzimy sensu — rozstajemy się i każdy idzie swoją drogą. Nie mamy KPI „liczba podpisanych klientów na tydzień". Nie potrzebujemy każdego.</p>
+        </details>
+        <details>
+          <summary><span class="num">02</span> Czy podpiszemy NDA przed rozmową? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Tak, jeśli potrzebujecie. Przyślijcie szablon razem z formularzem lub na maila — podpisujemy standardowe NDA w 24h. Bez NDA też nie roznosimy informacji o klientach — to mała branża i reputacja jest jedynym kapitałem.</p>
+        </details>
+        <details>
+          <summary><span class="num">03</span> Kto prowadzi rozmowę i kto będzie pracował przy projekcie? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Pierwszą rozmowę prowadzi Tomek Wojciechowski — założyciel SZRON. Bezpośrednio, bez sales i account managerów. Przy projekcie pracują te same dwie osoby od diagnozy do przekazania: Tomek (AI workflow i strategia) i Maciej Stopa (backend, mobile, frontend). Bez podwykonawców. Jeśli temat jest mocno mobile'owy albo backendowy, Maciej dołącza już do pierwszej rozmowy — wystarczy zapowiedzieć w formularzu.</p>
+        </details>
+        <details>
+          <summary><span class="num">04</span> Co jeśli nasza aplikacja nie nadaje się do 3-miesięcznego zakresu? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Powiemy to wprost na rozmowie. Program kwartalny nie jest dla każdej firmy — czasem trzeba 6 miesięcy, czasem najpierw audyt bezpieczeństwa, czasem rewrite zamiast pilota. Wtedy albo zaproponujemy inny scope, albo zarekomendujemy kogoś, kto pasuje lepiej.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+</Interior>

@@ -1,0 +1,268 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="Kalkulator ROI AI — ile zyskuje Twój zespół na wdrożeniu AI | SZRON"
+  description="Policz w 2 minuty, ile Twój zespół może zaoszczędzić dzięki AI. Interaktywny kalkulator ROI dla zarządu, oparty na badaniach GitHub Copilot i naszych projektach."
+  eyebrow="Narzędzie · liczy w przeglądarce"
+  heading="Sprawdź, czy AI opłaca się u Was."
+  lead="Kalkulator bazuje na danych z naszych projektów i badań GitHub. Każdy przypadek jest inny, ale to dobry punkt wyjścia. Wszystko liczy się lokalnie w Twojej przeglądarce — nic nie wysyłamy na serwer."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>2 minuty</strong><span>pięć suwaków i gotowy wynik</span></div>
+        <div><strong>Dane lokalnie</strong><span>liczone w przeglądarce, nic nie wysyłamy</span></div>
+        <div><strong>Realne założenia</strong><span>~55% szybsze kodowanie wg badań GitHub Copilot</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 kalkulator -->
+  <section class="sect" aria-labelledby="kalk">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Kalkulator · Dane Twojego zespołu</p>
+        <h2 class="sect-title sect-title--s ws" id="kalk">Pięć suwaków. Twój wynik liczy się na bieżąco.</h2>
+      </div>
+
+      <div class="roi rv">
+        <div class="roi__panel">
+          <div class="roi__field">
+            <label for="roi-dev">Liczba programistów: <span class="roi__val" id="roi-dev-out">5</span></label>
+            <input type="range" id="roi-dev" min="1" max="50" step="1" value="5" />
+            <div class="roi__scale"><span>1</span><span>50</span></div>
+          </div>
+
+          <div class="roi__field">
+            <label for="roi-rate">Średnia stawka brutto/h: <span class="roi__val" id="roi-rate-out">200 PLN</span></label>
+            <input type="range" id="roi-rate" min="100" max="500" step="10" value="200" />
+            <div class="roi__scale"><span>100 PLN</span><span>500 PLN</span></div>
+          </div>
+
+          <div class="roi__field">
+            <label for="roi-review">Procent czasu na pilnowanie standardów: <span class="roi__val" id="roi-review-out">20%</span></label>
+            <input type="range" id="roi-review" min="5" max="40" step="1" value="20" />
+            <div class="roi__scale"><span>5%</span><span>40%</span></div>
+          </div>
+
+          <div class="roi__field">
+            <label for="roi-debug">Procent czasu na debugging: <span class="roi__val" id="roi-debug-out">30%</span></label>
+            <input type="range" id="roi-debug" min="10" max="50" step="1" value="30" />
+            <div class="roi__scale"><span>10%</span><span>50%</span></div>
+          </div>
+
+          <div class="roi__field">
+            <label for="roi-docs">Procent czasu na dokumentację: <span class="roi__val" id="roi-docs-out">10%</span></label>
+            <input type="range" id="roi-docs" min="5" max="25" step="1" value="10" />
+            <div class="roi__scale"><span>5%</span><span>25%</span></div>
+          </div>
+        </div>
+
+        <!-- wynik -->
+        <div class="roi__results" id="roi-results">
+          <p class="eyebrow">Twoje wyniki</p>
+          <div class="roi__stats">
+            <div class="roi__stat">
+              <span class="roi__stat-num" id="roi-savings">—</span>
+              <span class="roi__stat-label">Roczne oszczędności</span>
+            </div>
+            <div class="roi__stat">
+              <span class="roi__stat-num" id="roi-foundation">—</span>
+              <span class="roi__stat-label">ROI Foundation (8 tys./mies.)</span>
+            </div>
+            <div class="roi__stat">
+              <span class="roi__stat-num" id="roi-transform">—</span>
+              <span class="roi__stat-label">ROI Transform (20 tys./mies.)</span>
+            </div>
+          </div>
+          <p class="roi__hours">Szacowane godziny odzyskane rocznie: <strong id="roi-hours">—</strong></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 metodyka (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="metoda-roi">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Metodyka · Skąd te założenia</p>
+        <h2 class="sect-title ws" id="metoda-roi">Trzy źródła. Nie wymyślamy liczb — sprawdzamy je na żywych zespołach.</h2>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>GitHub Copilot Research<small>~56% szybsze kodowanie</small></dt><dd>W kontrolowanych testach kodowanie z asystentem AI jest około 56% szybsze. W praktyce zależy od projektu — czasem więcej, czasem mniej.</dd></div>
+        <div><dt>McKinsey Digital 2024<small>Zwrot w 1,5–2 lata</small></dt><dd>Według ich danych inwestycja w AI zwraca się w ciągu 1,5–2 lat — z dużym zapasem.</dd></div>
+        <div><dt>Nasze projekty<small>Średnio 3× przyspieszenie</small></dt><dd>W polskich zespołach, z którymi pracowaliśmy, widzimy średnio 3× przyspieszenie. Ale zanim powiemy „u Was też tak będzie", musimy zobaczyć Wasze repozytorium.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 03 jak to liczymy -->
+  <section class="sect" aria-labelledby="wzor">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Wzór · Jak powstaje liczba</p>
+        <h2 class="sect-title sect-title--s ws" id="wzor">Założenia w kalkulatorze, wprost.</h2>
+      </div>
+      <table class="results-table rv">
+        <thead><tr><th scope="col">Założenie</th><th scope="col">Wartość użyta w obliczeniu</th></tr></thead>
+        <tbody>
+          <tr><td>Godziny pracy programisty rocznie</td><td><strong>1800 h (≈ 225 dni × 8 h)</strong></td></tr>
+          <tr><td>Część zadań powtarzalnych możliwa do automatyzacji</td><td><strong>50%</strong></td></tr>
+          <tr><td>Przyrost produktywności z AI</td><td><strong>55% (dane GitHub Copilot)</strong></td></tr>
+          <tr><td>Koszt referencyjny Foundation</td><td><strong>8 tys. PLN/mies. = 96 tys. PLN/rok</strong></td></tr>
+          <tr><td>Koszt referencyjny Transform</td><td><strong>20 tys. PLN/mies. = 240 tys. PLN/rok</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 04 FAQ -->
+  <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>04 / FAQ · Najczęstsze pytania</p>
+        <h2 class="sect-title sect-title--s ws" id="faq-title">Zanim zaufasz liczbie.</h2>
+      </div>
+      <div class="faq rv">
+        <details>
+          <summary><span class="num">01</span> Czy moje dane są bezpieczne? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Nic nie wysyłamy na serwer. Cały kalkulator działa w Twojej przeglądarce — możesz nawet odłączyć internet i dalej liczyć.</p>
+        </details>
+        <details>
+          <summary><span class="num">02</span> Skąd te liczby? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Głównie z badań GitHub Copilot i z tego, co widzimy u naszych klientów. Badania mówią o ~56% wzroście produktywności. W praktyce bywa różnie — czasem więcej, czasem mniej. Kalkulator daje orientacyjny obraz, nie obietnicę.</p>
+        </details>
+        <details>
+          <summary><span class="num">03</span> Co jeśli mam mniej niż 5 programistów? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Spokojnie — Foundation jest właśnie dla zespołów 1–10 osób. Mniejsze zespoły często widzą proporcjonalnie większy efekt, bo każda zaoszczędzona godzina bardziej się liczy.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Kontakt</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Liczby wyglądają dobrze? Pogadajmy o Waszym przypadku.</h2>
+      <p class="rv">Powiemy szczerze, czy widzimy potencjał i od czego zacząć. Konkretne pytania, zero sprzedaży — zanim cokolwiek obiecamy, chcemy zobaczyć Wasze repozytorium.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .roi { display: grid; gap: var(--space-xl); }
+    @media (min-width: 60rem) { .roi { grid-template-columns: 1.1fr 1fr; align-items: start; } }
+    .roi__panel, .roi__results {
+      border: 1px solid var(--color-line);
+      border-radius: var(--radius-card);
+      padding: var(--space-2xl);
+      background: var(--color-paper-2);
+    }
+    .roi__results { background: var(--color-ink); color: var(--color-text-inv); border-color: transparent; }
+    .roi__field + .roi__field { margin-top: var(--space-xl); }
+    .roi__field label {
+      display: block; font-size: var(--text-s); font-weight: 600;
+      margin-bottom: var(--space-sm); color: var(--color-text);
+    }
+    .roi__val { color: var(--color-accent); font-weight: 700; }
+    .roi__field input[type="range"] {
+      width: 100%; accent-color: var(--color-accent); cursor: pointer; height: 1.5rem;
+    }
+    .roi__scale {
+      display: flex; justify-content: space-between;
+      font-size: var(--text-caption); color: var(--color-text-2); margin-top: var(--space-2xs);
+    }
+    .roi__results .eyebrow { color: var(--color-text-inv-2); margin-bottom: var(--space-xl); }
+    .roi__stats { display: grid; gap: var(--space-lg); }
+    @media (min-width: 30rem) { .roi__stats { grid-template-columns: repeat(3, 1fr); } }
+    .roi__stat {
+      text-align: center; padding: var(--space-lg) var(--space-sm);
+      border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm);
+    }
+    .roi__stat-num {
+      display: block; font-family: var(--font-display); font-weight: 600;
+      font-size: var(--text-h3); letter-spacing: -0.01em; color: var(--color-accent);
+    }
+    .roi__stat-label {
+      display: block; margin-top: var(--space-xs); font-size: var(--text-caption);
+      color: var(--color-text-inv-2);
+    }
+    .roi__hours { margin-top: var(--space-xl); font-size: var(--text-s); color: var(--color-text-inv-2); }
+    .roi__hours strong { color: var(--color-text-inv); }
+  </style>
+
+  <script is:inline>
+    (function () {
+      // Założenia ze źródła ROICalculator.tsx — nie zmieniaj wartości.
+      var WORKING_HOURS_PER_YEAR = 1800;   // ~225 dni * 8h
+      var AUTOMATION_POTENTIAL = 0.5;      // 50% zadań powtarzalnych
+      var AI_PRODUCTIVITY_BOOST = 0.55;    // 55% szybciej (dane GitHub Copilot)
+      var FOUNDATION_COST = 8000 * 12;     // 96 tys./rok
+      var TRANSFORM_COST = 20000 * 12;     // 240 tys./rok
+
+      var nf = new Intl.NumberFormat('pl-PL');
+
+      var dev = document.getElementById('roi-dev');
+      var rate = document.getElementById('roi-rate');
+      var review = document.getElementById('roi-review');
+      var debug = document.getElementById('roi-debug');
+      var docs = document.getElementById('roi-docs');
+
+      var devOut = document.getElementById('roi-dev-out');
+      var rateOut = document.getElementById('roi-rate-out');
+      var reviewOut = document.getElementById('roi-review-out');
+      var debugOut = document.getElementById('roi-debug-out');
+      var docsOut = document.getElementById('roi-docs-out');
+
+      var savingsOut = document.getElementById('roi-savings');
+      var foundationOut = document.getElementById('roi-foundation');
+      var transformOut = document.getElementById('roi-transform');
+      var hoursOut = document.getElementById('roi-hours');
+
+      function recalc() {
+        var developers = parseInt(dev.value, 10);
+        var hourlyRate = parseInt(rate.value, 10);
+        var codeReviewPercent = parseInt(review.value, 10);
+        var debuggingPercent = parseInt(debug.value, 10);
+        var docsPercent = parseInt(docs.value, 10);
+
+        // Echo wartości suwaków
+        devOut.textContent = developers;
+        rateOut.textContent = hourlyRate + ' PLN';
+        reviewOut.textContent = codeReviewPercent + '%';
+        debugOut.textContent = debuggingPercent + '%';
+        docsOut.textContent = docsPercent + '%';
+
+        // Wzory 1:1 ze źródła
+        var totalRepetitivePercent = (codeReviewPercent + debuggingPercent + docsPercent) / 100;
+        var hoursOnRepetitiveTasks = developers * WORKING_HOURS_PER_YEAR * totalRepetitivePercent;
+        var hoursSaved = hoursOnRepetitiveTasks * AUTOMATION_POTENTIAL * AI_PRODUCTIVITY_BOOST;
+        var yearlySavings = Math.round(hoursSaved * hourlyRate);
+
+        var roiFoundation = Math.round(((yearlySavings - FOUNDATION_COST) / FOUNDATION_COST) * 100);
+        var roiTransform = Math.round(((yearlySavings - TRANSFORM_COST) / TRANSFORM_COST) * 100);
+
+        savingsOut.textContent = nf.format(yearlySavings) + ' PLN';
+        foundationOut.textContent = (roiFoundation > 0 ? '+' : '') + roiFoundation + '%';
+        transformOut.textContent = (roiTransform > 0 ? '+' : '') + roiTransform + '%';
+        hoursOut.textContent = nf.format(Math.round(hoursSaved)) + ' h';
+      }
+
+      [dev, rate, review, debug, docs].forEach(function (el) {
+        el.addEventListener('input', recalc);
+      });
+      recalc();
+    })();
+  </script>
+</Interior>
