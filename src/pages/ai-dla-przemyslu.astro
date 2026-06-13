@@ -2,142 +2,117 @@
 import Interior from '../layouts/Interior.astro';
 ---
 <Interior
-  title="AI dla przemysłu — energetyka, maszyny, CNC, telco, pomiary | SZRON"
-  description="Wdrażamy AI w zespołach przemysłowych: energetyka, CNC, robotyka, telco, pomiary, PPOŻ. Modbus, OPC UA, SCADA, PLC. Lokalnie, bez chmury. Case studies i konkretne wyniki."
-  eyebrow="AI dla przemysłu · PLC, SCADA, pomiary"
-  heading="AI dla zespołów inżynierskich — energetyka, maszyny, telco, pomiary."
-  lead="Wdrażamy AI tam, gdzie kod steruje maszynami, mierzy parametry i kontroluje procesy. Wasze protokoły, Wasze normy, Wasz sprzęt."
+  title="Modernizacja systemów przemysłowych — HMI/SCADA, sterowniki, panele | SZRON"
+  description="Modernizujemy długowieczne systemy przemysłowe: HMI/SCADA, sterowniki urządzeń, panele sterowania. Stopniowo, bez przerywania ruchu, on-prem. Case panelu HMI w energetyce."
+  eyebrow="Przemysł · energetyka · automatyka"
+  heading="Aplikacje rozwijane 20–30 lat. Modernizacja bez przerywania ruchu."
+  lead="Sterują maszynami, mierzą parametry, działają w stacjach i na liniach. Migrujemy je na nowy stos i otwieramy na rozwój — modułowo, na danych z produkcji, lokalnie. Bez „big bang”, bez ryzyka przy każdej zmianie."
 >
-  <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>AI lokalnie</strong><span>bez chmury — Wasze normy, Wasze audyty</span></div>
-        <div><strong>NDA przed startem</strong><span>Wasza własność intelektualna jest bezpieczna</span></div>
-        <div><strong>25 lat</strong><span>doświadczenia w systemach embedded i przemysłowych</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 01 dlaczego -->
-  <section class="sect" aria-labelledby="dlaczego">
+  <!-- 01 problem legacy -->
+  <section class="sect" aria-labelledby="legacy">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Kontekst · Dlaczego te branże inaczej</p>
-        <h2 class="sect-title sect-title--s ws" id="dlaczego">Dlaczego te branże potrzebują innego podejścia.</h2>
+        <p class="eyebrow rv" data-scramble>01 / Problem · Długowieczne aplikacje przemysłowe</p>
+        <h2 class="sect-title sect-title--s ws" id="legacy">Aplikacje rozwijane dwadzieścia, trzydzieści lat.</h2>
+      </div>
+      <div class="prose rv">
+        <p>W przemyśle kod żyje dłużej niż maszyny, którymi steruje. Panel operatorski na bazie Qt 5 z mieszanką QWidget i QML, sterownik napisany pod konkretne urządzenie, SCADA z setkami tagów mapowanych ręcznie w Excelu — wszystko to działa, więc nikt tego nie rusza. A koszt utrzymania rośnie z każdym rokiem.</p>
+        <p>Najczęściej spotykamy te same trzy objawy.</p>
       </div>
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">a</p>
-          <h3>Standardowe narzędzia nie znają protokołów.</h3>
-          <p>Modbus, OPC UA, IEC 61131 — narzędzia AI potrzebują kontekstu, żeby się w nich odnaleźć.</p>
+          <h3>Rosnące koszty utrzymania.</h3>
+          <p>Każdy nowy widok powiela błędy starych. Code review trwa tygodnie, bo nie ma wspólnego punktu odniesienia. Wewnętrzny dług architekturalny narasta.</p>
         </article>
         <article class="card-tile rv" style="--rv-d:.1s">
           <p class="eyebrow">b</p>
-          <h3>Kod sterujący musi być pewny.</h3>
-          <p>Tam, gdzie kod steruje maszynami, nie ma miejsca na „wygeneruj i zapomnij".</p>
+          <h3>Technologie, których nikt nie chce dotykać.</h3>
+          <p>Migracja Qt 5 → Qt 6 odkładana w nieskończoność. Zamknięte toolchainy, framework sprzed dekad — „nikt nie ma czasu zacząć", ze strachu, że „połamiemy to, co działa".</p>
         </article>
         <article class="card-tile rv" style="--rv-d:.2s">
           <p class="eyebrow">c</p>
-          <h3>Certyfikacja i normy bezpieczeństwa.</h3>
-          <p>Cykle certyfikacji i normy bezpieczeństwa, jak SIL czy ATEX, wymagają innego procesu.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.3s">
-          <p class="eyebrow">d</p>
-          <h3>Legacy i zamknięte toolchainy.</h3>
-          <p>Systemy legacy i zamknięte toolchainy — AI musi działać w Waszych ograniczeniach.</p>
+          <h3>Ryzyko przy każdej zmianie.</h3>
+          <p>Brak testów frontendowych i regresyjnych sprawia, że każda poprawka to ryzyko. Tam, gdzie kod steruje maszynami, nie ma miejsca na „wygeneruj i zapomnij".</p>
         </article>
       </div>
     </div>
   </section>
 
-  <!-- 02 obszary (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="obszary">
+  <!-- 02 case HMI (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="case">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Zakres · Obszary pracy</p>
-        <h2 class="sect-title ws" id="obszary">Obszary, w których pracujemy.</h2>
+        <p class="eyebrow rv" data-scramble>02 / Realizacja · Panel HMI w energetyce</p>
+        <h2 class="sect-title ws" id="case">Nowy moduł w istniejącym panelu HMI. Dwa tygodnie. Klient kontynuuje sam.</h2>
+      </div>
+      <p class="rv">Operator infrastruktury energetycznej średniego napięcia potrzebował nowego modułu raportowania w panelu operatorskim Qt/QML, działającym na stanowiskach w stacjach rozdzielczych. Moduł odkładany od półtora roku. Od pierwszego szkicu interfejsu do podpisu odbioru — dwa tygodnie. Migrację Qt 5 → Qt 6 zrobiliśmy przy okazji.</p>
+      <figure class="quote-card rv">
+        <blockquote>Nie zbudowaliśmy „panelu raportów" — zbudowaliśmy wzorzec, który zespół powiela. Pierwszy widok zrobiliśmy razem. Drugi zrobili sami, po code review wewnątrz zespołu. Trzeci i czwarty — nie wiedzieliśmy nawet, że już powstały, dopóki nie zobaczyliśmy ich w raporcie po trzech miesiącach.</blockquote>
+        <figcaption><strong>Dlaczego to się udało</strong> — wniosek SZRON</figcaption>
+      </figure>
+      <div class="proof-strip rv">
+        <div><strong>3–4× szybciej</strong><span>2 tygodnie zamiast 6–8 w wewnętrznym zespole</span></div>
+        <div><strong>3 widoki samodzielnie</strong><span>dorobione przez zespół po naszym wyjściu</span></div>
+        <div><strong>0% → 41%</strong><span>pokrycie testami QML</span></div>
+      </div>
+      <div class="contact__cta rv">
+        <a class="btn btn--ghost" href="/case-studies/hmi">Pełny case: panel HMI w energetyce
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 co modernizujemy -->
+  <section class="sect" aria-labelledby="zakres">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Zakres · Co modernizujemy i jak</p>
+        <h2 class="sect-title sect-title--s ws" id="zakres">Co modernizujemy i jak.</h2>
       </div>
       <dl class="def-rows rv">
-        <div><dt>PLC / SCADA<small>Automatyka</small></dt><dd>IEC 61131, Modbus RTU, OPC UA, systemy SCADA.</dd></div>
-        <div><dt>CNC / Robotyka<small>Maszyny</small></dt><dd>G-code, sterowniki, wizja maszynowa, kinematyka.</dd></div>
-        <div><dt>Telco / Pomiary<small>Pomiar</small></dt><dd>LabVIEW, EtherCAT, systemy pomiarowe, laser.</dd></div>
-        <div><dt>Bezpieczeństwo / PPOŻ<small>Ochrona</small></dt><dd>Systemy SSP, detekcja, monitoring, certyfikacja.</dd></div>
+        <div><dt>Panele HMI / SCADA<small>Qt 6 / QML, OPC UA</small></dt><dd>Migracja Qt 5 → Qt 6, wzorzec MVVM ze ścisłym rozdziałem logiki i widoku, integracja z istniejącą warstwą SCADA przez OPC UA. Eksport CSV, wizualizacja trendów.</dd></div>
+        <div><dt>Sterowniki urządzeń<small>Firmware embedded</small></dt><dd>Kod sterujący konkretnym urządzeniem, często pisany pod jeden projekt. Porządkujemy strukturę, dodajemy testy, wypinamy logikę z warstwy sprzętowej — żeby dało się go rozwijać.</dd></div>
+        <div><dt>Panele sterowania<small>Stanowiska operatorskie</small></dt><dd>Aplikacje desktopowe i ekrany dotykowe na liniach i w stacjach. Linux embedded, ekrany 19", praca na lokalnych stanowiskach — modernizacja bez wymiany sprzętu.</dd></div>
+        <div><dt>Monolit → moduły<small>Stopniowo, bez „big bang"</small></dt><dd>Nie przepisujemy całości naraz. Ustawiamy wzorzec na jednym module, zespół powiela go na kolejnych. Stary i nowy kod współistnieją, dopóki migracja nie zostanie domknięta.</dd></div>
       </dl>
     </div>
   </section>
 
-  <!-- 03 case studies -->
-  <section class="sect" aria-labelledby="cases">
+  <!-- 04 ciągłość i bezpieczeństwo (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="ciaglosc">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Realizacje · AI w przemyśle</p>
-        <h2 class="sect-title sect-title--s ws" id="cases">Case studies — AI w przemyśle.</h2>
+        <p class="eyebrow rv" data-scramble>04 / Ruch · Ciągłość i bezpieczeństwo</p>
+        <h2 class="sect-title ws" id="ciaglosc">Modernizacja bez przerywania ruchu.</h2>
       </div>
-      <table class="results-table rv">
-        <thead><tr><th scope="col">Realizacja</th><th scope="col">Stack</th><th scope="col">Efekt</th></tr></thead>
-        <tbody>
-          <tr><td>Generator kodu ST dla PLC Siemens — bloki funkcyjne z opisu procesu, gotowe do TIA Portal</td><td>TIA Portal + Structured Text</td><td><strong>5x szybsze pisanie logiki</strong></td></tr>
-          <tr><td>Konfigurator OPC UA dla SCADA — mapowanie setek tagów wprost z dokumentacji maszyny</td><td>OPC UA + mapowanie tagów</td><td><strong>3 dni zamiast 3 tygodni</strong></td></tr>
-          <tr><td>Raporty z systemu pomiarowego LabVIEW — generowanie VI z wykresami i eksportem do PDF</td><td>LabVIEW + analiza danych</td><td><strong>80% mniej pracy analityka</strong></td></tr>
-        </tbody>
-      </table>
+      <div class="callout rv">
+        <p><strong>Zasada nadrzędna:</strong> system, który steruje produkcją, nie może zatrzymać się na czas migracji. Pracujemy tak, by w każdym momencie istniała działająca, sprawdzona wersja — a nowa wchodziła dopiero po testach na realnych danych.</p>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Dwa systemy równolegle<small>Bez „big bang"</small></dt><dd>Stary system działa dalej, nowy moduł wchodzi obok. Przełączamy dopiero, gdy nowy jest przetestowany i odebrany. Żadnej jednorazowej wymiany całości.</dd></div>
+        <div><dt>Testy regresyjne na danych z produkcji<small>Realne dane z linii</small></dt><dd>Testy regresyjne na danych produkcyjnych — w case'ie HMI na danych z jednej stacji. Setup QML Tests i automatyczne screenshoty regresyjne dają feedback szybciej niż „kompiluj i kliknij".</dd></div>
+        <div><dt>Baza bez zmian<small>Integracja, nie migracja danych</small></dt><dd>Wpinamy się w istniejącą warstwę SCADA i bazę (np. Postgres) bez ruszania schematu. Modernizujemy aplikację, nie ryzykujemy danymi produkcyjnymi.</dd></div>
+        <div><dt>Modele on-prem dla wrażliwych<small>Kod nie opuszcza infrastruktury</small></dt><dd>Tam, gdzie kod i dane są wrażliwe, AI działa lokalnie (Ollama, llama.cpp) — nic nie trafia do chmury bez Waszej zgody. NDA podpisujemy przed startem.</dd></div>
+      </dl>
     </div>
   </section>
 
-  <!-- 04 proces -->
-  <section class="sect" aria-labelledby="proces" style="padding-top:0">
+  <!-- 05 proof czasów dostarczania -->
+  <section class="sect" aria-labelledby="czasy">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Współpraca · Jak wygląda wdrożenie</p>
-        <h2 class="sect-title ws" id="proces">Mapa systemów → pilotaż → produkcja → utrzymanie ruchu.</h2>
-      </div>
-      <div class="steps">
-        <article class="step rv"><p class="eyebrow">01 · Mapa</p><h3>Mapa systemów</h3><p>Spisujemy Wasz park maszynowy, protokoły, systemy PLC/SCADA i to, gdzie realnie płyną dane produkcyjne.</p></article>
-        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Pilotaż</p><h3>Wybór pilotażu</h3><p>Typujemy jeden proces o wysokim zwrocie: diagnostyka, raportowanie, konfiguracja tagów, generator kodu ST.</p></article>
-        <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Produkcja</p><h3>Wdrożenie na produkcji</h3><p>Cztery tygodnie na realnych danych z Waszych linii. AI lokalnie, bez chmury. Wasze normy, Wasze audyty.</p></article>
-        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Transfer</p><h3>Transfer do utrzymania ruchu</h3><p>Szkolimy automatyków i technologów, zostawiamy runbooki i procedury odbioru.</p></article>
+        <p class="eyebrow rv" data-scramble>05 / Tempo · Czasy dostarczania</p>
+        <h2 class="sect-title sect-title--s ws" id="czasy">Ile to trwa.</h2>
       </div>
       <div class="proof-strip rv">
-        <div><strong>Lokalne modele AI</strong><span>kod nie opuszcza Waszej infrastruktury</span></div>
-        <div><strong>NDA przed startem</strong><span>compliance: świadomość AI Act i NIS2</span></div>
-        <div><strong>25 lat</strong><span>w systemach embedded i przemysłowych</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 05 FAQ -->
-  <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
-    <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>05 / FAQ · Najczęstsze pytania</p>
-        <h2 class="sect-title sect-title--s ws" id="faq-title">Często zadawane pytania.</h2>
-      </div>
-      <div class="faq rv">
-        <details>
-          <summary><span class="num">01</span> Czy AI radzi sobie z kodem PLC/SCADA? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Tak. AI świetnie radzi sobie z kodem strukturalnym (IEC 61131-3 ST), generowaniem konfiguracji SCADA i dokumentacją. Kluczem jest odpowiedni kontekst projektowy — dlatego zaczynamy od audytu Waszego stacku.</p>
-        </details>
-        <details>
-          <summary><span class="num">02</span> Jak wygląda bezpieczeństwo — nasz kod nie może wyciekać? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Podpisujemy NDA przed startem. Pracujemy na lokalnych modelach AI (Ollama, llama.cpp) — kod nie opuszcza Waszej infrastruktury. Żadne dane nie trafiają do chmury bez Waszej zgody.</p>
-        </details>
-        <details>
-          <summary><span class="num">03</span> Mamy zamknięty toolchain (Siemens, Beckhoff). Czy AI tu zadziała? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Tak. AI nie zastępuje Waszego toolchaina — działa obok niego. Generuje kod ST, konfiguracje, dokumentację. Eksportujecie do TIA Portal czy TwinCAT jak zwykle.</p>
-        </details>
-        <details>
-          <summary><span class="num">04</span> Jakie wyniki osiągacie w naszej branży? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Typowe rezultaty: 50–70% mniej boilerplate'u w firmware, 2–10x szybsza diagnostyka protokołów, nowe panele HMI w tygodniach zamiast miesięcy. Konkretne liczby zależą od stacku.</p>
-        </details>
-        <details>
-          <summary><span class="num">05</span> Ile to kosztuje i jak długo trwa? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Diagnoza (30 minut) jest bezpłatna. Pilotażowy sprint to dwa tygodnie. Pełne wdrożenie 1–3 miesiące. Koszt zależy od wielkości zespołu i złożoności stacku — ustalamy po diagnozie.</p>
-        </details>
-        <details>
-          <summary><span class="num">06</span> Czy AI spełnia normy bezpieczeństwa (SIL, ATEX)? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>AI jest narzędziem wspomagającym — nie zastępuje procesu certyfikacji. Generowany kod przechodzi te same review i testy co kod pisany ręcznie. AI przyspiesza pisanie, nie omija norm.</p>
-        </details>
+        <div><strong>30 minut</strong><span>bezpłatna diagnoza Waszego systemu</span></div>
+        <div><strong>2 tygodnie</strong><span>pilotażowy sprint — pierwszy zmodernizowany moduł</span></div>
+        <div><strong>1–3 miesiące</strong><span>pełne wdrożenie, zależnie od skali stacku</span></div>
       </div>
     </div>
   </section>
@@ -146,8 +121,8 @@ import Interior from '../layouts/Interior.astro';
   <section class="sect sect--dark cta-band" aria-labelledby="cta">
     <div class="container">
       <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Pracujesz w energetyce, CNC, telco lub PPOŻ?</h2>
-      <p class="rv">Porozmawiajmy o Waszym stacku. Powiemy, gdzie AI da Wam największy efekt.</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Wasz system przemysłowy też wymaga modernizacji?</h2>
+      <p class="rv">30-minutowa rozmowa — pokażemy, czy migrację da się ogarnąć przy okazji nowego modułu, czy wymaga osobnego sprintu. Z transferem wiedzy włącznie.</p>
       <div class="contact__cta rv">
         <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę 30 min
           <span class="btn__arr" aria-hidden="true">

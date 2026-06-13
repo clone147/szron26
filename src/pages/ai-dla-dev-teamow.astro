@@ -2,103 +2,123 @@
 import Interior from '../layouts/Interior.astro';
 ---
 <Interior
-  title="AI dla dev teamów — przyspieszamy delivery zespołów software | SZRON"
-  description="Wdrażamy AI w zespołach developerskich: Cursor, Claude Code, Copilot, Codex, Gemini CLI, MCP Tools. Quality gates, testy, debug, onboarding — mierzalne efekty po 2 tygodniach."
-  eyebrow="Dla zespołów software · sprint 2 tygodnie"
-  heading="Przyspieszamy delivery zespołów developerskich."
-  lead="Quality gates, debug, testy, onboarding — wdrażamy AI w procesy, które dziś spowalniają Wasz zespół. Mierzalne efekty po dwóch tygodniach, na Waszych prawdziwych zadaniach."
+  title="AI dla zespołów software — codzienny workflow agentowy | SZRON"
+  description="Jak zmienia się codzienna praca programisty z agentem AI: plan mode, subagenci, MCP servery, AGENTS.md jako kontrakt. Efekt mierzony DORA i DEVLens od pierwszego tygodnia."
+  eyebrow="Dla zespołów software · codzienny workflow"
+  heading="Tak wygląda dzień programisty, który prowadzi agenta."
+  lead="Najbardziej operacyjna z naszych stron — bez ogólników. Pokazujemy, jak konkretnie zmienia się codzienna praca, jakich narzędzi używamy i jak mierzymy efekt od pierwszego tygodnia."
 >
-  <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
+  <!-- 01 wczoraj → dziś -->
+  <section class="sect" aria-labelledby="wczoraj-dzis">
     <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Sprint 2 tygodnie</strong><span>coaching w ramach normalnych tasków</span></div>
-        <div><strong>Mierzalny baseline</strong><span>porównujemy wyniki z punktem startu</span></div>
-        <div><strong>Wasz stack</strong><span>narzędzia dobieramy do kontekstu, nie odwrotnie</span></div>
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Codzienna praca · Wczoraj a dziś</p>
+        <h2 class="sect-title sect-title--s ws" id="wczoraj-dzis">Co zmienia się w pracy dewa, gdy dochodzi agent.</h2>
       </div>
+      <table class="results-table rv">
+        <thead><tr><th scope="col">Czynność</th><th scope="col">Wczoraj — wspomaganie</th><th scope="col">Dziś — programowanie intencyjne</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Nowy task</td>
+            <td>Czytasz ticket, sam piszesz kod linijka po linijce, autouzupełnianie podpowiada fragmenty.</td>
+            <td><strong>Zlecasz agentowi intencję, kontekst i kryteria odbioru — i oceniasz wynik.</strong></td>
+          </tr>
+          <tr>
+            <td>Debug i legacy</td>
+            <td>Szukanie błędu w nieznanym kodzie zjada dni, zanim w ogóle ruszysz z poprawką.</td>
+            <td><strong>Agent czyta repo z kontekstem, lokalizuje problem i proponuje fix do oceny.</strong></td>
+          </tr>
+          <tr>
+            <td>Testy</td>
+            <td>Pisane po fakcie albo wcale — backlog rośnie szybciej niż pokrycie.</td>
+            <td><strong>Średnia 3–4 mergowane PR-y dziennie, każdy z testami.</strong></td>
+          </tr>
+          <tr>
+            <td>Standard zespołu</td>
+            <td>Tech lead pilnuje konwencji ręcznie, w code review — i staje się wąskim gardłem.</td>
+            <td><strong>AGENTS.md / CLAUDE.md to kontrakt: zasady i kryteria odbioru wykonuje agent.</strong></td>
+          </tr>
+          <tr>
+            <td>Pierwsze dostawy</td>
+            <td>Onboarding i nowy moduł liczone w miesiącach.</td>
+            <td><strong>Pierwsze realne dostawy w drugim tygodniu, na Waszym kodzie.</strong></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
-  <!-- 01 problemy -->
-  <section class="sect" aria-labelledby="problemy">
+  <!-- 02 pełny workflow agentowy (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="workflow">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Diagnoza · Co spowalnia Wasz zespół</p>
-        <h2 class="sect-title sect-title--s ws" id="problemy">Rozpoznajesz któryś z tych problemów?</h2>
-      </div>
-      <div class="grid-cards">
-        <article class="card-tile rv">
-          <p class="eyebrow">a</p>
-          <h3>Tech lead jako wąskie gardło.</h3>
-          <p>Seniorzy więcej czasu spędzają na pilnowaniu standardów niż na architekturze. Feedback loop jest za długi.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.1s">
-          <p class="eyebrow">b</p>
-          <h3>Debug zjada całe dni.</h3>
-          <p>Szukanie błędów w kodzie legacy to strata czasu, który mógłby iść na nowe funkcje.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.2s">
-          <p class="eyebrow">c</p>
-          <h3>Testy pisane po fakcie.</h3>
-          <p>Nikt nie ma czasu na testy, bo backlog rośnie. Błędy uciekają na produkcję.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.3s">
-          <p class="eyebrow">d</p>
-          <h3>Onboarding trwa za długo.</h3>
-          <p>Nowy developer potrzebuje trzech miesięcy, żeby zacząć dowozić samodzielnie. Z AI to trzy–cztery tygodnie.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- 02 sprint (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="sprint">
-    <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Proces · Jak wygląda sprint</p>
-        <h2 class="sect-title ws" id="sprint">Dwutygodniowy sprint: diagnoza → setup → coaching → pomiar.</h2>
-      </div>
-      <div class="steps">
-        <article class="step rv"><p class="eyebrow">01 · 2–3 dni</p><h3>Diagnoza</h3><p>Sprawdzamy, jak zespół pracuje, co go spowalnia, jakie narzędzia AI już ma. Mierzymy baseline.</p></article>
-        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · 2–3 dni</p><h3>Setup narzędzi</h3><p>Konfigurujemy Cursor, Claude Code, Copilot, Codex lub Gemini CLI pod Wasz stack. CLAUDE.md, project rules, MCP Tools.</p></article>
-        <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · 2 tygodnie</p><h3>Coaching na taskach</h3><p>Bierzemy Wasze prawdziwe zadania i robimy je razem z AI. Pair programming na żywo.</p></article>
-        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · 2–3 dni</p><h3>Pomiar i standard</h3><p>Porównujemy wyniki z baseline. Zostawiamy dokumentację, procesy i wyszkolonych championów AI.</p></article>
-      </div>
-    </div>
-  </section>
-
-  <!-- 03 narzędzia -->
-  <section class="sect" aria-labelledby="narzedzia">
-    <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Narzędzia · Co wdrażamy</p>
-        <h2 class="sect-title sect-title--s ws" id="narzedzia">Narzędzia, które wdrażamy w zespole.</h2>
+        <p class="eyebrow rv" data-scramble>02 / Workflow · Jak prowadzi się agenta</p>
+        <h2 class="sect-title ws" id="workflow">Pełny workflow agentowy, nie czat z promptami.</h2>
       </div>
       <dl class="def-rows rv">
-        <div><dt>Cursor<small>Edytor z kontekstem repo</small></dt><dd>Edycja wielu plików z kontekstem całego repozytorium.</dd></div>
-        <div><dt>Claude Code<small>Agenci w CLI</small></dt><dd>Złożone taski, refactoring, agenci pracujący w terminalu.</dd></div>
-        <div><dt>GitHub Copilot<small>Inline</small></dt><dd>Autouzupełnianie i podpowiedzi inline w trakcie pisania.</dd></div>
-        <div><dt>Codex (OpenAI)<small>Async workflow</small></dt><dd>Autonomiczne taski w sandboxie, praca asynchroniczna.</dd></div>
-        <div><dt>Gemini CLI<small>Ekosystem Google</small></dt><dd>Google AI w terminalu, integracja z ekosystemem Google.</dd></div>
-        <div><dt>MCP Tools<small>Integracje</small></dt><dd>Integracja AI z Jira, GitHub, Slack i CI/CD.</dd></div>
+        <div>
+          <dt>Plan mode<small>najpierw plan, potem kod</small></dt>
+          <dd>Agent najpierw rozpisuje plan na zadanie — intencję, kontekst, kryteria odbioru — który programista ocenia, zanim cokolwiek się zmieni w repo.</dd>
+        </div>
+        <div>
+          <dt>Subagenci<small>podział złożonego taska</small></dt>
+          <dd>Złożone zadania dzielą się na wyspecjalizowane przebiegi, które pracują równolegle i wracają z wynikiem do oceny.</dd>
+        </div>
+        <div>
+          <dt>MCP servery<small>połączenie wprost z Waszym kontekstem</small></dt>
+          <dd>Dedykowane MCP servery łączą agenta wprost z Waszą bazą danych (MS SQL, MySQL, IBM DB2, Postgres, Oracle) i narzędziami zespołu.</dd>
+        </div>
+        <div>
+          <dt>AGENTS.md / CLAUDE.md<small>kontrakt zespołu</small></dt>
+          <dd>Konstytucja zespołu: zasady, konwencje i kryteria odbioru zapisane raz, egzekwowane przez agenta przy każdym tasku. Zostaje u Was jako powielalny wzorzec.</dd>
+        </div>
+        <div>
+          <dt>Wspólny commit<small>na żywym kodzie</small></dt>
+          <dd>Uczymy przez wspólne sesje na Waszym kodzie, nie przez slajdy. Każdy programista pracuje samodzielnie po kilku spotkaniach.</dd>
+        </div>
       </dl>
     </div>
   </section>
 
-  <!-- 04 efekty -->
-  <section class="sect" aria-labelledby="efekty" style="padding-top:0">
+  <!-- 03 pomiar -->
+  <section class="sect" aria-labelledby="pomiar">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Efekty · Zespoły software</p>
-        <h2 class="sect-title sect-title--s ws" id="efekty">Efekty u zespołów software.</h2>
+        <p class="eyebrow rv" data-scramble>03 / Pomiar · DORA i DEVLens</p>
+        <h2 class="sect-title sect-title--s ws" id="pomiar">Efekt w danych, nie w deklaracjach.</h2>
       </div>
-      <table class="results-table rv">
-        <thead><tr><th scope="col">Kontekst</th><th scope="col">Narzędzia · czas</th><th scope="col">Wynik</th></tr></thead>
-        <tbody>
-          <tr><td>Fintech — 15 developerów</td><td>Claude Code + Cursor · 8 tygodni</td><td><strong>+47% PR merge rate, -62% czas do merge, 2x szybszy onboarding</strong></td></tr>
-          <tr><td>SaaS — 8 developerów</td><td>Copilot + MCP · 4 tygodnie</td><td><strong>60% szybszy delivery, -45% błędów na produkcji, 3x więcej funkcji na sprint</strong></td></tr>
-        </tbody>
-      </table>
+      <div class="proof-strip rv">
+        <div><strong>Tydzień 1</strong><span>baseline DORA: czas od ticketu do PR, czas merge, bug escape rate, pokrycie testami</span></div>
+        <div><strong>DEVLens</strong><span>wskaźniki produktywności wprost z repozytoriów Git i SVN, od pierwszego tygodnia</span></div>
+        <div><strong>Tydzień 12</strong><span>pomiar ponowny i raport ROI dla zarządu — dashboard, nie prezentacja</span></div>
+      </div>
+      <p class="rv" style="--rv-d:.1s; margin-top:var(--space-lg); max-width:60ch">
+        Baseline zakładamy w tygodniu 1, mierzymy ponownie w tygodniu 12 — porównujemy te same wskaźniki, a nie wrażenia. To, co zajmowało 6 miesięcy, zespół dostarcza w 4 tygodnie; tempo rośnie 2–4 razy. Średnia po naszych projektach to 3–4 mergowane PR-y dziennie na programistę, każdy z testami.
+      </p>
+    </div>
+  </section>
+
+  <!-- 04 dokąd dalej -->
+  <section class="sect" aria-labelledby="dalej" style="padding-top:0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>04 / Dokąd dalej · Powiązane</p>
+        <h2 class="sect-title sect-title--s ws" id="dalej">Gdzie zajrzeć po szczegóły.</h2>
+      </div>
+      <div class="link-cards rv">
+        <a class="link-card" href="/metoda">
+          <h3>Metoda</h3>
+          <p>Trzy ścieżki w jednym kwartale: trening AI, agentowe programowanie i pilot modernizacji. Jak prowadzimy zmianę krok po kroku.</p>
+        </a>
+        <a class="link-card" href="/akademia">
+          <h3>Akademia</h3>
+          <p>Szkolenia i materiały o codziennej pracy z agentem — plan mode, subagenci, skille, MCP. Wiedza, na której opieramy workflow.</p>
+        </a>
+        <a class="link-card" href="/case-studies">
+          <h3>Case studies</h3>
+          <p>Efekty wdrożeń pokazane na danych z repozytoriów. Co zostaje po nas: działający system, samodzielny programista i powielalny wzorzec.</p>
+        </a>
+      </div>
     </div>
   </section>
 
@@ -106,25 +126,25 @@ import Interior from '../layouts/Interior.astro';
   <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>05 / FAQ · Pytania o AI dla dev teamów</p>
-        <h2 class="sect-title sect-title--s ws" id="faq-title">Pytania o AI dla dev teamów.</h2>
+        <p class="eyebrow rv" data-scramble>05 / FAQ · Pytania o pracę z agentem</p>
+        <h2 class="sect-title sect-title--s ws" id="faq-title">Pytania, które padają przed startem.</h2>
       </div>
       <div class="faq rv">
         <details>
-          <summary><span class="num">01</span> Czy to zadziała z naszym stackiem? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Pracujemy z TypeScript, Python, Java, PHP, Rust, Go — i wieloma innymi. Narzędzia AI dobieramy do kontekstu, nie odwrotnie.</p>
+          <summary><span class="num">01</span> Jak zmierzymy efekt? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>DORA metrics jako baseline w tygodniu 1: czas od ticketu do PR, czas merge, bug escape rate, pokrycie testami. Mierzymy ponownie w tygodniu 12. Raport ROI dla zarządu — dashboard, nie prezentacja.</p>
         </details>
         <details>
-          <summary><span class="num">02</span> Ile czasu musi poświęcić nasz zespół? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Sprint to dwa tygodnie. Coaching odbywa się w ramach normalnych tasków — nie zabieramy ludzi od pracy, integrujemy AI w ich codzienną pracę.</p>
+          <summary><span class="num">02</span> Co z bezpieczeństwem naszych danych? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Wasz kod nie idzie do publicznych modeli. Dla branż regulowanych — Bedrock w AWS, dane w Waszej VPC. Dla obronności i wrażliwego embedded — lokalne modele (Ollama, vLLM) na Waszych serwerach. Audit log każdej interakcji z AI. NDA podpisujemy przed pierwszą rozmową.</p>
         </details>
         <details>
-          <summary><span class="num">03</span> Co jeśli mamy security constraints albo compliance? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Konfigurujemy narzędzia pod Wasze polityki. Lokalne modele tam, gdzie kod nie może wyciekać. NDA przed startem.</p>
+          <summary><span class="num">03</span> Co jeśli zespół nie kupi tej zmiany? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny". Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.</p>
         </details>
         <details>
-          <summary><span class="num">04</span> Jaki jest typowy zwrot z inwestycji? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Po dwutygodniowym sprincie zespoły raportują 40–60% szybszy delivery i 2x szybszy onboarding nowych developerów. Mierzymy to twardymi danymi.</p>
+          <summary><span class="num">04</span> Czy stara aplikacja będzie działać w trakcie? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Tak. Pilot wchodzi obok: dwa systemy równolegle, moduł po module, testy regresyjne na danych z produkcji. Wasza baza danych zostaje bez zmian.</p>
         </details>
       </div>
     </div>
@@ -134,8 +154,8 @@ import Interior from '../layouts/Interior.astro';
   <section class="sect sect--dark cta-band" aria-labelledby="cta">
     <div class="container">
       <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Gotowi przyspieszyć delivery?</h2>
-      <p class="rv">30 minut rozmowy. Powiemy, czy i gdzie AI da Waszemu zespołowi realny zwrot.</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Zobaczcie ten workflow na własnym kodzie.</h2>
+      <p class="rv">30 minut rozmowy. Powiemy, czy i gdzie agent da Waszemu zespołowi realny zwrot — i jak go zmierzymy od pierwszego tygodnia.</p>
       <div class="contact__cta rv">
         <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę
           <span class="btn__arr" aria-hidden="true">

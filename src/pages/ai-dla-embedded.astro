@@ -2,113 +2,103 @@
 import Interior from '../layouts/Interior.astro';
 ---
 <Interior
-  title="AI dla embedded i hard-tech — Qt, C++, STM32, ARM | SZRON"
-  description="Wdrażamy AI w zespołach embedded i hard-tech: Qt/QML, C++, STM32, ARM Linux, CAN bus, protokoły przemysłowe. Case studies z automotive, transportu i IoT."
-  eyebrow="Embedded / hard-tech · firmware i HMI"
-  heading="Wdrażamy AI w zespołach Qt, C++, embedded i industrial."
-  lead="Tam, gdzie standardowe narzędzia AI nie wystarczają. Znamy hardware, protokoły i ograniczenia embedded — i wiemy, jak AI może tu realnie pomóc."
+  title="AI dla embedded i firmware — realizm bare-metal | SZRON"
+  description="Embedded to inna gra: toolchainy Keil/STM32, hardware-in-the-loop, modele lokalne, safety. Pokazujemy, co AI realnie robi w firmware — i czego nie zrobi."
+  eyebrow="Embedded · IoT · firmware"
+  heading="Embedded to inna gra. AI też gramy tu inaczej."
+  lead="Nie obiecujemy, że AI napisze Wam firmware. Obiecujemy, że zdejmie z Was 70% pracy, która nigdy nie była „magicznym” kodem hardware'owym — testy, parsery protokołów, dokumentację rejestrów. Reszta to nadal Wy, datasheet i ławka testowa."
 >
-  <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Firmware i HMI</strong><span>od konfiguracji peryferiów po nowoczesny interfejs</span></div>
-        <div><strong>Protokoły przemysłowe</strong><span>CAN bus, OBD-II, Modbus, RS232/485</span></div>
-        <div><strong>Wasz toolchain</strong><span>AI działa obok niego, nie zamiast</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 01 dlaczego -->
-  <section class="sect" aria-labelledby="dlaczego">
+  <!-- 01 dlaczego embedded to inna gra (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="inna-gra">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Kontekst · Dlaczego embedded inaczej</p>
-        <h2 class="sect-title sect-title--s ws" id="dlaczego">Dlaczego embedded potrzebuje innego podejścia.</h2>
+        <p class="eyebrow rv" data-scramble>01 / Kontekst · Ograniczenia, nie życzenia</p>
+        <h2 class="sect-title ws" id="inna-gra">Dlaczego embedded to inna gra.</h2>
       </div>
-      <div class="grid-cards">
-        <article class="card-tile rv">
-          <p class="eyebrow">a</p>
-          <h3>Standardowe narzędzia nie znają hardware.</h3>
-          <p>Copilot czy ChatGPT nie znają HAL, QML ani protokołów przemysłowych — potrzebują dobrego kontekstu.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.1s">
-          <p class="eyebrow">b</p>
-          <h3>Boilerplate to większość kodu.</h3>
-          <p>W embedded boilerplate to 60–70% kodu — idealny target dla AI, która zostawia czas na logikę.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.2s">
-          <p class="eyebrow">c</p>
-          <h3>Dokumentacja hardware jest fragmentaryczna.</h3>
-          <p>AI potrzebuje dobrego kontekstu projektowego, żeby skutecznie wspierać pracę z układem.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.3s">
-          <p class="eyebrow">d</p>
-          <h3>Bezpieczeństwo kodu jest krytyczne.</h3>
-          <p>Nie można „wygenerować i zapomnieć" — generowany kod przechodzi review i testy jak każdy inny.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- 02 stacki (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="stacki">
-    <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Stack · Obszary pracy</p>
-        <h2 class="sect-title ws" id="stacki">Stacki i obszary, w których pracujemy.</h2>
+      <div class="prose rv">
+        <p>Większość narzędzi AI projektowano pod web i backend — repozytorium, internet pod ręką, szybki cykl build-run. W embedded żadne z tych założeń nie obowiązuje na ślepo. Zanim zaczniemy mówić, „co AI robi", trzeba uczciwie nazwać, w czym pracujemy.</p>
       </div>
       <dl class="def-rows rv">
-        <div><dt>Qt / QML<small>Interfejsy</small></dt><dd>Panele HMI, aplikacje desktop, embedded UI.</dd></div>
-        <div><dt>C++ / STM32<small>Firmware</small></dt><dd>Firmware, sterowniki, HAL/LL, RTOS.</dd></div>
-        <div><dt>ARM Linux<small>Edge</small></dt><dd>Daemony systemd, telemetria, edge computing.</dd></div>
-        <div><dt>Protokoły<small>Komunikacja</small></dt><dd>CAN bus, OBD-II, Modbus, RS232/485.</dd></div>
+        <div><dt>Toolchainy<small>Keil, STM32CubeIDE, arm-none-eabi</small></dt><dd>Kompilacja, flashowanie i debug przez sprzętowy programator. Pętla feedbacku liczona w minutach, nie w sekundach — AI nie „uruchomi" za Was kodu, dopóki nie zbudujecie szybszego cyklu (host-testy, mocki HAL).</dd></div>
+        <div><dt>Hardware-in-the-loop<small>ławka testowa, oscyloskop, analizator</small></dt><dd>Część prawdy o systemie żyje wyłącznie na fizycznej ławce. Jedna ławka dzielona przez kilku inżynierów to realne wąskie gardło — model językowy go nie usunie, ale potrafi przesunąć większość testów do symulacji.</dd></div>
+        <div><dt>Brak lub ograniczony internet<small>urządzenie i czasem proces dev</small></dt><dd>Tam, gdzie kod nie może wyciekać poza sieć firmy, liczą się modele lokalne i workflow działający offline. AI musi zmieścić się w tych ramach, a nie odwrotnie.</dd></div>
+        <div><dt>Bezpieczeństwo i safety<small>certyfikacja, krytyczne ścieżki</small></dt><dd>W kodzie, który steruje maszyną, nie ma „wygeneruj i zapomnij". Każda linia przechodzi review, statyczną analizę i testy jak każda inna — niezależnie od tego, kto ją napisał.</dd></div>
       </dl>
     </div>
   </section>
 
-  <!-- 03 case studies -->
-  <section class="sect" aria-labelledby="cases">
+  <!-- 02 co AI realnie robi -->
+  <section class="sect" aria-labelledby="realnie">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Realizacje · Embedded i hard-tech</p>
-        <h2 class="sect-title sect-title--s ws" id="cases">Case studies embedded i hard-tech.</h2>
+        <p class="eyebrow rv" data-scramble>02 / Realizm · Co AI faktycznie zmienia</p>
+        <h2 class="sect-title sect-title--s ws" id="realnie">Co AI realnie robi w embedded.</h2>
       </div>
-      <table class="results-table rv">
-        <thead><tr><th scope="col">Realizacja</th><th scope="col">Stack</th><th scope="col">Efekt</th></tr></thead>
-        <tbody>
-          <tr><td>Dashboard diagnostyczny CAN bus — z ręcznego dekodera ramek do wizualizacji</td><td>Qt/QML + parser CAN bus</td><td><strong>10x mniej debugowania</strong></td></tr>
-          <tr><td>System biletowy dla transportu — MVP z aplikacją mobilną i backendem walidacji</td><td>React Native + Node.js + NFC</td><td><strong>4 tygodnie zamiast 6 miesięcy</strong></td></tr>
-          <tr><td>Firmware STM32 — sterownik silnika, generowanie peryferiów, DMA i przerwań</td><td>STM32 + HAL/LL + ARM Cortex-M</td><td><strong>70% mniej boilerplate'u</strong></td></tr>
-          <tr><td>Panel HMI w Qt/QML — nowy interfejs z animacjami i responsywnym layoutem</td><td>Qt 6 + QML + backend C++</td><td><strong>2 tygodnie zamiast 2 miesięcy</strong></td></tr>
-          <tr><td>Diagnostyka floty autobusowej — telemetria z pojazdów, daemon, parser, dashboard</td><td>ARM Linux + systemd + OBD-II</td><td><strong>1 inżynier zamiast zespołu 3 osób</strong></td></tr>
-        </tbody>
-      </table>
+      <div class="prose rv">
+        <p>Zacznijmy od tego, czego AI <strong>nie</strong> robi. Nie generuje firmware'u od zera. Nie zastąpi inżyniera, który czyta datasheet, rozumie timing przerwań i wie, dlaczego ten konkretny rejestr trzeba zapisać dwa razy. Kod w ISR, dobór peryferiów, walka z erratą układu — to dalej praca człowieka przy sprzęcie.</p>
+        <p>To, co AI realnie przyspiesza, to cała warstwa <em>dookoła</em> tego twardego rdzenia. Testy unit na hoście z mockami HAL. Parsery protokołów — Modbus, CANopen, ramki CAN bus, telemetria OBD-II. Dokumentacja rejestrów i mapy pamięci. Kod CRUD-owy na strukturach konfiguracyjnych, serializacja, walidacja danych z magistrali. Skrypty symulujące master/slave, żeby nie blokować ławki na każdą zmianę.</p>
+        <p>I tu pada liczba, która zmienia rachunek opłacalności: w typowym projekcie embedded to właśnie ta warstwa pochłania <strong>około 70% czasu projektu</strong> — nie kod w przerwaniach. Jeśli AI zdejmuje większość tej pracy, inżynier zostaje z czasem na to, co faktycznie wymaga jego głowy.</p>
+      </div>
+      <div class="callout rv">
+        <p><strong>Najkrócej:</strong> AI w embedded to nie generowanie firmware'u od zera — to przyspieszenie wszystkiego, co nie jest „magicznym” kodem hardware'owym: testy, parsery protokołów, dokumentacja rejestrów, kod CRUD-owy na strukturach. Tam jest 70% czasu projektu, nie w ISR-ach.</p>
+      </div>
     </div>
   </section>
 
-  <!-- 04 proces -->
-  <section class="sect" aria-labelledby="proces" style="padding-top:0">
+  <!-- 03 case STM32 -->
+  <section class="sect" aria-labelledby="case" style="padding-top:0">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Współpraca · Jak wygląda wdrożenie</p>
-        <h2 class="sect-title ws" id="proces">Audyt → konfiguracja → sprint → standard.</h2>
+        <p class="eyebrow rv" data-scramble>03 / Dowód · Sterownik STM32 w produkcji</p>
+        <h2 class="sect-title sect-title--s ws" id="case">Jak to wyglądało na realnym module STM32.</h2>
       </div>
-      <div class="steps">
-        <article class="step rv"><p class="eyebrow">01 · Audyt</p><h3>Audyt stacku</h3><p>Sprawdzamy Wasz toolchain, IDE i flow pracy. Szukamy, gdzie AI da największy efekt.</p></article>
-        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Konfiguracja</p><h3>Konfiguracja AI</h3><p>Stawiamy kontekst projektowy — CLAUDE.md, reguły dla hardware, szablony generowania.</p></article>
-        <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Sprint</p><h3>Sprint na Waszym kodzie</h3><p>Dwa tygodnie pair programmingu z AI na Waszych taskach: firmware, HMI, diagnostyka.</p></article>
-        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Standard</p><h3>Standard i dokumentacja</h3><p>Zostawiamy procesy, szablony i wyszkolonych ludzi w zespole.</p></article>
+      <div class="prose rv">
+        <p>Producent automatyki przemysłowej potrzebował nowego modułu komunikacji Modbus RTU + CANopen do sterownika STM32, który jest w produkcji od 2019 roku. Wycena wewnętrzna: 6–8 tygodni inżyniera plus 2 tygodnie testów HIL. Problem nie był techniczny — zespół znał stos i protokoły. Problem był pojemnościowy: cykl build/flash/test trwał 20–40 minut, jedna ławka HIL na trzech ludzi, a senior od warstwy CAN szedł na urlop w środku terminu.</p>
+        <p>Najpierw rozwiązaliśmy cykl iteracji — CI z arm-none-eabi, host-testy z mockami HAL, symulatory Modbus i CANopen w Pythonie. Dopiero potem zespół siadł do kodu modułu. Trzej inżynierowie klienta zamknęli go w dwa tygodnie, z testami HIL. My prowadziliśmy, kod pisali oni.</p>
       </div>
+      <figure class="quote-card rv">
+        <blockquote>Myślałem, że AI to nie dla nas — siedzimy bliżej krzemu niż chmury. Po dwóch tygodniach mam jednoznaczne zdanie: nie generuje za nas firmware'u, ale ratuje cały kontekst dookoła. Testy, dokumentacja rejestrów, sklejanie parserów. Tam, gdzie zwykle ginęliśmy.</blockquote>
+        <figcaption><strong>Inżynier R&amp;D embedded</strong> — producent automatyki przemysłowej (NDA)</figcaption>
+      </figure>
+      <div class="proof-strip rv">
+        <div><strong>2 mc → 2 tyg</strong><span>czas dostarczenia modułu (3–4× szybciej)</span></div>
+        <div><strong>30 → 4 min</strong><span>pętla feedback na CI host (20 → 12 min na HIL)</span></div>
+        <div><strong>3 z 3 inż.</strong><span>używa AI workflow w dzień 14 — sprawdzone w commitach</span></div>
+      </div>
+      <p class="rv" style="margin-top:var(--space-lg)">
+        <a class="btn btn--dark" href="/case-studies/stm32">Zobacz cały case
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <!-- 04 stack / toolchain (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="stack">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>04 / Stack · Z czym pracujemy</p>
+        <h2 class="sect-title ws" id="stack">Toolchain i obszary, w których siedzimy.</h2>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>C / C++ / STM32<small>bare-metal i RTOS</small></dt><dd>C17 bliżej hardware'u, C++17 (bez wyjątków, bez RTTI) na warstwę protokołów. STM32 na ARM Cortex-M, HAL/LL, FreeRTOS bez migracji na siłę.</dd></div>
+        <div><dt>Build i testy<small>CMake, arm-none-eabi, Unity</small></dt><dd>CMake + arm-none-eabi-gcc, ninja, statyczna analiza cppcheck i clang-tidy. Unity + CMock do mockowania HAL, własne fixtury HIL w Pythonie.</dd></div>
+        <div><dt>Protokoły<small>komunikacja przemysłowa</small></dt><dd>Modbus RTU (UART z DMA), CANopen (NMT/PDO/SDO), CAN bus, OBD-II, RS232/485. Parsery i symulatory master/slave do testów bez sprzętu.</dd></div>
+        <div><dt>Qt / QML i ARM Linux<small>HMI i edge</small></dt><dd>Panele HMI w Qt 6 / QML z backendem C++, daemony systemd i telemetria na ARM Linux tam, gdzie projekt wychodzi poza mikrokontroler.</dd></div>
+        <div><dt>AI workflow<small>dopasowany do bare-metal</small></dt><dd>Reguły w CLAUDE.md pisane pod sprzęt: nigdy kod HAL bez referencji do datasheet, PR z memory map diff, oznaczone funkcje ISR, lista funkcji thread-safe.</dd></div>
+      </dl>
     </div>
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+  <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
     <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Pracujesz z embedded lub hard-tech?</h2>
-      <p class="rv">Porozmawiajmy o Waszym stacku. Powiemy, gdzie AI da Wam największy efekt.</p>
+      <p class="eyebrow rv" data-scramble>Wasze firmware'y leżą tygodniami?</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Embedded też się da. Tylko inaczej.</h2>
+      <p class="rv">30-minutowa rozmowa — pokażemy, gdzie konkretnie zespół embedded traci tempo i co AI naprawdę przyspiesza w bare-metal, a czego nie tknie.</p>
       <div class="contact__cta rv">
         <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę
           <span class="btn__arr" aria-hidden="true">

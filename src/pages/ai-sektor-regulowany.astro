@@ -2,124 +2,131 @@
 import Interior from '../layouts/Interior.astro';
 ---
 <Interior
-  title="AI w sektorze regulowanym — obronność, płatności, R&D | SZRON"
-  description="Wdrażamy AI w sektorach regulowanych: obronność, systemy płatnicze, R&D. Lokalne modele AI, air-gapped deployments, NDA przed startem. PCI-DSS, ITAR, AI Act — bez kompromisów."
-  eyebrow="Sektor regulowany · lokalnie i air-gapped"
-  heading="AI w sektorach z wymogami compliance — obronność, płatności, R&D."
-  lead="Kod nie opuszcza Waszej infrastruktury. NDA podpisujemy przed startem. Lokalne modele AI — zero danych w chmurze."
+  title="AI w sektorze regulowanym — compliance i suwerenność danych | SZRON"
+  description="AI w obronności, fintechu i medycynie bez kompromisów w bezpieczeństwie. Kod nie opuszcza Waszej infrastruktury: modele lokalne, Bedrock w VPC lub air-gapped, audit log każdej interakcji. AI Act, NIS2, RODO."
+  eyebrow="Obronność · fintech · medycyna"
+  heading="AI tam, gdzie dane nie mogą wyjść poza ścianę."
+  lead="Compliance i suwerenność danych to nie dodatek — to oś projektu. W obronności, fintechu i medycynie pokazujemy najpierw architekturę bezpieczeństwa, dopiero potem prędkość. Kod nie trafia do publicznych modeli, a każda interakcja z AI zostaje w audit logu."
+  headingSmall={false}
 >
-  <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
+  <!-- 01 wymogi -->
+  <section class="sect" aria-labelledby="wymogi">
     <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>NDA przed startem</strong><span>lokalne modele AI, air-gapped deployments</span></div>
-        <div><strong>Zero danych w chmurze</strong><span>kod nie opuszcza Waszej infrastruktury</span></div>
-        <div><strong>AI Act i NIS2</strong><span>compliant — 25 lat doświadczenia</span></div>
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Wymogi · Co regulator wymaga od wytwarzania software</p>
+        <h2 class="sect-title ws" id="wymogi">Wymogi, które musicie spełnić.</h2>
+        <p class="rv" style="--rv-d:.06s">Zanim zaczniemy mówić o prędkości, ustalamy ramy. Trzy regulacje, które realnie dotykają sposobu, w jaki powstaje u Was kod — i co z każdej z nich wynika dla pracy z AI.</p>
       </div>
+      <dl class="def-rows rv">
+        <div><dt>AI Act<small>Rozporządzenie UE o sztucznej inteligencji</small></dt><dd>Klasyfikuje systemy AI według ryzyka i nakłada obowiązki na tych, którzy je tworzą i wdrażają. Dla wytwarzania software oznacza dokumentowanie, jak i gdzie AI uczestniczy w powstawaniu kodu, oraz kontrolę nad danymi, które do modelu trafiają.</dd></div>
+        <div><dt>NIS2<small>Dyrektywa o cyberbezpieczeństwie</small></dt><dd>Podnosi wymagania bezpieczeństwa dla podmiotów kluczowych i ważnych — w tym dla łańcucha dostaw oprogramowania. Narzędzia AI w procesie developmentu muszą mieścić się w Waszych politykach bezpieczeństwa i zarządzania ryzykiem, a nie omijać je bocznym kanałem.</dd></div>
+        <div><dt>RODO<small>Ochrona danych osobowych</small></dt><dd>Dane osobowe nie mogą wyciekać do zewnętrznych modeli ani opuszczać kontrolowanego środowiska bez podstawy prawnej. Przy pracy z AI oznacza to ścisłą kontrolę nad tym, co trafia do promptu i gdzie fizycznie jest przetwarzane.</dd></div>
+      </dl>
+      <p class="rv" style="--rv-d:.12s; margin-top:var(--space-lg)">
+        <a class="btn btn--dark" href="/ai-act-compliance">Szczegóły AI Act
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+      </p>
     </div>
   </section>
 
-  <!-- 01 światy -->
-  <section class="sect" aria-labelledby="swiaty">
+  <!-- 02 architektura (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="architektura">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Segmenty · Trzy światy, jedno podejście</p>
-        <h2 class="sect-title sect-title--s ws" id="swiaty">Trzy światy, jedno podejście.</h2>
+        <p class="eyebrow rv" data-scramble>02 / Architektura · Gdzie fizycznie są dane</p>
+        <h2 class="sect-title ws" id="architektura">Architektura, która nie wypuszcza danych.</h2>
+        <p class="rv" style="--rv-d:.06s">Bezpieczeństwo nie jest deklaracją — jest decyzją architektoniczną. Pokazujemy ją wprost, warstwa po warstwie, zanim napiszemy pierwszą linię kodu.</p>
       </div>
-      <div class="grid-cards">
-        <article class="card-tile rv">
-          <p class="eyebrow">01 / Obronność</p>
-          <h3>Obronność i automotive.</h3>
-          <p>Systemy embedded, gdzie wyciek kodu to ryzyko. Środowiska air-gapped, świadomość ITAR/EAR, AUTOSAR, MISRA, DO-178B. Pracujemy na Waszym sprzęcie, z Waszymi ograniczeniami.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.1s">
-          <p class="eyebrow">02 / Płatności</p>
-          <h3>Systemy płatnicze i POS.</h3>
-          <p>Terminale, systemy fiskalne, przetwarzanie transakcji. PCI-DSS, certyfikacja EMV. AI przyspiesza development bez naruszania standardów bezpieczeństwa.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.2s">
-          <p class="eyebrow">03 / R&D</p>
-          <h3>R&D, uczelnie, PCB, EMS.</h3>
-          <p>Małe zespoły R&D, gdzie jeden programista z AI zastępuje 3–4-osobowy team. Granty, reprodukowalność wyników, automatyzacja projektowania PCB, tooling EMS.</p>
-        </article>
-      </div>
+      <dl class="def-rows rv">
+        <div><dt>Kod nie idzie do publicznych modeli<small>Zasada zerowego wycieku</small></dt><dd>Żaden fragment Waszego kodu ani danych nie trafia do publicznych API modeli. Punktem wyjścia jest pytanie, gdzie fizycznie odbywa się każda inferencja — a nie wygoda dostawcy.</dd></div>
+        <div><dt>Bedrock w prywatnym VPC<small>AWS pod Waszą kontrolą</small></dt><dd>Tam, gdzie chmura jest dopuszczalna, używamy Amazon Bedrock w prywatnym VPC w AWS. Ruch nie wychodzi do publicznego internetu, a dane pozostają w Waszym koncie i regionie.</dd></div>
+        <div><dt>Modele lokalne na Waszych serwerach<small>Ollama, vLLM</small></dt><dd>Tam, gdzie chmura odpada, stawiamy modele lokalnie — przez Ollama lub vLLM — na Waszych serwerach lub stacjach roboczych. Inferencja dzieje się w pełni wewnątrz Waszej infrastruktury.</dd></div>
+        <div><dt>Wariant air-gapped<small>Środowisko bez sieci zewnętrznej</small></dt><dd>Dla najwyższych wymagań pracujemy w środowisku air-gapped — odciętym od sieci zewnętrznej. Modele i narzędzia działają offline, bez jakiegokolwiek połączenia z internetem.</dd></div>
+        <div><dt>Audit log każdej interakcji<small>Pełna ścieżka dowodowa</small></dt><dd>Każda interakcja z AI zostaje zapisana w audit logu. Macie pełną ścieżkę dowodową tego, co i kiedy trafiło do modelu oraz co zostało wygenerowane — gotową pod wymogi regulatora i audyt.</dd></div>
+      </dl>
     </div>
   </section>
 
-  <!-- 02 case studies (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="cases">
+  <!-- 03 vpc vs on-prem -->
+  <section class="sect" aria-labelledby="warianty">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Realizacje · Sektory regulowane</p>
-        <h2 class="sect-title ws" id="cases">Case studies z sektorów regulowanych.</h2>
+        <p class="eyebrow rv" data-scramble>03 / Wybór · Dwa modele wdrożenia</p>
+        <h2 class="sect-title sect-title--s ws" id="warianty">Kiedy VPC, a kiedy on-premise.</h2>
+        <p class="rv" style="--rv-d:.06s">Nie ma jednego dobrego wariantu — jest ten, który mieści się w Waszych ograniczeniach. O wyborze decyduje kryterium bezpieczeństwa, nie wygoda. Oto jak to rozkładamy.</p>
       </div>
       <table class="results-table rv">
-        <thead><tr><th scope="col">Realizacja</th><th scope="col">Stack · compliance</th><th scope="col">Efekt</th></tr></thead>
+        <thead><tr><th scope="col">Kryterium</th><th scope="col">Bedrock w VPC</th><th scope="col">On-premise · air-gapped</th></tr></thead>
         <tbody>
-          <tr><td>System biletowy z walidacją NFC — MVP z backendem transakcyjnym</td><td>React Native + Node.js + NFC · architektura zgodna z PCI-DSS</td><td><strong>4 tygodnie zamiast 6 miesięcy</strong></td></tr>
-          <tr><td>Firmware STM32 — sterownik silnika, peryferia, DMA i przerwania</td><td>STM32 + HAL/LL + ARM Cortex-M · zgodność z MISRA C</td><td><strong>70% mniej boilerplate'u</strong></td></tr>
-          <tr><td>Dashboard diagnostyczny CAN bus — z ręcznego dekodera do wizualizacji</td><td>Qt/QML + parser CAN bus · diagnostyka automotive-grade</td><td><strong>10x mniej debugowania</strong></td></tr>
+          <tr><td>Gdzie odbywa się inferencja</td><td>W prywatnym VPC w AWS, w Waszym koncie i regionie</td><td><strong>Na Waszych serwerach, w pełni wewnątrz infrastruktury</strong></td></tr>
+          <tr><td>Połączenie z siecią zewnętrzną</td><td>Bez wyjścia do publicznego internetu, w granicach VPC</td><td><strong>Brak — środowisko odcięte od sieci</strong></td></tr>
+          <tr><td>Kiedy ma sens</td><td>Gdy chmura jest dopuszczalna, a liczy się czas startu</td><td><strong>Gdy chmura odpada lub wymóg to środowisko offline</strong></td></tr>
+          <tr><td>Modele</td><td>Modele dostępne w Amazon Bedrock</td><td><strong>Modele lokalne przez Ollama lub vLLM</strong></td></tr>
+          <tr><td>Audit log</td><td>Każda interakcja zapisywana</td><td><strong>Każda interakcja zapisywana — także offline</strong></td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
-  <!-- 03 proces -->
-  <section class="sect" aria-labelledby="proces">
+  <!-- 04 zaufanie -->
+  <section class="sect" aria-labelledby="zaufanie" style="padding-top:0">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Współpraca · Jak wygląda wdrożenie</p>
-        <h2 class="sect-title ws" id="proces">Audyt → konfiguracja lokalna → sprint → standard.</h2>
+        <p class="eyebrow rv" data-scramble>04 / Zaufanie · Na czym je budujemy</p>
+        <h2 class="sect-title sect-title--s ws" id="zaufanie">Zaufanie zaczyna się przed pierwszą rozmową.</h2>
       </div>
-      <div class="steps">
-        <article class="step rv"><p class="eyebrow">01 · Audyt</p><h3>Audyt bezpieczeństwa</h3><p>Weryfikujemy wymagania compliance, podpisujemy NDA, definiujemy zakres i ograniczenia.</p></article>
-        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Konfiguracja</p><h3>Konfiguracja lokalna</h3><p>Stawiamy lokalne modele AI na Waszej infrastrukturze. Zero danych w chmurze, pełna kontrola.</p></article>
-        <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Sprint</p><h3>Sprint na Waszym kodzie</h3><p>Dwa tygodnie pair programmingu z AI na Waszych zadaniach, w Waszej infrastrukturze.</p></article>
-        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Standard</p><h3>Standard i dokumentacja</h3><p>Zostawiamy procesy, szablony, audyt trail i wyszkolonych ludzi w zespole.</p></article>
+      <div class="proof-strip rv">
+        <div><strong>NDA przed rozmową</strong><span>podpisujemy je przed pierwszą rozmową techniczną</span></div>
+        <div><strong>25 lat</strong><span>doświadczenia w wytwarzaniu oprogramowania</span></div>
+        <div><strong>0 podwykonawców</strong><span>nikt z zewnątrz nie dotyka Waszego kodu</span></div>
       </div>
     </div>
   </section>
 
-  <!-- 04 FAQ -->
-  <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
+  <!-- 05 FAQ bezpieczeństwa -->
+  <section class="sect sect--dark" aria-labelledby="faq-title">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / FAQ · Najczęstsze pytania</p>
-        <h2 class="sect-title sect-title--s ws" id="faq-title">Najczęstsze pytania.</h2>
+        <p class="eyebrow rv" data-scramble>05 / FAQ · Pytania o bezpieczeństwo</p>
+        <h2 class="sect-title sect-title--s ws" id="faq-title">Pytania o bezpieczeństwo, które padają najczęściej.</h2>
       </div>
       <div class="faq rv">
         <details>
           <summary><span class="num">01</span> Czy dane i kod naprawdę nie opuszczają naszej infrastruktury? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Tak. Używamy lokalnych modeli AI (Llama, Mistral, CodeLlama) uruchamianych na Waszych serwerach lub stacjach roboczych. Żadne dane nie trafiają do zewnętrznych API ani chmury.</p>
+          <p>Tak. Przy wariancie on-premise używamy modeli lokalnych — przez Ollama lub vLLM — uruchamianych na Waszych serwerach lub stacjach roboczych. Żadne dane nie trafiają do zewnętrznych API ani publicznych modeli. Przy wariancie VPC inferencja odbywa się w prywatnym VPC w AWS, bez wyjścia do publicznego internetu.</p>
         </details>
         <details>
-          <summary><span class="num">02</span> Jak spełniacie wymogi PCI-DSS, ITAR, AI Act? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Przed startem robimy audyt wymagań regulacyjnych Waszej branży. Dobieramy narzędzia i procesy tak, żeby spełniały konkretne standardy — od air-gapped deployments po audyt trail generowanego kodu.</p>
+          <summary><span class="num">02</span> Jak adresujecie wymogi AI Act, NIS2 i RODO? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Przed startem ustalamy ramy regulacyjne Waszej branży i dobieramy architekturę tak, żeby się w nich mieściła — od wariantu air-gapped po audit log każdej interakcji z AI. Kontrolujemy, co trafia do promptu i gdzie fizycznie jest przetwarzane.</p>
         </details>
         <details>
           <summary><span class="num">03</span> Czy podpisujecie NDA i umowę o poufności? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Zawsze. NDA podpisujemy przed pierwszym spotkaniem technicznym. Mamy doświadczenie z NDA w sektorze obronnym, finansowym i R&D.</p>
+          <p>Zawsze. NDA podpisujemy przed pierwszą rozmową techniczną. Mamy doświadczenie z NDA w sektorze obronnym, finansowym i R&D.</p>
         </details>
         <details>
-          <summary><span class="num">04</span> Mamy 3-osobowy zespół R&D. Czy to za mało? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Wręcz przeciwnie — małe zespoły zyskują najwięcej. Jeden programista z AI pair programmingiem zastępuje 3–4-osobowy team. Im mniejszy zespół, tym większy mnożnik.</p>
+          <summary><span class="num">04</span> Czy korzystacie z podwykonawców? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Nie. Zero podwykonawców — nikt z zewnątrz nie dotyka Waszego kodu. Pracujemy bezpośrednio, w oparciu o 25 lat doświadczenia w wytwarzaniu oprogramowania.</p>
         </details>
         <details>
           <summary><span class="num">05</span> Jakich modeli AI używacie w środowiskach offline? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Llama 3, Mistral, CodeLlama, StarCoder2 — w zależności od zadania i dostępnego hardware. Konfigurujemy je lokalnie z kontekstem Waszego projektu, bez połączenia z internetem.</p>
+          <p>Modele lokalne serwowane przez Ollama lub vLLM, dobrane do zadania i dostępnego hardware. Konfigurujemy je w pełni wewnątrz Waszej infrastruktury, w wariancie air-gapped — bez połączenia z internetem.</p>
         </details>
       </div>
     </div>
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
+  <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
     <div class="container">
       <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Opowiemy, jak to wygląda w Waszej branży.</h2>
-      <p class="rv">Porozmawiajmy o Waszych wymaganiach compliance i pokażemy, jak AI może przyspieszyć development bez kompromisów w bezpieczeństwie.</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Zacznijmy od architektury bezpieczeństwa, nie od demówki.</h2>
+      <p class="rv">NDA podpisujemy przed pierwszą rozmową techniczną. Powiedzcie, jakie wymogi compliance Was wiążą — pokażemy, gdzie fizycznie będą Wasze dane i jak AI przyspieszy development bez ich wypuszczania.</p>
       <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę 30 min
+        <a class="btn btn--accent" href="/umow-rozmowe">Zarezerwuj termin
           <span class="btn__arr" aria-hidden="true">
             <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
             <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
