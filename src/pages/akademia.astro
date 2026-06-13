@@ -1,0 +1,45 @@
+---
+import Interior from '../layouts/Interior.astro';
+import { akademia } from '../data/akademia.mjs';
+---
+<Interior
+  title="Akademia SZRON — praktyczne szkolenia z programowania agentowego | SZRON"
+  description="Akademia SZRON: praktyczne materiały z Claude Code, MCP, lokalnych modeli LLM i workflow agentowego. Wiedza, którą wdrażamy u klientów — teraz otwarta."
+  eyebrow="Akademia SZRON"
+  heading="Programowanie agentowe. Tak, jak robimy to u klientów."
+  lead="Materiały z naszych wdrożeń: instalacja i workflow Claude Code, serwery MCP, lokalne modele LLM, bezpieczeństwo pracy z AI na firmowym kodzie. Aktualne komendy, realne pułapki, zero teorii dla teorii."
+>
+  <section class="sect">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>Wszystkie szkolenia</p>
+        <h2 class="sect-title sect-title--s ws">{akademia.length} ścieżek — od pierwszej instalacji po model na własnym serwerze.</h2>
+      </div>
+      <div class="link-cards rv">
+        {akademia.map((a) => (
+          <a class="link-card" href={`/${a.slug}`}>
+            <h3>{a.title}</h3>
+            <p>{a.desc}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="sect sect--dark cta-band" style="padding-top:0">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
+      <h2 class="ws" style="margin-top:var(--space-lg)">Chcecie, żeby tak pracował cały Wasz zespół?</h2>
+      <p class="rv">Akademia to materiały. Wdrożenie to kwartał na Waszym kodzie — z pomiarem efektu w DEVLens. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="/metoda">Zobacz metodę</a>
+      </div>
+    </div>
+  </section>
+</Interior>

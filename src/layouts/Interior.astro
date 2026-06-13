@@ -1,0 +1,32 @@
+---
+import Base from './Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+// Layout stron wewnętrznych: ciemny baner nagłówka → biała „kartka" z sekcjami → stopka.
+// Ten sam język wizualny co homepage, bez sticky-hero.
+const {
+  title,
+  description,
+  ogDescription,
+  ogImage,
+  eyebrow,          // krótki tag nad tytułem (np. "03 / Metoda")
+  heading,          // H1 w banerze
+  lead,             // akapit pod H1
+  headingSmall = false, // mniejszy H1 dla długich tytułów
+} = Astro.props;
+---
+<Base title={title} description={description} ogDescription={ogDescription} ogImage={ogImage}>
+  <Nav />
+  <header class="page-hero">
+    <div class="container">
+      {eyebrow && <p class="eyebrow rv" data-scramble>{eyebrow}</p>}
+      <h1 class={`page-hero__title ws${headingSmall ? ' page-hero__title--s' : ''}`}>{heading}</h1>
+      {lead && <p class="page-hero__lead rv" set:html={lead} />}
+    </div>
+  </header>
+  <div class="page-body page-body--interior">
+    <slot />
+    <Footer />
+  </div>
+</Base>

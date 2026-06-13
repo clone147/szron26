@@ -5,6 +5,44 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# ── 301: stare aliasy URL ze szron.tech (zgodność z dotychczasowym routingiem) ──
+[[redirects]]
+  from = "/about"
+  to = "/o-nas"
+  status = 301
+[[redirects]]
+  from = "/services"
+  to = "/doradztwo-technologiczne"
+  status = 301
+[[redirects]]
+  from = "/uslugi"
+  to = "/doradztwo-technologiczne"
+  status = 301
+[[redirects]]
+  from = "/contact"
+  to = "/kontakt"
+  status = 301
+[[redirects]]
+  from = "/benefits"
+  to = "/wdrozenia-ai"
+  status = 301
+[[redirects]]
+  from = "/ai-transformation"
+  to = "/transformacja-ai"
+  status = 301
+[[redirects]]
+  from = "/studia-przypadkow"
+  to = "/wdrozenia-ai"
+  status = 301
+[[redirects]]
+  from = "/szkolenia"
+  to = "/claude-code"
+  status = 301
+[[redirects]]
+  from = "/augmentacja-programistow"
+  to = "/augmentacja-pracownikow"
+  status = 301
+
 # Bezpieczeństwo + cache statyków
 [[headers]]
   for = "/*"

@@ -1,35 +1,51 @@
 ---
-// Główna nawigacja SZRON (z homepage). Linki ewoluują w Fazie 2.
+// Główna nawigacja SZRON — realne trasy + dropdown Akademia
+import { akademia } from '../data/akademia.mjs';
+const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg><svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg></span>`;
 ---
 <header class="nav" id="nav">
   <div class="container nav__inner">
     <a class="logo" href="/" aria-label="SZRON — strona główna">
-      <img src="/img/logo-dark.svg" alt="" width="105" height="26">
+      <img src="/img/logo-dark.svg" alt="" width="105" height="26" />
     </a>
     <nav aria-label="Nawigacja główna">
       <ul class="nav__links">
-        <li><a href="#metoda">Metoda</a></li>
-        <li><a href="doradztwo.html">Doradztwo</a></li>
-        <li><a href="#case-study">Case studies</a></li>
-        <li><a href="#zespol">Zespół</a></li>
-        <li><a href="#kontakt">Kontakt</a></li>
+        <li><a href="/metoda">Metoda</a></li>
+        <li><a href="/doradztwo-technologiczne">Doradztwo</a></li>
+        <li><a href="/case-studies">Case studies</a></li>
+        <li class="nav__dd">
+          <button type="button" class="nav__dd-toggle" aria-expanded="false" aria-controls="dd-akademia">
+            Akademia
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="nav__dd-panel" id="dd-akademia" role="menu">
+            <a class="nav__dd-head" href="/akademia" role="menuitem">Akademia SZRON — wszystkie szkolenia →</a>
+            <div class="nav__dd-grid">
+              {akademia.map((a) => (
+                <a href={`/${a.slug}`} role="menuitem"><span>{a.title}</span></a>
+              ))}
+            </div>
+          </div>
+        </li>
+        <li><a href="/o-nas">Zespół</a></li>
       </ul>
     </nav>
-    <a class="btn btn--accent" href="#kontakt">Umów diagnozę
-      <span class="btn__arr" aria-hidden="true">
-        <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-        <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-      </span>
-    </a>
+    <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę<Fragment set:html={arrow} /></a>
     <button class="nav__burger" aria-expanded="false" aria-controls="nav-menu" aria-label="Otwórz menu">
       <span></span><span></span><span></span>
     </button>
   </div>
   <nav class="nav__menu" id="nav-menu" aria-label="Nawigacja mobilna">
-    <a href="#metoda">Metoda</a>
-    <a href="doradztwo.html">Doradztwo</a>
-    <a href="#case-study">Case studies</a>
-    <a href="#zespol">Zespół</a>
-    <a href="#kontakt">Kontakt</a>
+    <a href="/metoda">Metoda</a>
+    <a href="/doradztwo-technologiczne">Doradztwo</a>
+    <a href="/case-studies">Case studies</a>
+    <a href="/o-nas">Zespół</a>
+    <a href="/kontakt">Kontakt</a>
+    <details class="nav__menu-acc">
+      <summary>Akademia</summary>
+      <a href="/akademia">Wszystkie szkolenia →</a>
+      {akademia.map((a) => <a href={`/${a.slug}`}>{a.title}</a>)}
+    </details>
+    <a class="btn btn--accent" href="/umow-rozmowe" style="margin-top:var(--space-md)">Umów diagnozę</a>
   </nav>
 </header>
