@@ -1,0 +1,30 @@
+---
+import '../styles/main.css';
+const {
+  title = 'SZRON — Wasz zespół IT. 2–4 razy szybszy. W jeden kwartał.',
+  description = 'Wdrażamy programowanie agentowe w zespołach IT dużych firm — na Waszym kodzie. Szkolimy zespół z AI, wprowadzamy agentów do codziennej pracy, a dowodem jest pilot modernizacji w jeden kwartał.',
+  ogDescription = description,
+  ogImage = '/img/og-cover.webp',
+} = Astro.props;
+---
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={ogDescription} />
+  <meta property="og:image" content={ogImage} />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,300..700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+</head>
+<body>
+  <slot />
+  <script src="/js/main.js" defer></script>
+</body>
+</html>

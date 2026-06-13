@@ -1,1 +1,11 @@
 .DS_Store
+
+# Astro / Node
+node_modules/
+dist/
+.astro/
+*.log
+.netlify/
+.env
+.env.*
+!.env.example

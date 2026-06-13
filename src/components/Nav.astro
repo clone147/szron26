@@ -1,0 +1,35 @@
+---
+// Główna nawigacja SZRON (z homepage). Linki ewoluują w Fazie 2.
+---
+<header class="nav" id="nav">
+  <div class="container nav__inner">
+    <a class="logo" href="/" aria-label="SZRON — strona główna">
+      <img src="/img/logo-dark.svg" alt="" width="105" height="26">
+    </a>
+    <nav aria-label="Nawigacja główna">
+      <ul class="nav__links">
+        <li><a href="#metoda">Metoda</a></li>
+        <li><a href="doradztwo.html">Doradztwo</a></li>
+        <li><a href="#case-study">Case studies</a></li>
+        <li><a href="#zespol">Zespół</a></li>
+        <li><a href="#kontakt">Kontakt</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn--accent" href="#kontakt">Umów diagnozę
+      <span class="btn__arr" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+        <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+      </span>
+    </a>
+    <button class="nav__burger" aria-expanded="false" aria-controls="nav-menu" aria-label="Otwórz menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <nav class="nav__menu" id="nav-menu" aria-label="Nawigacja mobilna">
+    <a href="#metoda">Metoda</a>
+    <a href="doradztwo.html">Doradztwo</a>
+    <a href="#case-study">Case studies</a>
+    <a href="#zespol">Zespół</a>
+    <a href="#kontakt">Kontakt</a>
+  </nav>
+</header>

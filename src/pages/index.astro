@@ -1,0 +1,511 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+<Base>
+  <Nav />
+<!-- ── HERO ─────────────────────────────────────────── -->
+<section class="hero" aria-label="Wprowadzenie">
+  <div class="container">
+    <p class="eyebrow rv" data-scramble>Dla zarządów dużych firm</p>
+    <h1 class="hero__title ws" style="margin-top: var(--space-lg)">Wasz zespół IT. 2–4&nbsp;razy szybszy. W&nbsp;jeden kwartał.</h1>
+    <p class="hero__lead rv" style="--rv-d:.15s">Wdrażamy programowanie agentowe w zespołach IT dużych firm — na Waszym kodzie. Szkolimy zespół z AI, wprowadzamy agentów do codziennej pracy, a dowodem jest pilot: jeden moduł zmodernizowany do nowoczesnego stosu jeszcze w tym samym kwartale. Ci sami programiści, którzy znają Wasz biznes — tylko teraz dostarczają 2 do 4 razy szybciej.</p>
+    <div class="hero__cta rv" style="--rv-d:.25s">
+      <a class="btn btn--accent" href="#kontakt">Umów 30-minutową rozmowę
+        <span class="btn__arr" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+        </span>
+      </a>
+      <a class="btn btn--ghost" href="#metoda">Zobacz, jak pracujemy</a>
+    </div>
+    <div class="hero__grid">
+      <div class="hero__panel rv">
+        <img src="/img/hero-panel.webp" alt="" loading="eager" onload="this.parentElement.classList.add('has-img')" onerror="this.remove()">
+        <span class="ph__label">img/hero-panel.webp · 1600×1200</span>
+        <p class="hero__panel-num" aria-hidden="true">2–4<em>×</em></p>
+        <p class="hero__panel-cap">szybsze dostarczanie po jednym kwartale — ci sami ludzie, ten sam kod, nowy sposób pracy</p>
+      </div>
+      <div class="hero__aside rv" style="--rv-d:.1s">
+        <p class="hero__aside-lead">Dwóch seniorów, 40+ lat łącznie w branży. Trzy lata z LLM-ami w produkcji. Mówimy wprost z zarządem i CTO, diagnozę prowadzi założyciel, kod piszemy razem z Waszym zespołem.</p>
+        <p class="eyebrow">Pracujemy z firmami, których zespół IT liczy 30+ osób</p>
+        <div class="hero__proof">
+          <div><strong>40+ lat</strong> <span>łącznie (Tomek 25 · Maciej 18)</span></div>
+          <div><strong>3 lata</strong> <span>z LLM-ami w produkcji, od premiery Claude Code</span></div>
+          <div><strong>2 osoby</strong> <span>na każdym projekcie, bez wyjątku</span></div>
+          <div><strong>0</strong> <span>podwykonawców</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="page-body">
+
+  <!-- ── 01 PROBLEM ─────────────────────────────────── -->
+  <section class="sect" id="problem" aria-labelledby="problem-title">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Problem · Sytuacja zarządu</p>
+        <h2 class="sect-title sect-title--s ws" id="problem-title">Wasz zespół zna biznes lepiej niż ktokolwiek na rynku. Tylko dostarcza wolniej, niż biznes potrzebuje.</h2>
+      </div>
+      <div class="problems">
+        <div class="problem-row rv">
+          <div>
+            <p class="eyebrow">a</p>
+            <h3>Konkurencja wypuszcza szybciej.</h3>
+          </div>
+          <p>Wasz zespół IT pracuje na pełnych obrotach, a aplikacje rozwijane od 20–30 lat kosztują w utrzymaniu coraz więcej. Każda zmiana idzie tygodniami.</p>
+          <figure class="ph" style="--ph-ar: 4/3">
+            <img src="/img/problem-a.webp" alt="Smugi świateł nocnej drogi mijające oszroniony serwer" loading="lazy" onload="this.parentElement.classList.add('has-img')" onerror="this.remove()">
+            <figcaption class="ph__label">img/problem-a.webp · 960×720</figcaption>
+          </figure>
+        </div>
+        <div class="problem-row rv">
+          <div>
+            <p class="eyebrow">b</p>
+            <h3>Klasyczne odpowiedzi nie skalują się przy 30+ osobach.</h3>
+          </div>
+          <p>Rekrutacja trwa pół roku i podbija koszty. Outsourcing oddaje wiedzę o biznesie na zewnątrz. Rewrite całego systemu kończy się technologią, której zespół nie zna.</p>
+          <figure class="ph" style="--ph-ar: 4/3">
+            <img src="/img/problem-b.webp" alt="Ciemna hala identycznych szaf serwerowych znikających w mroku" loading="lazy" onload="this.parentElement.classList.add('has-img')" onerror="this.remove()">
+            <figcaption class="ph__label">img/problem-b.webp · 960×720</figcaption>
+          </figure>
+        </div>
+        <div class="problem-row rv">
+          <div>
+            <p class="eyebrow">c</p>
+            <h3>AI obiecuje rozwiązanie.</h3>
+          </div>
+          <p>Ale pojedyncze licencje na copilota nie zmieniają tempa zespołu — zmienia je dopiero nowy sposób pracy.</p>
+          <figure class="ph" style="--ph-ar: 4/3">
+            <img src="/img/problem-c.webp" alt="Pomarańczowa iskra światła zamknięta w bryle lodu" loading="lazy" onload="this.parentElement.classList.add('has-img')" onerror="this.remove()">
+            <figcaption class="ph__label">img/problem-c.webp · 960×720</figcaption>
+          </figure>
+        </div>
+      </div>
+      <div class="industries rv">
+        <p class="eyebrow">Pracujemy w branżach</p>
+        <div class="industries__grid">
+          <article>
+            <h3>Przemysł i energetyka</h3>
+            <p>embedded/IoT, maszyny i CNC, automotive</p>
+          </article>
+          <article>
+            <h3>Transport i płatności</h3>
+            <p>systemy biletowe, POS</p>
+          </article>
+          <article>
+            <h3>Sektor regulowany</h3>
+            <p>obronność, fintech, medycyna</p>
+          </article>
+          <article>
+            <h3>Software house, telco, R&amp;D</h3>
+            <p>zespoły produktowe i usługowe</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 02 DLACZEGO TERAZ ──────────────────────────── -->
+  <section class="sect" id="dlaczego-teraz" aria-labelledby="teraz-title" style="padding-top: 0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Dlaczego teraz · Okno przewagi</p>
+        <h2 class="sect-title ws" id="teraz-title">Rynek już to liczy. Pytanie, kto w Waszej branży policzy to pierwszy.</h2>
+      </div>
+      <div>
+        <figure class="quote-card rv">
+          <blockquote>„W produkcji oprogramowania rozwiązania agentowe przyspieszają pracę o 30 do 60 proc., a przy modernizacji systemów ERP pod kątem AI i chmury liczymy na kolejne 30–50 proc. wzrostu produktywności."</blockquote>
+          <figcaption><strong>Zbigniew Rymarczyk</strong> — wiceprezes Comarch, dyrektor sektora ERP · wypowiedź prasowa, czerwiec 2026</figcaption>
+        </figure>
+        <div class="now-stats">
+          <article class="rv">
+            <strong>20×&nbsp;szybciej</strong>
+            <p>programowanie intencyjne wobec wspomaganego, na zadaniach mierzonych w naszych projektach</p>
+          </article>
+          <article class="rv" style="--rv-d:.1s">
+            <strong>6–12&nbsp;miesięcy</strong>
+            <p>zapowiadany horyzont w pełni autonomicznych agentów programistycznych</p>
+          </article>
+        </div>
+        <p class="now-note rv">Większość rynku zatrzymała się na autouzupełnianiu i czacie z AI. My uczymy zespoły programowania intencyjnego: programista zleca agentowi zadanie — intencję, kontekst, kryteria odbioru — i ocenia wynik. Pełną autonomię, którą zapowiadają producenci modeli, wykorzystają te zespoły, które już dziś są w tym biegłe. Kwartał treningu teraz jest wart więcej niż rok doganiania później.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 03 METODA (ciemna) ─────────────────────────── -->
+  <section class="sect sect--dark" id="metoda" aria-labelledby="metoda-title">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Metoda · Jak to robimy</p>
+        <h2 class="sect-title sect-title--s ws" id="metoda-title">Trening AI, programowanie agentowe i pilot modernizacji. W tym samym kwartale.</h2>
+        <p class="sect-lead rv">Trzy ścieżki idą równolegle. Najpierw szkolimy Wasz zespół z AI — żeby każdy programista umiał prowadzić agenta w codziennej pracy. Potem wprowadzamy programowanie agentowe na Waszej obecnej aplikacji, bez ryzyka, na kodzie, który ludzie znają. Dowodem jest pilot: zespół modernizuje jeden moduł do stosu, w którym AI najmocniej obniża koszt rozwoju — i wypuszcza go też natywnie na iOS i Androida. Po kwartale zespół ma nowy sposób pracy, zmierzony wynik i wzorzec, którym sam obejmuje resztę systemu.</p>
+      </div>
+      <div class="paths">
+        <article class="path rv">
+          <figure class="ph ph--dark" style="--ph-ar: 16/9">
+            <img src="/img/path-01.webp" alt="Stół warsztatowy z laptopami i odręcznymi diagramami w ciepłym świetle" loading="lazy" onload="this.parentElement.classList.add('has-img')" onerror="this.remove()">
+            <figcaption class="ph__label">img/path-01.webp · 1280×720</figcaption>
+          </figure>
+          <p class="eyebrow">Ścieżka 01</p>
+          <h3>Trening z AI</h3>
+          <p>Uczymy Wasz zespół, jak realnie pracować z AI. Nie szkolenie z promptów — codzienne ramy pracy: agent AI jako daily driver, AGENTS.md jako konstytucja zespołu, dedykowane MCP servery połączone wprost z Waszą bazą danych (MS SQL, MySQL, IBM DB2, Postgres, Oracle).</p>
+          <ul role="list">
+            <li>Wspólne sesje na żywym kodzie, nie slajdy</li>
+            <li>Pełny workflow agentowy: plan mode, subagenci, skille, MCP</li>
+            <li>Wskaźniki produktywności od pierwszego tygodnia (DEVLens — wykresy z repozytoriów Git i SVN)</li>
+            <li>Każdy programista pracuje samodzielnie po kilku spotkaniach</li>
+          </ul>
+          <p class="path__lead">Prowadzi: Tomek Wojciechowski</p>
+        </article>
+        <article class="path rv" style="--rv-d:.1s">
+          <figure class="ph ph--dark" style="--ph-ar: 16/9">
+            <img src="/img/path-02.webp" alt="Pomarańczowe nici światła przeplatające się przez ciemną krystaliczną strukturę" loading="lazy" onload="this.parentElement.classList.add('has-img')" onerror="this.remove()">
+            <figcaption class="ph__label">img/path-02.webp · 1280×720</figcaption>
+          </figure>
+          <p class="eyebrow">Ścieżka 02</p>
+          <h3>Agentowe programowanie</h3>
+          <p>Wprowadzamy zespół w pracę z agentami na Waszej obecnej aplikacji. Bez ryzyka modernizacji, bez przerzucania na nową technologię. Pierwsze realne dostawy w drugim tygodniu.</p>
+          <ul role="list">
+            <li>Praca na Waszej istniejącej aplikacji</li>
+            <li>Niski próg wejścia, szybki ROI</li>
+            <li>Zero przerwy w rozwoju produktu</li>
+          </ul>
+          <p class="path__lead">Prowadzi: Tomek Wojciechowski</p>
+        </article>
+        <article class="path path--wide rv">
+          <p class="eyebrow">Ścieżka 03</p>
+          <h3>Pilot modernizacji</h3>
+          <p>Zespół przenosi jeden moduł lub aplikację na nowoczesny stos, w którym AI obniża koszt rozwoju nawet o 60%. My doradzamy, pokazujemy wzorzec, a trudne fragmenty bierzemy na siebie. Pilot to dowód metody — po kwartale zespół tym samym wzorcem obejmuje kolejne moduły.</p>
+          <div class="path__cols">
+            <dl class="spec-rows">
+              <div><dt>Platforma</dt><dd>Desktop, web, SaaS — jedna aplikacja, wybór formy dostawy</dd></div>
+              <div><dt>Mobile</dt><dd>Natywne iOS i Android z jednego kodu, w tym samym kwartale</dd></div>
+              <div><dt>Architektura</dt><dd>Monolit → moduły, stopniowo, bez „big bang"</dd></div>
+              <div><dt>Dane i integracje</dt><dd>Wasza baza zostaje bez zmian (MS SQL, MySQL, PostgreSQL, DB2, Oracle), API działają jak wcześniej</dd></div>
+            </dl>
+            <div class="path-aside">
+              <figure class="ph ph--dark" style="--ph-ar: 16/9">
+                <img src="/img/path-03.webp" alt="Stara hala przemysłowa przechodząca w nowoczesną szklaną dobudowę o zmierzchu" loading="lazy" onload="this.parentElement.classList.add('has-img')" onerror="this.remove()">
+                <figcaption class="ph__label">img/path-03.webp · 1280×720</figcaption>
+              </figure>
+              <article>
+                <h4>Czego nie obiecujemy</h4>
+                <ul role="list">
+                  <li>Nie obiecujemy „identycznej kopii". Pilot to okazja, żeby naprawić to, co od lat irytowało użytkowników.</li>
+                  <li>Nie zaczynamy bez analizy. Diagnoza mówi uczciwie, czy pilot ma sens i od którego modułu zacząć.</li>
+                </ul>
+              </article>
+              <article>
+                <h4>Pod NDA</h4>
+                <p>Pierwsze programy prowadzimy pod NDA. Konkretne wyniki i nazwy klientów zaczniemy publikować w drugiej połowie 2026 roku.</p>
+              </article>
+            </div>
+          </div>
+          <p class="path__lead">Prowadzi: Maciej Stopa (backend/mobile/frontend) + Tomek (architektura)</p>
+        </article>
+      </div>
+      <div class="statement">
+        <h3 class="ws">Zespół, który znacie. Tempo, którego nie znacie.</h3>
+        <p class="rv">Bez wymiany ludzi. Bez utraty wiedzy o biznesie. W 3 miesiące, za stałą opłatę.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 04 CO ROBIMY INACZEJ ───────────────────────── -->
+  <section class="sect" id="inaczej" aria-labelledby="inaczej-title">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>04 / Co robimy inaczej · Szkolenie a wdrożenie</p>
+        <h2 class="sect-title sect-title--s ws" id="inaczej-title">Samo szkolenie to za mało. Bez wdrożenia w codzienną pracę zostajecie z certyfikatami i starym tempem.</h2>
+      </div>
+      <div class="twocol">
+        <p class="rv">Trzy ścieżki idą równolegle, nie po kolei. Zespół uczy się AI na własnej aplikacji — w stosie, który zna. Kiedy startuje pilot modernizacji, programiści już wiedzą, jak prowadzić agenta. Nowy sposób pracy od pierwszego dnia jest ich sposobem, nie naszym.</p>
+        <p class="rv" style="--rv-d:.1s">Cały program trwa 3 miesiące, nie rok. Stara aplikacja działa bez przerwy, pilot wchodzi obok, mobile razem z webem. Bez „big bang" i bez ryzyka, że wszystko padnie w jeden weekend.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 05 KORZYŚCI ────────────────────────────────── -->
+  <section class="sect" id="korzysci" aria-labelledby="korzysci-title" style="padding-top: 0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>05 / Korzyści</p>
+        <h2 class="sect-title ws" id="korzysci-title">Co zyskujecie</h2>
+      </div>
+      <div class="benefits">
+        <article class="benefit rv">
+          <p class="eyebrow">01 / Tempo</p>
+          <h3>Zespół dostarcza 2–4 razy szybciej.</h3>
+          <p>To, co zajmowało 6 miesięcy, zespół dostarcza w 4 tygodnie. Wcześniejszy przychód, szybsza reakcja na konkurencję. Mierzone DORA metrics od pierwszego tygodnia, nie deklaracjami.</p>
+        </article>
+        <article class="benefit rv" style="--rv-d:.1s">
+          <p class="eyebrow">02 / Ludzie</p>
+          <h3>Ci sami ludzie, nowe kompetencje.</h3>
+          <p>Nie zatrudniacie nowych ludzi i nie tracicie wiedzy o biznesie. Programiści, którzy pracują z AI, rzadziej odchodzą — a Wasza firma staje się pracodawcą, do którego się aplikuje.</p>
+        </article>
+        <article class="benefit rv" style="--rv-d:.2s">
+          <p class="eyebrow">03 / Koszt</p>
+          <h3>Niższy koszt rozwoju, z pilotem jako mnożnikiem.</h3>
+          <p>W stosie z pilota koszt dalszego rozwoju spada nawet o 60% — a wzorzec skaluje się na kolejne moduły. W ramach stałego doradztwa idziemy dalej: eliminujemy opłaty licencyjne za zamknięte technologie. <a href="doradztwo.html">Zobacz Doradztwo →</a></p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 06 CASE STUDY ──────────────────────────────── -->
+  <section class="sect" id="case-study" aria-labelledby="case-title" style="padding-top: 0">
+    <div class="container">
+      <div class="case-card rv">
+        <div>
+          <p class="eyebrow" data-scramble>06 / Case study · RegioBus Systems</p>
+          <h2 id="case-title">Sześć miesięcy planu. Cztery tygodnie do produktu.</h2>
+          <figure>
+            <blockquote>Zaplanowaliśmy 6 miesięcy na nowy system. Po czterech tygodniach mieliśmy działający produkt. Z czterech programistów zostawiliśmy jednego, z asystentem AI.</blockquote>
+            <figcaption><strong>Marek Zawadzki</strong> — CTO, RegioBus Systems · LinkedIn i pełne dane referencyjne na życzenie po NDA</figcaption>
+          </figure>
+          <div class="case-card__meta">
+            <p>Lead operacyjny: Maciej Stopa (backend + mobile NFC) · Tomek (AI workflow)</p>
+            <p>Skala pilota: 4-osobowy zespół, jeden system. To samo robimy z jednym zespołem w Waszej organizacji — falami, zespół po zespole.</p>
+          </div>
+          <figure class="ph ph--dark" style="--ph-ar: 16/9">
+            <img src="/img/case-regiobus.webp" alt="Miejski autobus nocą mijający oszkloną wiatę przystankową" loading="lazy" onload="this.parentElement.classList.add('has-img')" onerror="this.remove()">
+            <figcaption class="ph__label">img/case-regiobus.webp · 1280×720</figcaption>
+          </figure>
+        </div>
+        <div class="case-card__stats">
+          <div>
+            <span>Czas</span>
+            <strong>6 miesięcy <em>→ 4 tygodnie</em></strong>
+          </div>
+          <div>
+            <span>Zespół</span>
+            <strong>3 z 4 osób uwolnione</strong>
+            <span style="margin-top: 4px">do nowych projektów · 0 odejść</span>
+          </div>
+          <div>
+            <span>Roczne oszczędności</span>
+            <strong>setki tysięcy złotych</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 07 WYNIKI ──────────────────────────────────── -->
+  <section class="sect" id="wyniki" aria-labelledby="wyniki-title" style="padding-top: 0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>07 / Wyniki · Pozostałe projekty</p>
+        <h2 class="sect-title sect-title--s ws" id="wyniki-title">Skrócenie czasu dostarczania w trzech różnych branżach.</h2>
+      </div>
+      <table class="results-table rv">
+        <thead>
+          <tr>
+            <th scope="col">Projekt</th>
+            <th scope="col">Dotychczas</th>
+            <th scope="col">Po wdrożeniu</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>System biletowy</td>
+            <td>6 miesięcy</td>
+            <td><strong>4 tygodnie</strong></td>
+          </tr>
+          <tr>
+            <td>Sterownik urządzenia przemysłowego</td>
+            <td>2 miesiące</td>
+            <td><strong>2 tygodnie</strong></td>
+          </tr>
+          <tr>
+            <td>Panel sterowania (energetyka)</td>
+            <td>nowy moduł</td>
+            <td><strong>2 tygodnie</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 08 PROCES ──────────────────────────────────── -->
+  <section class="sect" id="proces" aria-labelledby="proces-title" style="padding-top: 0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>08 / Proces · Cztery kroki, jeden kwartał</p>
+        <h2 class="sect-title ws" id="proces-title">Jak pracujemy. 3 miesiące. Stała opłata.</h2>
+      </div>
+      <div class="steps">
+        <article class="step rv">
+          <p class="eyebrow">01 · Tydzień 1</p>
+          <h3>Diagnoza</h3>
+          <p>Analizujemy aplikację i zespół. Ustalamy zakres pilota i ścieżkę wdrożenia AI. Diagnozę prowadzi Tomek, w razie potrzeby dołącza Maciej.</p>
+        </article>
+        <article class="step rv" style="--rv-d:.08s">
+          <p class="eyebrow">02 · Tydzień 2</p>
+          <h3>Plan i wycena</h3>
+          <p>Konkretny zakres, harmonogram, mierzalne wskaźniki. Wycenę zatwierdzamy obaj — bo to my będziemy projekt prowadzić.</p>
+        </article>
+        <article class="step rv" style="--rv-d:.16s">
+          <p class="eyebrow">03 · Tygodnie 3–10</p>
+          <h3>Trzy ścieżki na raz</h3>
+          <p>Dwie ścieżki treningowe — AI i agentowe programowanie na obecnym kodzie — plus pilot modernizacji z natywnym mobile.</p>
+        </article>
+        <article class="step rv" style="--rv-d:.24s">
+          <p class="eyebrow">04 · Tygodnie 11–12</p>
+          <h3>Przekazanie</h3>
+          <p>Dokumentacja, wskaźniki, samodzielny zespół zdolny do dalszego rozwoju aplikacji.</p>
+        </article>
+      </div>
+      <div class="process-terms rv">
+        <div><strong>3 miesiące</strong> <span>Razem</span></div>
+        <div><strong>Stała opłata</strong> <span>Bez ukrytych kosztów</span></div>
+        <div><strong>Bez przedłużania</strong> <span>Zamknięty zakres</span></div>
+      </div>
+      <div class="after-note rv">
+        <div>
+          <h3>A po kwartale?</h3>
+          <p>Dla firm, które chcą utrzymać tempo: stała współpraca — doradca technologiczny zarządu i zewnętrzny dział B+R.</p>
+        </div>
+        <a class="btn btn--dark" href="doradztwo.html">Zobacz Doradztwo
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 09 ZESPÓŁ ──────────────────────────────────── -->
+  <section class="sect" id="zespol" aria-labelledby="zespol-title" style="padding-top: 0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>09 / Zespół · Dwa nazwiska, jeden numer telefonu</p>
+        <h2 class="sect-title sect-title--s ws" id="zespol-title">Ci sami dwaj ludzie prowadzą diagnozę, wdrożenie i przekazanie.</h2>
+        <p class="sect-lead rv">Bez account managerów. Bez wymiany konsultantów co kwartał. Wszystko, co robimy u Was, robi jeden z nas — i każdy wie, co robi drugi.</p>
+      </div>
+      <div class="team">
+        <article class="person rv">
+          <div class="person__head">
+            <span class="person__avatar" aria-hidden="true">TW<img src="/img/team-tomek.webp" alt="" loading="lazy" onload="this.parentElement.classList.add('has-img')" onerror="this.remove()"></span>
+            <div>
+              <h3>Tomek Wojciechowski</h3>
+              <p class="person__role">Założyciel · 25 lat w IT</p>
+            </div>
+          </div>
+          <p>Od Delphi i WinAPI, przez C++ i web, do LLM i agentów. Prowadzi diagnozy, AI workflow i rozmowy z zarządem. Były CTO 40-osobowego zespołu IT. Specjalizacja: Claude Code, MCP servers, CLAUDE.md jako kontrakt zespołu.</p>
+        </article>
+        <article class="person rv" style="--rv-d:.1s">
+          <div class="person__head">
+            <span class="person__avatar" aria-hidden="true">MS<img src="/img/team-maciej.webp" alt="" loading="lazy" onload="this.parentElement.classList.add('has-img')" onerror="this.remove()"></span>
+            <div>
+              <h3>Maciej Stopa</h3>
+              <p class="person__role">Senior Full-stack / Mobile · 18 lat w produkcji</p>
+            </div>
+          </div>
+          <p>Modernizacje aplikacji webowych i natywnych mobile. Prowadzi backend, frontend i iOS/Android w projektach SZRON. Spring Boot 3, Kotlin, Swift, React Native, Qt/QML, PostgreSQL. Wcześniej tech lead w trzech scaleupach, ostatnio mobile platform owner u operatora płatności. Specjalizacja: migracje monolitów, NFC, UI dla systemów krytycznych (HMI/SCADA).</p>
+        </article>
+      </div>
+      <div class="team-quote rv">
+        <blockquote>„Byliśmy programistami, liderami, doradcami zarządów, CTO i klientami zewnętrznych dostawców. Wiemy dokładnie, gdzie projekty się sypią — z każdej z tych stron osobno."</blockquote>
+        <a class="btn btn--dark" href="zespol.html" style="align-self: flex-start">Zobacz zespół na osobnej stronie
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 10 FAQ ─────────────────────────────────────── -->
+  <section class="sect" id="faq" aria-labelledby="faq-title" style="padding-top: 0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>10 / FAQ · Pytania zarządu</p>
+        <h2 class="sect-title sect-title--s ws" id="faq-title">Pytania, które zwykle padają na pierwszym spotkaniu.</h2>
+      </div>
+      <div class="faq rv">
+        <details>
+          <summary><span class="num">01</span> Co z bezpieczeństwem naszych danych? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Wasz kod nie idzie do publicznych modeli. Dla branż regulowanych — Bedrock w AWS, dane w Waszej VPC. Dla obronności i wrażliwego embedded — lokalne modele (Ollama, vLLM) na Waszych serwerach. Audit log każdej interakcji z AI. NDA podpisujemy przed pierwszą rozmową.</p>
+        </details>
+        <details>
+          <summary><span class="num">02</span> Co jeśli zespół nie kupi tej zmiany? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny". Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. Opór znika, gdy programiści widzą, że dostarczają szybciej. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.</p>
+        </details>
+        <details>
+          <summary><span class="num">03</span> Jak zmierzymy efekt? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>DORA metrics jako baseline w tygodniu 1: czas od ticketu do PR, czas merge, bug escape rate, pokrycie testami. Mierzymy ponownie w tygodniu 12. Raport ROI dla zarządu — dashboard, nie prezentacja.</p>
+        </details>
+        <details>
+          <summary><span class="num">04</span> Ile to kosztuje? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Programy kwartalne nie są dla każdej firmy. Stała opłata kwartalna, zamknięty zakres, bez T&amp;M. Kwotę ustalamy po diagnozie i podajemy mailem w 48h.</p>
+        </details>
+        <details>
+          <summary><span class="num">05</span> Czy stara aplikacja będzie działać w trakcie pilota? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Tak. Pilot wchodzi obok: dwa systemy równolegle, moduł po module, testy regresyjne na danych z produkcji. Wasza baza danych zostaje bez zmian.</p>
+        </details>
+        <details>
+          <summary><span class="num">06</span> Czy to działa przy zespole 50+ osób? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Tak — falami. Nie szkolimy 50 osób naraz. Zaczynamy od jednego zespołu (5–10 osób) i pilota, wzorce zapisujemy w CLAUDE.md i standardach repo, a przeszkoleni programiści zostają championami kolejnych fal. Druga fala kosztuje mniej niż pierwsza, trzecia mniej niż druga.</p>
+        </details>
+        <details>
+          <summary><span class="num">07</span> Kto będzie pracował przy naszym projekcie? <span class="ico" aria-hidden="true">+</span></summary>
+          <p>Dwóch ludzi: Tomek Wojciechowski i Maciej Stopa. Te same dwie osoby od diagnozy do przekazania. Bez podwykonawców, bez wymiany konsultantów, bez ekspertów-fantomów w ofercie, których potem nie widać. Tomek prowadzi AI workflow i strategię, Maciej — backend, mobile i frontend. Każdy poważny PR przechodzi przez dwie pary oczu.</p>
+        </details>
+      </div>
+      <div class="faq-cta rv">
+        <p>Pełne odpowiedzi — z uwzględnieniem Waszego stacku, branży i compliance — na pierwszej, 30-minutowej rozmowie diagnostycznej.</p>
+        <a class="btn btn--dark" href="#kontakt">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── KONTAKT (ciemna) ───────────────────────────── -->
+  <section class="sect sect--dark" id="kontakt" aria-labelledby="kontakt-title">
+    <div class="container">
+      <div class="contact__grid">
+        <div>
+          <p class="eyebrow rv" data-scramble>Kontakt</p>
+          <h2 class="sect-title sect-title--s ws" id="kontakt-title" style="margin-top: var(--space-lg)">30 minut. Pokażemy, gdzie Wasz zespół IT traci tempo.</h2>
+          <p class="sect-lead rv">W jednym kwartale dzieją się trzy rzeczy: szkolimy Wasz zespół z AI, wprowadzamy programowanie agentowe na obecnej aplikacji, a pilot modernizacji potwierdza wynik na produkcji. Po kwartale zespół dostarcza 2–4 razy szybciej i sam obejmuje wzorcem resztę systemu.</p>
+          <div class="contact__note rv">
+            <p class="eyebrow">Pracujemy z firmami, których zespół IT liczy 30+ osób</p>
+            <p>Rozmowę prowadzi Tomek. W ciągu 48h dostajecie wycenę zatwierdzoną przez nas obu — bo to my będziemy ten projekt robić. Bez prezentacji, bez oferty handlowej. Konkretne liczby, które wykorzystacie niezależnie od dalszej decyzji.</p>
+          </div>
+        </div>
+        <div class="contact__panel rv" style="--rv-d:.1s">
+          <dl class="contact__facts">
+            <div><dt>Format</dt><dd>NDA przed pierwszą rozmową</dd></div>
+            <div><dt>Wycena</dt><dd>Stała opłata, mailem w 48h po diagnozie</dd></div>
+            <div><dt>Odpowiedzialność</dt><dd>Dwie osoby z imienia, bez podwykonawców</dd></div>
+          </dl>
+          <div class="contact__cta">
+            <a class="btn btn--accent" href="kontakt.html">Zarezerwuj termin
+              <span class="btn__arr" aria-hidden="true">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+                <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+              </span>
+            </a>
+            <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ─────────────────────────────────────── -->
+  <Footer />
+
+</div><!-- /.page-body -->
+</Base>
