@@ -173,9 +173,12 @@ h1, h2, h3, h4 {
 
 .nav__links {
   display: flex;
+  align-items: center;
   gap: clamp(1rem, 2.8vw, 2.5rem);
   list-style: none;
 }
+.nav__links > li { display: flex; align-items: center; }
+.nav__links > li > a { display: inline-flex; align-items: center; }
 .nav__links a {
   font-size: var(--text-caption);
   font-weight: 600;
@@ -1092,6 +1095,13 @@ form [name="bot-field"], form label:has([name="bot-field"]), p.hidden, .hidden-f
 .quote-card figcaption { color: var(--color-text-2); }
 .card-tile, .card-tile h3 { color: var(--color-text); }
 .sect--dark .card-tile, .sect--dark .card-tile h3 { color: var(--color-text-inv); }
+/* karty osób (.person) — zawsze jasne tło, więc wymuś ciemny tekst (także w sekcji --dark) */
+.person, .person h3 { color: var(--color-text); }
+.person ul { list-style: none; display: grid; gap: var(--space-2xs); margin: var(--space-sm) 0 var(--space-md); }
+.person li { position: relative; padding-left: 1.25rem; color: var(--color-text-2); font-size: var(--text-s); }
+.person li::before { content: "–"; position: absolute; left: 0; color: var(--color-accent); }
+.person > p { color: var(--color-text-2); }
+.person > p strong { color: var(--color-text); }
 
 /* prose w ciemnych sekcjach — czytelny jasny tekst */
 .sect--dark .prose p, .sect--dark .prose li { color: var(--color-text-inv-2); }
