@@ -1,0 +1,29 @@
+---
+import Strefa from '../../layouts/Strefa.astro';
+---
+<Strefa title="Pulpit" active="pulpit">
+  <div class="strefa-head">
+    <div>
+      <p class="strefa-eyebrow">Strefa zamknięta</p>
+      <h1>Pulpit</h1>
+      <p>Wewnętrzny panel SZRON. Dane chronione politykami RLS — widoczne tylko dla zespołu.</p>
+    </div>
+  </div>
+
+  <div class="strefa-tiles">
+    <a class="strefa-tile" href="/strefa/szkolenia">
+      <span class="strefa-tile__ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      </span>
+      <h2>Szkolenia</h2>
+      <p>Lista szkoleń, uczestnicy, obecność, abonamenty i notatki. Edycja tabeli z klawiatury.</p>
+    </a>
+    <div class="strefa-tile" style="cursor:default">
+      <span class="strefa-tile__ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/><path d="m9 12 2 2 4-4"/></svg>
+      </span>
+      <h2>Dostęp</h2>
+      <p>Logowanie Google lub loginem. Dostęp wyłącznie dla adresów z allowlisty zespołu SZRON.</p>
+    </div>
+  </div>
+</Strefa>

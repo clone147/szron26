@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /strefa
 
 Sitemap: https://szron.tech/sitemap-index.xml

@@ -1,0 +1,69 @@
+---
+// Layout strefy zamkniętej SZRON — samodzielna powłoka aplikacji (bez marketingowego nav/stopki).
+// Każda strona używająca tego layoutu jest chroniona: skrypt sprawdza sesję i allowlistę,
+// niezalogowanych przekierowuje na /strefa/login.
+import '../styles/main.css';
+import '../styles/strefa.css';
+const { title = 'Strefa SZRON', active = '' } = Astro.props;
+---
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title} — Strefa SZRON</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,300..700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+</head>
+<body class="strefa-body">
+  <div class="strefa-shell" data-strefa-guarded hidden>
+    <header class="strefa-top">
+      <div class="strefa-top__inner">
+        <a class="logo" href="/strefa" aria-label="Strefa SZRON">
+          <img src="/img/logo-dark.svg" alt="" width="96" height="24" />
+          <span class="strefa-top__tag">Strefa</span>
+        </a>
+        <nav class="strefa-top__nav" aria-label="Nawigacja strefy">
+          <a href="/strefa" class={active === 'pulpit' ? 'is-active' : ''}>Pulpit</a>
+          <a href="/strefa/szkolenia" class={active === 'szkolenia' ? 'is-active' : ''}>Szkolenia</a>
+        </nav>
+        <div class="strefa-top__user">
+          <span class="strefa-top__email" id="strefa-user" aria-live="polite"></span>
+          <button type="button" class="strefa-btn strefa-btn--ghost" id="strefa-logout">Wyloguj</button>
+        </div>
+      </div>
+    </header>
+    <main class="strefa-main">
+      <slot />
+    </main>
+  </div>
+
+  <div class="strefa-boot" id="strefa-boot">
+    <div class="strefa-boot__spinner" aria-hidden="true"></div>
+    <p>Sprawdzam dostęp…</p>
+  </div>
+
+  <script>
+    import { requireAuth, signOut } from '../lib/supabase.js';
+    (async () => {
+      const user = await requireAuth('/strefa/login');
+      if (!user) return; // requireAuth przekierował
+      const shell = document.querySelector('[data-strefa-guarded]');
+      const boot = document.getElementById('strefa-boot');
+      const emailEl = document.getElementById('strefa-user');
+      if (emailEl) emailEl.textContent = user.email || '';
+      if (boot) boot.remove();
+      if (shell) shell.hidden = false;
+      const logout = document.getElementById('strefa-logout');
+      logout?.addEventListener('click', async () => {
+        logout.disabled = true;
+        await signOut();
+        window.location.replace('/strefa/login');
+      });
+    })();
+  </script>
+</body>
+</html>

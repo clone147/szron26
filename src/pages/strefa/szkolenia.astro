@@ -1,0 +1,40 @@
+---
+import Strefa from '../../layouts/Strefa.astro';
+---
+<Strefa title="Szkolenia" active="szkolenia">
+  <div class="strefa-head">
+    <div>
+      <p class="strefa-eyebrow">Strefa zamknięta</p>
+      <h1>Szkolenia</h1>
+      <p>Lista szkoleń, obecność, abonamenty i notatki uczestników. Tabelę edytujesz z klawiatury — jak w arkuszu.</p>
+    </div>
+    <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center">
+      <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-import" title="Migracja danych ze starych tabel public.szron_*">Import z poprzedniej wersji</button>
+      <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-import-file">Wgraj JSON</button>
+      <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-export">Eksport JSON</button>
+      <button class="strefa-btn strefa-btn--accent" id="btn-add-training">+ Szkolenie</button>
+    </div>
+  </div>
+
+  <div class="strefa-stats" id="stats" aria-live="polite"></div>
+
+  <div class="strefa-toolbar">
+    <div class="strefa-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input class="strefa-input" id="search" type="search" placeholder="Szukaj uczestnika, szkolenia, e-maila, stanowiska…" autocomplete="off" />
+    </div>
+  </div>
+
+  <div id="trainings" class="strefa-trainings"></div>
+  <div id="empty" class="dgrid-empty" hidden>
+    <p>Brak szkoleń. Dodaj pierwsze przyciskiem <strong>+ Szkolenie</strong> lub zaimportuj dane z poprzedniej wersji.</p>
+  </div>
+
+  <input type="file" id="file-input" accept="application/json,.json" hidden />
+  <div id="modal-root"></div>
+  <div class="strefa-toasts" id="toasts" aria-live="polite"></div>
+
+  <script>
+    import '../../lib/strefa-szkolenia.js';
+  </script>
+</Strefa>

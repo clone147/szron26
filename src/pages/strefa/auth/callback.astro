@@ -1,0 +1,65 @@
+---
+import '../../../styles/main.css';
+import '../../../styles/strefa.css';
+---
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Logowanie… — Strefa SZRON</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+</head>
+<body class="strefa-body">
+  <div class="strefa-boot">
+    <div class="strefa-boot__spinner" aria-hidden="true"></div>
+    <p id="cb-msg">Kończę logowanie…</p>
+  </div>
+
+  <script>
+    import { getClient, getSessionUser, isAllowed, signOut } from '../../../lib/supabase.js';
+
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get('next') || '/strefa';
+      const safeNext = next.startsWith('/strefa') ? next : '/strefa';
+      const msg = document.getElementById('cb-msg');
+
+      if (params.get('error')) {
+        msg.textContent = 'Logowanie anulowane. Przekierowuję…';
+        setTimeout(() => window.location.replace('/strefa/login'), 1200);
+        return;
+      }
+
+      const sb = getClient(); // detectSessionInUrl: automatycznie wymienia kod PKCE na sesję
+
+      // Poczekaj na ustanowienie sesji (zdarzenie lub polling)
+      let user = await getSessionUser();
+      if (!user) {
+        await new Promise((resolve) => {
+          const { data } = sb.auth.onAuthStateChange((_e, session) => { if (session) resolve(); });
+          let tries = 0;
+          const iv = setInterval(async () => {
+            if (await getSessionUser() || ++tries > 20) { clearInterval(iv); data.subscription.unsubscribe(); resolve(); }
+          }, 200);
+        });
+        user = await getSessionUser();
+      }
+
+      if (!user) {
+        msg.textContent = 'Nie udało się zalogować. Spróbuj ponownie.';
+        setTimeout(() => window.location.replace('/strefa/login'), 1500);
+        return;
+      }
+      if (!isAllowed(user.email)) {
+        await signOut();
+        msg.textContent = 'To konto nie ma dostępu do strefy SZRON.';
+        setTimeout(() => window.location.replace('/strefa/login?denied=1'), 1800);
+        return;
+      }
+      window.location.replace(safeNext);
+    })();
+  </script>
+</body>
+</html>

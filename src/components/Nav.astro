@@ -30,6 +30,28 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
         <li><a href="/open-source">Open source</a></li>
         <li><a href="/o-nas">Zespół</a></li>
         <li><a href="/kontakt">Kontakt</a></li>
+        <li class="nav-auth" id="nav-auth">
+          <button type="button" class="nav__dd-toggle" id="nav-auth-toggle" aria-expanded="false" aria-controls="nav-auth-panel">
+            Strefa
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="nav-auth__panel" id="nav-auth-panel" role="dialog" aria-label="Logowanie do strefy zamkniętej">
+            <h3>Strefa zamknięta</h3>
+            <p class="nav-auth__hint">Zaloguj się loginem lub przez Google.</p>
+            <div class="nav-auth__msg" id="nav-auth-msg" hidden></div>
+            <form id="nav-auth-form">
+              <input class="nav-auth__input" type="email" id="na-email" placeholder="E-mail" autocomplete="username" required />
+              <input class="nav-auth__input" type="password" id="na-pass" placeholder="Hasło" autocomplete="current-password" required />
+              <button class="nav-auth__submit" type="submit" id="na-login">Zaloguj</button>
+            </form>
+            <div class="nav-auth__or"><span>albo</span></div>
+            <button class="nav-auth__google" type="button" id="na-google">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z"/></svg>
+              Zaloguj przez Google
+            </button>
+            <a class="nav-auth__open" href="/strefa">Otwórz panel →</a>
+          </div>
+        </li>
       </ul>
     </nav>
     <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę<Fragment set:html={arrow} /></a>
@@ -49,6 +71,96 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
       <a href="/akademia">Wszystkie szkolenia →</a>
       {akademia.map((a) => <a href={`/${a.slug}`}>{a.title}</a>)}
     </details>
+    <a href="/strefa/login">Strefa zamknięta →</a>
     <a class="btn btn--accent" href="/umow-rozmowe" style="margin-top:var(--space-md)">Umów diagnozę</a>
   </nav>
 </header>
+
+<style>
+  /* Inline login „Strefa" w nawigacji — tokeny Hallmark, ciemny panel */
+  .nav-auth { position: relative; }
+  .nav-auth__panel {
+    position: absolute; right: 0; top: calc(100% + 0.6rem); width: 18rem;
+    background: var(--color-ink-2); border: 1px solid var(--color-line-dark);
+    border-radius: var(--radius-card); padding: var(--space-md);
+    box-shadow: 0 20px 50px oklch(0% 0 0 / 0.4); z-index: 60;
+    display: none; flex-direction: column; gap: var(--space-sm);
+  }
+  .nav-auth.is-open .nav-auth__panel { display: flex; }
+  .nav-auth__panel h3 { font-family: var(--font-display); font-weight: 600; font-size: 1rem; margin: 0; color: var(--color-text-inv); }
+  .nav-auth__hint { color: var(--color-text-inv-3); font-size: 0.8rem; margin: 0 0 0.2rem; }
+  .nav-auth__panel form { display: flex; flex-direction: column; gap: var(--space-sm); margin: 0; }
+  .nav-auth__input {
+    background: var(--color-ink); color: var(--color-text-inv); border: 1px solid var(--color-line-dark);
+    border-radius: var(--radius-btn); padding: 0.5rem 0.65rem; font: inherit; font-size: 0.9rem; width: 100%;
+  }
+  .nav-auth__input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-soft); }
+  .nav-auth__input::placeholder { color: var(--color-text-inv-3); }
+  .nav-auth__submit {
+    background: var(--color-accent); color: var(--color-ink); border: 0; border-radius: var(--radius-btn);
+    padding: 0.55rem; font: inherit; font-weight: 600; cursor: pointer; width: 100%;
+  }
+  .nav-auth__submit:hover:not(:disabled) { background: var(--color-paper); }
+  .nav-auth__submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .nav-auth__or { display: flex; align-items: center; gap: 0.5rem; color: var(--color-text-inv-3); font-size: 0.78rem; }
+  .nav-auth__or::before, .nav-auth__or::after { content: ""; flex: 1; height: 1px; background: var(--color-line-dark); }
+  .nav-auth__google {
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%;
+    background: var(--color-paper); color: var(--color-ink); border: 0; border-radius: var(--radius-btn);
+    padding: 0.55rem; font: inherit; font-weight: 600; font-size: 0.9rem; cursor: pointer;
+  }
+  .nav-auth__google:hover:not(:disabled) { opacity: 0.9; }
+  .nav-auth__google svg { width: 16px; height: 16px; }
+  .nav-auth__open { text-align: center; font-size: 0.8rem; color: var(--color-text-inv-3); text-decoration: none; }
+  .nav-auth__open:hover { color: var(--color-accent); }
+  .nav-auth__msg { font-size: 0.82rem; padding: 0.45rem 0.6rem; border-radius: var(--radius-btn); background: oklch(60% 0.2 25 / 0.16); color: oklch(80% 0.14 25); border: 1px solid oklch(60% 0.2 25 / 0.35); }
+  @media (max-width: 980px) { .nav-auth { display: none; } }
+</style>
+
+<script>
+  // Inline logowanie do strefy z menu głównego. Klient Supabase ładowany leniwie
+  // (dynamiczny import) — strony marketingowe nie pobierają biblioteki, dopóki nie trzeba.
+  const root = document.getElementById('nav-auth');
+  if (root) {
+    const toggle = document.getElementById('nav-auth-toggle');
+    const panel = document.getElementById('nav-auth-panel');
+    const msg = document.getElementById('nav-auth-msg');
+    const form = document.getElementById('nav-auth-form');
+    const gbtn = document.getElementById('na-google');
+    const loginBtn = document.getElementById('na-login');
+
+    const close = () => { root.classList.remove('is-open'); toggle.setAttribute('aria-expanded', 'false'); };
+    const showErr = (t) => { msg.hidden = false; msg.textContent = t; };
+
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = root.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', String(open));
+      if (open) setTimeout(() => document.getElementById('na-email')?.focus(), 30);
+    });
+    document.addEventListener('click', (e) => { if (!root.contains(e.target)) close(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+
+    const lib = () => import('../lib/supabase.js');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.hidden = true; loginBtn.disabled = true; loginBtn.textContent = 'Logowanie…';
+      try {
+        const { signInPassword } = await lib();
+        const { error } = await signInPassword(document.getElementById('na-email').value, document.getElementById('na-pass').value);
+        if (error) { showErr(error); loginBtn.disabled = false; loginBtn.textContent = 'Zaloguj'; return; }
+        window.location.href = '/strefa';
+      } catch (err) { showErr('Błąd połączenia. Spróbuj ponownie.'); loginBtn.disabled = false; loginBtn.textContent = 'Zaloguj'; }
+    });
+
+    gbtn.addEventListener('click', async () => {
+      msg.hidden = true; gbtn.disabled = true;
+      try {
+        const { signInGoogle } = await lib();
+        const { error } = await signInGoogle('/strefa');
+        if (error) { showErr(error); gbtn.disabled = false; }
+      } catch (err) { showErr('Błąd połączenia.'); gbtn.disabled = false; }
+    });
+  }
+</script>
