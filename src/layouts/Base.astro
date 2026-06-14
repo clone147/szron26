@@ -6,6 +6,47 @@ const {
   ogDescription = description,
   ogImage = '/img/og-cover.webp',
 } = Astro.props;
+
+// Kanoniczny URL + absolutny og:image (względem domeny z astro.config `site`)
+const site = Astro.site ?? new URL('https://szron.tech');
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImageAbs = new URL(ogImage, site).href;
+
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': new URL('/#org', site).href,
+      name: 'SZRON',
+      legalName: 'SZRON Tomek Wojciechowski',
+      url: site.href,
+      logo: new URL('/img/logo.svg', site).href,
+      description: 'Transformacja zespołów IT i programowanie agentowe dla dużych firm.',
+      email: 'tw@szron.tech',
+      telephone: '+48505091200',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'ul. Legionistów 12/1/B',
+        postalCode: '35-317',
+        addressLocality: 'Rzeszów',
+        addressCountry: 'PL',
+      },
+      founder: [
+        { '@type': 'Person', name: 'Tomek Wojciechowski' },
+        { '@type': 'Person', name: 'Maciej Stopa' },
+      ],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': new URL('/#website', site).href,
+      url: site.href,
+      name: 'SZRON',
+      inLanguage: 'pl-PL',
+      publisher: { '@id': new URL('/#org', site).href },
+    },
+  ],
+};
 ---
 <!doctype html>
 <html lang="pl">
@@ -14,10 +55,19 @@ const {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{title}</title>
   <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
   <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="SZRON" />
+  <meta property="og:locale" content="pl_PL" />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={ogDescription} />
-  <meta property="og:image" content={ogImage} />
+  <meta property="og:image" content={ogImageAbs} />
+  <meta property="og:url" content={canonical} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={ogDescription} />
+  <meta name="twitter:image" content={ogImageAbs} />
+  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,300..700&display=swap" rel="stylesheet" />
