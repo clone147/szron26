@@ -61,7 +61,7 @@ const { title = 'Strefa SZRON', active = '' } = Astro.props;
       logout?.addEventListener('click', async () => {
         logout.disabled = true;
         await signOut();
-        window.location.replace('/strefa/login');
+        window.location.replace('/');
       });
     })();
   </script>
