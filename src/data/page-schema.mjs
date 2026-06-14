@@ -6,7 +6,7 @@ const PUBLISHED = '2026-06-14';
 
 // Akademia — TechArticle (przewodniki techniczne)
 const ACADEMY = new Set([
-  'claude-code', 'claude-code-bezpieczenstwo', 'szkolenie-git', 'szkolenie-context7',
+  'claude-code', 'claude-code-bezpieczenstwo', 'szkolenie-git',
   'szkolenie-supabase-mcp', 'szkolenie-mysql', 'serwery-mcp', 'tips-and-tricks',
   'gemini-cli', 'codex-cli', 'lm-studio', 'llama-server', 'petle',
 ]);
