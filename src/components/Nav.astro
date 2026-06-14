@@ -138,7 +138,9 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
       toggle.setAttribute('aria-expanded', String(open));
       if (open) setTimeout(() => document.getElementById('na-email')?.focus(), 30);
     });
-    document.addEventListener('click', (e) => { if (!root.contains(e.target)) close(); });
+    // Zamykaj tylko gdy NACIŚNIĘCIE myszy zaczęło się poza dialogiem — dzięki temu
+    // zaznaczanie tekstu w środku z puszczeniem przycisku na zewnątrz NIE zamyka panelu.
+    document.addEventListener('mousedown', (e) => { if (root.classList.contains('is-open') && !root.contains(e.target)) close(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
 
     const lib = () => import('../lib/supabase.js');
