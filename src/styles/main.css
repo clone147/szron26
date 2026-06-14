@@ -1106,6 +1106,39 @@ form [name="bot-field"], form label:has([name="bot-field"]), p.hidden, .hidden-f
 /* tabele w prose: przewijalne zamiast ucinania na wąskich ekranach */
 .prose table { display: block; max-width: 100%; overflow-x: auto; }
 
+/* ── open source: karty narzędzi, badge, komenda instalacji ── */
+.tool-card { gap: var(--space-md); }
+.tool-card .badges { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: var(--space-xs); }
+.badge {
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 0.22rem 0.6rem; border-radius: 100px;
+  background: var(--color-accent-soft); color: var(--color-accent);
+}
+.badge--new { background: var(--color-accent); color: var(--color-ink); }
+.sect--dark .badge { background: oklch(70.5% 0.187 45 / 0.18); }
+.tool-card .features { list-style: none; display: grid; gap: var(--space-xs); margin: var(--space-md) 0; }
+.tool-card .features li { position: relative; padding-left: 1.5rem; font-size: var(--text-s); color: var(--color-text-2); }
+.tool-card .features li::before { content: "✓"; position: absolute; left: 0; color: var(--color-accent); font-weight: 600; }
+.tool-card .tool-foot { margin-top: auto; padding-top: var(--space-md); }
+.tool-card .tool-foot a { font-weight: 600; color: var(--color-text); text-underline-offset: 3px; }
+
+.install { display: flex; align-items: stretch; gap: 0.4rem; margin-top: var(--space-md); }
+.install code {
+  flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.78rem;
+  background: var(--color-ink); color: var(--color-text-inv);
+  padding: 0.7rem 0.85rem; border-radius: var(--radius-btn);
+}
+.install__btn {
+  flex: 0 0 auto; cursor: pointer; font: inherit; font-size: 0.7rem; font-weight: 600;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 0 0.9rem; border-radius: var(--radius-btn);
+  background: var(--color-accent); color: var(--color-ink); border: 0;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.install__btn:hover { background: var(--color-paper); }
+.install__btn.is-done { background: oklch(70% 0.15 150); color: var(--color-ink); }
+
 /* ── reveals (scroll) ────────────────────────────────── */
 .rv {
   opacity: 0;
