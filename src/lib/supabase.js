@@ -80,6 +80,22 @@ export async function signOut() {
   await getClient().auth.signOut();
 }
 
+// Reset hasła — wyślij link e-mail. Gate'owane do allowlisty zespołu (to wspólny projekt
+// Supabase, nie chcemy wysyłać resetów do kont innych aplikacji). Komunikat w UI jednolity.
+export async function sendPasswordReset(email) {
+  const e = String(email).trim().toLowerCase();
+  if (!isAllowed(e)) return { error: null, gated: true };
+  const redirectTo = `${window.location.origin}/strefa/auth/reset`;
+  const { error } = await getClient().auth.resetPasswordForEmail(e, { redirectTo });
+  return { error: error ? error.message : null };
+}
+
+// Ustaw nowe hasło (działa w sesji recovery utworzonej z linku e-mail).
+export async function updatePassword(password) {
+  const { error } = await getClient().auth.updateUser({ password });
+  return { error: error ? error.message : null };
+}
+
 // Strażnik strony strefy: jeśli brak sesji lub e-mail spoza allowlisty → redirect na login.
 // Zwraca usera, gdy dostęp OK (albo nic nie zwraca i przekierowuje).
 export async function requireAuth(loginPath = '/strefa/login') {

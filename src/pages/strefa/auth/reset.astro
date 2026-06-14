@@ -1,0 +1,100 @@
+---
+import '../../../styles/main.css';
+import '../../../styles/strefa.css';
+---
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nowe hasło — Strefa SZRON</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,300..700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+</head>
+<body class="strefa-body">
+  <div class="strefa-login">
+    <div class="strefa-login__box">
+      <div class="strefa-login__brand">
+        <img src="/img/logo-dark.svg" alt="SZRON" />
+        <p>Strefa zamknięta</p>
+      </div>
+
+      <div class="strefa-login__card" id="card">
+        <div id="state-loading">
+          <h1>Nowe hasło</h1>
+          <p style="color:var(--color-text-inv-3);font-size:var(--text-s);margin:0">Weryfikuję link…</p>
+        </div>
+
+        <form id="reset-form" hidden>
+          <h1 style="margin-bottom:var(--space-md)">Ustaw nowe hasło</h1>
+          <div id="msg" hidden></div>
+          <div class="strefa-field">
+            <label for="pass">Nowe hasło</label>
+            <input class="strefa-input" type="password" id="pass" autocomplete="new-password" minlength="6" required />
+          </div>
+          <div class="strefa-field" style="margin-top:var(--space-md)">
+            <label for="pass2">Powtórz hasło</label>
+            <input class="strefa-input" type="password" id="pass2" autocomplete="new-password" minlength="6" required />
+          </div>
+          <button type="submit" class="strefa-btn strefa-btn--accent" id="btn-save" style="width:100%;padding:.65rem;margin-top:var(--space-md)">Zapisz nowe hasło</button>
+        </form>
+
+        <div id="state-invalid" hidden>
+          <h1>Link nieaktywny</h1>
+          <p style="color:var(--color-text-inv-2);font-size:var(--text-s);margin:0 0 var(--space-lg)">Link do resetu wygasł lub jest nieprawidłowy. Poproś o nowy.</p>
+          <a class="strefa-btn strefa-btn--accent" href="/strefa/reset" style="width:100%;padding:.65rem">Wyślij nowy link</a>
+        </div>
+      </div>
+
+      <a class="strefa-login__back" href="/strefa/login">← Powrót do logowania</a>
+    </div>
+  </div>
+
+  <script>
+    import { getClient, getSessionUser, updatePassword } from '../../../lib/supabase.js';
+
+    const loading = document.getElementById('state-loading');
+    const form = document.getElementById('reset-form');
+    const invalid = document.getElementById('state-invalid');
+    const msg = document.getElementById('msg');
+    const showErr = (t) => { msg.hidden = false; msg.className = 'strefa-msg strefa-msg--err'; msg.textContent = t; };
+
+    (async () => {
+      const sb = getClient(); // detectSessionInUrl: wymienia kod recovery na sesję
+      let user = await getSessionUser();
+      if (!user) {
+        await new Promise((resolve) => {
+          const { data } = sb.auth.onAuthStateChange((_e, session) => { if (session) resolve(); });
+          let tries = 0;
+          const iv = setInterval(async () => {
+            if (await getSessionUser() || ++tries > 20) { clearInterval(iv); data.subscription.unsubscribe(); resolve(); }
+          }, 200);
+        });
+        user = await getSessionUser();
+      }
+      loading.hidden = true;
+      if (!user) { invalid.hidden = false; return; }
+      form.hidden = false;
+      document.getElementById('pass').focus();
+    })();
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.hidden = true;
+      const p1 = document.getElementById('pass').value;
+      const p2 = document.getElementById('pass2').value;
+      if (p1.length < 6) return showErr('Hasło musi mieć min. 6 znaków.');
+      if (p1 !== p2) return showErr('Hasła nie są takie same.');
+      const btn = document.getElementById('btn-save');
+      btn.disabled = true; btn.textContent = 'Zapisuję…';
+      const { error } = await updatePassword(p1);
+      if (error) { showErr(error); btn.disabled = false; btn.textContent = 'Zapisz nowe hasło'; return; }
+      btn.textContent = 'Zapisano ✓';
+      window.location.replace('/strefa');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+---
+import '../../styles/main.css';
+import '../../styles/strefa.css';
+---
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reset hasła — Strefa SZRON</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,300..700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+</head>
+<body class="strefa-body">
+  <div class="strefa-login">
+    <div class="strefa-login__box">
+      <div class="strefa-login__brand">
+        <img src="/img/logo-dark.svg" alt="SZRON" />
+        <p>Strefa zamknięta</p>
+      </div>
+      <div class="strefa-login__card">
+        <h1>Reset hasła</h1>
+        <p style="color:var(--color-text-inv-2);font-size:var(--text-s);margin:0 0 var(--space-lg)">Podaj adres e-mail konta. Wyślemy link do ustawienia nowego hasła.</p>
+
+        <div id="msg" hidden></div>
+
+        <form id="reset-form">
+          <div class="strefa-field">
+            <label for="email">E-mail</label>
+            <input class="strefa-input" type="email" id="email" name="email" autocomplete="username" required />
+          </div>
+          <button type="submit" class="strefa-btn strefa-btn--accent" id="btn-send" style="width:100%;padding:.65rem">Wyślij link resetujący</button>
+        </form>
+      </div>
+      <a class="strefa-login__back" href="/strefa/login">← Powrót do logowania</a>
+    </div>
+  </div>
+
+  <script>
+    import { sendPasswordReset } from '../../lib/supabase.js';
+
+    const msg = document.getElementById('msg');
+    const show = (t, ok) => { msg.hidden = false; msg.className = ok ? 'strefa-msg' : 'strefa-msg strefa-msg--err'; msg.style.cssText = ok ? 'background:color-mix(in oklch, oklch(62% 0.16 150) 16%, transparent);color:oklch(82% 0.14 150);border:1px solid color-mix(in oklch, oklch(62% 0.16 150) 35%, transparent)' : ''; msg.textContent = t; };
+
+    document.getElementById('reset-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-send');
+      btn.disabled = true; btn.textContent = 'Wysyłam…'; msg.hidden = true;
+      const email = document.getElementById('email').value;
+      const { error } = await sendPasswordReset(email);
+      if (error) { show(error, false); btn.disabled = false; btn.textContent = 'Wyślij link resetujący'; return; }
+      // Jednolity komunikat — nie ujawniamy, które adresy mają dostęp.
+      show('Jeśli to konto ma dostęp do strefy, wysłaliśmy na nie link do resetu hasła. Sprawdź skrzynkę (i spam).', true);
+      btn.textContent = 'Wysłano';
+    });
+  </script>
+</body>
+</html>
