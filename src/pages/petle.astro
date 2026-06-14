@@ -1,0 +1,117 @@
+---
+import Interior from '../layouts/Interior.astro';
+---
+<Interior
+  title="Pętle agentowe — /goal i /loop w Claude Code | Akademia SZRON"
+  description="Jak prowadzić agenta w pętli: /goal pracuje aż do osiągnięcia celu, /loop powtarza zadanie co interwał. Wzorzec checklisty TODO.md odhaczanej automatycznie — z gotowym przykładem i promptem."
+  eyebrow="Akademia · Pętle"
+  heading="Pętle: /goal i /loop. Agent pracuje, aż cel osiągnięty."
+  lead="Najwięcej daje nie pojedyncze polecenie, tylko agent prowadzony w pętli. Dwie komendy: <strong>/goal</strong> — pracuje, aż osiągnie cel, oraz <strong>/loop</strong> — powtarza zadanie co zadany czas. Spinają je wzorzec checklisty: plik z zadaniami, który agent sam odhacza."
+>
+  <!-- proof -->
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div><strong>/goal</strong><span>pętla do celu — kończy, gdy warunek spełniony</span></div>
+        <div><strong>/loop 60s</strong><span>powtarza zadanie co 60 sekund</span></div>
+        <div><strong>Checklista = pamięć</strong><span>[ ] → [x] jako stan między iteracjami</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 dwie pętle -->
+  <section class="sect" aria-labelledby="dwie">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>01 / Dwie pętle · Kiedy której</p>
+        <h2 class="sect-title sect-title--s ws" id="dwie">Dwie pętle, dwa zastosowania.</h2>
+      </div>
+      <div class="prose rv">
+        <h2>/goal — pętla do celu</h2>
+        <p><code>/goal</code> uruchamia agenta w trybie zadaniowym: dostaje cel i pracuje w kółko, aż go osiągnie. Po każdej iteracji sam sprawdza, czy warunek końcowy jest spełniony — jeśli nie, planuje kolejny krok i kontynuuje. Idealny do zadań, które da się rozbić na listę kroków o jasnym warunku zakończenia: „zrób wszystko z listy", „napraw, aż testy przechodzą", „uzupełnij brakujące pliki".</p>
+        <div class="callout"><p><strong>Sedno:</strong> definiujesz <em>cel</em> i <em>warunek osiągnięcia celu</em>, nie pojedynczą czynność. Agent sam decyduje, ile iteracji potrzeba.</p></div>
+        <h2>/loop — powtarzanie co interwał</h2>
+        <p><code>/loop 60s</code> powtarza to samo polecenie co zadany czas (tu: co 60 sekund). Sprawdza się przy monitorowaniu i pracy reaktywnej: „co minutę sprawdź status builda", „co 5 minut zerknij na nowe zgłoszenia", „pilnuj kolejki, aż się opróżni". Pętla działa, dopóki jej nie zatrzymasz albo dopóki warunek w prompcie nie każe jej zakończyć.</p>
+        <ul>
+          <li><strong>/goal</strong> — gdy znasz <em>cel</em>, ale nie wiesz, ile kroków zajmie. Kończy się sam.</li>
+          <li><strong>/loop &lt;czas&gt;</strong> — gdy chcesz <em>cyklicznie</em> coś sprawdzać lub dorzucać po kawałku w równych odstępach.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 wzorzec checklisty (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="checklista">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>02 / Wzorzec · Checklista jako pamięć</p>
+        <h2 class="sect-title ws" id="checklista">Plik z checkboxami, który agent sam odhacza.</h2>
+      </div>
+      <div class="prose rv">
+        <p>Najprostszy sposób, żeby pętla wiedziała, co już zrobiła, a co zostało — to plik z listą zadań i checkboxami. Agent po każdym wykonanym zadaniu zamienia <code>[ ]</code> na <code>[x]</code>. Plik jest jednocześnie planem, pamięcią i warunkiem zakończenia: cel osiągnięty, gdy wszystkie pozycje są zaznaczone.</p>
+        <p>Przykładowy <code>TODO.md</code>:</p>
+        <pre><code># Lista zadań do wykonania
+
+- [ ] 1. Utwórz plik `hello.txt` z tekstem "Hello SZRON"
+- [ ] 2. Utwórz plik `data.json` z obiektem &#123;"version": 1&#125;
+- [ ] 3. Dopisz do `hello.txt` drugą linię z aktualną datą
+- [ ] 4. Utwórz `README.md` z nagłówkiem "# Demo /goal"
+- [ ] 5. Policz pliki w katalogu i zapisz liczbę do `count.txt`</code></pre>
+        <p>I prompt, który uruchamia całość:</p>
+        <pre><code>/goal wykonaj po kolei każdy task z TODO.md, po wykonaniu
+zamień [ ] na [x] przy tym tasku; cel osiągnięty gdy wszystkie
+checkboxy w TODO.md są zaznaczone [x]</code></pre>
+        <div class="callout"><p><strong>Dlaczego to działa:</strong> warunek końcowy jest <em>mierzalny i widoczny w pliku</em> — agent po każdej iteracji czyta <code>TODO.md</code>, widzi, ile zostało <code>[ ]</code>, i wie, czy kontynuować. Ty w każdej chwili widzisz postęp w tym samym pliku.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 dobre praktyki -->
+  <section class="sect" aria-labelledby="praktyki">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>03 / Praktyka · Żeby pętla nie zwariowała</p>
+        <h2 class="sect-title sect-title--s ws" id="praktyki">Kilka zasad, zanim puścisz agenta samego.</h2>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Jasny warunek końca<small>Bez tego pętla się nie zatrzyma</small></dt><dd>Zawsze podaj mierzalny warunek osiągnięcia celu — „wszystkie checkboxy [x]", „testy zielone", „brak plików bez nagłówka". Inaczej agent będzie kręcił się w nieskończoność.</dd></div>
+        <div><dt>Małe, atomowe zadania<small>Jedno zadanie = jeden checkbox</small></dt><dd>Rozbij cel na kroki, które da się wykonać i odhaczyć pojedynczo. Łatwiej wznowić po przerwie i widać realny postęp.</dd></div>
+        <div><dt>Checklista to stan<small>Plik przeżywa restart</small></dt><dd>Trzymanie postępu w pliku (a nie w pamięci sesji) sprawia, że pętlę można przerwać i wznowić — agent czyta, co już odhaczone, i rusza dalej.</dd></div>
+        <div><dt>/loop do monitoringu, /goal do roboty<small>Dobierz pętlę do zadania</small></dt><dd>Powtarzalne sprawdzanie stanu → <code>/loop</code>. Doprowadzenie zadania do końca → <code>/goal</code>. Można je łączyć: <code>/loop</code> pilnuje, a po wykryciu zmiany odpala pracę.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- powiązane -->
+  <section class="sect" aria-labelledby="powiazane" style="padding-top:0">
+    <div class="container">
+      <div class="sect-head">
+        <p class="eyebrow rv" data-scramble>Powiązane</p>
+        <h2 class="sect-title sect-title--s ws" id="powiazane">Dalej w Akademii.</h2>
+      </div>
+      <div class="link-cards rv">
+        <a class="link-card" href="/claude-code"><h3>Claude Code</h3><p>Podstawy: instalacja, poziomy myślenia, workflow agentowy.</p></a>
+        <a class="link-card" href="/tips-and-tricks"><h3>Tips &amp; Tricks</h3><p>Praktyki i wzorce, które realnie przyspieszają pracę z AI.</p></a>
+        <a class="link-card" href="/serwery-mcp"><h3>Serwery MCP</h3><p>Podłącz agenta do narzędzi i danych przez MCP.</p></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie, żeby Wasz zespół tak prowadził agentów?</h2>
+      <p class="rv">Pętle, checklisty i AGENTS.md jako kontrakt zespołu wdrażamy na Waszym kodzie — w ramach kwartału transformacji. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="/akademia">Cała Akademia</a>
+      </div>
+    </div>
+  </section>
+</Interior>
