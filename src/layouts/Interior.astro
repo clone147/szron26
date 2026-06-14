@@ -2,6 +2,7 @@
 import Base from './Base.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import { pageSchema } from '../data/page-schema.mjs';
 
 // Layout stron wewnętrznych: ciemny baner nagłówka → biała „kartka" z sekcjami → stopka.
 // Ten sam język wizualny co homepage, bez sticky-hero.
@@ -17,8 +18,14 @@ const {
   heroImage,            // opcjonalna grafika bohatera (ścieżka /img/sub/...)
   heroAlt = '',
 } = Astro.props;
+
+// per-stronowe JSON-LD (breadcrumb + typ strony)
+const site = Astro.site ?? new URL('https://szron.tech');
+const canonical = new URL(Astro.url.pathname, site).href;
+const image = heroImage ? new URL(heroImage, site).href : null;
+const schema = pageSchema(Astro.url.pathname, { title, description, heading, image, canonical, site });
 ---
-<Base title={title} description={description} ogDescription={ogDescription} ogImage={ogImage}>
+<Base title={title} description={description} ogDescription={ogDescription} ogImage={ogImage} schema={schema}>
   <Nav />
   <header class={`page-hero${heroImage ? ' page-hero--media' : ''}`}>
     <div class="container">

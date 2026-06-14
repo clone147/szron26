@@ -5,6 +5,7 @@ const {
   description = 'Wdrażamy programowanie agentowe w zespołach IT dużych firm — na Waszym kodzie. Szkolenie z AI, agenci w codziennej pracy i pilot modernizacji w jeden kwartał.',
   ogDescription = description,
   ogImage = '/img/og-cover.webp',
+  schema = [],
 } = Astro.props;
 
 // Kanoniczny URL + absolutny og:image (względem domeny z astro.config `site`)
@@ -68,6 +69,7 @@ const orgSchema = {
   <meta name="twitter:description" content={ogDescription} />
   <meta name="twitter:image" content={ogImageAbs} />
   <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+  {schema.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,300..700&display=swap" rel="stylesheet" />
