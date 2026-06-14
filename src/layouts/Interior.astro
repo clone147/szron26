@@ -14,15 +14,27 @@ const {
   heading,          // H1 w banerze
   lead,             // akapit pod H1
   headingSmall = false, // mniejszy H1 dla długich tytułów
+  heroImage,            // opcjonalna grafika bohatera (ścieżka /img/sub/...)
+  heroAlt = '',
 } = Astro.props;
 ---
 <Base title={title} description={description} ogDescription={ogDescription} ogImage={ogImage}>
   <Nav />
-  <header class="page-hero">
+  <header class={`page-hero${heroImage ? ' page-hero--media' : ''}`}>
     <div class="container">
-      {eyebrow && <p class="eyebrow rv" data-scramble>{eyebrow}</p>}
-      <h1 class={`page-hero__title ws${headingSmall ? ' page-hero__title--s' : ''}`}>{heading}</h1>
-      {lead && <p class="page-hero__lead rv" set:html={lead} />}
+      <div class="page-hero__inner">
+        <div class="page-hero__text">
+          {eyebrow && <p class="eyebrow rv" data-scramble>{eyebrow}</p>}
+          <h1 class={`page-hero__title ws${headingSmall ? ' page-hero__title--s' : ''}`}>{heading}</h1>
+          {lead && <p class="page-hero__lead rv" set:html={lead} />}
+        </div>
+        {heroImage && (
+          <figure class="page-hero__media rv">
+            <img src={heroImage} alt={heroAlt} loading="eager" decoding="async"
+                 onload="this.parentElement.classList.add('has-img')" onerror="this.closest('.page-hero').classList.remove('page-hero--media'); this.parentElement.remove()" />
+          </figure>
+        )}
+      </div>
     </div>
   </header>
   <div class="page-body page-body--interior">
