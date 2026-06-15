@@ -260,20 +260,45 @@ async function toggleAttendance(td) {
   if (!(await dbUpdatePart(pid, { attendance_confirmed: nv }))) { p.attendance_confirmed = !nv; td.innerHTML = cellInner(p, 'attendance'); renderStats(); updateCounts(p.training_id); }
 }
 
-function beginEdit(td, initial) {
+// Indeks znaku pod kursorem myszy — by postawić karetkę dokładnie tam, gdzie user kliknął.
+function caretIndexFromPoint(td, x, y) {
+  try {
+    if (document.caretRangeFromPoint) {
+      const r = document.caretRangeFromPoint(x, y);
+      if (r && td.contains(r.startContainer)) return r.startOffset;
+    } else if (document.caretPositionFromPoint) {
+      const pp = document.caretPositionFromPoint(x, y);
+      if (pp && td.contains(pp.offsetNode)) return pp.offset;
+    }
+  } catch (e) { /* ignore */ }
+  return null;
+}
+
+function beginEdit(td, opts = {}) {
   if (editing) return;
   const col = td.dataset.col;
   if (col === 'attendance') return;
+  const { caret = null, appendChar = null, selectAll = false } = opts;
   const pid = td.closest('tr').dataset.pid;
   const p = partMap.get(pid);
   const orig = p[col] ?? '';
   editing = true;
+  if (activeTd && activeTd !== td) activeTd.classList.remove('is-active');
+  activeTd = td;
   td.classList.add('is-editing');
-  td.innerHTML = `<input class="dgrid-edit" type="${col === 'email' ? 'email' : col === 'phone' ? 'tel' : 'text'}">`;
+  // type="text" celowo dla wszystkich kolumn — email/tel nie wspierają setSelectionRange/select (rzucają wyjątek)
+  td.innerHTML = `<input class="dgrid-edit" type="text">`;
   const inp = td.querySelector('input');
-  inp.value = initial != null ? initial : orig;
+  inp.value = appendChar != null ? orig + appendChar : orig;
   inp.focus();
-  if (initial == null) inp.select();
+  // Karetka: dopisany znak → koniec; klik → w miejscu kliknięcia; F2/Enter → koniec; dwuklik → zaznacz całość.
+  try {
+    if (selectAll) inp.select();
+    else {
+      const pos = (appendChar == null && caret != null) ? Math.min(caret, inp.value.length) : inp.value.length;
+      inp.setSelectionRange(pos, pos);
+    }
+  } catch (e) { /* ignore */ }
   let done = false;
   const finish = async (dir) => {
     if (done) return; done = true;
@@ -340,12 +365,9 @@ function bindGrids() {
       const td = e.target.closest('td[data-col]');
       if (td) {
         if (td.dataset.col === 'attendance') { toggleAttendance(td); setActive(td); }
-        else setActive(td);
+        // Pojedynczy klik = edycja w miejscu: karetka tam, gdzie kliknięto, bez kasowania zawartości.
+        else { const caret = caretIndexFromPoint(td, e.clientX, e.clientY); beginEdit(td, { caret }); }
       }
-    });
-    grid.addEventListener('dblclick', (e) => {
-      const td = e.target.closest('td[data-col]');
-      if (td && td.dataset.col !== 'attendance') { setActive(td); beginEdit(td); }
     });
 
     // nawigacja klawiaturą
@@ -364,7 +386,7 @@ function bindGrids() {
         case 'F2': if (col !== 'attendance') { e.preventDefault(); beginEdit(td); } return;
         case ' ': if (col === 'attendance') { e.preventDefault(); toggleAttendance(td); } return;
         default:
-          if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && col !== 'attendance') { e.preventDefault(); beginEdit(td, e.key); }
+          if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && col !== 'attendance') { e.preventDefault(); beginEdit(td, { appendChar: e.key }); }
           handled = false;
       }
       if (handled) { const nt = cellAt(grid, r, c); if (nt) { e.preventDefault(); setActive(nt); } }
