@@ -36,7 +36,8 @@ let editing = false;
 
 const SUBS = ['Claude', 'Gemini', 'ChatGPT', 'Github Copilot', 'Brak'];
 // kolumny nawigowane klawiaturą (kolejność = lewo/prawo)
-const NAV = ['attendance', 'first_name', 'last_name', 'position', 'email'];
+const NAV = ['attendance', 'first_name', 'last_name', 'position', 'email', 'phone'];
+const MAXC = NAV.length - 1; // ostatni indeks kolumny edytowalnej
 
 /* ── toasty ── */
 function toast(title, body = '', kind = '') {
@@ -102,7 +103,7 @@ async function dbUpdatePart(pid, patch) {
 function matches(p, t) {
   if (!query) return true;
   const q = query.toLowerCase();
-  return [p.first_name, p.last_name, p.position, p.email, p.subscription, t.name, t.location].some((v) => String(v || '').toLowerCase().includes(q));
+  return [p.first_name, p.last_name, p.position, p.email, p.phone, p.subscription, t.name, t.location].some((v) => String(v || '').toLowerCase().includes(q));
 }
 function visibleParts(t) { return query ? t.participants.filter((p) => matches(p, t)) : t.participants; }
 
@@ -132,6 +133,7 @@ function rowHTML(p, r) {
     <td data-col="last_name" data-r="${r}" data-c="2">${cellInner(p, 'last_name')}</td>
     <td data-col="position" data-r="${r}" data-c="3">${cellInner(p, 'position')}</td>
     <td data-col="email" data-r="${r}" data-c="4">${cellInner(p, 'email')}</td>
+    <td data-col="phone" data-r="${r}" data-c="5">${cellInner(p, 'phone')}</td>
     <td class="col-sub"><div class="dcell" data-act="sub" title="Edytuj abonament / notatki" style="cursor:pointer">${subBadge(p)}</div></td>
     <td class="col-actions"><div class="dcell">
       <button class="strefa-iconbtn" data-act="notes" title="Notatki i abonament">${ICO.file}</button>
@@ -146,7 +148,7 @@ function gridHTML(t) {
   const rows = parts.map((p, i) => rowHTML(p, i)).join('');
   const body = parts.length
     ? rows
-    : `<tr><td colspan="8" class="dgrid-empty">${query ? 'Brak pasujących uczestników.' : 'Brak uczestników. Dodaj poniżej.'}</td></tr>`;
+    : `<tr><td colspan="9" class="dgrid-empty">${query ? 'Brak pasujących uczestników.' : 'Brak uczestników. Dodaj poniżej.'}</td></tr>`;
   return `
     ${selCount ? `<div class="strefa-toolbar" style="margin-bottom:.6rem">
       <span class="strefa-chip strefa-chip--count">Zaznaczono: ${selCount}</span>
@@ -158,21 +160,18 @@ function gridHTML(t) {
       <table class="dgrid">
         <thead><tr>
           <th class="col-sel"><input type="checkbox" data-sel-all aria-label="Zaznacz wszystkich"></th>
-          <th class="col-check">Obecność</th><th>Imię</th><th>Nazwisko</th><th>Stanowisko</th><th>E-mail</th><th>Abonament</th><th class="col-actions"></th>
+          <th class="col-check">Obecność</th><th>Imię</th><th>Nazwisko</th><th>Stanowisko</th><th>E-mail</th><th>Telefon</th><th>Abonament</th><th class="col-actions"></th>
         </tr></thead>
         <tbody>${body}</tbody>
         <tr class="dgrid-add">
           <td></td>
-          <td colspan="4">
-            <div style="display:flex;gap:.4rem;padding:.35rem .5rem;flex-wrap:wrap">
-              <input class="strefa-input strefa-input--sm" data-add="first_name" placeholder="Imię" style="width:8rem">
-              <input class="strefa-input" data-add="last_name" placeholder="Nazwisko" style="width:9rem">
-              <input class="strefa-input" data-add="position" placeholder="Stanowisko" style="width:9rem">
-            </div>
-          </td>
-          <td colspan="3">
-            <div style="display:flex;gap:.4rem;padding:.35rem .5rem;align-items:center">
-              <input class="strefa-input" data-add="email" type="email" placeholder="E-mail" style="flex:1">
+          <td colspan="8">
+            <div style="display:flex;gap:.4rem;padding:.35rem .5rem;flex-wrap:wrap;align-items:center">
+              <input class="strefa-input" data-add="first_name" placeholder="Imię" style="width:7rem">
+              <input class="strefa-input" data-add="last_name" placeholder="Nazwisko" style="width:8rem">
+              <input class="strefa-input" data-add="position" placeholder="Stanowisko" style="width:8rem">
+              <input class="strefa-input" data-add="email" type="email" placeholder="E-mail" style="width:11rem">
+              <input class="strefa-input" data-add="phone" type="tel" placeholder="Telefon" style="width:8rem">
               <button class="strefa-btn strefa-btn--accent strefa-btn--sm" data-add-go>Dodaj</button>
             </div>
           </td>
@@ -270,7 +269,7 @@ function beginEdit(td, initial) {
   const orig = p[col] ?? '';
   editing = true;
   td.classList.add('is-editing');
-  td.innerHTML = `<input class="dgrid-edit" type="${col === 'email' ? 'email' : 'text'}">`;
+  td.innerHTML = `<input class="dgrid-edit" type="${col === 'email' ? 'email' : col === 'phone' ? 'tel' : 'text'}">`;
   const inp = td.querySelector('input');
   inp.value = initial != null ? initial : orig;
   inp.focus();
@@ -309,8 +308,8 @@ function moveActive(grid, td, dir) {
   let r = +td.dataset.r, c = +td.dataset.c;
   if (dir === 'down') r++;
   else if (dir === 'up') r = Math.max(0, r - 1);
-  else if (dir === 'next') { c++; if (c > 4) { c = 0; r++; } }
-  else if (dir === 'prev') { c--; if (c < 0) { c = 4; r = Math.max(0, r - 1); } }
+  else if (dir === 'next') { c++; if (c > MAXC) { c = 0; r++; } }
+  else if (dir === 'prev') { c--; if (c < 0) { c = MAXC; r = Math.max(0, r - 1); } }
   const nt = cellAt(grid, r, c);
   if (nt) setActive(nt);
 }
@@ -356,7 +355,7 @@ function bindGrids() {
       const td = activeTd; const col = td.dataset.col;
       let r = +td.dataset.r, c = +td.dataset.c; let handled = true;
       switch (e.key) {
-        case 'ArrowRight': c = Math.min(4, c + 1); break;
+        case 'ArrowRight': c = Math.min(MAXC, c + 1); break;
         case 'ArrowLeft': c = Math.max(0, c - 1); break;
         case 'ArrowDown': r++; break;
         case 'ArrowUp': r = Math.max(0, r - 1); break;
@@ -462,7 +461,7 @@ async function addParticipant(tid, inputs) {
   if (!vals.first_name && !vals.last_name) { toast('Uzupełnij dane', 'Podaj przynajmniej imię lub nazwisko', 'err'); return; }
   const { error } = await sb.from('participants').insert({
     training_id: tid, first_name: vals.first_name || '—', last_name: vals.last_name || '—',
-    position: vals.position || null, email: vals.email || null, attendance_confirmed: false,
+    position: vals.position || null, email: vals.email || null, phone: vals.phone || null, attendance_confirmed: false,
   });
   if (error) return toast('Błąd', error.message, 'err');
   await loadData(); renderAll(); openIds.add(tid);
@@ -659,7 +658,7 @@ async function importFile(file) {
   for (const t of arr) {
     T.push({ id: t.id, name: t.name, training_date: t.training_date || null, location: t.location || null, description: t.description || null });
     for (const p of (t.participants || [])) {
-      P.push({ id: p.id, training_id: t.id, first_name: p.first_name, last_name: p.last_name, position: p.position || null, email: p.email || null, attendance_confirmed: !!p.attendance_confirmed, subscription: p.subscription || null, subscription_start_date: p.subscription_start_date || null });
+      P.push({ id: p.id, training_id: t.id, first_name: p.first_name, last_name: p.last_name, position: p.position || null, email: p.email || null, phone: p.phone || null, attendance_confirmed: !!p.attendance_confirmed, subscription: p.subscription || null, subscription_start_date: p.subscription_start_date || null });
       for (const n of (p.notes || [])) N.push({ id: n.id, participant_id: p.id, raw_note: n.raw_note, ai_summary: n.ai_summary || null });
     }
   }
@@ -678,7 +677,7 @@ async function exportJSON() {
     const parts = [];
     for (const p of t.participants) {
       const { data: notes } = await sb.from('participant_notes').select('id,raw_note,ai_summary,created_at,updated_at').eq('participant_id', p.id).order('created_at');
-      parts.push({ id: p.id, first_name: p.first_name, last_name: p.last_name, position: p.position, email: p.email, attendance_confirmed: p.attendance_confirmed, subscription: p.subscription, subscription_start_date: p.subscription_start_date, notes: notes || [] });
+      parts.push({ id: p.id, first_name: p.first_name, last_name: p.last_name, position: p.position, email: p.email, phone: p.phone, attendance_confirmed: p.attendance_confirmed, subscription: p.subscription, subscription_start_date: p.subscription_start_date, notes: notes || [] });
     }
     out.push({ id: t.id, name: t.name, training_date: t.training_date, location: t.location, description: t.description, participants: parts });
   }
