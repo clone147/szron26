@@ -1,0 +1,139 @@
+---
+import '../styles/main.css';
+import '../styles/strefa.css';
+---
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zapis na szkolenie — SZRON</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,300..700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+</head>
+<body class="strefa-body">
+  <div class="strefa-login">
+    <div class="strefa-login__box">
+      <div class="strefa-login__brand">
+        <img src="/img/logo-dark.svg" alt="SZRON" />
+        <p>Zapis na szkolenie</p>
+      </div>
+      <div class="strefa-login__card">
+        <div id="state-loading" style="text-align:center;color:var(--color-text-inv-3)">
+          <div class="strefa-boot__spinner" style="margin:0 auto var(--space-md)"></div>
+          <p style="margin:0">Wczytuję szkolenie…</p>
+        </div>
+
+        <div id="state-form" hidden>
+          <p class="strefa-eyebrow" style="margin-bottom:.3rem">Dopisz się do listy</p>
+          <h1 id="tr-name" style="font-family:var(--font-display);font-weight:600;font-size:1.4rem;margin:0 0 .25rem"></h1>
+          <p id="tr-meta" style="color:var(--color-text-inv-3);font-size:var(--text-caption);margin:0 0 var(--space-lg)"></p>
+
+          <div id="msg" hidden></div>
+
+          <form id="reg-form" style="display:flex;flex-direction:column;gap:var(--space-md)">
+            <div class="strefa-grid2">
+              <div class="strefa-field"><label for="f-first">Imię *</label><input class="strefa-input" id="f-first" autocomplete="given-name" required /></div>
+              <div class="strefa-field"><label for="f-last">Nazwisko *</label><input class="strefa-input" id="f-last" autocomplete="family-name" required /></div>
+            </div>
+            <div class="strefa-field"><label for="f-pos">Stanowisko</label><input class="strefa-input" id="f-pos" autocomplete="organization-title" /></div>
+            <div class="strefa-field"><label for="f-email">E-mail</label><input class="strefa-input" id="f-email" type="email" autocomplete="email" /></div>
+            <div class="strefa-field"><label for="f-phone">Telefon</label><input class="strefa-input" id="f-phone" type="tel" autocomplete="tel" /></div>
+            <button type="submit" class="strefa-btn strefa-btn--accent" id="f-submit" style="width:100%;padding:.7rem;font-size:1rem">Dodaj mnie do listy</button>
+          </form>
+        </div>
+
+        <div id="state-done" hidden style="text-align:center">
+          <div style="width:54px;height:54px;border-radius:50%;background:color-mix(in oklch, oklch(62% 0.16 150) 24%, transparent);color:oklch(82% 0.15 150);display:grid;place-content:center;margin:0 auto var(--space-md)">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
+          </div>
+          <h1 style="font-family:var(--font-display);font-weight:600;font-size:1.3rem;margin:0 0 .4rem">Jesteś na liście!</h1>
+          <p id="done-name" style="color:var(--color-text-inv-2);font-size:var(--text-s);margin:0 0 var(--space-lg)"></p>
+          <button type="button" class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-again">Zapisz kolejną osobę</button>
+        </div>
+
+        <div id="state-bad" hidden style="text-align:center">
+          <h1 style="font-family:var(--font-display);font-weight:600;font-size:1.3rem;margin:0 0 .4rem">Nieprawidłowy link</h1>
+          <p style="color:var(--color-text-inv-2);font-size:var(--text-s);margin:0">Ten link do zapisu jest nieprawidłowy lub szkolenie nie istnieje. Poproś prowadzącego o aktualny kod QR.</p>
+        </div>
+      </div>
+      <a class="strefa-login__back" href="https://szron.tech">szron.tech</a>
+    </div>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var SB = 'https://sttluvcbucpxzbcsuigw.supabase.co';
+      var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dGx1dmNidWNweHpiY3N1aWd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MzgzMzEsImV4cCI6MjA1ODUxNDMzMX0.m0BzQUhQL4mDkkm_VPrZjoGsJplDCmRtW1UePb4PVzw';
+      var FN = SB + '/functions/v1/strefa-self-register';
+      var t = new URLSearchParams(location.search).get('t');
+      var trainingName = '';
+
+      function show(id) {
+        ['state-loading', 'state-form', 'state-done', 'state-bad'].forEach(function (s) {
+          document.getElementById(s).hidden = s !== id;
+        });
+      }
+      function fmtDate(d) {
+        if (!d) return '';
+        try { return new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(d)); } catch (e) { return d; }
+      }
+      var msg = document.getElementById('msg');
+      function showErr(txt) { msg.hidden = false; msg.className = 'strefa-msg strefa-msg--err'; msg.textContent = txt; }
+
+      (async function init() {
+        if (!t) return show('state-bad');
+        try {
+          var r = await fetch(FN + '?t=' + encodeURIComponent(t), { headers: { apikey: ANON } });
+          var d = await r.json();
+          if (!r.ok || !d.name) return show('state-bad');
+          trainingName = d.name;
+          document.getElementById('tr-name').textContent = d.name;
+          var meta = [fmtDate(d.training_date), d.location].filter(Boolean).join(' · ');
+          document.getElementById('tr-meta').textContent = meta;
+          show('state-form');
+        } catch (e) { show('state-bad'); }
+      })();
+
+      document.getElementById('reg-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        msg.hidden = true;
+        var btn = document.getElementById('f-submit');
+        var first = document.getElementById('f-first').value.trim();
+        var last = document.getElementById('f-last').value.trim();
+        if (!first || !last) return showErr('Podaj imię i nazwisko.');
+        btn.disabled = true; btn.textContent = 'Dodaję…';
+        try {
+          var r = await fetch(FN, {
+            method: 'POST',
+            headers: { apikey: ANON, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              training_id: t, first_name: first, last_name: last,
+              position: document.getElementById('f-pos').value.trim(),
+              email: document.getElementById('f-email').value.trim(),
+              phone: document.getElementById('f-phone').value.trim(),
+            }),
+          });
+          var d = await r.json();
+          if (!r.ok || !d.success) { showErr(d.error || 'Nie udało się zapisać. Spróbuj ponownie.'); btn.disabled = false; btn.textContent = 'Dodaj mnie do listy'; return; }
+          document.getElementById('done-name').textContent = 'Dodaliśmy Cię do listy: ' + trainingName;
+          show('state-done');
+        } catch (e) {
+          showErr('Błąd połączenia. Spróbuj ponownie.'); btn.disabled = false; btn.textContent = 'Dodaj mnie do listy';
+        }
+      });
+
+      document.getElementById('btn-again').addEventListener('click', function () {
+        document.getElementById('reg-form').reset();
+        var btn = document.getElementById('f-submit'); btn.disabled = false; btn.textContent = 'Dodaj mnie do listy';
+        msg.hidden = true;
+        show('state-form');
+        document.getElementById('f-first').focus();
+      });
+    })();
+  </script>
+</body>
+</html>

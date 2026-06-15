@@ -8,5 +8,5 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://szron.tech',
   build: { format: 'directory' },
-  integrations: [sitemap({ filter: (page) => !page.includes('/strefa') })],
+  integrations: [sitemap({ filter: (page) => !page.includes('/strefa') && !page.includes('/zapis') })],
 });

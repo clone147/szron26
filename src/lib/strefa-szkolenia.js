@@ -1,6 +1,7 @@
 // Aplikacja „Szkolenia" strefy zamkniętej SZRON.
 // Dane w schemacie `strefa` (RLS). Siatka uczestników edytowalna w pełni z klawiatury (jak arkusz).
 import { getClient, getSessionUser, isAllowed, LEGACY_OWNER_ID } from './supabase.js';
+import qrcode from 'qrcode-generator';
 
 const sb = getClient();
 
@@ -22,6 +23,7 @@ const ICO = {
   file: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>',
   check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>',
   x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+  qr: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h2v2M18 14h.01M21 17v.01M14 18v.01M17 21h.01M21 21v-2"/></svg>',
 };
 
 /* ── stan ── */
@@ -206,6 +208,7 @@ function trainingHTML(t) {
         ${withSub ? `<span class="strefa-chip strefa-chip--count">${withSub} abon.</span>` : ''}
       </div>
       <div class="strefa-tr__actions">
+        <button class="strefa-iconbtn" data-act="qr" title="Kod QR do samozapisu">${ICO.qr}</button>
         <button class="strefa-iconbtn" data-act="add-part" title="Dodaj uczestnika">${ICO.plus}</button>
         <button class="strefa-iconbtn" data-act="toggle-disabled" title="Przełącz sufiks DISABLED w mailach">${ICO.shield}</button>
         <button class="strefa-iconbtn" data-act="edit-training" title="Edytuj szkolenie">${ICO.pencil}</button>
@@ -446,6 +449,7 @@ async function bulkAction(tid, action) {
 async function headAction(act, tid) {
   const t = trMap.get(tid);
   if (act === 'add-part') { openIds.add(tid); renderAll(); setTimeout(() => $(`.strefa-tr[data-tid="${tid}"] [data-add="first_name"]`)?.focus(), 30); }
+  else if (act === 'qr') qrModal(t);
   else if (act === 'edit-training') trainingModal(t);
   else if (act === 'del-training') {
     if (!(await confirmDialog(`Usunąć szkolenie „${t.name}" wraz z listą uczestników?`))) return;
@@ -491,8 +495,45 @@ async function addParticipant(tid, inputs) {
   toast('Dodano', 'Uczestnik dopisany', 'ok');
 }
 
+/* ── modal QR samozapisu ── */
+function qrModal(t) {
+  const url = `${window.location.origin}/zapis?t=${t.id}`;
+  const box = openModal(`
+    <div class="strefa-modal__head">
+      <div><h2>Kod QR — samozapis</h2><p>${esc(t.name)}</p></div>
+      <button class="strefa-iconbtn" data-close-x>${ICO.x}</button>
+    </div>
+    <div class="strefa-modal__body" style="text-align:center">
+      <div id="qrbox" style="background:#fff;padding:18px;border-radius:14px;display:inline-block;line-height:0"></div>
+      <p style="color:var(--color-text-inv-2);font-size:var(--text-s);margin:var(--space-md) auto 0;max-width:34ch">Uczestnik skanuje telefonem i dopisuje się do listy tego szkolenia.</p>
+      <div style="display:flex;gap:.4rem;margin-top:var(--space-md)">
+        <input class="strefa-input" id="qr-link" readonly value="${esc(url)}" style="text-align:center">
+        <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="qr-copy">Kopiuj</button>
+      </div>
+      <div class="strefa-actions-row" style="justify-content:center">
+        <a class="strefa-btn strefa-btn--accent strefa-btn--sm" href="${esc(url)}" target="_blank" rel="noopener">Otwórz stronę zapisu →</a>
+      </div>
+    </div>`);
+  box.querySelectorAll('[data-close-x]').forEach((b) => b.addEventListener('click', closeModal));
+  try {
+    const qr = qrcode(0, 'M');
+    qr.addData(url);
+    qr.make();
+    const host = $('#qrbox', box);
+    host.innerHTML = qr.createSvgTag({ cellSize: 6, margin: 1, scalable: true });
+    const el = host.querySelector('svg');
+    if (el) { el.style.width = '230px'; el.style.height = '230px'; }
+  } catch (e) {
+    $('#qrbox', box).innerHTML = '<p style="color:#b00;margin:0">Nie udało się wygenerować kodu QR.</p>';
+  }
+  $('#qr-copy', box).addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(url); toast('Skopiowano', 'Link w schowku', 'ok'); }
+    catch (e) { $('#qr-link', box).select(); }
+  });
+}
+
 /* ── modal szkolenia (dodaj/edytuj) ── */
-function trainingModal(t) {
+function trainingModal(t, opts = {}) {
   const isEdit = !!t;
   const box = openModal(`
     <div class="strefa-modal__head"><div><h2>${isEdit ? 'Edytuj szkolenie' : 'Nowe szkolenie'}</h2></div>
@@ -521,6 +562,7 @@ function trainingModal(t) {
     if (!isEdit && res.data) openIds.add(res.data.id);
     await loadData(); renderAll();
     toast(isEdit ? 'Zapisano' : 'Dodano', isEdit ? 'Szkolenie zaktualizowane' : 'Nowe szkolenie', 'ok');
+    if (!isEdit && res.data && opts.afterCreate) opts.afterCreate(res.data);
   });
 }
 
@@ -716,6 +758,7 @@ async function init() {
   if (!user || !isAllowed(user.email)) return; // layout przekieruje na login
 
   $('#btn-add-training').addEventListener('click', () => trainingModal(null));
+  $('#btn-qr')?.addEventListener('click', () => trainingModal(null, { afterCreate: (tr) => qrModal(tr) }));
   $('#btn-import').addEventListener('click', importLegacy);
   $('#btn-export').addEventListener('click', exportJSON);
   $('#btn-import-file').addEventListener('click', () => $('#file-input').click());
