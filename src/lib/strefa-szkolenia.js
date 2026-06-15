@@ -84,16 +84,47 @@ function confirmDialog(message, okLabel = 'Usuń', danger = true) {
 }
 
 /* ── DB helpery ── */
-async function loadData() {
+let polling = false;
+
+async function fetchTrainings() {
   const { data, error } = await sb.from('trainings').select('*, participants:participants(*)');
-  if (error) { toast('Błąd ładowania', error.message, 'err'); return; }
-  trainings = (data || []).sort((a, b) => (b.training_date || '').localeCompare(a.training_date || ''));
-  trMap.clear(); partMap.clear();
-  for (const t of trainings) {
-    t.participants = (t.participants || []).sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
-    trMap.set(t.id, t);
-    for (const p of t.participants) partMap.set(p.id, p);
-  }
+  if (error) throw error;
+  const arr = (data || []).sort((a, b) => (b.training_date || '').localeCompare(a.training_date || ''));
+  for (const t of arr) t.participants = (t.participants || []).sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
+  return arr;
+}
+function commitTrainings(arr) {
+  trainings = arr; trMap.clear(); partMap.clear();
+  for (const t of trainings) { trMap.set(t.id, t); for (const p of t.participants) partMap.set(p.id, p); }
+}
+// Sygnatura danych — do wykrycia, czy cokolwiek się zmieniło (bez tego nie ruszamy DOM).
+function sigOf(arr) {
+  return JSON.stringify((arr || []).map((t) => [t.id, t.name, t.training_date, t.location, t.description,
+    (t.participants || []).map((p) => [p.id, p.first_name, p.last_name, p.position, p.email, p.phone, p.attendance_confirmed, p.subscription, p.subscription_start_date])]));
+}
+async function loadData() {
+  try { commitTrainings(await fetchTrainings()); }
+  catch (e) { toast('Błąd ładowania', e.message, 'err'); }
+}
+
+// Ciche auto-odświeżanie: renderuje WYŁĄCZNIE gdy dane serwera różnią się od lokalnych.
+// Pomija, gdy: zakładka w tle, trwa edycja komórki, otwarty jest dialog, albo user jest aktywny w siatce.
+async function pollRefresh() {
+  if (polling || document.hidden || editing) return;
+  if (document.getElementById('modal-root')?.children.length) return;
+  const root = document.getElementById('trainings');
+  if (root && root.contains(document.activeElement)) return;
+  polling = true;
+  try {
+    const arr = await fetchTrainings();
+    if (sigOf(arr) !== sigOf(trainings)) {
+      const y = window.scrollY;
+      commitTrainings(arr);
+      renderAll();
+      window.scrollTo({ top: y });
+    }
+  } catch (e) { /* błąd auto-odświeżania ignorujemy po cichu */ }
+  finally { polling = false; }
 }
 async function dbUpdatePart(pid, patch) {
   const { error } = await sb.from('participants').update(patch).eq('id', pid);
@@ -776,6 +807,10 @@ async function init() {
   await loadData();
   if (trainings.length) openIds.add(trainings[0].id); // pierwsze rozwinięte
   renderAll();
+
+  // Auto-odświeżanie co 15 s (ciche) + natychmiast po powrocie do zakładki.
+  setInterval(pollRefresh, 15000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) pollRefresh(); });
 }
 
 init();
