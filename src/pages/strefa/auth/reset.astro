@@ -63,18 +63,32 @@ import '../../../styles/strefa.css';
     const showErr = (t) => { msg.hidden = false; msg.className = 'strefa-msg strefa-msg--err'; msg.textContent = t; };
 
     (async () => {
-      const sb = getClient(); // detectSessionInUrl: wymienia kod recovery na sesję
+      const sb = getClient();
+      const params = new URLSearchParams(window.location.search);
+      const tokenHash = params.get('token_hash');
+      const type = params.get('type') || 'recovery';
+
       let user = await getSessionUser();
+
+      // Preferowane: token_hash z maila — verifyOtp działa NIEZALEŻNIE od przeglądarki/urządzenia
+      // (w przeciwieństwie do PKCE, które wymaga code_verifier z tej samej przeglądarki).
+      if (!user && tokenHash) {
+        const { error } = await sb.auth.verifyOtp({ token_hash: tokenHash, type });
+        if (!error) user = await getSessionUser();
+      }
+
+      // Fallback: PKCE code w URL (gdy link otwarty w tej samej przeglądarce, co prośba o reset)
       if (!user) {
         await new Promise((resolve) => {
           const { data } = sb.auth.onAuthStateChange((_e, session) => { if (session) resolve(); });
           let tries = 0;
           const iv = setInterval(async () => {
-            if (await getSessionUser() || ++tries > 20) { clearInterval(iv); data.subscription.unsubscribe(); resolve(); }
+            if (await getSessionUser() || ++tries > 15) { clearInterval(iv); data.subscription.unsubscribe(); resolve(); }
           }, 200);
         });
         user = await getSessionUser();
       }
+
       loading.hidden = true;
       if (!user) { invalid.hidden = false; return; }
       form.hidden = false;
