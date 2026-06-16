@@ -5,9 +5,10 @@
 import { createClient } from '@supabase/supabase-js';
 
 export const SUPABASE_URL = 'https://sttluvcbucpxzbcsuigw.supabase.co';
-// Klucz anon jest publiczny z założenia (RLS pilnuje dostępu). Ten sam, którego używał szron.tech.
-export const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dGx1dmNidWNweHpiY3N1aWd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MzgzMzEsImV4cCI6MjA1ODUxNDMzMX0.m0BzQUhQL4mDkkm_VPrZjoGsJplDCmRtW1UePb4PVzw';
+// Klucz publishable (nowy system kluczy Supabase — projekt podpisuje access_tokeny ES256).
+// Publiczny z założenia (RLS pilnuje dostępu). WYMAGANY dla Realtime: legacy anon (HS256) dawał
+// :signature_error. Działa też dla REST/auth/edge functions.
+export const SUPABASE_ANON_KEY = 'sb_publishable_X5xi2HxbmVnbxmCNd8us4Q_Dr6eXvo0';
 
 // Allowlista zespołu SZRON — MUSI być zgodna z polityką RLS `strefa.is_team()`.
 export const ALLOWLIST = [

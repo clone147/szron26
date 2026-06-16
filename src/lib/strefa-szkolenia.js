@@ -130,8 +130,10 @@ async function pollRefresh() {
 }
 
 // Realtime: zmiany w strefa.participants/trainings doklejają się na żywo (ciche jak pollRefresh).
-function startRealtime() {
+async function startRealtime() {
   const sb = getClient();
+  // Przekaż token sesji do Realtime (RLS) — pewność, że jest ustawiony przed subskrypcją.
+  try { const { data } = await sb.auth.getSession(); if (data?.session) sb.realtime.setAuth(data.session.access_token); } catch (e) { /* ignore */ }
   let debounce;
   const trigger = () => { clearTimeout(debounce); debounce = setTimeout(pollRefresh, 400); };
   sb.channel('strefa-szkolenia-list')
