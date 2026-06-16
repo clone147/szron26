@@ -12,6 +12,7 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 const fmtDate = (d) => d ? new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(d)) : 'bez daty';
 const fmtDateTime = (d) => d ? new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(d)) : '';
 const todayStr = () => new Date().toISOString().slice(0, 10);
+const telHref = (s) => String(s || '').replace(/[^\d+]/g, ''); // tylko cyfry i + do linku tel:
 
 /* ── ikony ── */
 const ICO = {
@@ -24,6 +25,7 @@ const ICO = {
   check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>',
   x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
   qr: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h2v2M18 14h.01M21 17v.01M14 18v.01M17 21h.01M21 21v-2"/></svg>',
+  phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>',
 };
 
 /* ── stan ── */
@@ -126,6 +128,20 @@ async function pollRefresh() {
   } catch (e) { /* błąd auto-odświeżania ignorujemy po cichu */ }
   finally { polling = false; }
 }
+
+// Realtime: zmiany w strefa.participants/trainings doklejają się na żywo (ciche jak pollRefresh).
+function startRealtime() {
+  const sb = getClient();
+  let debounce;
+  const trigger = () => { clearTimeout(debounce); debounce = setTimeout(pollRefresh, 400); };
+  sb.channel('strefa-szkolenia-list')
+    .on('postgres_changes', { event: '*', schema: 'strefa', table: 'participants' }, trigger)
+    .on('postgres_changes', { event: '*', schema: 'strefa', table: 'trainings' }, trigger)
+    .subscribe((status) => { if (status === 'SUBSCRIBED') pollRefresh(); });
+  // Bezpiecznik na wypadek zerwania socketu (rzadki fallback) + sync po powrocie do zakładki.
+  setInterval(pollRefresh, 60000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) pollRefresh(); });
+}
 async function dbUpdatePart(pid, patch) {
   const { error } = await sb.from('participants').update(patch).eq('id', pid);
   if (error) { toast('Błąd zapisu', error.message, 'err'); return false; }
@@ -169,6 +185,7 @@ function rowHTML(p, r) {
     <td data-col="phone" data-r="${r}" data-c="5">${cellInner(p, 'phone')}</td>
     <td class="col-sub"><div class="dcell" data-act="sub" title="Edytuj abonament / notatki" style="cursor:pointer">${subBadge(p)}</div></td>
     <td class="col-actions"><div class="dcell">
+      ${p.phone ? `<a class="strefa-iconbtn strefa-iconbtn--call" href="tel:${esc(telHref(p.phone))}" title="Zadzwoń: ${esc(p.phone)}">${ICO.phone}</a>` : ''}
       <button class="strefa-iconbtn" data-act="notes" title="Notatki i abonament">${ICO.file}</button>
       <button class="strefa-iconbtn" data-act="del-part" title="Usuń uczestnika">${ICO.trash}</button>
     </div></td>
@@ -808,9 +825,8 @@ async function init() {
   if (trainings.length) openIds.add(trainings[0].id); // pierwsze rozwinięte
   renderAll();
 
-  // Auto-odświeżanie co 15 s (ciche) + natychmiast po powrocie do zakładki.
-  setInterval(pollRefresh, 15000);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) pollRefresh(); });
+  // Realtime: zmiany doklejają się na żywo (zamiast pollingu co 15 s).
+  startRealtime();
 }
 
 init();

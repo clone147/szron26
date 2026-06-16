@@ -147,7 +147,7 @@
 
 /* ── SIATKA EDYTOWALNA Z KLAWIATURY ── */
 .dgrid-wrap { overflow-x: auto; border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); }
-.dgrid { width: 100%; border-collapse: collapse; font-size: var(--text-caption); min-width: 64rem; }
+.dgrid { width: 100%; border-collapse: collapse; font-size: var(--text-caption); min-width: 66rem; }
 .dgrid thead th {
   position: sticky; top: 0; z-index: 2; background: var(--color-ink-3);
   text-align: left; font-family: var(--font-display); font-weight: 600; letter-spacing: .04em;
@@ -172,7 +172,8 @@
 }
 .dgrid td.col-check, .dgrid th.col-check { width: 3rem; text-align: center; }
 .dgrid td.col-check .dcell { justify-content: center; cursor: pointer; }
-.dgrid td.col-actions, .dgrid th.col-actions { width: 5.5rem; }
+.dgrid td.col-actions, .dgrid th.col-actions { width: 7.2rem; }
+.strefa-iconbtn--call:hover { background: color-mix(in oklch, oklch(62% 0.16 150) 22%, transparent); color: oklch(80% 0.15 150); }
 .dgrid td.col-actions .dcell { justify-content: flex-end; gap: .15rem; cursor: default; }
 .dgrid td.col-sel, .dgrid th.col-sel { width: 2.4rem; text-align: center; }
 .dgrid input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--color-accent); cursor: pointer; }
