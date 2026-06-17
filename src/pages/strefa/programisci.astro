@@ -9,6 +9,10 @@ import Strefa from '../../layouts/Strefa.astro';
       <p>Kokpit prowadzenia programistów ku autonomicznemu programowaniu intencyjnemu. Lista po firmach, etapy dojrzałości, umiejętności, notatki, spotkania, zadania, prompty i maile. Tabelę edytujesz z klawiatury.</p>
     </div>
     <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center">
+      <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-history" title="Historia zmian i notatek (per miesiąc)">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        Historia
+      </button>
       <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-import-legacy" title="Migracja danych ze starych tabel public.szron_*">Import z poprzedniej wersji</button>
       <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-import-file">Wgraj JSON</button>
       <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-export">Eksport JSON</button>

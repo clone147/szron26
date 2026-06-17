@@ -374,6 +374,30 @@
 .mail-badge--draft { background: var(--color-ink-3); color: var(--color-text-inv-2); }
 .mail-badge--err { background: color-mix(in oklch, oklch(60% 0.2 25) 20%, transparent); color: oklch(78% 0.14 25); }
 
+/* ── Historia (oś czasu eventów + notatek) ── */
+.hist-controls { display: flex; gap: var(--space-sm); flex-wrap: wrap; align-items: flex-end; margin-bottom: var(--space-md); }
+.hist-controls .strefa-input, .hist-controls .strefa-select { width: auto; }
+.hist-day { position: sticky; top: 0; background: var(--color-ink-2); padding: .5rem 0 .3rem; z-index: 1; }
+.hist-day__date { font-family: var(--font-display); font-weight: 600; font-size: .72rem; color: var(--color-text-inv-3); text-transform: uppercase; letter-spacing: .08em; }
+.hist-item { display: flex; gap: .6rem; padding: .55rem .1rem; border-bottom: 1px solid color-mix(in oklch, var(--color-line-dark) 55%, transparent); }
+.hist-item__ico { width: 1.85rem; height: 1.85rem; flex: none; border-radius: 50%; display: grid; place-content: center; background: var(--color-ink-3); color: var(--color-text-inv-2); }
+.hist-item__ico svg { width: 15px; height: 15px; }
+.hist-item--awans .hist-item__ico { background: color-mix(in oklch, oklch(72% 0.15 150) 25%, transparent); color: oklch(84% 0.15 150); }
+.hist-item--etap .hist-item__ico { background: var(--color-accent-soft); color: var(--color-accent); }
+.hist-item--skill .hist-item__ico { background: var(--color-accent-soft); color: var(--color-accent); }
+.hist-item--skill-minus .hist-item__ico { background: color-mix(in oklch, oklch(60% 0.2 25) 20%, transparent); color: oklch(78% 0.14 25); }
+.hist-item--note .hist-item__ico { background: color-mix(in oklch, var(--color-brand) 22%, transparent); color: oklch(82% 0.09 265); }
+.hist-item--firma .hist-item__ico { background: color-mix(in oklch, var(--color-brand) 22%, transparent); color: oklch(82% 0.09 265); }
+.hist-item__body { flex: 1; min-width: 0; }
+.hist-item__top { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.hist-dev { font-weight: 600; cursor: pointer; }
+.hist-dev:hover { color: var(--color-accent); text-decoration: underline; }
+.hist-dev__co { font-size: var(--text-caption); color: var(--color-text-inv-3); }
+.hist-item__time { margin-left: auto; font-size: var(--text-caption); color: var(--color-text-inv-3); }
+.hist-item__txt { font-size: var(--text-s); color: var(--color-text-inv); margin-top: .1rem; white-space: pre-wrap; word-break: break-word; }
+.hist-note-label { color: oklch(82% 0.09 265); font-weight: 600; }
+.hist-empty { text-align: center; color: var(--color-text-inv-3); padding: var(--space-xl); }
+
 @media (max-width: 700px) {
   .strefa-top__nav { margin-left: 0; }
   .strefa-top__email { display: none; }

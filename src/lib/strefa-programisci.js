@@ -15,6 +15,10 @@ const todayStr = () => new Date().toISOString().slice(0, 10);
 const pad2 = (n) => String(n).padStart(2, '0');
 const nowLocalDT = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
 const todayLocal = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
+const curMonth = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`; };
+const monthRange = (ym) => { const [y, m] = ym.split('-').map(Number); return [new Date(y, m - 1, 1).toISOString(), new Date(y, m, 1).toISOString()]; };
+const hhmm = (d) => new Intl.DateTimeFormat('pl-PL', { hour: '2-digit', minute: '2-digit' }).format(new Date(d));
+const fmtMonth = (ym) => { const [y, m] = ym.split('-').map(Number); return new Intl.DateTimeFormat('pl-PL', { month: 'long', year: 'numeric' }).format(new Date(y, m - 1, 1)); };
 const telHref = (s) => String(s || '').replace(/[^\d+]/g, '');
 const daysUntil = (d) => Math.round((new Date(d).setHours(0,0,0,0) - new Date().setHours(0,0,0,0)) / 86400000);
 
@@ -31,6 +35,10 @@ const ICO = {
   user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
   open: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M10 14 21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>',
   copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 15 7-7 7 7"/></svg>',
+  lines: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>',
+  building: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/></svg>',
 };
 
 /* ── model coachingu ── */
@@ -741,6 +749,74 @@ async function loadMails(d, panel) {
   }));
 }
 
+/* ── HISTORIA — dialog z osią czasu eventów + notatek per miesiąc ── */
+const HIST_ICON = { awans: ICO.up, etap: ICO.up, firma: ICO.building, pole: ICO.pencil, umiejetnosc_plus: ICO.check, umiejetnosc_minus: ICO.x, notatka: ICO.lines };
+const HIST_CLS = { awans: 'awans', etap: 'etap', firma: 'firma', pole: 'pole', umiejetnosc_plus: 'skill', umiejetnosc_minus: 'skill-minus', notatka: 'note' };
+
+function openHistory(devId = null) {
+  const allDevs = companies.flatMap((c) => c.developers).slice().sort((a, b) => (a.last_name || '').localeCompare(b.last_name || '', 'pl'));
+  const box = openModal(`
+    <div class="strefa-modal__head">
+      <div><h2>Historia</h2><p>Zmiany i notatki w wybranym miesiącu</p></div>
+      <button class="strefa-iconbtn" data-close-x>${ICO.x}</button>
+    </div>
+    <div class="strefa-modal__body">
+      <div class="hist-controls">
+        <div class="strefa-field"><label>Miesiąc</label><input class="strefa-input" type="month" id="hist-month" value="${curMonth()}" max="${curMonth()}"></div>
+        <div class="strefa-field" style="flex:1"><label>Programista</label>
+          <select class="strefa-select" id="hist-dev"><option value="">Wszyscy programiści</option>
+            ${allDevs.map((d) => `<option value="${d.id}" ${d.id === devId ? 'selected' : ''}>${esc(d.first_name)} ${esc(d.last_name)}${d.company_id ? ' — ' + esc(companies.find((c) => c.id === d.company_id)?.name || '') : ''}</option>`).join('')}
+          </select></div>
+      </div>
+      <div id="hist-list">Wczytuję…</div>
+    </div>`);
+  box.querySelector('[data-close-x]').addEventListener('click', closeModal);
+  const monthEl = $('#hist-month', box), devEl = $('#hist-dev', box);
+  const reload = () => loadHistory(monthEl.value || curMonth(), devEl.value || null);
+  monthEl.addEventListener('change', reload);
+  devEl.addEventListener('change', reload);
+  reload();
+}
+
+async function loadHistory(ym, devId) {
+  const host = $('#hist-list'); if (!host) return;
+  host.innerHTML = 'Wczytuję…';
+  const [start, end] = monthRange(ym);
+  let evq = sb.from('dev_events').select('id,developer_id,event_type,summary,created_at').gte('created_at', start).lt('created_at', end);
+  let nq = sb.from('dev_notes').select('id,developer_id,note,created_at').gte('created_at', start).lt('created_at', end);
+  if (devId) { evq = evq.eq('developer_id', devId); nq = nq.eq('developer_id', devId); }
+  const [{ data: ev, error: ee }, { data: nt }] = await Promise.all([evq, nq]);
+  if (ee) { host.innerHTML = `<p class="hist-empty">Błąd: ${esc(ee.message)}</p>`; return; }
+  const items = [
+    ...(ev || []).map((e) => ({ kind: 'event', developer_id: e.developer_id, created_at: e.created_at, type: e.event_type, text: e.summary })),
+    ...(nt || []).map((n) => ({ kind: 'note', developer_id: n.developer_id, created_at: n.created_at, type: 'notatka', text: n.note })),
+  ].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+  if (!items.length) { host.innerHTML = `<p class="hist-empty">Brak zdarzeń i notatek w miesiącu ${esc(fmtMonth(ym))}.${devId ? '' : ' Zmień miesiąc, by zobaczyć inne okresy.'}</p>`; return; }
+  const byDay = new Map();
+  for (const it of items) { const day = String(it.created_at).slice(0, 10); if (!byDay.has(day)) byDay.set(day, []); byDay.get(day).push(it); }
+  host.innerHTML = [...byDay.entries()].map(([day, list]) => `
+    <div class="hist-day"><span class="hist-day__date">${esc(fmtDate(day))}</span></div>
+    ${list.map(histItemHTML).join('')}`).join('');
+  host.querySelectorAll('[data-open]').forEach((el) => el.addEventListener('click', () => openProfile(el.dataset.open)));
+}
+
+function histItemHTML(it) {
+  const d = devMap.get(it.developer_id);
+  const who = d ? `${esc(d.first_name)} ${esc(d.last_name)}` : '—';
+  const comp = d && d.company_id ? (companies.find((c) => c.id === d.company_id)?.name || '') : '';
+  const cls = HIST_CLS[it.type] || 'pole';
+  return `<div class="hist-item hist-item--${cls}">
+    <span class="hist-item__ico">${HIST_ICON[it.type] || ICO.pencil}</span>
+    <div class="hist-item__body">
+      <div class="hist-item__top">
+        <span class="hist-dev" data-open="${it.developer_id}">${who}</span>
+        ${comp ? `<span class="hist-dev__co">${esc(comp)}</span>` : ''}
+        <span class="hist-item__time">${hhmm(it.created_at)}</span>
+      </div>
+      <div class="hist-item__txt">${it.kind === 'note' ? `<span class="hist-note-label">Notatka:</span> ${esc(it.text)}` : esc(it.text)}</div>
+    </div></div>`;
+}
+
 /* ── realtime + ciche auto-odświeżanie listy ── */
 async function pollRefresh() {
   if (polling || document.hidden || editing) return;
@@ -803,6 +879,7 @@ async function init() {
     if (first) { openIds.add(first.id); renderAll(); setTimeout(() => $(`.strefa-tr[data-cid="${first.id}"] [data-add="first_name"]`)?.focus(), 40); }
     else companyModal(null);
   });
+  $('#btn-history')?.addEventListener('click', () => openHistory());
   $('#btn-export').addEventListener('click', exportJSON);
   $('#btn-import-file').addEventListener('click', () => $('#file-input').click());
   $('#btn-import-legacy')?.addEventListener('click', importLegacy);
