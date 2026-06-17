@@ -448,7 +448,7 @@ function bindGrids() {
     // dodawanie uczestnika
     const addGo = $('[data-add-go]', sec);
     const addInputs = $$('[data-add]', sec);
-    const doAdd = () => addParticipant(tid, addInputs);
+    const doAdd = () => addParticipant(tid, addInputs, addGo);
     addGo?.addEventListener('click', doAdd);
     addInputs.forEach((inp) => inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); doAdd(); } }));
   });
@@ -531,18 +531,24 @@ async function rowAction(act, pid) {
   }
 }
 
-async function addParticipant(tid, inputs) {
+let adding = false;
+async function addParticipant(tid, inputs, btn) {
+  if (adding) return; // blokada podwójnego wstawienia (Enter+klik / dwa Entery zanim pola się wyczyściły)
   const vals = {};
   inputs.forEach((i) => { vals[i.dataset.add] = i.value.trim(); });
   if (!vals.first_name && !vals.last_name) { toast('Uzupełnij dane', 'Podaj przynajmniej imię lub nazwisko', 'err'); return; }
-  const { error } = await sb.from('participants').insert({
-    training_id: tid, first_name: vals.first_name || '—', last_name: vals.last_name || '—',
-    position: vals.position || null, email: vals.email || null, phone: vals.phone || null, attendance_confirmed: false,
-  });
-  if (error) return toast('Błąd', error.message, 'err');
-  await loadData(); renderAll(); openIds.add(tid);
-  setTimeout(() => $(`.strefa-tr[data-tid="${tid}"] [data-add="first_name"]`)?.focus(), 30);
-  toast('Dodano', 'Uczestnik dopisany', 'ok');
+  adding = true;
+  if (btn) btn.disabled = true;
+  try {
+    const { error } = await sb.from('participants').insert({
+      training_id: tid, first_name: vals.first_name || '—', last_name: vals.last_name || '—',
+      position: vals.position || null, email: vals.email || null, phone: vals.phone || null, attendance_confirmed: false,
+    });
+    if (error) { toast('Błąd', error.message, 'err'); if (btn) btn.disabled = false; return; }
+    await loadData(); openIds.add(tid); renderAll();
+    setTimeout(() => $(`.strefa-tr[data-tid="${tid}"] [data-add="first_name"]`)?.focus(), 30);
+    toast('Dodano', 'Uczestnik dopisany', 'ok');
+  } finally { adding = false; }
 }
 
 /* ── modal QR samozapisu ── */
