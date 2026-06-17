@@ -270,9 +270,115 @@
 .nav-auth__panel h3 { font-family: var(--font-display); font-weight: 600; font-size: .95rem; margin: 0 0 .2rem; color: var(--color-text-inv); }
 .nav-auth__panel .strefa-input, .nav-auth__panel .strefa-google { font-size: var(--text-s); }
 
+/* ───────────────────────────────────────────────────────────────────────────
+   WIDOK „PROGRAMIŚCI" — kokpit coachingowy
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* kolumny siatki specyficzne dla programistów */
+.dgrid td.col-stage, .dgrid th.col-stage { width: 11.5rem; }
+.dgrid td.col-stage .dcell { cursor: pointer; }
+.dgrid td.col-skills, .dgrid th.col-skills { width: 9rem; }
+.dgrid td.col-skills .dcell { cursor: pointer; }
+
+/* chip etapu (kolor zależny od --sc) */
+.stage-chip {
+  display: inline-flex; align-items: center; gap: .35rem; white-space: nowrap;
+  font-size: var(--text-caption); font-weight: 600; line-height: 1.4;
+  padding: .15rem .55rem; border-radius: 999px;
+  background: color-mix(in oklch, var(--sc, var(--color-accent)) 20%, transparent);
+  color: var(--sc, var(--color-accent));
+  border: 1px solid color-mix(in oklch, var(--sc, var(--color-accent)) 35%, transparent);
+}
+
+/* pasek umiejętności */
+.skill-bar { display: block; width: 100%; height: 7px; background: var(--color-ink-3); border-radius: 999px; overflow: hidden; }
+.skill-bar__fill { display: block; height: 100%; background: var(--color-accent); border-radius: 999px; transition: width var(--dur-1); }
+.skill-bar--cell { display: inline-block; width: 3.6rem; height: 6px; vertical-align: middle; }
+.skill-bar__num { font-size: var(--text-caption); color: var(--color-text-inv-3); margin-left: .45rem; }
+
+/* sparkline rozkładu etapów w statystykach */
+.stage-spark { display: flex; gap: 2px; height: 1.6rem; border-radius: var(--radius-sm); overflow: hidden; }
+.stage-spark span { display: block; }
+
+/* popover wyboru etapu (z siatki) */
+.stage-pop {
+  position: fixed; z-index: 90; min-width: 12rem;
+  background: var(--color-ink-2); border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm);
+  padding: .3rem; display: flex; flex-direction: column; gap: .1rem;
+  box-shadow: 0 20px 50px oklch(0% 0 0 / .5);
+}
+.stage-pop button {
+  display: flex; align-items: center; gap: .5rem; text-align: left; width: 100%;
+  background: transparent; border: 0; color: var(--color-text-inv); font: inherit; font-size: var(--text-s);
+  padding: .4rem .55rem; border-radius: var(--radius-btn); cursor: pointer;
+}
+.stage-pop button:hover { background: var(--color-ink-3); }
+.stage-pop button.is-active { background: var(--color-accent-soft); color: var(--color-accent); }
+.stage-pop__dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+
+/* drawer profilu (prawy panel pełnej wysokości) */
+.strefa-modal--drawer { padding: 0; place-items: stretch end; }
+.strefa-modal--drawer .strefa-modal__box {
+  width: min(42rem, 100%); height: 100vh; max-height: 100vh; border-radius: 0;
+  border-top: 0; border-right: 0; border-bottom: 0; overflow: hidden;
+  display: flex; flex-direction: column; animation: strefa-drawer-in .22s var(--ease-out);
+}
+@keyframes strefa-drawer-in { from { transform: translateX(24px); opacity: .6; } }
+.strefa-prof { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.strefa-modal--drawer .strefa-modal__head { position: static; }
+.strefa-modal--drawer .strefa-modal__body { overflow: auto; flex: 1; min-height: 0; }
+
+/* zakładki */
+.strefa-tabs { display: flex; gap: .2rem; padding: 0 var(--space-lg); border-bottom: 1px solid var(--color-line-dark); background: var(--color-ink-2); overflow-x: auto; flex: none; }
+.strefa-tab { appearance: none; background: transparent; border: 0; border-bottom: 2px solid transparent; color: var(--color-text-inv-2); font: inherit; font-weight: 600; font-size: var(--text-s); padding: .6rem .7rem; cursor: pointer; white-space: nowrap; transition: color var(--dur-1), border-color var(--dur-1); }
+.strefa-tab:hover { color: var(--color-text-inv); }
+.strefa-tab.is-active { color: var(--color-accent); border-bottom-color: var(--color-accent); }
+
+/* drabinka etapów (profil) */
+.stage-ladder { display: flex; gap: .3rem; flex-wrap: wrap; }
+.stage-step { flex: 1 1 0; min-width: 5.2rem; display: flex; flex-direction: column; align-items: center; gap: .35rem; padding: .55rem .3rem; background: var(--color-ink); border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); cursor: pointer; transition: border-color var(--dur-1), background var(--dur-1); }
+.stage-step:hover { border-color: var(--sc); }
+.stage-step__dot { width: 1.7rem; height: 1.7rem; border-radius: 50%; display: grid; place-content: center; font-family: var(--font-display); font-weight: 600; background: var(--color-ink-3); color: var(--color-text-inv-2); border: 2px solid transparent; }
+.stage-step__lbl { font-size: .64rem; color: var(--color-text-inv-3); text-align: center; line-height: 1.2; }
+.stage-step.is-done .stage-step__dot { background: color-mix(in oklch, var(--sc) 30%, transparent); color: var(--sc); }
+.stage-step.is-current { border-color: var(--sc); background: color-mix(in oklch, var(--sc) 12%, transparent); }
+.stage-step.is-current .stage-step__dot { background: var(--sc); color: var(--color-ink); }
+.stage-step.is-current .stage-step__lbl { color: var(--color-text-inv); }
+.stage-hint { color: var(--color-text-inv-2); font-size: var(--text-s); margin: var(--space-sm) 0 0; font-style: italic; }
+
+/* checklista umiejętności */
+.skill-check { display: grid; grid-template-columns: 1fr 1fr; gap: .35rem; }
+.skill-row { display: flex; align-items: center; gap: .55rem; padding: .4rem .55rem; background: var(--color-ink); border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); cursor: pointer; font-size: var(--text-s); }
+.skill-row > span { flex: 1; min-width: 0; }
+.skill-row input { width: 16px; height: 16px; accent-color: oklch(62% 0.16 150); flex: none; cursor: pointer; }
+.skill-row .strefa-iconbtn { width: 1.5rem; height: 1.5rem; flex: none; }
+.skill-row.is-done { border-color: color-mix(in oklch, oklch(62% 0.16 150) 45%, var(--color-line-dark)); background: color-mix(in oklch, oklch(62% 0.16 150) 8%, transparent); }
+
+/* spotkania / zadania / prompty / maile */
+.meet-item, .prompt-card { background: var(--color-ink); border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); padding: var(--space-md); margin-top: var(--space-sm); }
+.meet-item--upcoming { border-left: 3px solid var(--color-accent); }
+.meet-item.is-done { opacity: .58; }
+.meet-done input { width: 16px; height: 16px; accent-color: oklch(62% 0.16 150); cursor: pointer; }
+.task-item { display: flex; align-items: center; gap: .5rem; background: var(--color-ink); border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); padding: .45rem .6rem; margin-top: .4rem; }
+.task-item--overdue { border-color: color-mix(in oklch, oklch(60% 0.2 25) 45%, transparent); }
+.task-item.is-done .task-title { text-decoration: line-through; color: var(--color-text-inv-3); }
+.task-status { flex: none; background: var(--color-ink-2); color: var(--color-text-inv); border: 1px solid var(--color-line-dark); border-radius: var(--radius-btn); padding: .25rem .4rem; font: inherit; font-size: var(--text-caption); }
+.task-title { flex: 1; min-width: 0; }
+.task-due { flex: none; font-size: var(--text-caption); color: var(--color-text-inv-3); white-space: nowrap; }
+.task-due.is-overdue { color: oklch(72% 0.17 25); font-weight: 600; }
+.mail-item { background: var(--color-ink); border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); padding: var(--space-md); margin-top: var(--space-sm); border-left: 3px solid var(--color-text-inv-3); }
+.mail-item--sent { border-left-color: oklch(62% 0.16 150); }
+.mail-item--failed { border-left-color: oklch(60% 0.2 25); }
+.mail-badge { display: inline-block; font-size: .68rem; font-weight: 600; padding: .1rem .45rem; border-radius: 999px; margin-left: .4rem; white-space: nowrap; }
+.mail-badge--sent { background: color-mix(in oklch, oklch(62% 0.16 150) 22%, transparent); color: oklch(82% 0.15 150); }
+.mail-badge--draft { background: var(--color-ink-3); color: var(--color-text-inv-2); }
+.mail-badge--err { background: color-mix(in oklch, oklch(60% 0.2 25) 20%, transparent); color: oklch(78% 0.14 25); }
+
 @media (max-width: 700px) {
   .strefa-top__nav { margin-left: 0; }
   .strefa-top__email { display: none; }
   .strefa-grid2 { grid-template-columns: 1fr; }
   .strefa-head { align-items: flex-start; }
+  .skill-check { grid-template-columns: 1fr; }
+  .strefa-modal--drawer .strefa-modal__box { width: 100%; }
 }
