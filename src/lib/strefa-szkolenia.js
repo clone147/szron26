@@ -597,7 +597,7 @@ function trainingModal(t, opts = {}) {
     <div class="strefa-modal__body">
       <div class="strefa-field" style="margin-bottom:var(--space-md)"><label>Nazwa *</label><input class="strefa-input" id="tf-name" value="${esc(t?.name || '')}" placeholder="np. Szkolenie w R&G Plus"></div>
       <div class="strefa-grid2">
-        <div class="strefa-field"><label>Data</label><input class="strefa-input" id="tf-date" type="date" value="${t?.training_date || ''}"></div>
+        <div class="strefa-field"><label>Data</label><input class="strefa-input" id="tf-date" type="date" value="${t ? (t.training_date || '') : todayStr()}"></div>
         <div class="strefa-field"><label>Lokalizacja</label><input class="strefa-input" id="tf-loc" value="${esc(t?.location || '')}" placeholder="np. Sala"></div>
       </div>
       <div class="strefa-field" style="margin-top:var(--space-md)"><label>Opis</label><textarea class="strefa-textarea" id="tf-desc" placeholder="opcjonalnie">${esc(t?.description || '')}</textarea></div>
@@ -645,7 +645,7 @@ async function notesModal(pid) {
               <option value="__custom" ${p.subscription && !SUBS.includes(p.subscription) ? 'selected' : ''}>Inny (wpisz)…</option>
             </select>
           </div>
-          <div class="strefa-field"><label>Data startu</label><input class="strefa-input" id="sub-date" type="date" value="${p.subscription_start_date || ''}"></div>
+          <div class="strefa-field"><label>Data startu</label><input class="strefa-input" id="sub-date" type="date" value="${p.subscription_start_date || todayStr()}"></div>
         </div>
         <div class="strefa-field" id="sub-custom-wrap" style="margin-top:var(--space-sm);${p.subscription && !SUBS.includes(p.subscription) ? '' : 'display:none'}">
           <label>Nazwa własna</label><input class="strefa-input" id="sub-custom" value="${p.subscription && !SUBS.includes(p.subscription) ? esc(p.subscription) : ''}">

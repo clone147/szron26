@@ -12,6 +12,9 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 const fmtDate = (d) => d ? new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(d)) : '';
 const fmtDateTime = (d) => d ? new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(d)) : '';
 const todayStr = () => new Date().toISOString().slice(0, 10);
+const pad2 = (n) => String(n).padStart(2, '0');
+const nowLocalDT = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
+const todayLocal = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
 const telHref = (s) => String(s || '').replace(/[^\d+]/g, '');
 const daysUntil = (d) => Math.round((new Date(d).setHours(0,0,0,0) - new Date().setHours(0,0,0,0)) / 86400000);
 
@@ -502,7 +505,7 @@ function renderOverview(panel, d) {
         <div class="strefa-field"><label>Ulubiony agent</label><select class="strefa-select" id="o-agent"><option value="">—</option>${AGENTS.map((a) => `<option ${d.fav_agent === a ? 'selected' : ''}>${a}</option>`).join('')}</select></div>
         <div class="strefa-field"><label>Nastawienie</label><select class="strefa-select" id="o-mind"><option value="">—</option>${MINDSETS.map((m) => `<option ${d.mindset === m ? 'selected' : ''}>${m}</option>`).join('')}</select></div>
         <div class="strefa-field"><label>Abonament AI</label><select class="strefa-select" id="o-sub"><option value="">—</option>${SUBS.map((s) => `<option ${d.subscription === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
-        <div class="strefa-field"><label>Data abonamentu</label><input class="strefa-input" type="date" id="o-subdate" value="${d.subscription_start_date || ''}"></div>
+        <div class="strefa-field"><label>Data abonamentu</label><input class="strefa-input" type="date" id="o-subdate" value="${d.subscription_start_date || todayLocal()}"></div>
       </div>
       <div class="strefa-field" style="margin-top:var(--space-sm)"><label>Blokery</label><textarea class="strefa-textarea" id="o-block" placeholder="Co hamuje przed autonomią…">${esc(d.blockers || '')}</textarea></div>
       <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="o-obs-save">Zapisz obserwacje</button></div>
@@ -570,13 +573,13 @@ async function renderListTab(panel, d, kind) {
   if (kind === 'notes') addSec.innerHTML = `<h3>Nowa notatka</h3><textarea class="strefa-textarea" id="x-note" placeholder="Obserwacja, ustalenie, wniosek…"></textarea>
     <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="x-clear">Wyczyść</button><button class="strefa-btn strefa-btn--accent strefa-btn--sm" id="x-add">Dodaj notatkę</button></div>`;
   if (kind === 'meetings') addSec.innerHTML = `<h3>Nowe spotkanie</h3><div class="strefa-grid2">
-    <div class="strefa-field"><label>Termin</label><input class="strefa-input" type="datetime-local" id="x-at"></div>
+    <div class="strefa-field"><label>Termin</label><input class="strefa-input" type="datetime-local" id="x-at" value="${nowLocalDT()}"></div>
     <div class="strefa-field"><label>Tytuł</label><input class="strefa-input" id="x-title" placeholder="np. 1:1 — MCP setup"></div></div>
     <div class="strefa-field" style="margin-top:var(--space-sm)"><label>Notatki</label><textarea class="strefa-textarea" id="x-notes" placeholder="Agenda / ustalenia…"></textarea></div>
     <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--accent strefa-btn--sm" id="x-add">Dodaj spotkanie</button></div>`;
   if (kind === 'tasks') addSec.innerHTML = `<h3>Nowe zadanie</h3><div class="strefa-grid2">
     <div class="strefa-field"><label>Zadanie</label><input class="strefa-input" id="x-title" placeholder="np. Napisz feature z /loop"></div>
-    <div class="strefa-field"><label>Termin</label><input class="strefa-input" type="date" id="x-due"></div></div>
+    <div class="strefa-field"><label>Termin</label><input class="strefa-input" type="date" id="x-due" value="${todayLocal()}"></div></div>
     <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--accent strefa-btn--sm" id="x-add">Dodaj zadanie</button></div>`;
   if (kind === 'prompts') addSec.innerHTML = `<h3>Nowy prompt</h3><div class="strefa-field"><label>Tytuł</label><input class="strefa-input" id="x-title" placeholder="np. Retry z exponential backoff"></div>
     <div class="strefa-field" style="margin-top:var(--space-sm)"><label>Treść promptu</label><textarea class="strefa-textarea" id="x-prompt" placeholder="Wklej najlepszy prompt…"></textarea></div>
