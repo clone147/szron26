@@ -608,12 +608,17 @@ function trainingModal(t, opts = {}) {
     </div>`);
   box.querySelectorAll('[data-close-x]').forEach((b) => b.addEventListener('click', closeModal));
   $('#tf-name', box).focus();
-  $('#tf-save', box).addEventListener('click', async () => {
+  let saving = false;
+  const saveBtn = $('#tf-save', box);
+  saveBtn.addEventListener('click', async () => {
+    if (saving) return; // blokada podwójnego utworzenia/zapisu szkolenia
     const name = $('#tf-name', box).value.trim();
     if (!name) { toast('Brak nazwy', 'Podaj nazwę szkolenia', 'err'); return; }
+    saving = true;
+    saveBtn.disabled = true;
     const payload = { name, training_date: $('#tf-date', box).value || null, location: $('#tf-loc', box).value.trim() || null, description: $('#tf-desc', box).value.trim() || null };
     const res = isEdit ? await sb.from('trainings').update(payload).eq('id', t.id) : await sb.from('trainings').insert(payload).select().single();
-    if (res.error) { toast('Błąd', res.error.message, 'err'); return; }
+    if (res.error) { toast('Błąd', res.error.message, 'err'); saving = false; saveBtn.disabled = false; return; }
     closeModal();
     if (!isEdit && res.data) openIds.add(res.data.id);
     await loadData(); renderAll();
