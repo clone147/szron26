@@ -14,6 +14,7 @@ const fmtDateTime = (d) => d ? new Intl.DateTimeFormat('pl-PL', { day: 'numeric'
 const todayStr = () => new Date().toISOString().slice(0, 10);
 const pad2 = (n) => String(n).padStart(2, '0');
 const nowLocalDT = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
+const localDT = (v) => { const d = new Date(v); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
 const todayLocal = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
 const curMonth = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`; };
 const monthRange = (ym) => { const [y, m] = ym.split('-').map(Number); return [new Date(y, m - 1, 1).toISOString(), new Date(y, m, 1).toISOString()]; };
@@ -141,6 +142,20 @@ async function dbUpdateDev(did, patch) {
   const { error } = await sb.from('developers').update(patch).eq('id', did);
   if (error) { toast('Błąd zapisu', error.message, 'err'); return false; }
   return true;
+}
+
+/* ── synchronizacja spotkań z Google Calendar (Edge Function strefa-meeting-sync) ── */
+async function syncMeeting(action, meetingId) {
+  try {
+    const { data, error } = await sb.functions.invoke('strefa-meeting-sync', { body: { action, meeting_id: meetingId } });
+    if (error || !data?.success) return { ok: false, msg: (data && data.error) || error?.message || 'błąd synchronizacji' };
+    return { ok: true, data };
+  } catch (e) { return { ok: false, msg: e.message }; }
+}
+const SYNC_LBL = { synced: ['ok', 'Google OK'], pending: ['pending', 'Sync…'], syncing: ['pending', 'Sync…'], error: ['error', 'Błąd sync'], local: ['count', 'Lokalnie'] };
+function syncChip(m) {
+  const [cls, lbl] = SYNC_LBL[m.sync_status] || SYNC_LBL.pending;
+  return `<span class="strefa-chip strefa-chip--${cls}" title="${esc(m.sync_error || lbl)}">${lbl}</span>`;
 }
 
 /* ── render: statystyki ── */
@@ -582,7 +597,8 @@ async function renderListTab(panel, d, kind) {
     <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="x-clear">Wyczyść</button><button class="strefa-btn strefa-btn--accent strefa-btn--sm" id="x-add">Dodaj notatkę</button></div>`;
   if (kind === 'meetings') addSec.innerHTML = `<h3>Nowe spotkanie</h3><div class="strefa-grid2">
     <div class="strefa-field"><label>Termin</label><input class="strefa-input" type="datetime-local" id="x-at" value="${nowLocalDT()}"></div>
-    <div class="strefa-field"><label>Tytuł</label><input class="strefa-input" id="x-title" placeholder="np. 1:1 — MCP setup"></div></div>
+    <div class="strefa-field"><label>Czas trwania</label><select class="strefa-select" id="x-dur">${[15, 30, 45, 60, 90].map((v) => `<option value="${v}" ${v === 30 ? 'selected' : ''}>${v} min</option>`).join('')}</select></div></div>
+    <div class="strefa-field" style="margin-top:var(--space-sm)"><label>Tytuł</label><input class="strefa-input" id="x-title" placeholder="np. 1:1 — MCP setup"></div>
     <div class="strefa-field" style="margin-top:var(--space-sm)"><label>Notatki</label><textarea class="strefa-textarea" id="x-notes" placeholder="Agenda / ustalenia…"></textarea></div>
     <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--accent strefa-btn--sm" id="x-add">Dodaj spotkanie</button></div>`;
   if (kind === 'tasks') addSec.innerHTML = `<h3>Nowe zadanie</h3><div class="strefa-grid2">
@@ -608,8 +624,12 @@ async function addListItem(d, kind, sec) {
     if (error) return toast('Błąd', error.message, 'err'); $('#x-note', sec).value = ''; toast('Dodano', 'Notatka', 'ok');
   } else if (kind === 'meetings') {
     const title = $('#x-title', sec).value.trim(); const at = $('#x-at', sec).value;
-    const { error } = await sb.from('dev_meetings').insert({ developer_id: d.id, title: title || null, notes: $('#x-notes', sec).value.trim() || null, meeting_at: at ? new Date(at).toISOString() : new Date().toISOString() });
-    if (error) return toast('Błąd', error.message, 'err'); $('#x-title', sec).value = ''; $('#x-notes', sec).value = ''; toast('Dodano', 'Spotkanie', 'ok');
+    const dur = +($('#x-dur', sec)?.value || 30);
+    const { data, error } = await sb.from('dev_meetings').insert({ developer_id: d.id, title: title || null, notes: $('#x-notes', sec).value.trim() || null, meeting_at: at ? new Date(at).toISOString() : new Date().toISOString(), duration_min: dur }).select('id').single();
+    if (error) return toast('Błąd', error.message, 'err');
+    $('#x-title', sec).value = ''; $('#x-notes', sec).value = ''; toast('Dodano', 'Spotkanie — synchronizuję…', 'ok');
+    const r = await syncMeeting('create', data.id);
+    if (!r.ok) toast('Sync', r.msg, 'err');
   } else if (kind === 'tasks') {
     const title = $('#x-title', sec).value.trim(); if (!title) return toast('Pusto', 'Wpisz zadanie', 'err');
     const { error } = await sb.from('dev_tasks').insert({ developer_id: d.id, title, due_date: $('#x-due', sec).value || null });
@@ -633,12 +653,47 @@ async function loadList(d, kind) {
       const du = daysUntil(m.meeting_at);
       const when = up && du >= 0 ? `<span class="strefa-chip strefa-chip--count">${du === 0 ? 'dziś' : du === 1 ? 'jutro' : `za ${du} dni`}</span>` : '';
       return `<div class="meet-item ${up ? 'meet-item--upcoming' : ''} ${m.done ? 'is-done' : ''}" data-id="${m.id}">
-        <div class="note__head"><span class="note__time">${fmtDateTime(m.meeting_at)} ${when}</span>
-          <span style="display:flex;gap:.15rem"><label class="meet-done" title="Odbyte"><input type="checkbox" data-done="${m.id}" ${m.done ? 'checked' : ''}></label><button class="strefa-iconbtn" data-del="dev_meetings" data-id="${m.id}">${ICO.trash}</button></span></div>
+        <div class="note__head"><span class="note__time" style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap">${fmtDateTime(m.meeting_at)} · ${m.duration_min || 30} min ${when} ${syncChip(m)}</span>
+          <span style="display:flex;gap:.15rem;align-items:center">
+            <label class="meet-done" title="Odbyte"><input type="checkbox" data-done="${m.id}" ${m.done ? 'checked' : ''}></label>
+            ${m.gcal_html_link ? `<a class="strefa-iconbtn" href="${esc(m.gcal_html_link)}" target="_blank" rel="noopener" title="Otwórz w Google Calendar">${ICO.open}</a>` : ''}
+            <button class="strefa-iconbtn" data-resched="${m.id}" title="Zmień termin">${ICO.pencil}</button>
+            ${m.sync_status === 'error' ? `<button class="strefa-iconbtn" data-resync="${m.id}" title="Ponów synchronizację">${ICO.clock}</button>` : ''}
+            <button class="strefa-iconbtn" data-del="dev_meetings" data-id="${m.id}" title="Usuń">${ICO.trash}</button>
+          </span></div>
         ${m.title ? `<strong>${esc(m.title)}</strong>` : ''}${m.notes ? `<p style="margin:.3rem 0 0;color:var(--color-text-inv-2);font-size:var(--text-s);white-space:pre-wrap">${esc(m.notes)}</p>` : ''}</div>`;
     }).join('') : '<p class="note-empty">Brak spotkań.</p>';
+    // odbyte — bez sync (status „odbyte" nie idzie do Google)
     host.querySelectorAll('[data-done]').forEach((cb) => cb.addEventListener('change', async () => {
       await sb.from('dev_meetings').update({ done: cb.checked }).eq('id', cb.dataset.done); loadList(d, 'meetings');
+    }));
+    // przestaw termin → update wiersza + sync 'update'
+    host.querySelectorAll('[data-resched]').forEach((b) => b.addEventListener('click', () => {
+      const m = (data || []).find((x) => x.id === b.dataset.resched); if (!m) return;
+      const box = openModal(`<div class="strefa-modal__head"><h2>Zmień termin</h2><button class="strefa-iconbtn" data-close-x>${ICO.x}</button></div>
+        <div class="strefa-modal__body"><div class="strefa-grid2">
+          <div class="strefa-field"><label>Termin</label><input class="strefa-input" type="datetime-local" id="r-at" value="${localDT(m.meeting_at)}"></div>
+          <div class="strefa-field"><label>Czas trwania</label><select class="strefa-select" id="r-dur">${[15, 30, 45, 60, 90].map((v) => `<option value="${v}" ${(m.duration_min || 30) === v ? 'selected' : ''}>${v} min</option>`).join('')}</select></div></div>
+        <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--ghost" data-close-x>Anuluj</button><button class="strefa-btn strefa-btn--accent" id="r-save">Zapisz i zsynchronizuj</button></div></div>`);
+      box.querySelectorAll('[data-close-x]').forEach((x) => x.addEventListener('click', closeModal));
+      let busy = false;
+      $('#r-save', box).addEventListener('click', async () => {
+        if (busy) return; const at = $('#r-at', box).value; if (!at) return toast('Brak terminu', 'Podaj datę i godzinę', 'err');
+        busy = true; const sv = $('#r-save', box); sv.disabled = true; sv.textContent = 'Synchronizuję…';
+        const { error } = await sb.from('dev_meetings').update({ meeting_at: new Date(at).toISOString(), duration_min: +$('#r-dur', box).value, sync_status: 'pending' }).eq('id', m.id);
+        if (error) { toast('Błąd', error.message, 'err'); busy = false; sv.disabled = false; sv.textContent = 'Zapisz i zsynchronizuj'; return; }
+        const r = await syncMeeting('update', m.id);
+        closeModal();
+        toast(r.ok ? 'Przesunięto' : 'Zapisano (błąd sync)', r.ok ? 'Termin zmieniony' : r.msg, r.ok ? 'ok' : 'err');
+        loadList(d, 'meetings');
+      });
+    }));
+    // ponów synchronizację po błędzie
+    host.querySelectorAll('[data-resync]').forEach((b) => b.addEventListener('click', async () => {
+      await sb.from('dev_meetings').update({ sync_status: 'pending' }).eq('id', b.dataset.resync);
+      const r = await syncMeeting('update', b.dataset.resync);
+      toast(r.ok ? 'Zsynchronizowano' : 'Błąd sync', r.ok ? 'Google OK' : r.msg, r.ok ? 'ok' : 'err');
+      loadList(d, 'meetings');
     }));
   } else if (kind === 'tasks') {
     const { data } = await sb.from('dev_tasks').select('*').eq('developer_id', d.id).order('due_date', { ascending: true, nullsFirst: false });
@@ -666,11 +721,16 @@ async function loadList(d, kind) {
       const p = (data || []).find((x) => x.id === b.dataset.copy); try { await navigator.clipboard.writeText(p.prompt); toast('Skopiowano', 'Prompt w schowku', 'ok'); } catch (e) { /* ignore */ }
     }));
   }
-  // wspólne: usuwanie
+  // wspólne: usuwanie (dev_meetings kasuje też event w Google przez Edge Function)
   host.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', async () => {
     if (!(await confirmDialog('Usunąć tę pozycję?'))) return;
-    const { error } = await sb.from(b.dataset.del).delete().eq('id', b.dataset.id);
-    if (error) return toast('Błąd', error.message, 'err');
+    if (b.dataset.del === 'dev_meetings') {
+      const r = await syncMeeting('delete', b.dataset.id);
+      if (!r.ok) return toast('Błąd', r.msg, 'err');
+    } else {
+      const { error } = await sb.from(b.dataset.del).delete().eq('id', b.dataset.id);
+      if (error) return toast('Błąd', error.message, 'err');
+    }
     loadList(d, kind); renderStats();
   }));
 }
@@ -750,8 +810,8 @@ async function loadMails(d, panel) {
 }
 
 /* ── HISTORIA — dialog z osią czasu eventów + notatek per miesiąc ── */
-const HIST_ICON = { awans: ICO.up, etap: ICO.up, firma: ICO.building, pole: ICO.pencil, umiejetnosc_plus: ICO.check, umiejetnosc_minus: ICO.x, notatka: ICO.lines };
-const HIST_CLS = { awans: 'awans', etap: 'etap', firma: 'firma', pole: 'pole', umiejetnosc_plus: 'skill', umiejetnosc_minus: 'skill-minus', notatka: 'note' };
+const HIST_ICON = { awans: ICO.up, etap: ICO.up, firma: ICO.building, pole: ICO.pencil, umiejetnosc_plus: ICO.check, umiejetnosc_minus: ICO.x, notatka: ICO.lines, spotkanie_utworzone: ICO.clock, spotkanie_przestawione: ICO.clock, spotkanie_odwolane: ICO.x };
+const HIST_CLS = { awans: 'awans', etap: 'etap', firma: 'firma', pole: 'pole', umiejetnosc_plus: 'skill', umiejetnosc_minus: 'skill-minus', notatka: 'note', spotkanie_utworzone: 'meeting', spotkanie_przestawione: 'meeting', spotkanie_odwolane: 'meeting-cancel' };
 
 function openHistory(devId = null) {
   const allDevs = companies.flatMap((c) => c.developers).slice().sort((a, b) => (a.last_name || '').localeCompare(b.last_name || '', 'pl'));
@@ -817,6 +877,82 @@ function histItemHTML(it) {
     </div></div>`;
 }
 
+/* ── globalny modal „Umów spotkanie" — wielu programistów naraz ── */
+function openScheduleMeetingModal() {
+  const groups = companies
+    .map((c) => ({ name: c.name, devs: c.developers.slice().sort((a, b) => (a.last_name || '').localeCompare(b.last_name || '', 'pl')) }))
+    .filter((g) => g.devs.length);
+  if (!groups.length) return toast('Brak programistów', 'Najpierw dodaj programistów', 'err');
+  const box = openModal(`
+    <div class="strefa-modal__head"><div><h2>Umów spotkanie</h2><p>Wybierz programistów i ustaw terminy — trafią do Google Calendar</p></div><button class="strefa-iconbtn" data-close-x>${ICO.x}</button></div>
+    <div class="strefa-modal__body">
+      <div class="strefa-grid2">
+        <div class="strefa-field"><label>Data</label><input class="strefa-input" type="date" id="sm-date" value="${todayLocal()}"></div>
+        <div class="strefa-field"><label>Pierwsza godzina</label><input class="strefa-input" type="time" id="sm-time" value="10:00" step="900"></div>
+        <div class="strefa-field"><label>Czas trwania</label><select class="strefa-select" id="sm-dur">${[15, 30, 45, 60, 90].map((v) => `<option value="${v}" ${v === 30 ? 'selected' : ''}>${v} min</option>`).join('')}</select></div>
+        <div class="strefa-field"><label>Tytuł (wspólny)</label><input class="strefa-input" id="sm-title" placeholder="np. 1:1"></div>
+      </div>
+      <div class="strefa-field" style="margin-top:var(--space-sm)"><label>Notatki (wspólne)</label><textarea class="strefa-textarea" id="sm-notes" placeholder="Agenda / ustalenia…"></textarea></div>
+      <div class="strefa-field" style="margin-top:var(--space-sm)"><label>Programiści</label>
+        <input class="strefa-input" id="sm-search" type="search" placeholder="Filtruj programistów…" autocomplete="off"></div>
+      <div class="sm-devlist" id="sm-devlist">
+        ${groups.map((g) => `<div class="sm-group" data-group><div class="sm-group__name">${esc(g.name)}</div>
+          ${g.devs.map((d) => `<label class="sm-dev" data-name="${esc(((d.first_name || '') + ' ' + (d.last_name || '') + ' ' + (d.position || '')).toLowerCase())}">
+            <input type="checkbox" data-pick="${d.id}">
+            <span class="sm-dev__name">${esc(d.first_name || '')} ${esc(d.last_name || '')}${d.position ? ` <span class="sm-dev__pos">${esc(d.position)}</span>` : ''}</span>
+            <input class="strefa-input sm-dev__time" type="time" step="900" value="" disabled aria-label="Godzina spotkania">
+          </label>`).join('')}
+        </div>`).join('')}
+      </div>
+      <div class="strefa-actions-row" style="justify-content:space-between;align-items:center">
+        <span id="sm-summary" style="color:var(--color-text-inv-3);font-size:var(--text-s)">Nikogo nie wybrano</span>
+        <span style="display:flex;gap:.4rem"><button class="strefa-btn strefa-btn--ghost" data-close-x>Anuluj</button>
+        <button class="strefa-btn strefa-btn--accent" id="sm-go" disabled>Umów</button></span>
+      </div>
+    </div>`);
+  box.querySelectorAll('[data-close-x]').forEach((b) => b.addEventListener('click', closeModal));
+  const picks = () => $$('[data-pick]:checked', box);
+  const addMin = (hhmm, min) => { const [h, m] = (hhmm || '10:00').split(':').map(Number); const t = (h * 60 + m + min) % 1440; return `${pad2(Math.floor(t / 60))}:${pad2(t % 60)}`; };
+  const plural = (n) => n === 1 ? 'spotkanie' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'spotkania' : 'spotkań');
+  function recalc() {
+    const base = $('#sm-time', box).value || '10:00';
+    const dur = +$('#sm-dur', box).value;
+    $$('[data-pick]', box).forEach((cb) => { const ti = cb.closest('.sm-dev').querySelector('.sm-dev__time'); ti.disabled = !cb.checked; });
+    const checked = picks();
+    checked.forEach((cb, i) => { cb.closest('.sm-dev').querySelector('.sm-dev__time').value = addMin(base, i * dur); });
+    const n = checked.length;
+    $('#sm-summary', box).textContent = n ? `Utworzysz ${n} ${plural(n)}` : 'Nikogo nie wybrano';
+    const go = $('#sm-go', box); go.disabled = !n; go.textContent = n ? `Umów (${n})` : 'Umów';
+  }
+  box.addEventListener('change', (e) => { if (e.target.matches('[data-pick], #sm-dur, #sm-time')) recalc(); });
+  $('#sm-search', box).addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    box.querySelectorAll('.sm-dev').forEach((el) => { el.style.display = !q || el.dataset.name.includes(q) ? '' : 'none'; });
+    box.querySelectorAll('[data-group]').forEach((g) => { const any = Array.from(g.querySelectorAll('.sm-dev')).some((el) => el.style.display !== 'none'); g.style.display = any ? '' : 'none'; });
+  });
+  let busy = false;
+  $('#sm-go', box).addEventListener('click', async () => {
+    if (busy) return;
+    const checked = picks(); if (!checked.length) return;
+    const date = $('#sm-date', box).value; if (!date) return toast('Brak daty', 'Wybierz datę', 'err');
+    const dur = +$('#sm-dur', box).value;
+    const title = $('#sm-title', box).value.trim() || null;
+    const notes = $('#sm-notes', box).value.trim() || null;
+    const rows = checked.map((cb) => {
+      const time = cb.closest('.sm-dev').querySelector('.sm-dev__time').value || '10:00';
+      return { developer_id: cb.dataset.pick, title, notes, meeting_at: new Date(`${date}T${time}`).toISOString(), duration_min: dur };
+    });
+    busy = true; const go = $('#sm-go', box); go.disabled = true; go.textContent = 'Tworzę…';
+    const { data, error } = await sb.from('dev_meetings').insert(rows).select('id');
+    if (error) { toast('Błąd', error.message, 'err'); busy = false; go.disabled = false; go.textContent = `Umów (${checked.length})`; return; }
+    const results = await Promise.all((data || []).map((m) => syncMeeting('create', m.id)));
+    const okN = results.filter((r) => r.ok).length;
+    closeModal(); await loadData(); renderAll();
+    if (okN === results.length) toast('Utworzono', `${okN} ${plural(okN)} w Google Calendar`, 'ok');
+    else toast('Utworzono', `${okN}/${results.length} zsynchronizowano — resztę ponów w profilu`, 'err');
+  });
+}
+
 /* ── realtime + ciche auto-odświeżanie listy ── */
 async function pollRefresh() {
   if (polling || document.hidden || editing) return;
@@ -837,6 +973,7 @@ async function startRealtime() {
     .on('postgres_changes', { event: '*', schema: 'strefa', table: 'developers' }, trigger)
     .on('postgres_changes', { event: '*', schema: 'strefa', table: 'dev_companies' }, trigger)
     .on('postgres_changes', { event: '*', schema: 'strefa', table: 'dev_skills' }, trigger)
+    .on('postgres_changes', { event: '*', schema: 'strefa', table: 'dev_meetings' }, trigger)
     .subscribe((s) => { if (s === 'SUBSCRIBED') pollRefresh(); });
   setInterval(pollRefresh, 60000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) pollRefresh(); });
@@ -880,6 +1017,7 @@ async function init() {
     else companyModal(null);
   });
   $('#btn-history')?.addEventListener('click', () => openHistory());
+  $('#btn-schedule-meeting')?.addEventListener('click', () => openScheduleMeetingModal());
   $('#btn-export').addEventListener('click', exportJSON);
   $('#btn-import-file').addEventListener('click', () => $('#file-input').click());
   $('#btn-import-legacy')?.addEventListener('click', importLegacy);

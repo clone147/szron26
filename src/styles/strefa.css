@@ -144,6 +144,8 @@
 .strefa-chip { display: inline-flex; align-items: center; gap: .3rem; font-size: var(--text-caption); font-weight: 600; padding: .15rem .5rem; border-radius: 999px; line-height: 1.4; }
 .strefa-chip--count { background: var(--color-ink-3); color: var(--color-text-inv-2); }
 .strefa-chip--ok { background: color-mix(in oklch, oklch(62% 0.16 150) 22%, transparent); color: oklch(80% 0.15 150); }
+.strefa-chip--pending { background: color-mix(in oklch, oklch(72% 0.14 60) 22%, transparent); color: oklch(82% 0.12 60); }
+.strefa-chip--error { background: color-mix(in oklch, oklch(60% 0.2 25) 20%, transparent); color: oklch(80% 0.14 25); }
 
 /* ── SIATKA EDYTOWALNA Z KLAWIATURY ── */
 .dgrid-wrap { overflow-x: auto; border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); }
@@ -359,6 +361,17 @@
 .meet-item--upcoming { border-left: 3px solid var(--color-accent); }
 .meet-item.is-done { opacity: .58; }
 .meet-done input { width: 16px; height: 16px; accent-color: oklch(62% 0.16 150); cursor: pointer; }
+
+/* modal „Umów spotkanie" (multi-programista) */
+.sm-devlist { max-height: 34vh; overflow-y: auto; border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); padding: .25rem; margin-top: .3rem; }
+.sm-group__name { font-size: var(--text-caption); font-weight: 700; color: var(--color-text-inv-3); text-transform: uppercase; letter-spacing: .04em; padding: .5rem .5rem .25rem; }
+.sm-dev { display: flex; align-items: center; gap: .5rem; padding: .35rem .5rem; border-radius: var(--radius-sm); cursor: pointer; }
+.sm-dev:hover { background: var(--color-ink-2); }
+.sm-dev > input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--color-accent); cursor: pointer; flex: none; }
+.sm-dev__name { flex: 1; min-width: 0; font-size: var(--text-s); }
+.sm-dev__pos { color: var(--color-text-inv-3); font-size: var(--text-caption); }
+.sm-dev__time { flex: none; width: 6.5rem; }
+.sm-dev__time:disabled { opacity: .3; }
 .task-item { display: flex; align-items: center; gap: .5rem; background: var(--color-ink); border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); padding: .45rem .6rem; margin-top: .4rem; }
 .task-item--overdue { border-color: color-mix(in oklch, oklch(60% 0.2 25) 45%, transparent); }
 .task-item.is-done .task-title { text-decoration: line-through; color: var(--color-text-inv-3); }
@@ -388,6 +401,8 @@
 .hist-item--skill-minus .hist-item__ico { background: color-mix(in oklch, oklch(60% 0.2 25) 20%, transparent); color: oklch(78% 0.14 25); }
 .hist-item--note .hist-item__ico { background: color-mix(in oklch, var(--color-brand) 22%, transparent); color: oklch(82% 0.09 265); }
 .hist-item--firma .hist-item__ico { background: color-mix(in oklch, var(--color-brand) 22%, transparent); color: oklch(82% 0.09 265); }
+.hist-item--meeting .hist-item__ico { background: var(--color-accent-soft); color: var(--color-accent); }
+.hist-item--meeting-cancel .hist-item__ico { background: color-mix(in oklch, oklch(60% 0.2 25) 20%, transparent); color: oklch(78% 0.14 25); }
 .hist-item__body { flex: 1; min-width: 0; }
 .hist-item__top { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
 .hist-dev { font-weight: 600; cursor: pointer; }
