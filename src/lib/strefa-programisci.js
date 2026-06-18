@@ -2,6 +2,9 @@
 // ku autonomicznemu programowaniu intencyjnemu. Dane w schemacie `strefa` (RLS), styl jak „Szkolenia".
 import { getClient, getSessionUser, isAllowed } from './supabase.js';
 import { akademia } from '../data/akademia.mjs';
+import flatpickr from 'flatpickr';
+import { Polish } from 'flatpickr/dist/l10n/pl.js';
+import 'flatpickr/dist/themes/dark.css';
 
 const sb = getClient();
 
@@ -15,6 +18,13 @@ const todayStr = () => new Date().toISOString().slice(0, 10);
 const pad2 = (n) => String(n).padStart(2, '0');
 const nowLocalDT = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
 const localDT = (v) => { const d = new Date(v); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
+
+/* ── pickery daty/czasu: flatpickr (kalendarz/zegar klikany myszką na desktopie,
+   natywny picker systemowy na telefonie); wpisywanie z klawiatury dalej działa ── */
+const FP_BASE = { locale: Polish, time_24hr: true, minuteIncrement: 5, allowInput: true, disableMobile: false };
+const fpDate = (el, defaultDate) => el && flatpickr(el, { ...FP_BASE, dateFormat: 'Y-m-d', defaultDate });
+const fpTime = (el, defaultDate) => el && flatpickr(el, { ...FP_BASE, enableTime: true, noCalendar: true, dateFormat: 'H:i', defaultDate });
+const fpDateTime = (el, defaultDate) => el && flatpickr(el, { ...FP_BASE, enableTime: true, dateFormat: 'Y-m-d\\TH:i', defaultDate });
 const todayLocal = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
 const curMonth = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`; };
 const monthRange = (ym) => { const [y, m] = ym.split('-').map(Number); return [new Date(y, m - 1, 1).toISOString(), new Date(y, m, 1).toISOString()]; };
@@ -528,7 +538,7 @@ function renderOverview(panel, d) {
         <div class="strefa-field"><label>Ulubiony agent</label><select class="strefa-select" id="o-agent"><option value="">—</option>${AGENTS.map((a) => `<option ${d.fav_agent === a ? 'selected' : ''}>${a}</option>`).join('')}</select></div>
         <div class="strefa-field"><label>Nastawienie</label><select class="strefa-select" id="o-mind"><option value="">—</option>${MINDSETS.map((m) => `<option ${d.mindset === m ? 'selected' : ''}>${m}</option>`).join('')}</select></div>
         <div class="strefa-field"><label>Abonament AI</label><select class="strefa-select" id="o-sub"><option value="">—</option>${SUBS.map((s) => `<option ${d.subscription === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
-        <div class="strefa-field"><label>Data abonamentu</label><input class="strefa-input" type="date" id="o-subdate" value="${d.subscription_start_date || todayLocal()}"></div>
+        <div class="strefa-field"><label>Data abonamentu</label><input class="strefa-input fp-d" type="text" id="o-subdate" placeholder="kliknij lub wpisz…"></div>
       </div>
       <div class="strefa-field" style="margin-top:var(--space-sm)"><label>Blokery</label><textarea class="strefa-textarea" id="o-block" placeholder="Co hamuje przed autonomią…">${esc(d.blockers || '')}</textarea></div>
       <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="o-obs-save">Zapisz obserwacje</button></div>
@@ -559,6 +569,7 @@ function renderOverview(panel, d) {
       blockers: $('#o-block', panel).value.trim() || null };
     if (await dbUpdateDev(d.id, patch)) { Object.assign(d, patch); toast('Zapisano', 'Obserwacje', 'ok'); renderAll(); }
   });
+  fpDate($('#o-subdate', panel), d.subscription_start_date || todayLocal());
   loadSkills(panel, d);
 }
 async function loadSkills(panel, d) {
@@ -596,19 +607,21 @@ async function renderListTab(panel, d, kind) {
   if (kind === 'notes') addSec.innerHTML = `<h3>Nowa notatka</h3><textarea class="strefa-textarea" id="x-note" placeholder="Obserwacja, ustalenie, wniosek…"></textarea>
     <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="x-clear">Wyczyść</button><button class="strefa-btn strefa-btn--accent strefa-btn--sm" id="x-add">Dodaj notatkę</button></div>`;
   if (kind === 'meetings') addSec.innerHTML = `<h3>Nowe spotkanie</h3><div class="strefa-grid2">
-    <div class="strefa-field"><label>Termin</label><input class="strefa-input" type="datetime-local" id="x-at" value="${nowLocalDT()}"></div>
+    <div class="strefa-field"><label>Termin</label><input class="strefa-input fp-dt" type="text" id="x-at" placeholder="kliknij lub wpisz…"></div>
     <div class="strefa-field"><label>Czas trwania</label><select class="strefa-select" id="x-dur">${[15, 30, 45, 60, 90].map((v) => `<option value="${v}" ${v === 30 ? 'selected' : ''}>${v} min</option>`).join('')}</select></div></div>
     <div class="strefa-field" style="margin-top:var(--space-sm)"><label>Tytuł</label><input class="strefa-input" id="x-title" placeholder="np. 1:1 — MCP setup"></div>
     <div class="strefa-field" style="margin-top:var(--space-sm)"><label>Notatki</label><textarea class="strefa-textarea" id="x-notes" placeholder="Agenda / ustalenia…"></textarea></div>
     <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--accent strefa-btn--sm" id="x-add">Dodaj spotkanie</button></div>`;
   if (kind === 'tasks') addSec.innerHTML = `<h3>Nowe zadanie</h3><div class="strefa-grid2">
     <div class="strefa-field"><label>Zadanie</label><input class="strefa-input" id="x-title" placeholder="np. Napisz feature z /loop"></div>
-    <div class="strefa-field"><label>Termin</label><input class="strefa-input" type="date" id="x-due" value="${todayLocal()}"></div></div>
+    <div class="strefa-field"><label>Termin</label><input class="strefa-input fp-d" type="text" id="x-due" placeholder="kliknij lub wpisz…"></div></div>
     <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--accent strefa-btn--sm" id="x-add">Dodaj zadanie</button></div>`;
   if (kind === 'prompts') addSec.innerHTML = `<h3>Nowy prompt</h3><div class="strefa-field"><label>Tytuł</label><input class="strefa-input" id="x-title" placeholder="np. Retry z exponential backoff"></div>
     <div class="strefa-field" style="margin-top:var(--space-sm)"><label>Treść promptu</label><textarea class="strefa-textarea" id="x-prompt" placeholder="Wklej najlepszy prompt…"></textarea></div>
     <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--accent strefa-btn--sm" id="x-add">Dodaj prompt (${fmtDate(todayStr())})</button></div>`;
   $('#x-clear', addSec)?.addEventListener('click', () => { const t = $('#x-note', addSec); if (t) t.value = ''; });
+  if (kind === 'meetings') fpDateTime($('#x-at', addSec), new Date());
+  if (kind === 'tasks') fpDate($('#x-due', addSec), new Date());
   let busy = false;
   $('#x-add', addSec)?.addEventListener('click', async () => {
     if (busy) return; busy = true; const btn = $('#x-add', addSec); btn.disabled = true;
@@ -672,10 +685,11 @@ async function loadList(d, kind) {
       const m = (data || []).find((x) => x.id === b.dataset.resched); if (!m) return;
       const box = openModal(`<div class="strefa-modal__head"><h2>Zmień termin</h2><button class="strefa-iconbtn" data-close-x>${ICO.x}</button></div>
         <div class="strefa-modal__body"><div class="strefa-grid2">
-          <div class="strefa-field"><label>Termin</label><input class="strefa-input" type="datetime-local" id="r-at" value="${localDT(m.meeting_at)}"></div>
+          <div class="strefa-field"><label>Termin</label><input class="strefa-input fp-dt" type="text" id="r-at" placeholder="kliknij lub wpisz…"></div>
           <div class="strefa-field"><label>Czas trwania</label><select class="strefa-select" id="r-dur">${[15, 30, 45, 60, 90].map((v) => `<option value="${v}" ${(m.duration_min || 30) === v ? 'selected' : ''}>${v} min</option>`).join('')}</select></div></div>
         <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--ghost" data-close-x>Anuluj</button><button class="strefa-btn strefa-btn--accent" id="r-save">Zapisz i zsynchronizuj</button></div></div>`);
       box.querySelectorAll('[data-close-x]').forEach((x) => x.addEventListener('click', closeModal));
+      fpDateTime($('#r-at', box), m.meeting_at);
       let busy = false;
       $('#r-save', box).addEventListener('click', async () => {
         if (busy) return; const at = $('#r-at', box).value; if (!at) return toast('Brak terminu', 'Podaj datę i godzinę', 'err');
@@ -887,8 +901,8 @@ function openScheduleMeetingModal() {
     <div class="strefa-modal__head"><div><h2>Umów spotkanie</h2><p>Wybierz programistów i ustaw terminy — trafią do Google Calendar</p></div><button class="strefa-iconbtn" data-close-x>${ICO.x}</button></div>
     <div class="strefa-modal__body">
       <div class="strefa-grid2">
-        <div class="strefa-field"><label>Data</label><input class="strefa-input" type="date" id="sm-date" value="${todayLocal()}"></div>
-        <div class="strefa-field"><label>Pierwsza godzina</label><input class="strefa-input" type="time" id="sm-time" value="10:00" step="900"></div>
+        <div class="strefa-field"><label>Data</label><input class="strefa-input fp-d" type="text" id="sm-date" placeholder="kliknij lub wpisz…"></div>
+        <div class="strefa-field"><label>Pierwsza godzina</label><input class="strefa-input fp-t" type="text" id="sm-time" placeholder="kliknij lub wpisz…"></div>
         <div class="strefa-field"><label>Czas trwania</label><select class="strefa-select" id="sm-dur">${[15, 30, 45, 60, 90].map((v) => `<option value="${v}" ${v === 30 ? 'selected' : ''}>${v} min</option>`).join('')}</select></div>
         <div class="strefa-field"><label>Tytuł (wspólny)</label><input class="strefa-input" id="sm-title" placeholder="np. 1:1"></div>
       </div>
@@ -900,7 +914,7 @@ function openScheduleMeetingModal() {
           ${g.devs.map((d) => `<label class="sm-dev" data-name="${esc(((d.first_name || '') + ' ' + (d.last_name || '') + ' ' + (d.position || '')).toLowerCase())}">
             <input type="checkbox" data-pick="${d.id}">
             <span class="sm-dev__name">${esc(d.first_name || '')} ${esc(d.last_name || '')}${d.position ? ` <span class="sm-dev__pos">${esc(d.position)}</span>` : ''}</span>
-            <input class="strefa-input sm-dev__time" type="time" step="900" value="" disabled aria-label="Godzina spotkania">
+            <input class="strefa-input fp-t sm-dev__time" type="text" value="" disabled aria-label="Godzina spotkania" placeholder="--:--">
           </label>`).join('')}
         </div>`).join('')}
       </div>
@@ -911,15 +925,25 @@ function openScheduleMeetingModal() {
       </div>
     </div>`);
   box.querySelectorAll('[data-close-x]').forEach((b) => b.addEventListener('click', closeModal));
+  fpDate($('#sm-date', box), todayLocal());
+  fpTime($('#sm-time', box), '10:00');
   const picks = () => $$('[data-pick]:checked', box);
   const addMin = (hhmm, min) => { const [h, m] = (hhmm || '10:00').split(':').map(Number); const t = (h * 60 + m + min) % 1440; return `${pad2(Math.floor(t / 60))}:${pad2(t % 60)}`; };
   const plural = (n) => n === 1 ? 'spotkanie' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'spotkania' : 'spotkań');
   function recalc() {
     const base = $('#sm-time', box).value || '10:00';
     const dur = +$('#sm-dur', box).value;
-    $$('[data-pick]', box).forEach((cb) => { const ti = cb.closest('.sm-dev').querySelector('.sm-dev__time'); ti.disabled = !cb.checked; });
+    $$('[data-pick]', box).forEach((cb) => {
+      const ti = cb.closest('.sm-dev').querySelector('.sm-dev__time');
+      ti.disabled = !cb.checked;
+      if (cb.checked && !ti._flatpickr) fpTime(ti);
+    });
     const checked = picks();
-    checked.forEach((cb, i) => { cb.closest('.sm-dev').querySelector('.sm-dev__time').value = addMin(base, i * dur); });
+    checked.forEach((cb, i) => {
+      const ti = cb.closest('.sm-dev').querySelector('.sm-dev__time');
+      const v = addMin(base, i * dur);
+      if (ti._flatpickr) ti._flatpickr.setDate(v, false); else ti.value = v;
+    });
     const n = checked.length;
     $('#sm-summary', box).textContent = n ? `Utworzysz ${n} ${plural(n)}` : 'Nikogo nie wybrano';
     const go = $('#sm-go', box); go.disabled = !n; go.textContent = n ? `Umów (${n})` : 'Umów';
