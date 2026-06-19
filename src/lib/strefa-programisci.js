@@ -171,18 +171,19 @@ function syncChip(m) {
 async function pullMeetings(d) {
   if (pullInFlight) return; // bez nakładających się pull-i przy szybkim przełączaniu zakładek
   pullInFlight = true;
-  const host = $('#list-sec');
-  let ind = null;
-  if (host) { ind = document.createElement('p'); ind.className = 'note-empty'; ind.style.cssText = 'display:flex;align-items:center;gap:.45rem;margin:0 0 .5rem'; ind.innerHTML = '<span class="strefa-spin"></span> Sprawdzam Google Calendar…'; host.prepend(ind); }
+  const ind = $('#meet-sync-ind'); // stały wskaźnik u góry panelu (nie znika przy reloadzie listy)
+  if (ind) { ind.textContent = 'Synchronizacja z Google Calendar…'; ind.hidden = false; }
+  const minShow = new Promise((r) => setTimeout(r, 600)); // żeby wskaźnik był zauważalny nawet przy szybkim sync
   try {
     const { data, error } = await sb.functions.invoke('strefa-meeting-sync', { body: { action: 'pull', developer_id: d.id } });
+    await minShow;
     if (!error && data?.success && (data.changed || data.deleted || data.unlinked)) {
       if (openDevId === d.id && activeTab === 'meetings') loadList(d, 'meetings');
       const gone = (data.deleted || 0) + (data.unlinked || 0);
       toast('Zsynchronizowano z Google', `${data.changed || 0} przestawionych, ${gone} odwołanych`, 'ok');
     }
   } catch (e) { /* cicho */ }
-  finally { ind?.remove(); pullInFlight = false; }
+  finally { const i = $('#meet-sync-ind'); if (i) i.hidden = true; pullInFlight = false; }
 }
 
 /* ── render: statystyki ── */
@@ -623,7 +624,7 @@ async function renderListTab(panel, d, kind) {
   const addSec = $('#add-sec', panel);
   if (kind === 'notes') addSec.innerHTML = `<h3>Nowa notatka</h3><textarea class="strefa-textarea" id="x-note" placeholder="Obserwacja, ustalenie, wniosek…"></textarea>
     <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="x-clear">Wyczyść</button><button class="strefa-btn strefa-btn--accent strefa-btn--sm" id="x-add">Dodaj notatkę</button></div>`;
-  if (kind === 'meetings') addSec.innerHTML = `<h3>Nowe spotkanie</h3><div class="strefa-grid2">
+  if (kind === 'meetings') addSec.innerHTML = `<div id="meet-sync-ind" class="sync-ind" hidden></div><h3>Nowe spotkanie</h3><div class="strefa-grid2">
     <div class="strefa-field"><label>Termin</label><input class="strefa-input fp-dt" type="text" id="x-at" placeholder="kliknij lub wpisz…"></div>
     <div class="strefa-field"><label>Czas trwania</label><select class="strefa-select" id="x-dur">${[15, 30, 45, 60, 90].map((v) => `<option value="${v}" ${v === 30 ? 'selected' : ''}>${v} min</option>`).join('')}</select></div></div>
     <div class="strefa-field" style="margin-top:var(--space-sm)"><label>Tytuł</label><input class="strefa-input" id="x-title" placeholder="np. 1:1 — MCP setup"></div>
