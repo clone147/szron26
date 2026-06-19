@@ -124,6 +124,10 @@
   box-shadow: 0 0 0 3px var(--color-accent-soft);
 }
 .strefa-input::placeholder, .strefa-textarea::placeholder { color: var(--color-text-inv-3); }
+/* select: bez natywnego (niższego) chromu macOS — własny chevron, równa wysokość z inputami */
+.strefa-select { appearance: none; -webkit-appearance: none; -moz-appearance: none; padding-right: 2rem; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23a9a9b5'%20stroke-width='2.4'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='m6%209%206%206%206-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right .6rem center; background-size: 14px; }
 
 /* ── lista szkoleń (akordeon) ── */
 .strefa-trainings { display: flex; flex-direction: column; gap: var(--space-sm); }

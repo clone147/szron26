@@ -24,7 +24,7 @@ const localDT = (v) => { const d = new Date(v); return `${d.getFullYear()}-${pad
 const FP_BASE = { locale: Polish, time_24hr: true, minuteIncrement: 5, allowInput: true, disableMobile: false };
 const fpDate = (el, defaultDate) => el && flatpickr(el, { ...FP_BASE, dateFormat: 'Y-m-d', defaultDate });
 const fpTime = (el, defaultDate) => el && flatpickr(el, { ...FP_BASE, enableTime: true, noCalendar: true, dateFormat: 'H:i', defaultDate });
-const fpDateTime = (el, defaultDate) => el && flatpickr(el, { ...FP_BASE, enableTime: true, dateFormat: 'Y-m-d\\TH:i', defaultDate });
+const fpDateTime = (el, defaultDate) => el && flatpickr(el, { ...FP_BASE, enableTime: true, dateFormat: 'Y-m-d\\TH:i', altInput: true, altFormat: 'd.m.Y, H:i', defaultDate });
 const todayLocal = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
 const curMonth = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`; };
 const monthRange = (ym) => { const [y, m] = ym.split('-').map(Number); return [new Date(y, m - 1, 1).toISOString(), new Date(y, m, 1).toISOString()]; };
