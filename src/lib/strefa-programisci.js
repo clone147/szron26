@@ -167,6 +167,21 @@ function syncChip(m) {
   const [cls, lbl] = SYNC_LBL[m.sync_status] || SYNC_LBL.pending;
   return `<span class="strefa-chip strefa-chip--${cls}" title="${esc(m.sync_error || lbl)}">${lbl}</span>`;
 }
+// Pull z Google: przy wejściu na zakładkę Spotkania sprawdź, czy ktoś nie przestawił/odwołał eventu w Google.
+async function pullMeetings(d) {
+  const host = $('#list-sec');
+  let ind = null;
+  if (host) { ind = document.createElement('p'); ind.className = 'note-empty'; ind.style.cssText = 'display:flex;align-items:center;gap:.45rem;margin:0 0 .5rem'; ind.innerHTML = '<span class="strefa-spin"></span> Sprawdzam Google Calendar…'; host.prepend(ind); }
+  try {
+    const { data, error } = await sb.functions.invoke('strefa-meeting-sync', { body: { action: 'pull', developer_id: d.id } });
+    if (!error && data?.success && (data.changed || data.deleted)) {
+      if (openDevId === d.id && activeTab === 'meetings') loadList(d, 'meetings');
+      toast('Zsynchronizowano z Google', `${data.changed || 0} przestawionych, ${data.deleted || 0} odwołanych`, 'ok');
+      return;
+    }
+  } catch (e) { /* cicho */ }
+  ind?.remove();
+}
 
 /* ── render: statystyki ── */
 function renderStats() {
@@ -628,7 +643,8 @@ async function renderListTab(panel, d, kind) {
     try { await addListItem(d, kind, addSec); await loadList(d, kind); }
     finally { busy = false; const b = $('#x-add', addSec); if (b) b.disabled = false; }
   });
-  loadList(d, kind);
+  if (kind === 'meetings') loadList(d, kind).then(() => pullMeetings(d));
+  else loadList(d, kind);
 }
 async function addListItem(d, kind, sec) {
   if (kind === 'notes') {
