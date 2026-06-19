@@ -76,7 +76,7 @@ const devMap = new Map();    // did -> developer
 let query = '';
 const openIds = new Set();
 let activeTd = null, editing = false;
-let polling = false, adding = false;
+let polling = false, adding = false, pullInFlight = false;
 let openDevId = null, activeTab = 'overview', tabBusy = false;
 const NAV = ['first_name', 'last_name', 'position', 'main_project', 'email', 'phone'];
 const MAXC = NAV.length - 1;
@@ -169,18 +169,20 @@ function syncChip(m) {
 }
 // Pull z Google: przy wejściu na zakładkę Spotkania sprawdź, czy ktoś nie przestawił/odwołał eventu w Google.
 async function pullMeetings(d) {
+  if (pullInFlight) return; // bez nakładających się pull-i przy szybkim przełączaniu zakładek
+  pullInFlight = true;
   const host = $('#list-sec');
   let ind = null;
   if (host) { ind = document.createElement('p'); ind.className = 'note-empty'; ind.style.cssText = 'display:flex;align-items:center;gap:.45rem;margin:0 0 .5rem'; ind.innerHTML = '<span class="strefa-spin"></span> Sprawdzam Google Calendar…'; host.prepend(ind); }
   try {
     const { data, error } = await sb.functions.invoke('strefa-meeting-sync', { body: { action: 'pull', developer_id: d.id } });
-    if (!error && data?.success && (data.changed || data.deleted)) {
+    if (!error && data?.success && (data.changed || data.deleted || data.unlinked)) {
       if (openDevId === d.id && activeTab === 'meetings') loadList(d, 'meetings');
-      toast('Zsynchronizowano z Google', `${data.changed || 0} przestawionych, ${data.deleted || 0} odwołanych`, 'ok');
-      return;
+      const gone = (data.deleted || 0) + (data.unlinked || 0);
+      toast('Zsynchronizowano z Google', `${data.changed || 0} przestawionych, ${gone} odwołanych`, 'ok');
     }
   } catch (e) { /* cicho */ }
-  ind?.remove();
+  finally { ind?.remove(); pullInFlight = false; }
 }
 
 /* ── render: statystyki ── */
