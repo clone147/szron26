@@ -58,8 +58,8 @@
   --space-xl:  2rem;
   --space-2xl: 3rem;
   --space-3xl: 4rem;
-  --space-4xl: clamp(3rem, 7vw, 6.25rem);     /* wewnętrzne bloki sekcji */
-  --space-sect: clamp(5rem, 13.8vw, 12.5rem); /* padding pionowy sekcji */
+  --space-4xl: clamp(2rem, 4.5vw, 4rem);      /* wewnętrzne bloki sekcji */
+  --space-sect: clamp(3.5rem, 8vw, 7.5rem);   /* padding pionowy sekcji */
 
   /* ── promienie ────────────────────────────────────── */
   --radius-sect: clamp(2rem, 5.5vw, 5rem);    /* zaokrąglenie sekcji ciemnych */

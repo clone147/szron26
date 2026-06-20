@@ -227,17 +227,17 @@ h1, h2, h3, h4 {
   position: sticky;
   top: 0;
   z-index: 0;
-  min-height: 100svh;
+  min-height: 82svh;
   display: flex;
   align-items: flex-end;
   background: var(--color-ink);
   color: var(--color-text-inv);
-  padding-top: calc(var(--nav-h) + clamp(2rem, 6vw, 5rem));
+  padding-top: calc(var(--nav-h) + clamp(1.5rem, 4vw, 3rem));
   padding-bottom: clamp(2.5rem, 5vw, 4.5rem);
 }
 
 .hero__title {
-  max-width: 17ch;
+  max-width: 22ch;
   font-size: var(--text-display);
   letter-spacing: -0.02em;
 }
@@ -260,7 +260,7 @@ h1, h2, h3, h4 {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   gap: clamp(1.5rem, 3vw, 3rem);
-  margin-top: clamp(2.5rem, 5.5vw, 5rem);
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
 }
 
 /* panel-grafika: czysty CSS, bez fałszywych zrzutów */
@@ -933,8 +933,8 @@ h1, h2, h3, h4 {
 /* ── nagłówek strony wewnętrznej (ciemny baner) ──────── */
 .page-hero {
   background: var(--color-ink); color: var(--color-text-inv);
-  padding-top: calc(var(--nav-h) + clamp(2.5rem, 7vw, 5.5rem));
-  padding-bottom: clamp(4.5rem, 10vw, 8rem);
+  padding-top: calc(var(--nav-h) + clamp(1.75rem, 4.5vw, 3.5rem));
+  padding-bottom: clamp(3rem, 6vw, 5rem);
 }
 .page-hero .eyebrow { color: var(--color-text-inv-2); margin-bottom: var(--space-lg); }
 .page-hero__title { font-size: var(--text-display); max-width: 20ch; letter-spacing: -0.02em; }
