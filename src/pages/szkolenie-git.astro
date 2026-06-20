@@ -2,6 +2,7 @@
 import Interior from '../layouts/Interior.astro';
 ---
 <Interior
+  updated="2026-06-20"
   title="Claude Code i Git — automatyczne commity | Akademia SZRON"
   description="Jak Claude Code prowadzi kontrolę wersji: automatyczne commity, porządkowanie historii, konflikty, Pull Requesty i bisect. Praktyczne komendy i pułapki."
   eyebrow="Akademia · Claude Code i Git"
@@ -65,6 +66,17 @@ claude "rozwiaz konflikty w plikach i zachowaj najlepsze rozwiazania z obu wersj
         <p>Claude analizuje commity i generuje opis PR z listą zmian, informacją o testach i breaking changes.</p>
         <pre><code>claude "stworz PR z opisem zmian"</code></pre>
 
+        <h3>Recenzja kodu komendą /code-review</h3>
+        <p>Wbudowana komenda <code>/code-review</code> recenzuje diff prosto w terminalu — szuka bugów oraz miejsc do poprawy pod kątem reuse, uproszczenia i wydajności. Jako cel podajesz ścieżkę, numer PR, nazwę gałęzi albo zakres refów (np. <code>main...feature</code>). Flaga <code>--comment</code> publikuje uwagi jako komentarze inline na PR, a <code>--fix</code> od razu nanosi proponowane poprawki.</p>
+        <pre><code># Recenzja zakresu refow
+claude /code-review main...feature
+
+# Recenzja PR z komentarzami inline
+claude /code-review 1234 --comment
+
+# Recenzja i automatyczne naniesienie poprawek
+claude /code-review --fix</code></pre>
+
         <h3>Git bisect — szukanie commita z błędem</h3>
         <p>Agent pomaga przeszukać historię, by znaleźć commit, który wprowadził regresję.</p>
         <pre><code># Szukanie blednego commita
@@ -97,7 +109,17 @@ claude "sprawdz, czy galaz jest gotowa do scalenia, wyczysc historie jesli trzeb
           <li><strong>Mów naturalnie.</strong> Claude rozumie kontekst projektu — działają zwroty typu „posprzątaj ten bałagan w commitach".</li>
           <li><strong>CLAUDE.md dla konwencji Git.</strong> Dodaj sekcję z konwencjami commitów — agent automatycznie będzie ich przestrzegał.</li>
           <li><strong>Claude i git hooks.</strong> Agent potrafi tworzyć i edytować git hooks: automatyczne formatowanie, testy przed commitem, sprawdzanie konwencji.</li>
+          <li><strong>Claude w CI przez GitHub Actions.</strong> Action <code>anthropics/claude-code-action@v1</code> odpala Claude w pipeline przy każdym PR — naturalne przedłużenie automatyzacji gałęzi na poziom CI.</li>
         </ul>
+
+        <h2>Integracja z GitHub</h2>
+        <p>Claude Code potrafi pracować bezpośrednio na GitHubie, nie tylko w terminalu. Komenda <code>/install-github-app</code> instaluje GitHub App i konfiguruje sekret w repozytorium. Od tego momentu wystarczy oznaczyć <code>@claude</code> w komentarzu pod PR-em lub issue — agent przeanalizuje wątek, utworzy PR, zaimplementuje zmiany i naprawi zgłoszone bugi.</p>
+        <pre><code># Jednorazowa konfiguracja w repozytorium
+claude /install-github-app</code></pre>
+        <div class="callout"><p><strong>Wskazówka:</strong> Pod spodem działa GitHub Actions — możesz też ręcznie dodać do workflow action <code>anthropics/claude-code-action@v1</code>, żeby uruchamiać Claude w CI przy każdym PR.</p></div>
+
+        <h3>Automatyczne review PR (Team/Enterprise)</h3>
+        <p>Na planach Team i Enterprise dostępne jest GitHub Code Review. Po włączeniu przez administratora review odpala się automatycznie przy każdym PR lub pushu, albo ręcznie komentarzem <code>@claude review</code>. Findingi pojawiają się jako komentarze inline w PR. Zachowanie konfigurujesz przez pliki <code>CLAUDE.md</code> i <code>REVIEW.md</code> w repozytorium.</p>
       </div>
     </div>
   </section>

@@ -5,6 +5,7 @@ import Interior from '../layouts/Interior.astro';
   title="MCP Supabase + Claude Code | Akademia SZRON"
   description="Połącz Supabase z Claude Code przez MCP: instalacja serwera, tryb read-only, project-ref scoping i bezpieczeństwo. Nie łącz z produkcją — tylko dev."
   eyebrow="Akademia · MCP Supabase"
+  updated="2026-06-20"
   heading="MCP Supabase: agent na Waszej bazie — z trybem read-only."
   lead="MCP Supabase daje Claude Code bezpośredni dostęp do bazy w naturalnym języku: listowanie tabel, zapytania, migracje, generowanie typów TypeScript. Klucz to bezpieczna konfiguracja — tryb read-only i ograniczenie do jednego projektu, nigdy na produkcji."
 >
@@ -32,22 +33,27 @@ import Interior from '../layouts/Interior.astro';
 
         <div class="callout"><p><strong>Uwaga (bezpieczeństwo):</strong> serwer MCP ma realny dostęp do bazy. Używaj go tylko na środowiskach deweloperskich — nie łącz agenta z produkcją. Domyślnie uruchamiaj w trybie read-only i ograniczaj zakres do jednego projektu przez project-ref.</p></div>
 
+        <div class="callout"><p><strong>Aktualizacja:</strong> aktualna dokumentacja MCP Supabase jest pod <code>supabase.com/docs/guides/ai-tools/mcp</code>. Dla serwera zdalnego ten sam zakres ustawisz parametrami w URL: <code>read_only=true</code>, <code>project_ref=&lt;id&gt;</code> oraz <code>features=&lt;groups&gt;</code>.</p></div>
+
         <h2>Wymagania</h2>
         <ul>
           <li>Node.js w wersji 20 lub nowszej (do uruchomienia serwera przez npx).</li>
           <li>Personal access token z panelu Supabase: Settings → Access Tokens → Create new token.</li>
           <li>Project ref bazy: Settings → General → Reference ID.</li>
+          <li>Przy lokalnym developmencie z Supabase CLI serwer MCP jest dostępny pod <code>http://localhost:54321/mcp</code> — nie potrzebujesz wtedy tokenu ani project-ref.</li>
         </ul>
         <pre><code># weryfikacja wersji Node.js
 node --version</code></pre>
 
         <h2>Instalacja serwera</h2>
-        <p>Najprostsze podejście to dodanie serwera bezpośrednio w Claude Code z tokenem dostępu, w trybie tylko do odczytu i z ograniczeniem do jednego projektu:</p>
+        <p>Od października 2025 podstawową metodą w dokumentacji jest zdalny (hosted) serwer MCP — dodajesz go jednym poleceniem, bez lokalnego procesu npx:</p>
+        <pre><code>claude mcp add --transport http supabase https://mcp.supabase.com/mcp</code></pre>
+        <p>Lokalny serwer stdio przez npx wciąż działa jako alternatywa — z tokenem dostępu, w trybie tylko do odczytu i z ograniczeniem do jednego projektu:</p>
         <pre><code>claude mcp add supabase -- npx -y @supabase/mcp-server-supabase@latest \
   --access-token=TWOJ_TOKEN \
   --read-only \
   --project-ref=TWOJ_PROJECT_REF</code></pre>
-        <div class="callout"><p><strong>Aktualizacja:</strong> serwer uruchamiaj jako <code>npx -y @supabase/mcp-server-supabase@latest --access-token=&lt;token&gt;</code>. Flaga <code>--read-only</code> wymusza tylko odczyt, a <code>--project-ref</code> ogranicza dostęp do jednej bazy. Token możesz też przekazać przez zmienną środowiskową <code>SUPABASE_ACCESS_TOKEN</code> zamiast w argumencie.</p></div>
+        <div class="callout"><p><strong>Aktualizacja:</strong> dla serwera zdalnego domyślną autoryzacją jest OAuth — przy pierwszym połączeniu logujesz się przez przeglądarkę, bez ręcznego PAT. Personal access token pozostaje fallbackiem dla CI. Przy lokalnym npx serwer uruchamiaj jako <code>npx -y @supabase/mcp-server-supabase@latest --access-token=&lt;token&gt;</code>; token możesz też przekazać przez zmienną środowiskową <code>SUPABASE_ACCESS_TOKEN</code> zamiast w argumencie.</p></div>
 
         <h3>Alternatywa — przez Claude Desktop</h3>
         <p>Możesz najpierw skonfigurować serwer w Claude Desktop, a potem zaimportować go do Claude Code. W pliku konfiguracyjnym Claude Desktop dodaj wpis serwera (klamry zakodowane encjami, w realnym pliku JSON użyj zwykłych nawiasów):</p>

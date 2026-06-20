@@ -7,6 +7,7 @@ const related = akademia.filter((a) => ['lm-studio', 'claude-code-bezpieczenstwo
   title="Lokalny LLM — llama-server | Akademia SZRON"
   description="Przewodnik po llama-server (llama.cpp): kompilacja z CUDA/Metal/ROCm, modele GGUF, continuous batching, flagi, WebUI i API zgodne z OpenAI. Modele w firmie."
   eyebrow="Akademia · Lokalne modele"
+  updated="2026-06-20"
   heading="Lokalny LLM w firmie — llama-server od podstaw."
   lead="Jeśli szukasz maksymalnej wydajności, elastyczności i prawdziwej współbieżności na własnym sprzęcie, odpowiedzią jest llama-server z projektu llama.cpp. Poniżej kompilacja, modele GGUF, flagi uruchomienia i dostęp przez API zgodne z OpenAI."
 >
@@ -73,8 +74,11 @@ const related = akademia.filter((a) => ['lm-studio', 'claude-code-bezpieczenstwo
       <div class="prose rv">
         <p>Budujemy oprogramowanie bezpośrednio ze źródła, aby zapewnić maksymalną optymalizację dla sprzętu. Potrzebujesz <code>git</code>, <code>cmake</code> i odpowiedniego zestawu narzędzi deweloperskich.</p>
         <h3>1. Klonowanie repozytorium</h3>
-        <pre><code>git clone https://github.com/ggerganov/llama.cpp.git
+        <pre><code>git clone https://github.com/ggml-org/llama.cpp
 cd llama.cpp</code></pre>
+        <div class="callout">
+          <p><strong>Aktualizacja:</strong> repozytorium przeniesiono do organizacji <code>ggml-org</code>. Stary adres <code>github.com/ggerganov/llama.cpp</code> tylko przekierowuje — używaj <code>github.com/ggml-org/llama.cpp</code>.</p>
+        </div>
         <h3>2. Kompilacja</h3>
         <p>Proces różni się w zależności od posiadanego GPU.</p>
         <p>Apple Silicon (Metal):</p>
@@ -103,6 +107,7 @@ cmake --build build --config Release -j</code></pre>
         <h3>Najważniejsze flagi</h3>
         <ul>
           <li><code>-m, --model [SCIEZKA]</code> — <strong>wymagane:</strong> ścieżka do pliku modelu GGUF.</li>
+          <li><code>-hf, --hf-repo &lt;user&gt;/&lt;model&gt;[:quant]</code> — alternatywa dla <code>-m</code>: pobiera i uruchamia model GGUF prosto z Hugging Face, bez ręcznego ściągania pliku.</li>
           <li><code>-ngl, --n-gpu-layers [LICZBA]</code> — <strong>krytyczne:</strong> ile warstw modelu trafia do VRAM GPU. Ustawiaj wysoko (np. 99 lub 1000), aby załadować jak najwięcej na GPU.</li>
           <li><code>--parallel [LICZBA]</code> — ile zapytań (slotów) może być przetwarzanych równolegle.</li>
           <li><code>--host</code> / <code>--port</code> — adres i port nasłuchu (np. <code>0.0.0.0</code> i <code>8080</code>).</li>
@@ -155,7 +160,7 @@ cmake --build build --config Release -j</code></pre>
         <pre><code>git pull
 cmake --build build --config Release -j</code></pre>
         <h3>Dokumentacja</h3>
-        <p>Wszystkie dostępne endpointy (<code>/completion</code>, <code>/chat/completions</code>) znajdziesz w oficjalnej dokumentacji projektu na <a href="https://github.com/ggerganov/llama.cpp">github.com/ggerganov/llama.cpp</a>.</p>
+        <p>Wszystkie dostępne endpointy (<code>/completion</code>, <code>/chat/completions</code>) znajdziesz w oficjalnej dokumentacji projektu na <a href="https://github.com/ggml-org/llama.cpp">github.com/ggml-org/llama.cpp</a>.</p>
       </div>
     </div>
   </section>

@@ -3,8 +3,9 @@ import Interior from '../layouts/Interior.astro';
 ---
 <Interior
   title="Serwery MCP — Chrome DevTools MCP | Akademia SZRON"
-  description="Model Context Protocol rozszerza Claude Code o zewnętrzne narzędzia. Instalacja Chrome DevTools MCP krok po kroku: Node 20.19+, Chrome i przykłady."
+  description="Model Context Protocol rozszerza Claude Code o zewnętrzne narzędzia. Instalacja Chrome DevTools MCP krok po kroku: Node LTS, Chrome i przykłady."
   eyebrow="Akademia · Serwery MCP"
+  updated="2026-06-20"
   heading="Serwery MCP: rozszerz możliwości Claude Code."
   lead="Model Context Protocol to standardowy sposób łączenia narzędzi AI z zewnętrznymi systemami. Dzięki serwerom MCP Claude Code kontroluje przeglądarkę, sięga do baz danych i automatyzuje złożone zadania. Na warsztat bierzemy Chrome DevTools MCP — agent testuje i debuguje aplikacje webowe wprost w Chrome."
 >
@@ -14,7 +15,7 @@ import Interior from '../layouts/Interior.astro';
       <div class="proof-strip rv">
         <div><strong>Rozszerzalność</strong><span>nowe możliwości dla agenta</span></div>
         <div><strong>Chrome DevTools MCP</strong><span>testy, debug i wydajność w przeglądarce</span></div>
-        <div><strong>Node 20.19+</strong><span>i zainstalowany Google Chrome</span></div>
+        <div><strong>Node LTS</strong><span>i zainstalowany Google Chrome</span></div>
       </div>
     </div>
   </section>
@@ -41,7 +42,7 @@ import Interior from '../layouts/Interior.astro';
 
         <h3>Wymagania</h3>
         <ul>
-          <li>Node.js w wersji 20.19 lub nowszej (maintenance LTS).</li>
+          <li>Node.js w aktualnej wersji LTS.</li>
           <li>Zainstalowany Google Chrome (wersja stable lub nowsza).</li>
           <li>Claude Code — zamknij go przed instalacją serwera.</li>
         </ul>
@@ -51,10 +52,19 @@ node --version</code></pre>
         <h3>Instalacja</h3>
         <p>Zamknij Claude Code, a następnie uruchom w terminalu:</p>
         <pre><code>claude mcp add chrome-devtools --scope user npx chrome-devtools-mcp@latest</code></pre>
-        <div class="callout"><p><strong>Aktualizacja:</strong> w aktualnej składni nie używaj separatora <code>--</code> przed <code>npx</code> — komenda to <code>claude mcp add chrome-devtools --scope user npx chrome-devtools-mcp@latest</code>. Wymagany jest Node.js 20.19 lub nowszy oraz zainstalowany Chrome.</p></div>
+        <div class="callout"><p><strong>Aktualizacja:</strong> kanoniczna składnia stdio ma separator: <code>claude mcp add [options] &lt;name&gt; -- &lt;command&gt; [args...]</code>. Separator <code>--</code> jest opcjonalny przy prostym <code>npx</code> bez flag, ale <strong>wymagany</strong>, gdy przekazujesz serwerowi flagi z myślnikiem — inaczej trafią one do <code>claude mcp add</code>, a nie do serwera. Wymagane jest aktualne LTS Node.js oraz zainstalowany Chrome.</p></div>
         <p>Aby wyłączyć telemetrię, dołącz flagę serwera:</p>
-        <pre><code>claude mcp add chrome-devtools --scope user npx chrome-devtools-mcp@latest --no-usage-statistics</code></pre>
+        <pre><code>claude mcp add chrome-devtools --scope user -- npx chrome-devtools-mcp@latest --no-usage-statistics</code></pre>
         <div class="callout"><p><strong>Uwaga:</strong> po instalacji uruchom Claude Code ponownie, aby serwer MCP został wczytany.</p></div>
+
+        <h3>Instalacja jako plugin (rekomendowana)</h3>
+        <p>Obecnie zalecanym sposobem jest instalacja przez marketplace pluginów. Jeśli serwer dodałeś wcześniej przez CLI, najpierw go usuń, a potem:</p>
+        <pre><code># jeśli był dodany przez CLI — najpierw usuń
+claude mcp remove chrome-devtools
+
+# w Claude Code:
+/plugin marketplace add ChromeDevTools/chrome-devtools-mcp
+/plugin install chrome-devtools-mcp@chrome-devtools-plugins</code></pre>
 
         <h2>Przykłady użycia</h2>
         <ul>

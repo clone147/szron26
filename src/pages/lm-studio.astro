@@ -9,6 +9,7 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
   eyebrow="Akademia · Lokalne modele"
   heading="LM Studio — modele LLM bez chmury, na Twoim sprzęcie."
   lead="Darmowa aplikacja desktop do uruchamiania zaawansowanych modeli językowych lokalnie: pełna prywatność, zgodność z RODO, API zgodne z OpenAI na localhost. Poniżej instalacja, korzyści dla firm oraz modele, które warto znać."
+  updated="2026-06-20"
 >
   <!-- proof -->
   <section class="sect" style="padding-bottom:0">
@@ -37,6 +38,9 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
           <li><strong>Korzyści biznesowe</strong> — brak vendor lock-in, pełna kontrola i customizacja, działa na sprzęcie konsumenckim (16 GB RAM oraz 4 GB+ VRAM).</li>
         </ul>
         <div class="callout">
+          <p><strong>Nowości 2026:</strong> OAuth dla serwerów MCP, tensor parallelism (rozkładanie modelu na wiele GPU), aplikacja mobilna oraz natywne użycie modeli LM Studio w Claude Code.</p>
+        </div>
+        <div class="callout">
           <p><strong>W skrócie:</strong> LM Studio demokratyzuje dostęp do LLM i sprawdza się w branżach z wymogami prywatności — dane nie opuszczają komputera, a istniejące narzędzia podłączasz przez API zgodne z OpenAI.</p>
         </div>
       </div>
@@ -53,6 +57,7 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
       <div class="prose rv">
         <p>Przejdź na <a href="https://lmstudio.ai">lmstudio.ai</a> i pobierz wersję dla swojego systemu (macOS, Windows lub Linux).</p>
         <ul>
+          <li><strong>Aktualna wersja:</strong> linia 0.4.x (m.in. 0.4.16 z czerwca 2026).</li>
           <li><strong>Rozmiar instalatora:</strong> około 400 MB.</li>
           <li><strong>Wymagania rekomendowane:</strong> 16 GB RAM oraz 4 GB+ VRAM.</li>
           <li><strong>Po instalacji:</strong> wybierz model z wbudowanej biblioteki, pobierz go i uruchom lokalnie.</li>
@@ -67,12 +72,12 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
     <div class="container">
       <div class="sect-head">
         <p class="eyebrow rv" data-scramble>03 / Model · GLM (kodowanie)</p>
-        <h2 class="sect-title sect-title--s ws" id="glm">GLM 4.6 i GLM 4.7 — mistrzowie kodowania.</h2>
+        <h2 class="sect-title sect-title--s ws" id="glm">Linia GLM-5 — aktualni mistrzowie kodowania.</h2>
       </div>
       <div class="prose rv">
-        <p>GLM 4.6 (open-weight model od Zhipu AI) został wydany 30 września 2025, oferuje kontekst 200K tokenów i wynik 82,8% na LiveCodeBench. Nowszy <strong>GLM 4.7</strong> (22 grudnia 2025) osiąga <strong>84,9%</strong> na LiveCodeBench — to aktualny lider kodowania, również przy kontekście 200K tokenów.</p>
+        <p>GLM 4.6 (open-weight model od Zhipu AI) został wydany 30 września 2025, oferuje kontekst 200K tokenów i wynik 82,8% na LiveCodeBench. GLM 4.7 (22 grudnia 2025) osiągał 84,9% na LiveCodeBench. Oba zostały już przewyższone przez <strong>linię GLM-5</strong> (m.in. GLM-5.2) — to obecnie wiodący open-weight do kodowania, na licencji MIT, z kontekstem rozszerzonym do 1M tokenów.</p>
         <div class="callout">
-          <p><strong>Kompatybilność:</strong> sprawdź status uruchamiania w LM Studio (zgłoszenie #1061). Alternatywy: <code>vLLM</code>, <code>SGLang</code> lub API z <code>docs.z.ai</code>. Model ma też natywną integrację w Claude Code.</p>
+          <p><strong>Kompatybilność:</strong> modele GLM są obecnie szeroko wspierane w LM Studio. Alternatywy: <code>vLLM</code>, <code>SGLang</code> lub API z <code>docs.z.ai</code>. Model ma też natywną integrację w Claude Code.</p>
         </div>
       </div>
     </div>
@@ -83,10 +88,10 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
     <div class="container">
       <div class="sect-head">
         <p class="eyebrow rv" data-scramble>04 / Model · MiniMax (agenty)</p>
-        <h2 class="sect-title ws" id="minimax">MiniMax M2 i M2.1 — mistrzowie agentów.</h2>
+        <h2 class="sect-title ws" id="minimax">MiniMax M2 i nowsze — mistrzowie agentów.</h2>
       </div>
       <div class="prose rv">
-        <p>MiniMax M2 został wydany 27 października 2025. To architektura MoE: <strong>230B parametrów total, 10B aktywnych</strong>, na licencji MIT, w czołówce rankingu Artificial Analysis. Koszt rzędu $0.30/$1.20 za milion tokenów to ułamek ceny modeli komercyjnych. Nowsza wersja <strong>MiniMax M2.1</strong> ukazała się 23 grudnia 2025.</p>
+        <p>MiniMax M2 został wydany 27 października 2025. To architektura MoE: <strong>230B parametrów total, 10B aktywnych</strong>, na licencji MIT, w czołówce rankingu Artificial Analysis. Koszt rzędu $0.30/$1.20 za milion tokenów to ułamek ceny modeli komercyjnych. Wersja M2.1 ukazała się 23 grudnia 2025, a jej następcą jest <strong>MiniMax M2.7</strong> (marzec 2026) — to aktualne wydanie linii.</p>
         <div class="callout">
           <p><strong>Status LM Studio:</strong> wsparcie dla MiniMax M2 zostało dodane w wersji 0.3.31 — działa od tego wydania w górę. Dla starszych wersji alternatywy to <code>vLLM</code> oraz <code>SGLang</code> (zalecany dla parsowania wywołań narzędzi).</p>
         </div>
@@ -104,8 +109,8 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
       <div class="prose rv">
         <ul>
           <li><strong>LM Studio</strong> — demokratyzuje dostęp do LLM, idealne dla branż z wymogami prywatności; API zgodne z OpenAI na <code>localhost:1234</code>.</li>
-          <li><strong>GLM 4.7</strong> — aktualny lider kodowania (84,9% LiveCodeBench), kontekst 200K tokenów.</li>
-          <li><strong>MiniMax M2 / M2.1</strong> — mistrz zadań agentowych, MoE 230B/10B, działa w LM Studio 0.3.31+, ułamek ceny modeli komercyjnych.</li>
+          <li><strong>Linia GLM-5</strong> — aktualny lider kodowania open-weight (przewyższa GLM 4.7), licencja MIT, kontekst do 1M tokenów.</li>
+          <li><strong>MiniMax M2 / M2.7</strong> — mistrz zadań agentowych, MoE 230B/10B, działa w LM Studio 0.3.31+, ułamek ceny modeli komercyjnych.</li>
         </ul>
       </div>
     </div>

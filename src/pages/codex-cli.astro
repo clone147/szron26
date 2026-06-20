@@ -7,16 +7,17 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
   title="OpenAI Codex CLI — instalacja i komendy | Akademia SZRON"
   description="Przewodnik po OpenAI Codex CLI: instalacja przez npm, config.toml, tryby zatwierdzania, komendy sesji, MCP i kontrola przeglądarki. Agent kodujący w terminalu."
   eyebrow="Akademia · Narzędzia agentowe"
+  updated="2026-06-20"
   heading="OpenAI Codex CLI — autonomiczny agent w terminalu."
-  lead="Codex CLI to open-source agent kodujący napędzany modelem o3: buduje projekty od zera, refaktoryzuje, debuguje i integruje się z MCP. Poniżej instalacja, plik konfiguracyjny, tryby zatwierdzania i komendy, które realnie wykorzystujemy."
+  lead="Codex CLI to open-source agent kodujący napędzany rodziną GPT-5-Codex: buduje projekty od zera, refaktoryzuje, debuguje i integruje się z MCP. Poniżej instalacja, plik konfiguracyjny, tryby zatwierdzania i komendy, które realnie wykorzystujemy."
 >
   <!-- proof -->
   <section class="sect" style="padding-bottom:0">
     <div class="container">
       <div class="proof-strip rv">
-        <div><strong>Model o3</strong><span>GA od kwietnia 2025</span></div>
+        <div><strong>GPT-5-Codex</strong><span>domyślna rodzina modeli</span></div>
         <div><strong>Open-source</strong><span>licencja Apache 2.0</span></div>
-        <div><strong>128K tokenów</strong><span>kontekstu w sesji</span></div>
+        <div><strong>400K tokenów</strong><span>kontekstu w sesji</span></div>
       </div>
     </div>
   </section>
@@ -29,7 +30,7 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
         <h2 class="sect-title sect-title--s ws" id="czym">Agent, który prowadzi projekt od zera po produkcję.</h2>
       </div>
       <div class="prose rv">
-        <p>OpenAI Codex CLI to zaawansowane narzędzie agentowe do autonomicznego kodowania w terminalu, napędzane modelem o3 i dedykowanymi modelami kodującymi. Jest open-source (Apache 2.0), działa na macOS, Linux i Windows przez WSL. Wersja GA z kwietnia 2025 dodała pełne wsparcie macOS i Linux, SDK TypeScript oraz integrację z serwerami MCP.</p>
+        <p>OpenAI Codex CLI to zaawansowane narzędzie agentowe do autonomicznego kodowania w terminalu, napędzane rodziną modeli GPT-5-Codex dostrojonych do zadań inżynieryjnych. Jest open-source (Apache 2.0), działa natywnie na macOS, Linux i Windows. Domyślnym modelem jest dziś linia GPT-5.x-Codex (GPT-5-Codex pojawił się we wrześniu 2025, kolejne wersje GPT-5.x-Codex w 2026); modele o3 i codex-1 to era research preview z 2025.</p>
         <p>Kluczowe możliwości:</p>
         <ul>
           <li>Budowanie projektów od zera.</li>
@@ -49,14 +50,14 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
   <section class="sect sect--dark" aria-labelledby="model">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Model · o3 (2025)</p>
+        <p class="eyebrow rv" data-scramble>02 / Model · GPT-5-Codex</p>
         <h2 class="sect-title ws" id="model">Model zoptymalizowany pod inżynierię oprogramowania.</h2>
       </div>
       <div class="prose rv">
         <ul>
           <li>Zoptymalizowany pod kątem długich sesji kodowania.</li>
-          <li>Dedykowane modele Codex dostrojone do zadań inżynieryjnych.</li>
-          <li>Wspiera kontekst do 128K tokenów.</li>
+          <li>Rodzina GPT-5-Codex dostrojona do zadań inżynieryjnych — GPT-5-Codex od września 2025, kolejne wersje GPT-5.x-Codex w 2026.</li>
+          <li>Modele GPT-5.x wspierają kontekst do 400K tokenów (128K dotyczyło modeli z 2025).</li>
         </ul>
         <p>Model dynamicznie alokuje czas „myślenia" i automatycznie dostosowuje zasoby do skomplikowania problemu — od krótkich odpowiedzi po długie sesje nad złożonym zadaniem.</p>
       </div>
@@ -68,12 +69,12 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
     <div class="container">
       <div class="sect-head">
         <p class="eyebrow rv" data-scramble>03 / Instalacja · macOS, Linux, WSL</p>
-        <h2 class="sect-title sect-title--s ws" id="instalacja">Node.js 20+, a potem jedna komenda npm.</h2>
+        <h2 class="sect-title sect-title--s ws" id="instalacja">Node.js 22+, a potem jedna komenda npm.</h2>
       </div>
       <div class="prose rv">
         <h3>Wymagania systemowe</h3>
         <ul>
-          <li><strong>Node.js 20+</strong> — wymagana nowsza wersja.</li>
+          <li><strong>Node.js 22+</strong> — wymagana przy instalacji przez npm.</li>
           <li><strong>npm</strong> lub <strong>npx</strong> (instalowane razem z Node.js).</li>
           <li><strong>System:</strong> macOS, Linux lub Windows (przez WSL).</li>
           <li><strong>Git 2.23+</strong>, min. 4 GB RAM (8 GB rekomendowane).</li>
@@ -81,7 +82,7 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
 
         <h3>1. Instalacja Node.js</h3>
         <p>Windows: pobierz instalator Node.js 22 ze strony nodejs.org. Linux (Ubuntu/Debian):</p>
-        <pre><code>curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+        <pre><code>curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt-get install -y nodejs</code></pre>
         <p>macOS (Homebrew):</p>
         <pre><code>brew install node</code></pre>
@@ -91,7 +92,7 @@ sudo apt-get install -y nodejs</code></pre>
         <pre><code>npm install -g &#64;openai/codex</code></pre>
         <p>Po instalacji komenda <code>codex</code> działa z dowolnego miejsca w systemie. Paczka <code>&#64;openai/codex</code> jest aktywnie rozwijana.</p>
         <div class="callout">
-          <p><strong>Windows — eksperymentalnie:</strong> natywne wsparcie Windows jest wciąż eksperymentalne. Zalecany WSL: uruchom <code>wsl --install</code>, a następnie zainstaluj Node.js i Codex CLI wewnątrz WSL.</p>
+          <p><strong>Windows — natywnie:</strong> Codex działa natywnie w PowerShell z sandboxem Windows. WSL2 pozostaje opcją (np. dla zgodności z narzędziami linuksowymi), ale nie jest już wymogiem — w razie potrzeby uruchom <code>wsl --install</code> i zainstaluj Node.js oraz Codex CLI wewnątrz WSL.</p>
         </div>
       </div>
     </div>
@@ -107,15 +108,15 @@ sudo apt-get install -y nodejs</code></pre>
       <div class="prose rv">
         <p>Plik konfiguracyjny: <code>~/.codex/config.toml</code>.</p>
         <h3>1. Domyślny model</h3>
-        <pre><code>[model]
-default = "codex-mini-latest"  # lub "o3-mini"</code></pre>
-        <h3>2. Tryby zatwierdzania</h3>
-        <pre><code>[approvals]
-mode = "suggest"  # "suggest", "auto-edit", "full-auto"</code></pre>
+        <pre><code>model = "gpt-5-codex"  # lub inny wariant z rodziny gpt-5.x-codex</code></pre>
+        <p>Po przepisaniu CLI na Rust model ustawia się kluczem najwyższego poziomu <code>model</code> — bez tabeli <code>[model]</code>. Stare warianty <code>codex-mini-latest</code> i <code>o3-mini</code> zostały wycofane.</p>
+        <h3>2. Tryby zatwierdzania i sandbox</h3>
+        <pre><code>approval_policy = "on-request"   # "untrusted", "on-request", "never"
+sandbox_mode = "workspace-write" # "read-only", "workspace-write", "danger-full-access"</code></pre>
+        <p>Po przepisaniu CLI na Rust polityka zatwierdzania i sandbox to dwa osobne klucze. Stare tryby <code>suggest</code>/<code>auto-edit</code>/<code>full-auto</code> są legacy.</p>
         <ul>
-          <li><strong>suggest</strong> — domyślny: pyta o pozwolenie przy każdej akcji.</li>
-          <li><strong>auto-edit</strong> — automatyczne tworzenie i edycja plików.</li>
-          <li><strong>full-auto</strong> — pełna automatyzacja (wykonywanie wszystkich poleceń).</li>
+          <li><strong>approval_policy</strong> — kiedy Codex pyta o zgodę: <code>untrusted</code>, <code>on-request</code> (pyta przed wyjściem poza sandbox), <code>never</code>.</li>
+          <li><strong>sandbox_mode</strong> — zakres działań: <code>read-only</code>, <code>workspace-write</code> (zapis w katalogu projektu), <code>danger-full-access</code>.</li>
         </ul>
         <h3>3. Serwery MCP</h3>
         <pre><code>[[mcp.servers]]

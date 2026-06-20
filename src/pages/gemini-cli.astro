@@ -7,6 +7,7 @@ const related = akademia.filter((a) => ['codex-cli', 'claude-code', 'serwery-mcp
   title="Gemini CLI — instalacja i komendy | Akademia SZRON"
   description="Przewodnik po Gemini CLI: instalacja przez npm, logowanie kontem Google, darmowe limity, komendy slash, kontekst plików, MCP i tryb shell. Aktualne komendy."
   eyebrow="Akademia · Narzędzia agentowe"
+  updated="2026-06-20"
   heading="Gemini CLI — model Google w terminalu."
   lead="Open-source narzędzie wiersza poleceń, które przenosi modele Gemini wprost do terminala: do 1M tokenów kontekstu, wbudowane wyszukiwanie Google i obsługa Model Context Protocol. Poniżej instalacja, autoryzacja i komendy, których używamy na co dzień."
 >
@@ -15,8 +16,17 @@ const related = akademia.filter((a) => ['codex-cli', 'claude-code', 'serwery-mcp
     <div class="container">
       <div class="proof-strip rv">
         <div><strong>1M tokenów</strong><span>kontekstu w modelu Gemini</span></div>
-        <div><strong>Darmowy start</strong><span>logowanie kontem Google</span></div>
+        <div><strong>Darmowy start</strong><span>onboarding indywidualny przez Antigravity CLI</span></div>
         <div><strong>MCP i shell</strong><span>rozszerzasz o własne narzędzia</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- aktualizacja -->
+  <section class="sect" style="padding-top:0;padding-bottom:0">
+    <div class="container">
+      <div class="callout rv">
+        <p><strong>Aktualizacja:</strong> 18.06.2026 Gemini CLI przestał obsługiwać użytkowników indywidualnych (darmowych) oraz plany Google AI Pro i Ultra. Następcą dla tych odbiorców jest Antigravity CLI (napisany w Go, binarka <code>agy</code>). Dostęp do Gemini CLI zachowują konta Code Assist Standard/Enterprise oraz płatne klucze API.</p>
       </div>
     </div>
   </section>
@@ -31,7 +41,7 @@ const related = akademia.filter((a) => ['codex-cli', 'claude-code', 'serwery-mcp
       <div class="prose rv">
         <p>Gemini CLI to open-source narzędzie wiersza poleceń, które daje dostęp do modeli Gemini bezpośrednio w terminalu. Oferuje do 1M tokenów kontekstu, wbudowane narzędzia (m.in. wyszukiwarkę Google) oraz obsługę Model Context Protocol (MCP). Sprawdza się u osób, które pracują głównie w terminalu i chcą szybkiego dostępu do AI bez przełączania się między aplikacjami.</p>
         <ul>
-          <li><strong>Gemini 2.5 Pro</strong> — model z 1M tokenów kontekstu. Dostępne są też nowsze warianty (Gemini 3 Pro oraz Gemini Flash).</li>
+          <li><strong>Tryb Auto (domyślny)</strong> — CLI samo dobiera model z rodziny Gemini 3 lub 2.5 zależnie od złożoności zadania. Flagowy model to Gemini 3 Pro; Gemini 2.5 Pro pozostaje dostępnym wariantem (1M tokenów kontekstu).</li>
           <li><strong>Google Search</strong> — wbudowana integracja z wyszukiwarką.</li>
           <li><strong>MCP</strong> — rozszerzanie o własne narzędzia i serwery.</li>
           <li><strong>Szybkie odpowiedzi</strong> — interaktywny tryb czatu wprost z terminala.</li>
@@ -96,7 +106,7 @@ sudo apt-get install -y nodejs</code></pre>
           <li>(Code Assist) ustaw zmienną: <code>export GOOGLE_CLOUD_PROJECT="twoj-projekt"</code>.</li>
         </ol>
         <div class="callout">
-          <p><strong>Darmowe limity:</strong> logowanie kontem Google daje 60 zapytań na minutę i 1000 zapytań dziennie — to wyższy limit niż klucz API (100 zapytań dziennie). Vertex AI zależy od projektu i konta rozliczeniowego.</p>
+          <p><strong>Darmowe limity:</strong> dla użytkowników indywidualnych darmowy dostęp przez konto Google zakończył się 18.06.2026 — limity 60 zapytań na minutę i 1000 dziennie nie obowiązują już osób prywatnych. Zostają one dla kont Code Assist Standard/Enterprise oraz płatnych kluczy API. Darmowy onboarding indywidualny przeniósł się do Antigravity CLI. Vertex AI zależy od projektu i konta rozliczeniowego.</p>
         </div>
         <h3>Alternatywa: klucz Gemini API</h3>
         <p>Daje pełną kontrolę nad modelem i rozliczeniami. Klucz pobierzesz z <a href="https://aistudio.google.com/app/apikey">Google AI Studio</a>:</p>

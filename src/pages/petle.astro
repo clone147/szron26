@@ -5,6 +5,7 @@ import Interior from '../layouts/Interior.astro';
   title="Pętle agentowe — /goal i /loop | Akademia SZRON"
   description="Jak prowadzić agenta w pętli: /goal pracuje aż do celu, /loop powtarza zadanie co interwał. Wzorzec checklisty TODO.md odhaczanej automatycznie — z przykładem."
   eyebrow="Akademia · Pętle"
+  updated="2026-06-20"
   heading="Pętle: /goal i /loop. Agent pracuje, aż cel osiągnięty."
   lead="Najwięcej daje nie pojedyncze polecenie, tylko agent prowadzony w pętli. Dwie komendy: <strong>/goal</strong> — pracuje, aż osiągnie cel, oraz <strong>/loop</strong> — powtarza zadanie co zadany czas. Spinają je wzorzec checklisty: plik z zadaniami, który agent sam odhacza."
 >
@@ -28,10 +29,11 @@ import Interior from '../layouts/Interior.astro';
       </div>
       <div class="prose rv">
         <h2>/goal — pętla do celu</h2>
-        <p><code>/goal</code> uruchamia agenta w trybie zadaniowym: dostaje cel i pracuje w kółko, aż go osiągnie. Po każdej iteracji sam sprawdza, czy warunek końcowy jest spełniony — jeśli nie, planuje kolejny krok i kontynuuje. Idealny do zadań, które da się rozbić na listę kroków o jasnym warunku zakończenia: „zrób wszystko z listy", „napraw, aż testy przechodzą", „uzupełnij brakujące pliki".</p>
-        <div class="callout"><p><strong>Sedno:</strong> definiujesz <em>cel</em> i <em>warunek osiągnięcia celu</em>, nie pojedynczą czynność. Agent sam decyduje, ile iteracji potrzeba.</p></div>
+        <p><code>/goal</code> uruchamia agenta w trybie zadaniowym: dostaje cel i pracuje w kółko, aż go osiągnie. Po każdej turze warunek końcowy ocenia <em>osobny</em> model — mały i szybki (domyślnie Haiku) — i zwraca tak/nie wraz z uzasadnieniem. To celowe: agent, który wykonuje pracę, nie ocenia jej sam. Idealny do zadań, które da się rozbić na listę kroków o jasnym warunku zakończenia: „zrób wszystko z listy", „napraw, aż testy przechodzą", „uzupełnij brakujące pliki".</p>
+        <div class="callout"><p><strong>Sedno:</strong> definiujesz <em>cel</em> i <em>warunek osiągnięcia celu</em>, nie pojedynczą czynność. Ocenę spełnienia warunku robi po każdej turze odrębny mały, szybki model (domyślnie Haiku) — zwraca tak/nie z uzasadnieniem, żeby model nie był sędzią we własnej sprawie.</p></div>
         <h2>/loop — powtarzanie co interwał</h2>
         <p><code>/loop 60s</code> powtarza to samo polecenie co zadany czas (tu: co 60 sekund). Sprawdza się przy monitorowaniu i pracy reaktywnej: „co minutę sprawdź status builda", „co 5 minut zerknij na nowe zgłoszenia", „pilnuj kolejki, aż się opróżni". Pętla działa, dopóki jej nie zatrzymasz albo dopóki warunek w prompcie nie każe jej zakończyć.</p>
+        <div class="callout"><p><strong>Aktualizacja:</strong> <code>/loop</code> stoi na cronie, więc minimalny interwał to 1 minuta (sub-minutowe wartości zaokrąglają się w górę). Zadania są przypięte do sesji: wygasają po 7 dniach, maksymalnie 50 na sesję. Wymaga Claude Code w wersji v2.1.72 lub nowszej.</p></div>
         <ul>
           <li><strong>/goal</strong> — gdy znasz <em>cel</em>, ale nie wiesz, ile kroków zajmie. Kończy się sam.</li>
           <li><strong>/loop &lt;czas&gt;</strong> — gdy chcesz <em>cyklicznie</em> coś sprawdzać lub dorzucać po kawałku w równych odstępach.</li>
@@ -59,9 +61,10 @@ import Interior from '../layouts/Interior.astro';
 - [ ] 5. Policz pliki w katalogu i zapisz liczbę do `count.txt`</code></pre>
         <p>I prompt, który uruchamia całość:</p>
         <pre><code>/goal wykonaj po kolei każdy task z TODO.md, po wykonaniu
-zamień [ ] na [x] przy tym tasku; cel osiągnięty gdy wszystkie
-checkboxy w TODO.md są zaznaczone [x]</code></pre>
-        <div class="callout"><p><strong>Dlaczego to działa:</strong> warunek końcowy jest <em>mierzalny i widoczny w pliku</em> — agent po każdej iteracji czyta <code>TODO.md</code>, widzi, ile zostało <code>[ ]</code>, i wie, czy kontynuować. Ty w każdej chwili widzisz postęp w tym samym pliku.</p></div>
+zamień [ ] na [x] przy tym tasku; po każdej turze wypisz w
+odpowiedzi aktualną listę checkboxów; cel osiągnięty gdy w
+tym wypisie wszystkie checkboxy są zaznaczone [x]</code></pre>
+        <div class="callout"><p><strong>Dlaczego to działa:</strong> ewaluator <code>/goal</code> nie czyta plików ani nie uruchamia komend — ocenia wyłącznie transkrypt rozmowy. Dlatego warunek pisz tak, by dało się go udowodnić z odpowiedzi agenta: każ mu po każdej turze wypisać stan checklisty (ile <code>[ ]</code>, ile <code>[x]</code>) wprost w odpowiedzi. To, czego nie widać w transkrypcie, dla ewaluatora nie istnieje. Ty w każdej chwili widzisz postęp w tym samym pliku.</p></div>
       </div>
     </div>
   </section>
@@ -74,7 +77,7 @@ checkboxy w TODO.md są zaznaczone [x]</code></pre>
         <h2 class="sect-title sect-title--s ws" id="praktyki">Kilka zasad, zanim puścisz agenta samego.</h2>
       </div>
       <dl class="def-rows rv">
-        <div><dt>Jasny warunek końca<small>Bez tego pętla się nie zatrzyma</small></dt><dd>Zawsze podaj mierzalny warunek osiągnięcia celu — „wszystkie checkboxy [x]", „testy zielone", „brak plików bez nagłówka". Inaczej agent będzie kręcił się w nieskończoność.</dd></div>
+        <div><dt>Jasny warunek końca<small>Bez tego pętla się nie zatrzyma</small></dt><dd>Zawsze podaj mierzalny warunek osiągnięcia celu — „wszystkie checkboxy [x]", „testy zielone", „brak plików bez nagłówka". Inaczej agent będzie kręcił się w nieskończoność. Dorzuć też twardy limit: oficjalnie wystarczy dopisać do warunku <code>or stop after 20 turns</code>. Cały warunek może mieć do 4000 znaków. <code>/goal clear</code> przerywa bieżący cel, a samo <code>/goal</code> bez argumentu pokazuje status — liczbę tur, zużyte tokeny i uzasadnienie ostatniej oceny.</dd></div>
         <div><dt>Małe, atomowe zadania<small>Jedno zadanie = jeden checkbox</small></dt><dd>Rozbij cel na kroki, które da się wykonać i odhaczyć pojedynczo. Łatwiej wznowić po przerwie i widać realny postęp.</dd></div>
         <div><dt>Checklista to stan<small>Plik przeżywa restart</small></dt><dd>Trzymanie postępu w pliku (a nie w pamięci sesji) sprawia, że pętlę można przerwać i wznowić — agent czyta, co już odhaczone, i rusza dalej.</dd></div>
         <div><dt>/loop do monitoringu, /goal do roboty<small>Dobierz pętlę do zadania</small></dt><dd>Powtarzalne sprawdzanie stanu → <code>/loop</code>. Doprowadzenie zadania do końca → <code>/goal</code>. Można je łączyć: <code>/loop</code> pilnuje, a po wykryciu zmiany odpala pracę.</dd></div>

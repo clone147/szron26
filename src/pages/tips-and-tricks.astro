@@ -5,6 +5,7 @@ import Interior from '../layouts/Interior.astro';
   title="Claude Code — Tips & Tricks | Akademia SZRON"
   description="Praktyczne wskazówki do Claude Code: powiadomienia przez hooki, pomijanie uprawnień, status line, wyłączenie auto-compact, tryb planowania i prompty."
   eyebrow="Akademia · Praktyka pracy z AI"
+  updated="2026-06-20"
   heading="Claude Code — Tips & Tricks dla programistów."
   lead="Zestaw praktyk, skrótów i wzorców, które realnie przyspieszają codzienną pracę z agentem. Od powiadomień dźwiękowych po świadome zarządzanie kontekstem i optymalizację promptów — wszystko z naszej własnej praktyki."
 >
@@ -59,6 +60,9 @@ node ~/.claude/play.js ~/.claude/finish.wav</code></pre>
         </div>
         <p>Jeśli używasz jej często, schowaj ją za aliasem powłoki:</p>
         <pre><code>alias claude-fast='claude --dangerously-skip-permissions'</code></pre>
+        <div class="callout">
+          <p><strong>Bezpieczniejsza alternatywa:</strong> tryb Auto, dostępny w cyklu <code>Shift+Tab</code>, pozwala agentowi działać bez ciągłych potwierdzeń, ale każdą akcję sprawdza w tle osobny klasyfikator. To rozsądny kompromis między pełną kontrolą a <code>--dangerously-skip-permissions</code> — masz przyspieszenie bez całkowitego wyłączania kontroli bezpieczeństwa.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -109,26 +113,25 @@ node ~/.claude/play.js ~/.claude/finish.wav</code></pre>
       <div class="prose rv">
         <p class="eyebrow" data-scramble>05 / Tryb planowania · Plan Mode</p>
         <h2 id="planmode">Tryb planowania — plan przed jakąkolwiek zmianą.</h2>
-        <p>W trybie planowania agent <strong>tylko analizuje i planuje</strong> — nie edytuje plików i nie uruchamia komend. To faza read-only przed właściwymi zmianami. Aktywujesz ją skrótem <code>Shift+Tab</code> (dwukrotnie); ponowne naciśnięcie wychodzi z trybu.</p>
+        <p>W trybie planowania agent <strong>analizuje i planuje, ale nie zmienia plików</strong> — może za to czytać kod i uruchamiać komendy powłoki do eksploracji (read-only). To faza rozpoznania przed właściwymi zmianami. <code>Shift+Tab</code> przełącza tryby cyklicznie: default → acceptEdits → plan. Wejdziesz też komendą <code>/plan</code> albo startując agenta z flagą <code>--permission-mode plan</code>.</p>
         <ul>
-          <li><strong>Dostępne:</strong> Read, Glob, Grep, WebSearch, WebFetch, lista zadań do wykonania, agenci pomocniczy do głębszego researchu.</li>
-          <li><strong>Zablokowane:</strong> Write, Edit, Bash — wyłącznie planowanie.</li>
+          <li><strong>Dostępne:</strong> Read, Glob, Grep, WebSearch, WebFetch, komendy powłoki do eksploracji (read-only), lista zadań do wykonania, agenci pomocniczy do głębszego researchu.</li>
+          <li><strong>Zablokowane:</strong> Write, Edit i wszystko, co zapisuje zmiany — sam Bash nie jest blokowany, tylko operacje modyfikujące.</li>
         </ul>
         <p>Po wejściu w tryb opisz problem szczegółowo. Przykład:</p>
         <pre><code>Zaplanuj implementacje systemu autentykacji z OAuth2,
 JWT, refresh tokenami i rate limitingiem dla REST API.</code></pre>
-        <h3>Budżet myślenia: think, megathink, ultrathink</h3>
-        <p>Głębokość analizy sterujesz frazami w prompcie. Im wyższy poziom, tym większy budżet rozumowania — i wyższy koszt czasu oraz tokenów.</p>
+        <h3>Głębokość myślenia: /effort zamiast stałych budżetów</h3>
+        <p>Im głębiej agent myśli przed odpowiedzią, tym wyższy koszt czasu i tokenów. Steruje się tym na dwa sposoby: trwale komendą <code>/effort</code> i jednorazowo słowem w prompcie.</p>
         <table>
-          <thead><tr><th scope="col">Poziom</th><th scope="col">Budżet (orientacyjnie)</th><th scope="col">Frazy aktywujące</th></tr></thead>
+          <thead><tr><th scope="col">Mechanizm</th><th scope="col">Co robi</th><th scope="col">Zasięg</th></tr></thead>
           <tbody>
-            <tr><td><strong>think</strong></td><td>~4K tokenów</td><td>„think"</td></tr>
-            <tr><td><strong>megathink</strong></td><td>~10K tokenów</td><td>„think hard", „think harder", „megathink"</td></tr>
-            <tr><td><strong>ultrathink</strong></td><td>~32K tokenów</td><td>„ultrathink", „think really hard", „think intensely", „think longer"</td></tr>
+            <tr><td><strong>/effort</strong> (low / medium / high / xhigh / max)</td><td>ustawia, jak głęboko agent myśli</td><td>cała sesja, aż zmienisz</td></tr>
+            <tr><td><strong>ultrathink</strong> / <strong>think</strong> (w treści promptu)</td><td>jednorazowo podbija myślenie na tę jedną odpowiedź</td><td>tylko bieżący prompt</td></tr>
           </tbody>
         </table>
         <div class="callout">
-          <p><strong>Aktualizacja:</strong> poziomy myślenia są nadal sterowalne frazami. Najwyższy (ultrathink) to budżet rzędu ~32K tokenów, aktywowany m.in. przez „think harder", „think intensely", „think longer", „think really hard". Rezerwuj go na decyzje architektoniczne, duży refactoring i integracje wymagające researchu — tam, gdzie dokładność jest ważniejsza niż koszt tokenów.</p>
+          <p><strong>Aktualizacja:</strong> dla obecnych modeli (Opus 4.8 / 4.7) model „fraza → stały budżet tokenów" jest przestarzały. Dawne <code>think</code> / <code>megathink</code> / <code>ultrathink</code> mapowały na sztywne progi (~4K / 10K / 32K) — dziś te liczby są nieaktualne. Głębokość ustawiasz komendą <code>/effort</code> (low / medium / high / xhigh / max), która trzyma wybrany poziom między turami. Słowo <code>ultrathink</code> w prompcie to już tylko jednorazowy zastrzyk na jedną odpowiedź — był chwilowo zdeprecjonowany (16.01.2026) i przywrócony w v2.1.68. Głębsze myślenie rezerwuj na realnie trudne decyzje: architekturę, duży refactoring, niejasne błędy.</p>
         </div>
       </div>
     </div>
