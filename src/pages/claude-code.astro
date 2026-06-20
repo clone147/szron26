@@ -3,17 +3,18 @@ import Interior from '../layouts/Interior.astro';
 ---
 <Interior
   title="Claude Code — instalacja i workflow | Akademia SZRON"
-  description="Praktyczne szkolenie z Claude Code: aktualna instalacja (curl/brew), poziomy myślenia think/megathink/ultrathink, frazy aktywujące i workflow agentowy."
+  description="Praktyczne szkolenie z Claude Code: natywna instalacja (curl/brew/Windows), sterowanie myśleniem przez /effort i ultrathink, subagenci, tryb planowania, hooki i workflow agentowy."
   eyebrow="Akademia · Programowanie agentowe"
   heading="Claude Code — agent kodowania w terminalu, od pierwszej instalacji."
   lead="Czym jest agent kodowania, jak go zainstalować w aktualny sposób i jak ułożyć z nim codzienny workflow. Uczymy tego, czego sami używamy w pracy z klientami — na realnych komendach, bez teorii dla teorii."
+  updated="2026-06-20"
 >
   <!-- proof -->
   <section class="sect" style="padding-bottom:0">
     <div class="container">
       <div class="proof-strip rv">
-        <div><strong>Instalacja bez npm</strong><span>curl albo brew — natywny instalator</span></div>
-        <div><strong>Poziomy myślenia</strong><span>think, megathink, ultrathink</span></div>
+        <div><strong>Natywny instalator</strong><span>curl, brew albo Windows — bez Node.js</span></div>
+        <div><strong>Sterowanie myśleniem</strong><span>/effort na stałe, ultrathink na jeden prompt</span></div>
         <div><strong>Pamięć projektu</strong><span>CLAUDE.md i kontekst pod kontrolą</span></div>
       </div>
     </div>
@@ -46,16 +47,21 @@ import Interior from '../layouts/Interior.astro';
     <div class="container">
       <div class="prose rv">
         <p class="eyebrow" data-scramble>02 / Instalacja · macOS, Linux, Windows</p>
-        <h2 id="instalacja">Instalacja w aktualny sposób — bez npm.</h2>
+        <h2 id="instalacja">Instalacja w aktualny sposób — natywny instalator.</h2>
         <div class="callout">
-          <p><strong>Aktualizacja:</strong> instalacja przez <code>npm install -g @anthropic-ai/claude-code</code> jest przestarzała. Używaj natywnego instalatora (curl) albo menedżera pakietów. Node.js nie jest już wymagany do samej instalacji.</p>
+          <p><strong>Aktualizacja:</strong> rekomendowaną metodą jest natywny instalator — sam ściąga binarkę i aktualizuje się w tle, bez Node.js. Instalacja przez <code>npm install -g @anthropic-ai/claude-code</code> nadal działa (to ten sam binarny plik), ale to już tylko alternatywa, nie domyślna ścieżka.</p>
         </div>
         <h3>macOS i Linux</h3>
         <pre><code>curl -fsSL https://claude.ai/install.sh | bash</code></pre>
-        <p>Alternatywnie na macOS przez Homebrew:</p>
+        <p>Na macOS równie dobrze przez Homebrew (pamiętaj, że cask nie aktualizuje się sam):</p>
         <pre><code>brew install --cask claude-code</code></pre>
         <h3>Windows</h3>
-        <p>Na Windows zalecamy uruchamianie agenta z poziomu WSL2 (terminal Linux), co daje też dostęp do trybu sandbox. W natywnym PowerShell instalator dostarcza Anthropic w dokumentacji — sandbox tam jednak nie działa.</p>
+        <p>Claude Code działa dziś <strong>natywnie na Windows</strong> — nie potrzebujesz już WSL. W PowerShell:</p>
+        <pre><code>irm https://claude.ai/install.ps1 | iex</code></pre>
+        <p>Git for Windows możesz pominąć — przyda się tylko po to, by odblokować narzędzie Bash. WSL2 bierz, kiedy potrzebujesz linuksowego toolchainu albo trybu sandbox (na natywnym Windows sandbox nie działa). Wolisz menedżer pakietów? Jest <code>winget install Anthropic.ClaudeCode</code>. A jeśli wolisz klikać zamiast pisać — pobierz aplikację desktopową.</p>
+        <div class="callout">
+          <p><strong>Czego potrzebujesz:</strong> Claude Code wymaga konta Pro, Max, Team, Enterprise albo Console (darmowy plan Claude.ai go nie obejmuje). Alternatywnie podłączysz własny klucz API — także przez Amazon Bedrock czy Google Vertex AI.</p>
+        </div>
         <h3>Pierwsze uruchomienie</h3>
         <p>Po instalacji przejdź do katalogu projektu i uruchom agenta. Pierwsze polecenie warto poświęcić na zbudowanie pamięci projektu:</p>
         <pre><code>cd /sciezka/do/projektu
@@ -92,6 +98,13 @@ claude
           <li><strong>Pozwól agentowi czytać kod.</strong> Nie wklejaj całych plików — agent sam je otworzy, jeśli wskażesz, gdzie szukać.</li>
           <li><strong>Proś o plan przed zmianą</strong> przy większych zadaniach (tryb planowania), potem zatwierdzaj.</li>
         </ul>
+        <h3>Tryb planowania i poziomy uprawnień</h3>
+        <p>Klawiszem <strong>Shift+Tab</strong> przełączasz, ile swobody dajesz agentowi w danej chwili:</p>
+        <ul>
+          <li><strong>Default</strong> — agent pyta o zgodę przed każdą zmianą plików i każdą komendą.</li>
+          <li><strong>Auto-Accept</strong> — sam edytuje pliki bez dopytywania. Kiedy ufasz kierunkowi i zależy ci na tempie.</li>
+          <li><strong>Plan</strong> — tryb tylko do odczytu: agent bada kod i przedstawia plan, ale nic nie zmienia, dopóki go nie zaakceptujesz. Idealny na start większego zadania.</li>
+        </ul>
       </div>
     </div>
   </section>
@@ -100,25 +113,26 @@ claude
   <section class="sect sect--dark" aria-labelledby="myslenie">
     <div class="container">
       <div class="prose rv">
-        <p class="eyebrow" data-scramble>04 / Zaawansowane · Poziomy myślenia</p>
-        <h2 id="myslenie">Budżet myślenia: think, megathink, ultrathink.</h2>
-        <p>Claude Code potrafi przeznaczyć więcej „myślenia" (rozumowania przed odpowiedzią) na trudniejsze zadania. Im większy budżet, tym głębsza analiza — kosztem czasu i tokenów. Sterujesz tym frazami w prompcie.</p>
+        <p class="eyebrow" data-scramble>04 / Zaawansowane · Myślenie, subagenci, automatyzacja</p>
+        <h2 id="myslenie">Głębsze myślenie, subagenci i własna automatyzacja.</h2>
+        <p>Claude Code potrafi przeznaczyć więcej „myślenia" (rozumowania przed odpowiedzią) na trudniejsze zadania — kosztem czasu i tokenów. Steruje się tym na dwa sposoby: trwale komendą i jednorazowo słowem w prompcie.</p>
         <table>
-          <thead><tr><th scope="col">Poziom</th><th scope="col">Budżet (orientacyjnie)</th><th scope="col">Frazy aktywujące</th></tr></thead>
+          <thead><tr><th scope="col">Mechanizm</th><th scope="col">Co robi</th><th scope="col">Zasięg</th></tr></thead>
           <tbody>
-            <tr><td><strong>think</strong></td><td>~4K tokenów</td><td>„think"</td></tr>
-            <tr><td><strong>megathink</strong></td><td>~10K tokenów</td><td>„think hard", „think harder", „megathink"</td></tr>
-            <tr><td><strong>ultrathink</strong></td><td>~32K tokenów</td><td>„ultrathink", „think really hard", „think intensely", „think longer"</td></tr>
+            <tr><td><strong>/effort</strong> (low / medium / high / max)</td><td>ustawia, jak głęboko agent myśli</td><td>cała sesja, aż zmienisz</td></tr>
+            <tr><td><strong>/effort xhigh</strong></td><td>jeszcze głębiej, na najmocniejszych modelach (Opus 4.7/4.8)</td><td>cała sesja</td></tr>
+            <tr><td><strong>ultrathink</strong> / <strong>think</strong> (w treści promptu)</td><td>jednorazowo podbija myślenie na tę jedną odpowiedź</td><td>tylko bieżący prompt</td></tr>
           </tbody>
         </table>
         <div class="callout">
-          <p><strong>Aktualizacja:</strong> najwyższy poziom (ultrathink) to budżet rzędu ~32K tokenów. Frazy aktywujące rozszerzono — dla ultrathink działają m.in. „think harder", „think intensely", „think longer", „think really hard". Większy budżet rezerwuj na realnie trudne decyzje: architektura, refactoring na dużą skalę, niejasne błędy.</p>
+          <p><strong>Aktualizacja:</strong> dawniej <code>think</code> / <code>megathink</code> / <code>ultrathink</code> mapowały na sztywne budżety tokenów (~4K / 10K / 32K). Dziś podstawą jest komenda <code>/effort</code>, która trzyma wybrany poziom między turami. Słowa-klucze w prompcie (jak <code>ultrathink</code>) to już tylko jednorazowy zastrzyk na konkretną odpowiedź — nie zmieniają ustawienia sesji i nie są stałym budżetem. Głębsze myślenie rezerwuj na realnie trudne decyzje: architektura, refactoring na dużą skalę, niejasne błędy. Sam model dobierasz komendą <code>/model</code> — od najszybszych (Haiku) po najmocniejsze (Opus).</p>
         </div>
-        <h3>Inne techniki zaawansowane</h3>
-        <ul>
-          <li><strong>Promptowanie iteracyjne i role-playing:</strong> poproś agenta, by wcielił się w rolę (np. „jako recenzent bezpieczeństwa") i prowadził analizę krok po kroku.</li>
-          <li><strong>System skills i rozszerzenia:</strong> powtarzalne procedury można zamknąć w umiejętnościach (skills) i komendach, które agent wywołuje na żądanie.</li>
-        </ul>
+        <h3>Subagenci — delegowanie i praca równoległa</h3>
+        <p>Agent może odpalić <strong>subagenta</strong> do wyodrębnionego zadania — przeszukania kodu, weryfikacji zmiany, researchu — który pracuje w osobnym kontekście. Główna rozmowa się nie zaśmieca, a kilka subagentów może działać równolegle. Możesz definiować własnych: z własnym promptem systemowym i ograniczonym zestawem narzędzi.</p>
+        <h3>Skills, komendy i pluginy</h3>
+        <p>Powtarzalne procedury zamykasz w <strong>skillach</strong> (umiejętnościach) i własnych <strong>komendach</strong> (<code>/nazwa</code>), które agent uruchamia na żądanie. <strong>Pluginy</strong> pakują skille, komendy, hooki i serwery MCP w jedną instalowalną całość — wygodne, gdy chcesz rozdać ten sam zestaw całemu zespołowi.</p>
+        <h3>Hooki — twarde reguły zamiast próśb</h3>
+        <p>Hooki to skrypty odpalane na zdarzeniach cyklu życia agenta: przed edycją pliku, po komendzie, na starcie sesji, przy starcie i końcu subagenta. Dzięki nim zasadę <strong>wymuszasz kodem</strong> — np. „uruchom lint po każdej edycji" albo „zablokuj zapis do wrażliwego pliku" — zamiast liczyć, że agent o niej pamięta.</p>
       </div>
     </div>
   </section>
@@ -133,7 +147,9 @@ claude
         <ul>
           <li><strong>Git z agentem</strong> — inteligentne commity, code review i automatyzacja gałęzi prowadzona przez Claude Code.</li>
           <li><strong>Serwery MCP</strong> — łączenie agenta z bazami danych, API, przeglądarką i narzędziami zespołu.</li>
-          <li><strong>Alternatywni agenci</strong> — Gemini CLI (Google), Codex CLI (OpenAI) oraz modele lokalne, gdy dane nie mogą opuścić firmy.</li>
+          <li><strong>IDE i aplikacja desktopowa</strong> — ten sam agent w terminalu, w rozszerzeniach do VS Code i JetBrains oraz w apce desktopowej. Pracujesz tam, gdzie ci wygodnie.</li>
+          <li><strong>Przegląd kodu wieloma agentami</strong> — wbudowany code review, w którym osobni agenci niezależnie sprawdzają zmiany, zanim trafią do gałęzi.</li>
+          <li><strong>Alternatywni agenci</strong> — Codex CLI (OpenAI), Gemini CLI (Google) oraz modele lokalne, gdy dane nie mogą opuścić firmy. Krajobraz CLI zmienia się szybko — szczegóły trzymamy w osobnych szkoleniach.</li>
           <li><strong>Bezpieczeństwo</strong> — praca z AI na firmowym kodzie bez wycieku: deny rules, sandbox i hooki.</li>
         </ul>
       </div>

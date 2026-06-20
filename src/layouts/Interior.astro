@@ -17,13 +17,22 @@ const {
   headingSmall = false, // mniejszy H1 dla długich tytułów
   heroImage,            // opcjonalna grafika bohatera (ścieżka /img/sub/...)
   heroAlt = '',
+  updated,              // data ostatniej aktualizacji treści (ISO 'YYYY-MM-DD') — widoczna w hero + dateModified w JSON-LD
 } = Astro.props;
+
+// czytelna data PL z ISO (np. '2026-06-20' → '20 czerwca 2026')
+const MIESIACE_PL = ['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
+const fmtDataPl = (iso) => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso ?? '');
+  return m ? `${Number(m[3])} ${MIESIACE_PL[Number(m[2]) - 1]} ${m[1]}` : null;
+};
+const updatedLabel = fmtDataPl(updated);
 
 // per-stronowe JSON-LD (breadcrumb + typ strony)
 const site = Astro.site ?? new URL('https://szron.tech');
 const canonical = new URL(Astro.url.pathname, site).href;
 const image = heroImage ? new URL(heroImage, site).href : null;
-const schema = pageSchema(Astro.url.pathname, { title, description, heading, image, canonical, site });
+const schema = pageSchema(Astro.url.pathname, { title, description, heading, image, canonical, site, dateModified: updated });
 ---
 <Base title={title} description={description} ogDescription={ogDescription} ogImage={ogImage} schema={schema}>
   <Nav />
@@ -34,6 +43,7 @@ const schema = pageSchema(Astro.url.pathname, { title, description, heading, ima
           {eyebrow && <p class="eyebrow rv" data-scramble>{eyebrow}</p>}
           <h1 class={`page-hero__title ws${headingSmall ? ' page-hero__title--s' : ''}`}>{heading}</h1>
           {lead && <p class="page-hero__lead rv" set:html={lead} />}
+          {updatedLabel && <p class="page-hero__updated rv">Ostatnia aktualizacja: <time datetime={updated}>{updatedLabel}</time></p>}
         </div>
         {heroImage && (
           <figure class="page-hero__media rv">

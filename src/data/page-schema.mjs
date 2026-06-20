@@ -34,7 +34,8 @@ const COMPARISON = new Set(['outsourcing-vs-inhouse-ai']); // Article
 const CONTACT = new Set(['kontakt', 'umow-rozmowe']);
 
 export function pageSchema(pathname, ctx) {
-  const { title, description, heading, image, canonical, site } = ctx;
+  const { title, description, heading, image, canonical, site, dateModified } = ctx;
+  const modified = dateModified || PUBLISHED; // per-page data aktualizacji, fallback do globalnej daty publikacji
   const slug = pathname.replace(/^\/|\/$/g, ''); // bez wiodących/końcowych /
   if (!slug) return []; // homepage — tylko Organization+WebSite z Base
   const url = (p) => new URL(p, site).href;
@@ -61,13 +62,13 @@ export function pageSchema(pathname, ctx) {
   if (ACADEMY.has(slug)) {
     out.push({ ...base, '@type': 'TechArticle', headline: heading || title,
       image: image || url('/img/og-cover.webp'),
-      datePublished: PUBLISHED, dateModified: PUBLISHED,
+      datePublished: PUBLISHED, dateModified: modified,
       author: { '@type': 'Organization', ...orgRef, name: 'SZRON' },
       about: 'Programowanie agentowe, Claude Code, MCP, lokalne modele LLM' });
   } else if (CASE_STUDIES.has(slug) || COMPARISON.has(slug)) {
     out.push({ ...base, '@type': 'Article', headline: heading || title,
       image: image || url('/img/og-cover.webp'),
-      datePublished: PUBLISHED, dateModified: PUBLISHED,
+      datePublished: PUBLISHED, dateModified: modified,
       author: { '@type': 'Organization', ...orgRef, name: 'SZRON' } });
   } else if (slug === 'devlens') {
     out.push({ '@context': 'https://schema.org', '@type': 'SoftwareApplication',
