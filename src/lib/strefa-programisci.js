@@ -756,8 +756,8 @@ async function loadList(d, kind) {
   }
   // wspólne: usuwanie (dev_meetings kasuje też event w Google przez Edge Function)
   host.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', async () => {
-    if (!(await confirmDialog('Usunąć tę pozycję?'))) return;
     if (b.dataset.del === 'dev_meetings') {
+      if (!(await confirmDialog('Usunąć spotkanie? Zniknie też z Google Calendar.'))) return;
       const r = await syncMeeting('delete', b.dataset.id);
       if (!r.ok) return toast('Błąd', r.msg, 'err');
     } else {
@@ -834,7 +834,6 @@ async function loadMails(d, panel) {
     $('#m-head', panel).textContent = 'Edytujesz szkic'; $('#m-subject', panel).focus();
   }));
   host.querySelectorAll('[data-delmail]').forEach((b) => b.addEventListener('click', async () => {
-    if (!(await confirmDialog('Usunąć szkic maila?'))) return;
     const { error } = await sb.from('dev_emails').delete().eq('id', b.dataset.delmail);
     if (error) return toast('Błąd', error.message, 'err');
     if (mailDraftId === b.dataset.delmail) mailDraftId = null;
@@ -893,7 +892,6 @@ async function loadHistory(ym, devId) {
   host.querySelectorAll('[data-open]').forEach((el) => el.addEventListener('click', () => openProfile(el.dataset.open)));
   host.querySelectorAll('[data-del-hist]').forEach((b) => b.addEventListener('click', async (e) => {
     e.stopPropagation();
-    if (!(await confirmDialog('Usunąć ten wpis z historii? Tej operacji nie można cofnąć.'))) return;
     const { error } = await sb.from(b.dataset.table).delete().eq('id', b.dataset.id);
     if (error) return toast('Błąd', error.message, 'err');
     toast('Usunięto', 'Wpis skasowany z historii', 'ok');
