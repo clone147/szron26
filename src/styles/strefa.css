@@ -451,6 +451,9 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 .hist-dev:hover { color: var(--color-accent); text-decoration: underline; }
 .hist-dev__co { font-size: var(--text-caption); color: var(--color-text-inv-3); }
 .hist-item__time { margin-left: auto; font-size: var(--text-caption); color: var(--color-text-inv-3); }
+.hist-item__del { flex: none; opacity: .4; transition: opacity .15s ease, color .15s ease; }
+.hist-item:hover .hist-item__del, .hist-item__del:focus-visible { opacity: 1; }
+.hist-item__del:hover { color: oklch(72% 0.2 25); }
 .hist-item__txt { font-size: var(--text-s); color: var(--color-text-inv); margin-top: .1rem; white-space: pre-wrap; word-break: break-word; }
 .hist-note-label { color: oklch(82% 0.09 265); font-weight: 600; }
 .hist-empty { text-align: center; color: var(--color-text-inv-3); padding: var(--space-xl); }

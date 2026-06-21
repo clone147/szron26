@@ -881,8 +881,8 @@ async function loadHistory(ym, devId) {
   const [{ data: ev, error: ee }, { data: nt }] = await Promise.all([evq, nq]);
   if (ee) { host.innerHTML = `<p class="hist-empty">Błąd: ${esc(ee.message)}</p>`; return; }
   const items = [
-    ...(ev || []).map((e) => ({ kind: 'event', developer_id: e.developer_id, created_at: e.created_at, type: e.event_type, text: e.summary })),
-    ...(nt || []).map((n) => ({ kind: 'note', developer_id: n.developer_id, created_at: n.created_at, type: 'notatka', text: n.note })),
+    ...(ev || []).map((e) => ({ kind: 'event', id: e.id, table: 'dev_events', developer_id: e.developer_id, created_at: e.created_at, type: e.event_type, text: e.summary })),
+    ...(nt || []).map((n) => ({ kind: 'note', id: n.id, table: 'dev_notes', developer_id: n.developer_id, created_at: n.created_at, type: 'notatka', text: n.note })),
   ].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
   if (!items.length) { host.innerHTML = `<p class="hist-empty">Brak zdarzeń i notatek w miesiącu ${esc(fmtMonth(ym))}.${devId ? '' : ' Zmień miesiąc, by zobaczyć inne okresy.'}</p>`; return; }
   const byDay = new Map();
@@ -891,6 +891,14 @@ async function loadHistory(ym, devId) {
     <div class="hist-day"><span class="hist-day__date">${esc(fmtDate(day))}</span></div>
     ${list.map(histItemHTML).join('')}`).join('');
   host.querySelectorAll('[data-open]').forEach((el) => el.addEventListener('click', () => openProfile(el.dataset.open)));
+  host.querySelectorAll('[data-del-hist]').forEach((b) => b.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    if (!(await confirmDialog('Usunąć ten wpis z historii? Tej operacji nie można cofnąć.'))) return;
+    const { error } = await sb.from(b.dataset.table).delete().eq('id', b.dataset.id);
+    if (error) return toast('Błąd', error.message, 'err');
+    toast('Usunięto', 'Wpis skasowany z historii', 'ok');
+    loadHistory(ym, devId);
+  }));
 }
 
 function histItemHTML(it) {
@@ -905,6 +913,7 @@ function histItemHTML(it) {
         <span class="hist-dev" data-open="${it.developer_id}">${who}</span>
         ${comp ? `<span class="hist-dev__co">${esc(comp)}</span>` : ''}
         <span class="hist-item__time">${hhmm(it.created_at)}</span>
+        <button class="strefa-iconbtn hist-item__del" data-del-hist data-table="${it.table}" data-id="${it.id}" title="Usuń wpis z historii" aria-label="Usuń wpis z historii">${ICO.trash}</button>
       </div>
       <div class="hist-item__txt">${it.kind === 'note' ? `<span class="hist-note-label">Notatka:</span> ${esc(it.text)}` : esc(it.text)}</div>
     </div></div>`;
