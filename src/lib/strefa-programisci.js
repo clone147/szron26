@@ -55,13 +55,22 @@ const ICO = {
 /* ── model coachingu ── */
 const STAGES = [
   { n: 1, name: 'Początkujący', hint: 'Pierwszy kontakt z AI — agent jako asystent, człowiek pyta.' },
-  { n: 2, name: 'Prowadzący', hint: 'Formułuje intencję (co, po co, kryteria); agent pisze, dev recenzuje.' },
-  { n: 3, name: 'Agentowy', hint: 'Pętle /loop, MCP — agent pracuje obok, człowiek kontroluje.' },
-  { n: 4, name: 'Opanowujący', hint: 'CLAUDE.md, własne MCP, dostrajanie per zadanie.' },
+  { n: 2, name: 'Kierujący', hint: 'Formułuje intencję (co, po co, kryteria); agent pisze, dev recenzuje.' },
+  { n: 3, name: 'Operator', hint: 'Pętle /loop, MCP — agent pracuje obok, człowiek kontroluje.' },
+  { n: 4, name: 'Dostrajający', hint: 'CLAUDE.md, własne MCP, dostrajanie per zadanie.' },
   { n: 5, name: 'Autonomiczny', hint: 'Deleguje całe moduły — agent planuje, koduje, testuje.' },
   { n: 6, name: 'Architekt AI', hint: 'Mentoruje innych, projektuje workflow zespołu i strategię agentów.' },
 ];
-const stageColor = (n) => `oklch(72% 0.15 ${25 + (Math.max(1, Math.min(6, n)) - 1) * 25})`;
+// 6 wyraźnie odróżniających się kolorów etapów (różne odcienie + jasność/chroma), czytelne na ciemnym tle
+const STAGE_COLORS = [
+  'oklch(68% 0.13 250)', // 1 — niebieski
+  'oklch(75% 0.13 200)', // 2 — cyjan
+  'oklch(77% 0.16 150)', // 3 — zielony
+  'oklch(83% 0.15 90)',  // 4 — złoty
+  'oklch(72% 0.19 50)',  // 5 — pomarańczowy
+  'oklch(66% 0.21 330)', // 6 — magenta
+];
+const stageColor = (n) => STAGE_COLORS[Math.max(1, Math.min(6, n || 1)) - 1];
 const stageName = (n) => (STAGES[(n || 1) - 1] || STAGES[0]).name;
 const MINDSETS = ['entuzjasta', 'pragmatyk', 'sceptyk'];
 const AGENTS = ['Claude Code', 'Cursor', 'GitHub Copilot', 'Gemini CLI', 'Codex CLI', 'ChatGPT', 'LM Studio / lokalny', 'inny'];
