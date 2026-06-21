@@ -1,6 +1,6 @@
 /* Hallmark · macrostructure: Marquee Hero · theme: studied-DNA (source: https://phenomenonstudio.com)
  * paper oklch(100% 0 0) · ink oklch(17% 0.01 240) · accent oklch(70.5% 0.187 45) (orange)
- * display: Bricolage Grotesque (440/600) · body: Albert Sans · label: uppercase grotesque
+ * display: Space Grotesk (440/600) · body: Albert Sans · label: uppercase grotesque
  * nav: N1-slim (logo + center links + CTA) · footer: Ft3-index + giant wordmark
  * studied: yes · DNA-source: url · rhythm: verified via browser pass
  * Hallmark · pre-emit critique: P4 H5 E4 S4 R4 V4
@@ -33,7 +33,7 @@
   --color-brand:        #3c56f4;  /* primary brand blue — brackety logo */
 
   /* ── typografia ───────────────────────────────────── */
-  --font-display: "Bricolage Grotesque", "Albert Sans", system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Albert Sans", system-ui, sans-serif;
   --font-body:    "Albert Sans", system-ui, sans-serif;
 
   --text-display:   clamp(2.375rem, 5.4vw, 4.875rem);  /* hero h1 */
