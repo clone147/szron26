@@ -496,7 +496,13 @@ function devRowAction(act, did, anchor, ev) {
   if (!did) return;
   if (act === 'open') openProfile(did);
   else if (act === 'skills') openProfile(did, 'skills');
-  else if (act === 'mail') { const d = devMap.get(did); if (d) composeEmailModal([d]); }
+  else if (act === 'mail') {
+    if (!devMap.get(did)) return;
+    // jeśli ktoś jest zaznaczony checkboxami — pisz do wszystkich zaznaczonych (plus kliknięty); inaczej tylko kliknięty
+    const ids = selectedIds.size ? new Set([...selectedIds, did]) : new Set([did]);
+    const devs = [...ids].map((id) => devMap.get(id)).filter(Boolean);
+    composeEmailModal(devs);
+  }
   else if (act === 'stage') stagePopover(did, anchor);
   else if (act === 'del-dev') (async () => {
     const d = devMap.get(did);
