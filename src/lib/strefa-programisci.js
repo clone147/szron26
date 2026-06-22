@@ -84,6 +84,7 @@ let companies = [];          // [{...c, developers:[...]}]
 const devMap = new Map();    // did -> developer
 let query = '';
 const openIds = new Set();
+const selectedIds = new Set();   // did programistów zaznaczonych checkboxami (multi-akcje)
 let activeTd = null, editing = false;
 let polling = false, adding = false, pullInFlight = false;
 let openDevId = null, activeTab = 'overview', tabBusy = false;
@@ -231,7 +232,9 @@ function cellInner(d, col) {
   return `<div class="dcell${muted}">${val ? esc(val) : '—'}</div>`;
 }
 function devRow(d, r) {
-  return `<tr data-did="${d.id}">
+  const sel = selectedIds.has(d.id);
+  return `<tr data-did="${d.id}"${sel ? ' class="is-selected"' : ''}>
+    <td class="col-sel"><div class="dcell" style="justify-content:center;cursor:default"><input type="checkbox" data-pick="${d.id}"${sel ? ' checked' : ''} aria-label="Zaznacz: ${esc(d.first_name)} ${esc(d.last_name)}"></div></td>
     <td class="col-stage"><div class="dcell" style="cursor:pointer">${stageChip(d)}</div></td>
     <td data-col="first_name" data-r="${r}" data-c="0">${cellInner(d, 'first_name')}</td>
     <td data-col="last_name" data-r="${r}" data-c="1">${cellInner(d, 'last_name')}</td>
@@ -242,6 +245,7 @@ function devRow(d, r) {
     <td class="col-skills"><div class="dcell" data-act="skills" style="cursor:pointer">${skillBar(d)}</div></td>
     <td class="col-actions"><div class="dcell">
       ${d.phone ? `<a class="strefa-iconbtn strefa-iconbtn--call" href="tel:${esc(telHref(d.phone))}" title="Zadzwoń: ${esc(d.phone)}">${ICO.phone}</a>` : ''}
+      <button class="strefa-iconbtn strefa-iconbtn--mail" data-act="mail" title="${d.email ? 'Napisz maila: ' + esc(d.email) : 'Brak adresu e-mail'}">${ICO.mail}</button>
       <button class="strefa-iconbtn" data-act="open" title="Otwórz profil">${ICO.user}</button>
       <button class="strefa-iconbtn" data-act="del-dev" title="Usuń programistę">${ICO.trash}</button>
     </div></td>
@@ -250,11 +254,11 @@ function devRow(d, r) {
 function gridHTML(c) {
   const devs = visibleDevs(c);
   const rows = devs.length ? devs.map((d, i) => devRow(d, i)).join('')
-    : `<tr><td colspan="9" class="dgrid-empty">${query ? 'Brak pasujących programistów.' : 'Brak programistów. Dodaj poniżej.'}</td></tr>`;
+    : `<tr><td colspan="10" class="dgrid-empty">${query ? 'Brak pasujących programistów.' : 'Brak programistów. Dodaj poniżej.'}</td></tr>`;
   return `<div class="dgrid-wrap" tabindex="0"><table class="dgrid">
-    <thead><tr><th class="col-stage">Etap</th><th>Imię</th><th>Nazwisko</th><th>Stanowisko</th><th>Projekt</th><th>E-mail</th><th>Telefon</th><th class="col-skills">Umiejętności</th><th class="col-actions"></th></tr></thead>
+    <thead><tr><th class="col-sel"><input type="checkbox" data-pickall aria-label="Zaznacz wszystkich w firmie"></th><th class="col-stage">Etap</th><th>Imię</th><th>Nazwisko</th><th>Stanowisko</th><th>Projekt</th><th>E-mail</th><th>Telefon</th><th class="col-skills">Umiejętności</th><th class="col-actions"></th></tr></thead>
     <tbody>${rows}</tbody>
-    <tr class="dgrid-add"><td></td><td colspan="8">
+    <tr class="dgrid-add"><td></td><td></td><td colspan="8">
       <div style="display:flex;gap:.4rem;padding:.35rem .5rem;flex-wrap:wrap;align-items:center">
         <input class="strefa-input" data-add="first_name" placeholder="Imię" style="width:7rem">
         <input class="strefa-input" data-add="last_name" placeholder="Nazwisko" style="width:8rem">
@@ -296,7 +300,17 @@ function renderAll() {
   $('#companies').innerHTML = list.map(companyHTML).join('');
   $('#empty').hidden = companies.length !== 0;
   bindGrids();
+  updateBulkBar();
   activeTd = null;
+}
+
+/* ── pasek akcji zbiorczych (widoczny, gdy ktoś zaznaczony) ── */
+function updateBulkBar() {
+  for (const id of [...selectedIds]) if (!devMap.has(id)) selectedIds.delete(id);
+  const bar = $('#bulkbar'); if (!bar) return;
+  const n = selectedIds.size;
+  bar.hidden = n === 0;
+  const cnt = $('#bulk-count'); if (cnt) cnt.textContent = n === 1 ? '1 zaznaczony' : `${n} zaznaczonych`;
 }
 
 /* ── nawigacja klawiaturą po siatce (jak w Szkoleniach) ── */
@@ -378,6 +392,33 @@ function bindGrids() {
       const td = e.target.closest('td[data-col]');
       if (td) { const caret = caretIndexFromPoint(td, e.clientX, e.clientY); beginEdit(td, { caret }); }
     });
+    // zaznaczanie programistów (checkboxy → multi-akcje)
+    const selAll = $('input[data-pickall]', grid);
+    const syncSelAll = () => {
+      if (!selAll) return;
+      const boxes = $$('input[data-pick]', grid);
+      const on = boxes.filter((b) => b.checked).length;
+      selAll.checked = boxes.length > 0 && on === boxes.length;
+      selAll.indeterminate = on > 0 && on < boxes.length;
+    };
+    grid.addEventListener('change', (e) => {
+      const pick = e.target.closest('[data-pick]');
+      if (pick) {
+        const did = pick.dataset.pick;
+        if (pick.checked) selectedIds.add(did); else selectedIds.delete(did);
+        pick.closest('tr')?.classList.toggle('is-selected', pick.checked);
+        syncSelAll(); updateBulkBar(); return;
+      }
+      if (e.target.matches('[data-pickall]')) {
+        const on = e.target.checked; e.target.indeterminate = false;
+        $$('input[data-pick]', grid).forEach((b) => {
+          b.checked = on; if (on) selectedIds.add(b.dataset.pick); else selectedIds.delete(b.dataset.pick);
+          b.closest('tr')?.classList.toggle('is-selected', on);
+        });
+        updateBulkBar();
+      }
+    });
+    syncSelAll();
     const addGo = $('[data-add-go]', sec);
     const addInputs = $$('[data-add]', sec);
     const doAdd = () => addDeveloper(cid, addInputs, addGo);
@@ -455,6 +496,7 @@ function devRowAction(act, did, anchor, ev) {
   if (!did) return;
   if (act === 'open') openProfile(did);
   else if (act === 'skills') openProfile(did, 'skills');
+  else if (act === 'mail') { const d = devMap.get(did); if (d) composeEmailModal([d]); }
   else if (act === 'stage') stagePopover(did, anchor);
   else if (act === 'del-dev') (async () => {
     const d = devMap.get(did);
@@ -850,9 +892,55 @@ async function loadMails(d, panel) {
   }));
 }
 
+/* ── szybki mail do jednego lub wielu programistów (multi-wysyłka) ── */
+async function composeEmailModal(devs) {
+  const withEmail = devs.filter((d) => d.email && d.email.trim());
+  const without = devs.filter((d) => !d.email || !d.email.trim());
+  if (!withEmail.length) return toast('Brak adresów', 'Żaden z wybranych nie ma e-maila — uzupełnij w profilu', 'err');
+  const multi = withEmail.length > 1;
+  const chips = withEmail.map((d) => `<span class="mail-recip">${esc(d.first_name || '')} ${esc(d.last_name || '')}<span class="mail-recip__addr">${esc(d.email.trim())}</span></span>`).join('');
+  const box = openModal(`
+    <div class="strefa-modal__head">
+      <div><h2>${multi ? `Mail do ${withEmail.length} programistów` : `Mail do ${esc(withEmail[0].first_name)} ${esc(withEmail[0].last_name)}`}</h2>
+        <p>${multi ? 'Każdy dostanie osobną kopię — trafi też do historii i zakładki „Maile"' : esc(withEmail[0].email.trim())}</p></div>
+      <button class="strefa-iconbtn" data-close-x>${ICO.x}</button>
+    </div>
+    <div class="strefa-modal__body">
+      <div class="strefa-field"><label>Odbiorcy (${withEmail.length})</label><div class="mail-recips">${chips}</div></div>
+      ${without.length ? `<p class="strefa-msg strefa-msg--err" style="margin-top:var(--space-sm)">Pominięto (brak e-maila): ${esc(without.map((d) => ((d.first_name || '') + ' ' + (d.last_name || '')).trim()).join(', '))}</p>` : ''}
+      <div class="strefa-field" style="margin-top:var(--space-md)"><label>Temat</label><input class="strefa-input" id="cm-subject" placeholder="Temat maila"></div>
+      <div class="strefa-field" style="margin-top:var(--space-sm)"><label>Treść</label><textarea class="strefa-textarea" id="cm-body" style="min-height:9rem" placeholder="Cześć…"></textarea></div>
+      <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--ghost" data-close-x>Anuluj</button>
+        <button class="strefa-btn strefa-btn--accent" id="cm-send">Wyślij${multi ? ` (${withEmail.length})` : ''}</button></div>
+    </div>`);
+  box.querySelectorAll('[data-close-x]').forEach((b) => b.addEventListener('click', closeModal));
+  $('#cm-subject', box).focus();
+  let busy = false;
+  $('#cm-send', box).addEventListener('click', async () => {
+    if (busy) return;
+    const subject = $('#cm-subject', box).value.trim();
+    const bodyVal = $('#cm-body', box).value;
+    if (!subject && !bodyVal.trim()) return toast('Pusto', 'Podaj temat lub treść', 'err');
+    if (!(await confirmDialog(`Wysłać maila do ${withEmail.length} ${withEmail.length === 1 ? 'osoby' : 'osób'}? Po wysłaniu nie będzie można edytować.`, 'Wyślij', false))) return;
+    busy = true; const btn = $('#cm-send', box); btn.disabled = true; btn.textContent = 'Wysyłam…';
+    let ok = 0, fail = 0;
+    for (const d of withEmail) {
+      const { data, error } = await sb.from('dev_emails').insert({ developer_id: d.id, recipient_email: d.email.trim(), subject: subject || '(bez tematu)', body: bodyVal, status: 'draft' }).select('id').single();
+      if (error) { fail++; continue; }
+      const r = await sb.functions.invoke('strefa-send-dev-email', { body: { email_id: data.id } });
+      if (r.error || !r.data?.success) fail++; else ok++;
+    }
+    closeModal();
+    selectedIds.clear();
+    await loadData(); renderAll();
+    if (!fail) toast('Wysłano', `${ok} ${ok === 1 ? 'mail' : 'maili'} dostarczono`, 'ok');
+    else toast(ok ? 'Wysłano częściowo' : 'Błąd wysyłki', `${ok} OK, ${fail} błędów`, 'err');
+  });
+}
+
 /* ── HISTORIA — dialog z osią czasu eventów + notatek per miesiąc ── */
-const HIST_ICON = { awans: ICO.up, etap: ICO.up, firma: ICO.building, pole: ICO.pencil, umiejetnosc_plus: ICO.check, umiejetnosc_minus: ICO.x, notatka: ICO.lines, spotkanie_utworzone: ICO.clock, spotkanie_przestawione: ICO.clock, spotkanie_odwolane: ICO.x };
-const HIST_CLS = { awans: 'awans', etap: 'etap', firma: 'firma', pole: 'pole', umiejetnosc_plus: 'skill', umiejetnosc_minus: 'skill-minus', notatka: 'note', spotkanie_utworzone: 'meeting', spotkanie_przestawione: 'meeting', spotkanie_odwolane: 'meeting-cancel' };
+const HIST_ICON = { awans: ICO.up, etap: ICO.up, firma: ICO.building, pole: ICO.pencil, umiejetnosc_plus: ICO.check, umiejetnosc_minus: ICO.x, notatka: ICO.lines, spotkanie_utworzone: ICO.clock, spotkanie_przestawione: ICO.clock, spotkanie_odwolane: ICO.x, mail_wyslany: ICO.mail };
+const HIST_CLS = { awans: 'awans', etap: 'etap', firma: 'firma', pole: 'pole', umiejetnosc_plus: 'skill', umiejetnosc_minus: 'skill-minus', notatka: 'note', spotkanie_utworzone: 'meeting', spotkanie_przestawione: 'meeting', spotkanie_odwolane: 'meeting-cancel', mail_wyslany: 'mail' };
 
 function openHistory(devId = null) {
   const allDevs = companies.flatMap((c) => c.developers).slice().sort((a, b) => (a.last_name || '').localeCompare(b.last_name || '', 'pl'));
@@ -1077,6 +1165,11 @@ async function init() {
   });
   $('#btn-history')?.addEventListener('click', () => openHistory());
   $('#btn-schedule-meeting')?.addEventListener('click', () => openScheduleMeetingModal());
+  $('#bulk-clear')?.addEventListener('click', () => { selectedIds.clear(); renderAll(); });
+  $('#bulk-mail')?.addEventListener('click', () => {
+    const devs = [...selectedIds].map((id) => devMap.get(id)).filter(Boolean);
+    if (devs.length) composeEmailModal(devs);
+  });
   $('#btn-export').addEventListener('click', exportJSON);
   $('#btn-import-file').addEventListener('click', () => $('#file-input').click());
   $('#btn-import-legacy')?.addEventListener('click', importLegacy);
