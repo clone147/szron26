@@ -1,7 +1,6 @@
 // Aplikacja „Programiści" strefy zamkniętej SZRON — kokpit do prowadzenia programistów
 // ku autonomicznemu programowaniu intencyjnemu. Dane w schemacie `strefa` (RLS), styl jak „Szkolenia".
 import { getClient, getSessionUser, isAllowed } from './supabase.js';
-import { akademia } from '../data/akademia.mjs';
 import flatpickr from 'flatpickr';
 import { Polish } from 'flatpickr/dist/l10n/pl.js';
 import 'flatpickr/dist/themes/dark.css';
@@ -75,8 +74,17 @@ const stageName = (n) => (STAGES[(n || 1) - 1] || STAGES[0]).name;
 const MINDSETS = ['entuzjasta', 'pragmatyk', 'sceptyk'];
 const AGENTS = ['Claude Code', 'Cursor', 'GitHub Copilot', 'Gemini CLI', 'Codex CLI', 'ChatGPT', 'LM Studio / lokalny', 'inny'];
 const SUBS = ['Claude', 'Gemini', 'ChatGPT', 'Github Copilot', 'Brak'];
-const ALLOWED_SKILLS = ['claude-code', 'claude-code-bezpieczenstwo', 'szkolenie-git', 'szkolenie-supabase-mcp', 'szkolenie-mysql', 'serwery-mcp', 'tips-and-tricks', 'petle', 'gemini-cli', 'codex-cli', 'lm-studio', 'llama-server'];
-const SKILLS = akademia.filter((a) => ALLOWED_SKILLS.includes(a.slug)).map((a) => ({ slug: a.slug, title: a.title }));
+// Katalog umiejętności — dynamiczny, współdzielony (tabela strefa.dev_skill_catalog).
+// Wczytywany w init() i odświeżany po edycji. Element: { id, key, title, page_slug }.
+let SKILLS = [];
+async function loadSkillCatalog() {
+  const { data, error } = await sb.from('dev_skill_catalog').select('id, key, title, page_slug').order('sort_order').order('title');
+  if (!error && data) SKILLS = data;
+  return SKILLS;
+}
+const slugify = (s) => String(s || '').toLowerCase().trim()
+  .replace(/[ąàáâ]/g, 'a').replace(/ć/g, 'c').replace(/[ęèé]/g, 'e').replace(/ł/g, 'l').replace(/ń/g, 'n').replace(/[óòô]/g, 'o').replace(/ś/g, 's').replace(/[żź]/g, 'z')
+  .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
 const NONE = '__none__'; // grupa „bez firmy"
 
 /* ── stan ── */
@@ -224,8 +232,9 @@ function stageChip(d) {
   return `<span class="stage-chip" data-act="stage" title="Etap ${n} · ${esc(stageName(n))} (klik = zmień)" style="--sc:${stageColor(n)}">${n} · ${esc(stageName(n))}</span>`;
 }
 function skillBar(d) {
-  const c = d.skillsCount || 0; const pct = Math.round((c / SKILLS.length) * 100);
-  return `<span class="skill-bar skill-bar--cell" data-act="skills" title="Umiejętności ${c}/${SKILLS.length} (klik = profil)"><span class="skill-bar__fill" style="width:${pct}%"></span></span><span class="skill-bar__num">${c}/${SKILLS.length}</span>`;
+  const total = SKILLS.length || 0; const c = d.skillsCount || 0;
+  const pct = total ? Math.round((c / total) * 100) : 0;
+  return `<span class="skill-bar skill-bar--cell" data-act="skills" title="Umiejętności ${c}/${total} (klik = profil)"><span class="skill-bar__fill" style="width:${pct}%"></span></span><span class="skill-bar__num">${c}/${total}</span>`;
 }
 function cellInner(d, col) {
   const val = d[col]; const muted = !val ? ' dcell--muted' : '';
@@ -652,27 +661,96 @@ async function loadSkills(panel, d) {
   const done = new Set((data || []).map((x) => x.skill_key));
   d.skillsCount = done.size;
   const list = $('#sk-list', panel); if (!list) return;
-  list.innerHTML = SKILLS.map((s) => `<label class="skill-row ${done.has(s.slug) ? 'is-done' : ''}">
-    <input type="checkbox" data-skill="${s.slug}" ${done.has(s.slug) ? 'checked' : ''}>
-    <span>${esc(s.title)}</span>
-    <a href="/${s.slug}" target="_blank" rel="noopener" class="strefa-iconbtn" title="Otwórz materiał">${ICO.open}</a>
-  </label>`).join('');
-  const upd = () => { const c = $$('#sk-list input:checked', panel).length; $('#sk-count', panel).textContent = `${c}/${SKILLS.length}`; $('#sk-fill', panel).style.width = `${Math.round(c / SKILLS.length * 100)}%`; };
+
+  const rowHtml = (s) => `<div class="skill-row ${done.has(s.key) ? 'is-done' : ''}" data-key="${esc(s.key)}">
+    <input type="checkbox" data-skill="${esc(s.key)}" ${done.has(s.key) ? 'checked' : ''} title="Zaliczone przez tego programistę">
+    <input class="skill-row__title" data-title value="${esc(s.title)}" title="Kliknij, by zmienić nazwę">
+    ${s.page_slug ? `<a href="/${esc(s.page_slug)}" target="_blank" rel="noopener" class="strefa-iconbtn" title="Otwórz materiał">${ICO.open}</a>` : ''}
+    <button class="strefa-iconbtn skill-row__del" data-del-skill title="Usuń umiejętność (kliknij ponownie, by potwierdzić)">${ICO.trash}</button>
+  </div>`;
+
+  list.innerHTML = SKILLS.map(rowHtml).join('')
+    + `<div class="skill-row skill-row--add">
+        <input class="skill-row__title" id="sk-new" placeholder="Dodaj umiejętność…" title="Nowa umiejętność — pojawi się u wszystkich (domyślnie niezaznaczona)">
+        <button class="strefa-iconbtn" id="sk-add" title="Dodaj umiejętność">${ICO.plus}</button>
+      </div>`;
+
+  const upd = () => {
+    const c = $$('#sk-list input[data-skill]:checked', panel).length; const total = SKILLS.length || 0;
+    $('#sk-count', panel).textContent = `${c}/${total}`;
+    $('#sk-fill', panel).style.width = `${total ? Math.round(c / total * 100) : 0}%`;
+    d.skillsCount = c; renderStats();
+    const sec = $(`.strefa-tr [data-did="${d.id}"] .col-skills .dcell`); if (sec) sec.innerHTML = skillBar(d);
+  };
   upd();
+
+  // zaznaczanie zaliczenia per programista
   list.querySelectorAll('[data-skill]').forEach((cb) => cb.addEventListener('change', async () => {
-    const slug = cb.dataset.skill; const row = cb.closest('.skill-row');
+    const key = cb.dataset.skill; const row = cb.closest('.skill-row');
     if (cb.checked) {
       row.classList.add('is-done');
-      const { error } = await sb.from('dev_skills').insert({ developer_id: d.id, skill_key: slug });
+      const { error } = await sb.from('dev_skills').insert({ developer_id: d.id, skill_key: key });
       if (error && !String(error.message).includes('duplicate')) { cb.checked = false; row.classList.remove('is-done'); toast('Błąd', error.message, 'err'); }
     } else {
       row.classList.remove('is-done');
-      const { error } = await sb.from('dev_skills').delete().eq('developer_id', d.id).eq('skill_key', slug);
+      const { error } = await sb.from('dev_skills').delete().eq('developer_id', d.id).eq('skill_key', key);
       if (error) { cb.checked = true; row.classList.add('is-done'); toast('Błąd', error.message, 'err'); }
     }
-    upd(); d.skillsCount = $$('#sk-list input:checked', panel).length; renderStats();
-    const sec = $(`.strefa-tr [data-did="${d.id}"] .col-skills .dcell`); if (sec) sec.innerHTML = skillBar(d);
+    upd();
   }));
+
+  // edycja nazwy umiejętności (inline, zapis na blur/Enter) — zmienia ją u wszystkich
+  list.querySelectorAll('[data-title]').forEach((inp) => {
+    const row = inp.closest('.skill-row'); if (!row?.dataset.key) return;
+    const key = row.dataset.key; const orig = inp.value;
+    const save = async () => {
+      const v = inp.value.trim();
+      if (!v) { inp.value = orig; return; }
+      if (v === inp.dataset.saved && v === orig) return;
+      if (v === (SKILLS.find((s) => s.key === key)?.title)) return;
+      const { error } = await sb.from('dev_skill_catalog').update({ title: v }).eq('key', key);
+      if (error) { inp.value = orig; return toast('Błąd', error.message, 'err'); }
+      const s = SKILLS.find((x) => x.key === key); if (s) s.title = v;
+      toast('Zapisano', 'Nazwa umiejętności', 'ok');
+    };
+    inp.addEventListener('blur', save);
+    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); inp.blur(); } if (e.key === 'Escape') { inp.value = orig; inp.blur(); } });
+  });
+
+  // kasowanie umiejętności z katalogu — inline-potwierdzenie (drugi klik), kaskada usuwa zaliczenia u wszystkich
+  list.querySelectorAll('[data-del-skill]').forEach((btn) => {
+    const row = btn.closest('.skill-row'); const key = row?.dataset.key; if (!key) return;
+    btn.addEventListener('click', async () => {
+      if (!btn.classList.contains('is-confirm')) {
+        btn.classList.add('is-confirm'); btn.title = 'Kliknij ponownie, by usunąć na stałe';
+        btn._t = setTimeout(() => { btn.classList.remove('is-confirm'); }, 3000);
+        return;
+      }
+      clearTimeout(btn._t);
+      const { error } = await sb.from('dev_skill_catalog').delete().eq('key', key);
+      if (error) { btn.classList.remove('is-confirm'); return toast('Błąd', error.message, 'err'); }
+      SKILLS = SKILLS.filter((s) => s.key !== key);
+      row.remove(); upd(); toast('Usunięto', 'Umiejętność', 'ok');
+    });
+  });
+
+  // dodawanie nowej umiejętności do katalogu — pojawi się u wszystkich (domyślnie niezaznaczona)
+  const newInp = $('#sk-new', panel); const addBtn = $('#sk-add', panel);
+  const addSkill = async () => {
+    const title = newInp.value.trim(); if (!title) return;
+    let key = slugify(title) || 'umiejetnosc';
+    if (SKILLS.some((s) => s.key === key)) key += '-' + Math.random().toString(36).slice(2, 6);
+    const sort = SKILLS.length + 1;
+    const { error } = await sb.from('dev_skill_catalog').insert({ key, title, sort_order: sort });
+    if (error) return toast('Błąd', error.message, 'err');
+    SKILLS.push({ key, title, page_slug: null });
+    newInp.value = '';
+    await loadSkills(panel, d);
+    $('#sk-new', panel)?.focus();
+    toast('Dodano', 'Umiejętność widoczna u wszystkich', 'ok');
+  };
+  addBtn?.addEventListener('click', addSkill);
+  newInp?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addSkill(); } });
 }
 
 /* — wspólny renderer zakładek listowych: notes / meetings / tasks / prompts — */
@@ -1122,10 +1200,12 @@ async function startRealtime() {
   try { const { data } = await sb.auth.getSession(); if (data?.session) sb.realtime.setAuth(data.session.access_token); } catch (e) { /* ignore */ }
   let deb;
   const trigger = () => { clearTimeout(deb); deb = setTimeout(pollRefresh, 400); };
+  const triggerCatalog = () => { clearTimeout(deb); deb = setTimeout(async () => { await loadSkillCatalog(); await pollRefresh(); if (openDevId) renderProfile(); }, 400); };
   sb.channel('strefa-programisci-list')
     .on('postgres_changes', { event: '*', schema: 'strefa', table: 'developers' }, trigger)
     .on('postgres_changes', { event: '*', schema: 'strefa', table: 'dev_companies' }, trigger)
     .on('postgres_changes', { event: '*', schema: 'strefa', table: 'dev_skills' }, trigger)
+    .on('postgres_changes', { event: '*', schema: 'strefa', table: 'dev_skill_catalog' }, triggerCatalog)
     .on('postgres_changes', { event: '*', schema: 'strefa', table: 'dev_meetings' }, trigger)
     .subscribe((s) => { if (s === 'SUBSCRIBED') pollRefresh(); });
   setInterval(pollRefresh, 60000);
@@ -1182,6 +1262,7 @@ async function init() {
   $('#file-input').addEventListener('change', (e) => { if (e.target.files[0]) importFile(e.target.files[0]); e.target.value = ''; });
   let timer;
   $('#search').addEventListener('input', (e) => { clearTimeout(timer); timer = setTimeout(() => { query = e.target.value.trim(); renderAll(); }, 150); });
+  await loadSkillCatalog();
   await loadData();
   if (companies.length) openIds.add(companies[0].id);
   renderAll();

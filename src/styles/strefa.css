@@ -371,11 +371,18 @@
 
 /* checklista umiejętności */
 .skill-check { display: grid; grid-template-columns: 1fr 1fr; gap: .35rem; }
-.skill-row { display: flex; align-items: center; gap: .55rem; padding: .4rem .55rem; background: var(--color-ink); border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); cursor: pointer; font-size: var(--text-s); }
+.skill-row { display: flex; align-items: center; gap: .55rem; padding: .4rem .55rem; background: var(--color-ink); border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); font-size: var(--text-s); }
 .skill-row > span { flex: 1; min-width: 0; }
-.skill-row input { width: 16px; height: 16px; accent-color: oklch(62% 0.16 150); flex: none; cursor: pointer; }
+.skill-row input[type=checkbox] { width: 16px; height: 16px; accent-color: oklch(62% 0.16 150); flex: none; cursor: pointer; }
 .skill-row .strefa-iconbtn { width: 1.5rem; height: 1.5rem; flex: none; }
 .skill-row.is-done { border-color: color-mix(in oklch, oklch(62% 0.16 150) 45%, var(--color-line-dark)); background: color-mix(in oklch, oklch(62% 0.16 150) 8%, transparent); }
+/* nazwa umiejętności — wygląda jak tekst, edytowalna inline */
+.skill-row__title { flex: 1; min-width: 0; background: transparent; border: 1px solid transparent; border-radius: var(--radius-sm); color: inherit; font: inherit; padding: .15rem .35rem; }
+.skill-row__title:hover { border-color: var(--color-line-dark); }
+.skill-row__title:focus { outline: none; border-color: var(--color-accent); background: var(--color-ink-2); }
+.skill-row--add { border-style: dashed; cursor: default; grid-column: 1 / -1; }
+.skill-row--add #sk-new { cursor: text; }
+.skill-row__del.is-confirm { color: oklch(64% 0.2 25); border-color: oklch(64% 0.2 25); background: color-mix(in oklch, oklch(64% 0.2 25) 14%, transparent); }
 
 /* spotkania / zadania / prompty / maile */
 .meet-item, .prompt-card { background: var(--color-ink); border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); padding: var(--space-md); margin-top: var(--space-sm); }
