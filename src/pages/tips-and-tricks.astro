@@ -5,7 +5,7 @@ import Interior from '../layouts/Interior.astro';
   title="Claude Code — Tips & Tricks | Akademia SZRON"
   description="Praktyczne wskazówki do Claude Code: powiadomienia przez hooki, pomijanie uprawnień, status line, wyłączenie auto-compact, tryb planowania i prompty."
   eyebrow="Akademia · Praktyka pracy z AI"
-  updated="2026-06-20"
+  updated="2026-06-25"
   heading="Claude Code — Tips & Tricks dla programistów."
   lead="Zestaw praktyk, skrótów i wzorców, które realnie przyspieszają codzienną pracę z agentem. Od powiadomień dźwiękowych po świadome zarządzanie kontekstem i optymalizację promptów — wszystko z naszej własnej praktyki."
 >
@@ -72,17 +72,20 @@ node ~/.claude/play.js ~/.claude/finish.wav</code></pre>
     <div class="container">
       <div class="prose rv">
         <p class="eyebrow" data-scramble>03 / Status line · Monitoring w terminalu</p>
-        <h2 id="statusline">Status line — model i tokeny w czasie rzeczywistym.</h2>
-        <p>Status line pokazuje na bieżąco model, zużycie tokenów, czas i status operacji wprost w terminalu. Instalacja w katalogu projektu to jedna komenda:</p>
-        <pre><code>npx @chongdashu/cc-statusline@latest init</code></pre>
-        <p>Instalator przeprowadzi przez wybór elementów do wyświetlania:</p>
+        <h2 id="statusline">Status line — model i kontekst w czasie rzeczywistym.</h2>
+        <p>Status line to pasek na dole terminala. Pokazuje na bieżąco model, zapełnienie okna kontekstu, koszt sesji czy gałąź gita — cokolwiek wypisze skrypt, który mu podłączysz. Nie musisz już sięgać po zewnętrzne paczki: Claude Code ma wbudowaną komendę <code>/statusline</code>, która sama wygeneruje skrypt i wpisze go do ustawień. Opisujesz po ludzku, co chcesz widzieć:</p>
+        <pre><code>/statusline pokaż nazwę modelu i procent kontekstu z paskiem postępu</code></pre>
+        <p>Agent tworzy plik w <code>~/.claude/</code> i aktualizuje konfigurację za Ciebie. Co warto trzymać na pasku:</p>
         <ul>
           <li><strong>Model</strong> — aktualnie używany model i moment przełączenia między Opus a Sonnet.</li>
-          <li><strong>Licznik tokenów</strong> — kontrola kosztów i wczesne ostrzeżenie przed limitem.</li>
-          <li><strong>Czas</strong> — długość trwania konwersacji.</li>
-          <li><strong>Status</strong> — stan bieżącej operacji.</li>
+          <li><strong>Kontekst</strong> — zapełnienie okna; wczesne ostrzeżenie, zanim zrobi się ciasno.</li>
+          <li><strong>Koszt</strong> — wydatek na bieżącą sesję.</li>
+          <li><strong>Git</strong> — gałąź i stan repo, zawsze pod ręką.</li>
         </ul>
-        <p>Po instalacji odświeża się automatycznie podczas pracy agenta. Źródło: <code>github.com/chongdashu/cc-statusline</code>.</p>
+        <p>Pasek odświeża się sam podczas pracy. Chcesz go zmienić albo usunąć — wywołaj <code>/statusline</code> jeszcze raz i powiedz, co poprawić (albo <code>/statusline clear</code>).</p>
+        <div class="callout">
+          <p><strong>Aktualizacja:</strong> wcześniej polecaliśmy zewnętrzny instalator (<code>npx @chongdashu/cc-statusline@latest init</code>). Dziś jest to zbędne — wbudowana komenda <code>/statusline</code> robi to samo bez dokładania zależności do projektu.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -126,12 +129,12 @@ JWT, refresh tokenami i rate limitingiem dla REST API.</code></pre>
         <table>
           <thead><tr><th scope="col">Mechanizm</th><th scope="col">Co robi</th><th scope="col">Zasięg</th></tr></thead>
           <tbody>
-            <tr><td><strong>/effort</strong> (low / medium / high / xhigh / max)</td><td>ustawia, jak głęboko agent myśli</td><td>cała sesja, aż zmienisz</td></tr>
+            <tr><td><strong>/effort</strong> (low / medium / high / xhigh / max / ultracode)</td><td>ustawia, jak głęboko agent myśli</td><td>cała sesja, aż zmienisz</td></tr>
             <tr><td><strong>ultrathink</strong> / <strong>think</strong> (w treści promptu)</td><td>jednorazowo podbija myślenie na tę jedną odpowiedź</td><td>tylko bieżący prompt</td></tr>
           </tbody>
         </table>
         <div class="callout">
-          <p><strong>Aktualizacja:</strong> dla obecnych modeli (Opus 4.8 / 4.7) model „fraza → stały budżet tokenów" jest przestarzały. Dawne <code>think</code> / <code>megathink</code> / <code>ultrathink</code> mapowały na sztywne progi (~4K / 10K / 32K) — dziś te liczby są nieaktualne. Głębokość ustawiasz komendą <code>/effort</code> (low / medium / high / xhigh / max), która trzyma wybrany poziom między turami. Słowo <code>ultrathink</code> w prompcie to już tylko jednorazowy zastrzyk na jedną odpowiedź — był chwilowo zdeprecjonowany (16.01.2026) i przywrócony w v2.1.68. Głębsze myślenie rezerwuj na realnie trudne decyzje: architekturę, duży refactoring, niejasne błędy.</p>
+          <p><strong>Aktualizacja:</strong> dla obecnych modeli (Opus 4.8 / 4.7) model „fraza → stały budżet tokenów" jest przestarzały. Dawne <code>think</code> / <code>megathink</code> / <code>ultrathink</code> mapowały na sztywne progi (~4K / 10K / 32K) — dziś te liczby są nieaktualne. Głębokość ustawiasz komendą <code>/effort</code>: <code>low</code>, <code>medium</code>, <code>high</code> (domyślny dla Opus 4.8, też w Claude Code), <code>xhigh</code> na długie zadania agentowe i <code>max</code> na realnie graniczne problemy. Wybrany poziom trzyma się między turami. Na górze menu jest jeszcze <code>ultracode</code> — to nie osobny poziom modelu, tylko <code>xhigh</code> plus zgoda na to, żeby agent sam rozpisywał zadanie na wiele równoległych podagentów. Słowo <code>ultrathink</code> w prompcie to z kolei jednorazowy zastrzyk na jedną odpowiedź. Głębsze myślenie rezerwuj na trudne decyzje: architekturę, duży refactoring, niejasne błędy.</p>
         </div>
       </div>
     </div>

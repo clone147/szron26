@@ -7,7 +7,7 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
   title="OpenAI Codex CLI — instalacja i komendy | Akademia SZRON"
   description="Przewodnik po OpenAI Codex CLI: instalacja przez npm, config.toml, tryby zatwierdzania, komendy sesji, MCP i kontrola przeglądarki. Agent kodujący w terminalu."
   eyebrow="Akademia · Narzędzia agentowe"
-  updated="2026-06-20"
+  updated="2026-06-25"
   heading="OpenAI Codex CLI — autonomiczny agent w terminalu."
   lead="Codex CLI to open-source agent kodujący napędzany rodziną GPT-5-Codex: buduje projekty od zera, refaktoryzuje, debuguje i integruje się z MCP. Poniżej instalacja, plik konfiguracyjny, tryby zatwierdzania i komendy, które realnie wykorzystujemy."
 >
@@ -15,9 +15,9 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
   <section class="sect" style="padding-bottom:0">
     <div class="container">
       <div class="proof-strip rv">
-        <div><strong>GPT-5-Codex</strong><span>domyślna rodzina modeli</span></div>
+        <div><strong>GPT-5.x</strong><span>rekomendowana rodzina modeli</span></div>
         <div><strong>Open-source</strong><span>licencja Apache 2.0</span></div>
-        <div><strong>400K tokenów</strong><span>kontekstu w sesji</span></div>
+        <div><strong>Rust</strong><span>natywny binarny CLI</span></div>
       </div>
     </div>
   </section>
@@ -30,7 +30,7 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
         <h2 class="sect-title sect-title--s ws" id="czym">Agent, który prowadzi projekt od zera po produkcję.</h2>
       </div>
       <div class="prose rv">
-        <p>OpenAI Codex CLI to zaawansowane narzędzie agentowe do autonomicznego kodowania w terminalu, napędzane rodziną modeli GPT-5-Codex dostrojonych do zadań inżynieryjnych. Jest open-source (Apache 2.0), działa natywnie na macOS, Linux i Windows. Domyślnym modelem jest dziś linia GPT-5.x-Codex (GPT-5-Codex pojawił się we wrześniu 2025, kolejne wersje GPT-5.x-Codex w 2026); modele o3 i codex-1 to era research preview z 2025.</p>
+        <p>OpenAI Codex CLI to agent do autonomicznego kodowania w terminalu. Open-source na licencji Apache 2.0, napisany w Rust, działa na macOS, Linux i Windows. Modelu nie musisz wybierać — po zalogowaniu kontem ChatGPT Codex sam sięga po rekomendowany wariant z rodziny GPT-5.x. Stan na połowę 2026: GPT-5.5 to najnowszy model frontier, obok niego GPT-5.4 i szybszy GPT-5.4-mini. Dedykowana linia „-codex" (gpt-5.3-codex, gpt-5.2) została w maju 2026 wycofana z listy wyboru dla logujących się przez ChatGPT. GPT-5-Codex z września 2025 oraz o3 i codex-1 to już zamknięty rozdział.</p>
         <p>Kluczowe możliwości:</p>
         <ul>
           <li>Budowanie projektów od zera.</li>
@@ -50,16 +50,17 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
   <section class="sect sect--dark" aria-labelledby="model">
     <div class="container">
       <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Model · GPT-5-Codex</p>
-        <h2 class="sect-title ws" id="model">Model zoptymalizowany pod inżynierię oprogramowania.</h2>
+        <p class="eyebrow rv" data-scramble>02 / Model · GPT-5.x</p>
+        <h2 class="sect-title ws" id="model">Rodzina modeli pod inżynierię oprogramowania.</h2>
       </div>
       <div class="prose rv">
+        <p>Codex nie jest przywiązany do jednego modelu. Domyślnie bierze rekomendowany wariant rodziny GPT-5.x, a Ty przełączasz się między nimi w locie — komendą <code>/model</code>. Stan na połowę 2026:</p>
         <ul>
-          <li>Zoptymalizowany pod kątem długich sesji kodowania.</li>
-          <li>Rodzina GPT-5-Codex dostrojona do zadań inżynieryjnych — GPT-5-Codex od września 2025, kolejne wersje GPT-5.x-Codex w 2026.</li>
-          <li>Modele GPT-5.x wspierają kontekst do 400K tokenów (128K dotyczyło modeli z 2025).</li>
+          <li><strong>GPT-5.5</strong> — najnowszy model frontier, do najcięższego kodowania.</li>
+          <li><strong>GPT-5.4</strong> — model flagowy do codziennej pracy.</li>
+          <li><strong>GPT-5.4-mini</strong> — gdy zależy Ci na szybkości i koszcie.</li>
         </ul>
-        <p>Model dynamicznie alokuje czas „myślenia" i automatycznie dostosowuje zasoby do skomplikowania problemu — od krótkich odpowiedzi po długie sesje nad złożonym zadaniem.</p>
+        <p>Osobna linia „-codex" (gpt-5.3-codex, gpt-5.2) zniknęła z listy wyboru przy logowaniu kontem ChatGPT. Model dynamicznie alokuje czas „myślenia" i dostosowuje zasoby do skomplikowania problemu — od krótkich odpowiedzi po długie sesje nad złożonym zadaniem.</p>
       </div>
     </div>
   </section>
@@ -89,7 +90,12 @@ sudo apt-get install -y nodejs</code></pre>
         <p>Po instalacji zweryfikuj wersję: <code>node --version</code>.</p>
 
         <h3>2. Instalacja Codex CLI</h3>
+        <p>Najszybciej — skryptem instalacyjnym (macOS/Linux), bez Node.js:</p>
+        <pre><code>curl -fsSL https://chatgpt.com/codex/install.sh | sh</code></pre>
+        <p>Przez npm (wymaga Node.js 22+):</p>
         <pre><code>npm install -g &#64;openai/codex</code></pre>
+        <p>Albo przez Homebrew:</p>
+        <pre><code>brew install --cask codex</code></pre>
         <p>Po instalacji komenda <code>codex</code> działa z dowolnego miejsca w systemie. Paczka <code>&#64;openai/codex</code> jest aktywnie rozwijana.</p>
         <div class="callout">
           <p><strong>Windows — natywnie:</strong> Codex działa natywnie w PowerShell z sandboxem Windows. WSL2 pozostaje opcją (np. dla zgodności z narzędziami linuksowymi), ale nie jest już wymogiem — w razie potrzeby uruchom <code>wsl --install</code> i zainstaluj Node.js oraz Codex CLI wewnątrz WSL.</p>
@@ -108,8 +114,8 @@ sudo apt-get install -y nodejs</code></pre>
       <div class="prose rv">
         <p>Plik konfiguracyjny: <code>~/.codex/config.toml</code>.</p>
         <h3>1. Domyślny model</h3>
-        <pre><code>model = "gpt-5-codex"  # lub inny wariant z rodziny gpt-5.x-codex</code></pre>
-        <p>Po przepisaniu CLI na Rust model ustawia się kluczem najwyższego poziomu <code>model</code> — bez tabeli <code>[model]</code>. Stare warianty <code>codex-mini-latest</code> i <code>o3-mini</code> zostały wycofane.</p>
+        <pre><code>model = "gpt-5.5"  # lub gpt-5.4, gpt-5.4-mini</code></pre>
+        <p>Jeśli klucza <code>model</code> nie ustawisz, Codex sam dobiera rekomendowany wariant. Model ustawia się kluczem najwyższego poziomu — bez tabeli <code>[model]</code>. Linia „-codex" (gpt-5.3-codex, gpt-5.2) oraz starsze <code>codex-mini-latest</code> i <code>o3-mini</code> zostały wycofane.</p>
         <h3>2. Tryby zatwierdzania i sandbox</h3>
         <pre><code>approval_policy = "on-request"   # "untrusted", "on-request", "never"
 sandbox_mode = "workspace-write" # "read-only", "workspace-write", "danger-full-access"</code></pre>

@@ -5,7 +5,7 @@ import Interior from '../layouts/Interior.astro';
   title="MCP Supabase + Claude Code | Akademia SZRON"
   description="Połącz Supabase z Claude Code przez MCP: instalacja serwera, tryb read-only, project-ref scoping i bezpieczeństwo. Nie łącz z produkcją — tylko dev."
   eyebrow="Akademia · MCP Supabase"
-  updated="2026-06-20"
+  updated="2026-06-25"
   heading="MCP Supabase: agent na Waszej bazie — z trybem read-only."
   lead="MCP Supabase daje Claude Code bezpośredni dostęp do bazy w naturalnym języku: listowanie tabel, zapytania, migracje, generowanie typów TypeScript. Klucz to bezpieczna konfiguracja — tryb read-only i ograniczenie do jednego projektu, nigdy na produkcji."
 >
@@ -55,8 +55,10 @@ node --version</code></pre>
   --project-ref=TWOJ_PROJECT_REF</code></pre>
         <div class="callout"><p><strong>Aktualizacja:</strong> dla serwera zdalnego domyślną autoryzacją jest OAuth — przy pierwszym połączeniu logujesz się przez przeglądarkę, bez ręcznego PAT. Personal access token pozostaje fallbackiem dla CI. Przy lokalnym npx serwer uruchamiaj jako <code>npx -y @supabase/mcp-server-supabase@latest --access-token=&lt;token&gt;</code>; token możesz też przekazać przez zmienną środowiskową <code>SUPABASE_ACCESS_TOKEN</code> zamiast w argumencie.</p></div>
 
+        <div class="callout"><p><strong>Aktualizacja:</strong> od lutego 2026 Supabase jest oficjalnym konektorem Claude. W Claude.ai albo Claude Desktop wchodzisz w menu konektorów, wybierasz Supabase i autoryzujesz dostęp do swojej organizacji przez OAuth — bez ręcznego wpisu w configu. Konektor działa na płatnych planach Claude (Pro, Team, Enterprise, Max). Dla Claude Code w terminalu nadal najszybsze jest <code>claude mcp add --transport http</code> z URL serwera zdalnego.</p></div>
+
         <h3>Alternatywa — przez Claude Desktop</h3>
-        <p>Możesz najpierw skonfigurować serwer w Claude Desktop, a potem zaimportować go do Claude Code. W pliku konfiguracyjnym Claude Desktop dodaj wpis serwera (klamry zakodowane encjami, w realnym pliku JSON użyj zwykłych nawiasów):</p>
+        <p>Możesz też najpierw skonfigurować serwer ręcznie w Claude Desktop, a potem zaimportować go do Claude Code. W pliku konfiguracyjnym Claude Desktop dodaj wpis serwera (klamry zakodowane encjami, w realnym pliku JSON użyj zwykłych nawiasów):</p>
         <pre><code>&#123;
   "mcpServers": &#123;
     "supabase": &#123;

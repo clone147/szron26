@@ -2,7 +2,7 @@
 import Interior from '../layouts/Interior.astro';
 ---
 <Interior
-  updated="2026-06-20"
+  updated="2026-06-25"
   title="Claude Code i Git — automatyczne commity | Akademia SZRON"
   description="Jak Claude Code prowadzi kontrolę wersji: automatyczne commity, porządkowanie historii, konflikty, Pull Requesty i bisect. Praktyczne komendy i pułapki."
   eyebrow="Akademia · Claude Code i Git"
@@ -119,7 +119,8 @@ claude /install-github-app</code></pre>
         <div class="callout"><p><strong>Wskazówka:</strong> Pod spodem działa GitHub Actions — możesz też ręcznie dodać do workflow action <code>anthropics/claude-code-action@v1</code>, żeby uruchamiać Claude w CI przy każdym PR.</p></div>
 
         <h3>Automatyczne review PR (Team/Enterprise)</h3>
-        <p>Na planach Team i Enterprise dostępne jest GitHub Code Review. Po włączeniu przez administratora review odpala się automatycznie przy każdym PR lub pushu, albo ręcznie komentarzem <code>@claude review</code>. Findingi pojawiają się jako komentarze inline w PR. Zachowanie konfigurujesz przez pliki <code>CLAUDE.md</code> i <code>REVIEW.md</code> w repozytorium.</p>
+        <p>Na planach Team i Enterprise dostępne jest GitHub Code Review. Po włączeniu przez administratora review odpala się automatycznie przy każdym PR lub pushu, albo ręcznie komentarzem <code>@claude review</code>. Findingi pojawiają się jako komentarze inline w PR — oznaczone wagą (Important / Nit / Pre-existing) i bez blokowania merge. Zachowanie konfigurujesz przez pliki <code>CLAUDE.md</code> i <code>REVIEW.md</code> w repozytorium; <code>REVIEW.md</code> ma priorytet i służy do reguł tylko pod review.</p>
+        <div class="callout"><p><strong>Aktualizacja:</strong> GitHub Code Review jest na etapie research preview i nie działa w organizacjach z włączonym Zero Data Retention. Pojedyncze review bez zapisywania PR-a do kolejnych pushy odpalisz komentarzem <code>@claude review once</code>. Koszt liczony jest osobno z kredytów usage (średnio 15–25 USD za review), nie z limitu planu.</p></div>
       </div>
     </div>
   </section>

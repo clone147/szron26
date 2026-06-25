@@ -5,7 +5,7 @@ import Interior from '../layouts/Interior.astro';
   title="Pętle agentowe — /goal i /loop | Akademia SZRON"
   description="Jak prowadzić agenta w pętli: /goal pracuje aż do celu, /loop powtarza zadanie co interwał. Wzorzec checklisty TODO.md odhaczanej automatycznie — z przykładem."
   eyebrow="Akademia · Pętle"
-  updated="2026-06-20"
+  updated="2026-06-25"
   heading="Pętle: /goal i /loop. Agent pracuje, aż cel osiągnięty."
   lead="Najwięcej daje nie pojedyncze polecenie, tylko agent prowadzony w pętli. Dwie komendy: <strong>/goal</strong> — pracuje, aż osiągnie cel, oraz <strong>/loop</strong> — powtarza zadanie co zadany czas. Spinają je wzorzec checklisty: plik z zadaniami, który agent sam odhacza."
 >
@@ -14,7 +14,7 @@ import Interior from '../layouts/Interior.astro';
     <div class="container">
       <div class="proof-strip rv">
         <div><strong>/goal</strong><span>pętla do celu — kończy, gdy warunek spełniony</span></div>
-        <div><strong>/loop 60s</strong><span>powtarza zadanie co 60 sekund</span></div>
+        <div><strong>/loop 5m</strong><span>powtarza zadanie co interwał (granularność 1 min)</span></div>
         <div><strong>Checklista = pamięć</strong><span>[ ] → [x] jako stan między iteracjami</span></div>
       </div>
     </div>
@@ -30,10 +30,11 @@ import Interior from '../layouts/Interior.astro';
       <div class="prose rv">
         <h2>/goal — pętla do celu</h2>
         <p><code>/goal</code> uruchamia agenta w trybie zadaniowym: dostaje cel i pracuje w kółko, aż go osiągnie. Po każdej turze warunek końcowy ocenia <em>osobny</em> model — mały i szybki (domyślnie Haiku) — i zwraca tak/nie wraz z uzasadnieniem. To celowe: agent, który wykonuje pracę, nie ocenia jej sam. Idealny do zadań, które da się rozbić na listę kroków o jasnym warunku zakończenia: „zrób wszystko z listy", „napraw, aż testy przechodzą", „uzupełnij brakujące pliki".</p>
-        <div class="callout"><p><strong>Sedno:</strong> definiujesz <em>cel</em> i <em>warunek osiągnięcia celu</em>, nie pojedynczą czynność. Ocenę spełnienia warunku robi po każdej turze odrębny mały, szybki model (domyślnie Haiku) — zwraca tak/nie z uzasadnieniem, żeby model nie był sędzią we własnej sprawie.</p></div>
+        <div class="callout"><p><strong>Sedno:</strong> definiujesz <em>cel</em> i <em>warunek osiągnięcia celu</em>, nie pojedynczą czynność. Ocenę spełnienia warunku robi po każdej turze odrębny mały, szybki model (domyślnie Haiku) — zwraca tak/nie z uzasadnieniem, żeby model nie był sędzią we własnej sprawie. <code>/goal</code> wymaga Claude Code w wersji v2.1.139 lub nowszej; działa też nieinteraktywnie (<code>claude -p "/goal …"</code>) i przeżywa <code>--resume</code> sesji.</p></div>
         <h2>/loop — powtarzanie co interwał</h2>
-        <p><code>/loop 60s</code> powtarza to samo polecenie co zadany czas (tu: co 60 sekund). Sprawdza się przy monitorowaniu i pracy reaktywnej: „co minutę sprawdź status builda", „co 5 minut zerknij na nowe zgłoszenia", „pilnuj kolejki, aż się opróżni". Pętla działa, dopóki jej nie zatrzymasz albo dopóki warunek w prompcie nie każe jej zakończyć.</p>
-        <div class="callout"><p><strong>Aktualizacja:</strong> <code>/loop</code> stoi na cronie, więc minimalny interwał to 1 minuta (sub-minutowe wartości zaokrąglają się w górę). Zadania są przypięte do sesji: wygasają po 7 dniach, maksymalnie 50 na sesję. Wymaga Claude Code w wersji v2.1.72 lub nowszej.</p></div>
+        <p><code>/loop 5m sprawdź status builda</code> powtarza to samo polecenie co zadany czas (tu: co 5 minut). Sprawdza się przy monitorowaniu i pracy reaktywnej: „co minutę sprawdź status builda", „co 5 minut zerknij na nowe zgłoszenia", „pilnuj kolejki, aż się opróżni". Pętla działa na cronie, dopóki jej nie zatrzymasz (klawisz <code>Esc</code> kasuje najbliższe wybudzenie) albo dopóki nie minie 7 dni.</p>
+        <div class="callout"><p><strong>Aktualizacja:</strong> interwał jest opcjonalny. <code>/loop &lt;prompt&gt;</code> bez czasu sam dobiera odstęp (od 1 minuty do 1 godziny) — krótszy, gdy coś się dzieje, dłuższy, gdy cisza — a po wykonaniu zadania potrafi sam zakończyć pętlę. Samo <code>/loop</code> bez argumentów odpala wbudowany prompt utrzymaniowy (albo Twój plik <code>.claude/loop.md</code>): dociąga niedokończoną robotę, pilnuje PR-a bieżącej gałęzi i sprząta kod.</p></div>
+        <div class="callout"><p><strong>Wymagania:</strong> <code>/loop</code> stoi na cronie, więc stały interwał ma granularność 1 minuty (sekundy zaokrąglają się w górę). Zadania są przypięte do sesji: wygasają po 7 dniach, maksymalnie 50 na sesję. Wymaga Claude Code w wersji v2.1.72 lub nowszej.</p></div>
         <ul>
           <li><strong>/goal</strong> — gdy znasz <em>cel</em>, ale nie wiesz, ile kroków zajmie. Kończy się sam.</li>
           <li><strong>/loop &lt;czas&gt;</strong> — gdy chcesz <em>cyklicznie</em> coś sprawdzać lub dorzucać po kawałku w równych odstępach.</li>

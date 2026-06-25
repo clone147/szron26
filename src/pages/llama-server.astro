@@ -7,7 +7,7 @@ const related = akademia.filter((a) => ['lm-studio', 'claude-code-bezpieczenstwo
   title="Lokalny LLM — llama-server | Akademia SZRON"
   description="Przewodnik po llama-server (llama.cpp): kompilacja z CUDA/Metal/ROCm, modele GGUF, continuous batching, flagi, WebUI i API zgodne z OpenAI. Modele w firmie."
   eyebrow="Akademia · Lokalne modele"
-  updated="2026-06-20"
+  updated="2026-06-25"
   heading="Lokalny LLM w firmie — llama-server od podstaw."
   lead="Jeśli szukasz maksymalnej wydajności, elastyczności i prawdziwej współbieżności na własnym sprzęcie, odpowiedzią jest llama-server z projektu llama.cpp. Poniżej kompilacja, modele GGUF, flagi uruchomienia i dostęp przez API zgodne z OpenAI."
 >
@@ -108,7 +108,9 @@ cmake --build build --config Release -j</code></pre>
         <ul>
           <li><code>-m, --model [SCIEZKA]</code> — <strong>wymagane:</strong> ścieżka do pliku modelu GGUF.</li>
           <li><code>-hf, --hf-repo &lt;user&gt;/&lt;model&gt;[:quant]</code> — alternatywa dla <code>-m</code>: pobiera i uruchamia model GGUF prosto z Hugging Face, bez ręcznego ściągania pliku.</li>
-          <li><code>-ngl, --n-gpu-layers [LICZBA]</code> — <strong>krytyczne:</strong> ile warstw modelu trafia do VRAM GPU. Ustawiaj wysoko (np. 99 lub 1000), aby załadować jak najwięcej na GPU.</li>
+          <li><code>-ngl, --n-gpu-layers [LICZBA]</code> — <strong>krytyczne:</strong> ile warstw modelu trafia do VRAM GPU. Ustawiaj wysoko (np. 99), aby załadować jak najwięcej na GPU. Flaga przyjmuje też <code>auto</code> i <code>all</code> — przy <code>auto</code> serwer sam dobiera liczbę warstw pod dostępną pamięć.</li>
+          <li><code>--cpu-moe, -cmoe</code> / <code>--n-cpu-moe, -ncmoe [N]</code> — dla modeli MoE: trzyma wagi ekspertów w RAM zamiast w VRAM (wariant z <code>N</code> dotyczy tylko pierwszych N warstw). Tym sposobem odpalisz duży model MoE na karcie, która inaczej by go nie pomieściła.</li>
+          <li><code>-fa, --flash-attn [on|off|auto]</code> — Flash Attention; domyślnie <code>auto</code>, więc serwer sam włącza je, gdy sprzęt to wspiera.</li>
           <li><code>--parallel [LICZBA]</code> — ile zapytań (slotów) może być przetwarzanych równolegle.</li>
           <li><code>--host</code> / <code>--port</code> — adres i port nasłuchu (np. <code>0.0.0.0</code> i <code>8080</code>).</li>
         </ul>

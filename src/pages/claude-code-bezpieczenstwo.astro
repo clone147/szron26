@@ -8,7 +8,7 @@ import Interior from '../layouts/Interior.astro';
   heading="Zabezpieczanie Claude Code przed wyciekiem danych."
   lead="Praca z agentem na firmowym kodzie wymaga warstw ochrony. Pokazujemy, co realnie działa, a co jest tylko sugestią dla modelu — i jak złożyć deny rules, sandbox oraz hooki w jedną, niezawodną konfigurację."
   headingSmall={true}
-  updated="2026-06-20"
+  updated="2026-06-25"
 >
   <!-- proof -->
   <section class="sect" style="padding-bottom:0">
@@ -120,13 +120,16 @@ import Interior from '../layouts/Interior.astro';
   &#125;
 &#125;</code></pre>
         <div class="callout">
-          <p><strong>Twarde wymuszenie:</strong> <code>failIfUnavailable: true</code> sprawia, że Claude Code w ogóle nie wystartuje, gdy sandbox jest niedostępny — zamiast cicho przejść w tryb bez izolacji. Dodatkowo zmienna środowiskowa <code>CLAUDE_CODE_SUBPROCESS_ENV_SCRUB</code> usuwa zmienne środowiskowe rodzica (poświadczenia w <code>env</code>) z sandboxowanych subprocesów <code>Bash</code>, które domyślnie je dziedziczą.</p>
+          <p><strong>Twarde wymuszenie:</strong> <code>failIfUnavailable: true</code> sprawia, że Claude Code w ogóle nie wystartuje, gdy sandbox jest niedostępny — zamiast cicho przejść w tryb bez izolacji. Sandboxowane komendy <code>Bash</code> domyślnie dziedziczą zmienne środowiskowe rodzica, łącznie z poświadczeniami w <code>env</code> — kasujesz je przed każdą komendą blokiem <code>sandbox.credentials</code> (patrz niżej) albo globalnie zmienną <code>CLAUDE_CODE_SUBPROCESS_ENV_SCRUB</code>, która strippuje poświadczenia Anthropic i providerów chmurowych ze wszystkich subprocesów.</p>
+        </div>
+        <div class="callout">
+          <p><strong>Aktualizacja:</strong> od wersji 2.1.187 sandbox ma dedykowany blok <code>sandbox.credentials</code>: w <code>files</code> wpisujesz ścieżki do zablokowania odczytu, w <code>envVars</code> — zmienne do skasowania, każdy wpis z <code>"mode": "deny"</code>. To czytelniejsze niż mieszanie reguł w <code>filesystem.denyRead</code>: <code>&#123; "credentials": &#123; "files": [&#123; "path": "~/.aws/credentials", "mode": "deny" &#125;, &#123; "path": "~/.ssh", "mode": "deny" &#125;], "envVars": [&#123; "name": "GITHUB_TOKEN", "mode": "deny" &#125;] &#125; &#125;</code>. Wpisy z różnych zakresów się sumują, a jedyny dozwolony tryb to <code>deny</code> — żaden zakres nie poluzuje blokady.</p>
         </div>
         <div class="callout">
           <p><strong>Ograniczenia:</strong> sandbox dotyczy tylko narzędzia <code>Bash</code> — Read, Write, Edit i WebFetch są poza nim (rządzi nimi <code>permissions.deny</code>). Ustaw <code>allowUnsandboxedCommands: false</code>, inaczej agent może sam wyłączyć sandbox, gdy komenda zawiedzie. Na natywnym Windows używaj WSL2 (<code>sudo apt-get install bubblewrap socat</code>) albo Dockera.</p>
         </div>
         <div class="callout">
-          <p><strong>Domyślnie sandbox pozwala CZYTAĆ cały komputer</strong> — w tym <code>~/.aws/credentials</code> i <code>~/.ssh/</code>. Izolacja ogranicza zapis i sieć, ale nie odczyt. Te ścieżki musisz zablokować jawnie: przez <code>sandbox.filesystem.denyRead</code> albo reguły <code>Read</code> w <code>permissions.deny</code>.</p>
+          <p><strong>Domyślnie sandbox pozwala CZYTAĆ cały komputer</strong> — w tym <code>~/.aws/credentials</code> i <code>~/.ssh/</code>. Izolacja ogranicza zapis i sieć, ale nie odczyt. Nie ma wbudowanej listy blokad, więc te ścieżki musisz zablokować jawnie: najprościej przez <code>sandbox.credentials</code>, ewentualnie przez <code>sandbox.filesystem.denyRead</code> albo reguły <code>Read</code> w <code>permissions.deny</code>.</p>
         </div>
       </div>
     </div>

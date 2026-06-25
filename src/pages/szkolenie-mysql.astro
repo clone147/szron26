@@ -5,7 +5,7 @@ import Interior from '../layouts/Interior.astro';
   title="MySQL MCP Server + Claude Code | Akademia SZRON"
   description="Podłącz MySQL lub MariaDB do Claude Code przez MCP: instalacja serwera, konfiguracja .env, domyślnie wyłączone operacje zapisu i pułapki wersji."
   eyebrow="Akademia · MySQL MCP Server"
-  updated="2026-06-20"
+  updated="2026-06-25"
   heading="MySQL MCP Server: agent na bazie MySQL i MariaDB."
   lead="MCP-Server-MySQL daje Claude Code bezpośredni dostęp do baz MySQL i MariaDB: zapytania SQL, podgląd struktury, tworzenie tabel i zarządzanie danymi. Operacje zapisu są domyślnie wyłączone — włączasz je świadomie, flaga po fladze."
 >
@@ -56,8 +56,9 @@ MYSQL_DB=nazwa_bazy
 # Uprawnienia (domyslnie wszystkie wylaczone)
 ALLOW_INSERT_OPERATION=true
 ALLOW_UPDATE_OPERATION=true
-ALLOW_DELETE_OPERATION=true</code></pre>
-        <div class="callout"><p><strong>Aktualizacja:</strong> operacje zapisu są domyślnie wyłączone — bez konfiguracji serwer działa w trybie tylko do odczytu. Ustaw <code>ALLOW_INSERT_OPERATION</code>, <code>ALLOW_UPDATE_OPERATION</code> i <code>ALLOW_DELETE_OPERATION</code> na <code>true</code>, by je włączyć. Dla operacji DDL (CREATE, ALTER, DROP) użytkownik MySQL musi mieć odpowiednie uprawnienia po stronie bazy.</p></div>
+ALLOW_DELETE_OPERATION=true
+ALLOW_DDL_OPERATION=true</code></pre>
+        <div class="callout"><p><strong>Aktualizacja:</strong> wszystkie cztery flagi zapisu są domyślnie <code>false</code> — bez konfiguracji serwer działa w trybie tylko do odczytu. Ustaw <code>ALLOW_INSERT_OPERATION</code>, <code>ALLOW_UPDATE_OPERATION</code> i <code>ALLOW_DELETE_OPERATION</code> na <code>true</code>, żeby pozwolić na modyfikację danych. Operacje DDL (CREATE, ALTER, DROP) to osobna flaga <code>ALLOW_DDL_OPERATION</code> — sam serwer je blokuje, dopóki nie ustawisz jej na <code>true</code>, niezależnie od uprawnień użytkownika po stronie bazy.</p></div>
 
         <h2>Konfiguracja Claude Desktop</h2>
         <p>Dodaj wpis serwera do pliku konfiguracyjnego Claude Desktop (klamry zakodowane encjami, w realnym pliku JSON użyj zwykłych nawiasów). Zamiast kruchych ścieżek absolutnych do <code>node</code> i <code>dist/index.js</code> uruchamiaj przez <code>npx</code>:</p>
@@ -77,7 +78,8 @@ ALLOW_DELETE_OPERATION=true</code></pre>
         "MYSQL_DB": "nazwa_bazy",
         "ALLOW_INSERT_OPERATION": "true",
         "ALLOW_UPDATE_OPERATION": "true",
-        "ALLOW_DELETE_OPERATION": "true"
+        "ALLOW_DELETE_OPERATION": "true",
+        "ALLOW_DDL_OPERATION": "true"
       &#125;
     &#125;
   &#125;

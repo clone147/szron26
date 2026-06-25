@@ -7,7 +7,7 @@ import Interior from '../layouts/Interior.astro';
   eyebrow="Akademia · Programowanie agentowe"
   heading="Claude Code — agent kodowania w terminalu, od pierwszej instalacji."
   lead="Czym jest agent kodowania, jak go zainstalować w aktualny sposób i jak ułożyć z nim codzienny workflow. Uczymy tego, czego sami używamy w pracy z klientami — na realnych komendach, bez teorii dla teorii."
-  updated="2026-06-20"
+  updated="2026-06-25"
 >
   <!-- proof -->
   <section class="sect" style="padding-bottom:0">
@@ -125,7 +125,7 @@ claude
           </tbody>
         </table>
         <div class="callout">
-          <p><strong>Aktualizacja:</strong> dawniej <code>think</code> / <code>megathink</code> / <code>ultrathink</code> mapowały na sztywne budżety tokenów (~4K / 10K / 32K). Dziś podstawą jest komenda <code>/effort</code>, która trzyma wybrany poziom między turami. Słowa-klucze w prompcie (jak <code>ultrathink</code>) to już tylko jednorazowy zastrzyk na konkretną odpowiedź — nie zmieniają ustawienia sesji i nie są stałym budżetem. Głębsze myślenie rezerwuj na realnie trudne decyzje: architektura, refactoring na dużą skalę, niejasne błędy. W menu <code>/effort</code> jest też tryb <code>ultracode</code> — łączy najwyższy poziom myślenia (xhigh) ze stałą zgodą na uruchamianie wieloagentowych workflow, dostępny na modelach wspierających xhigh (Opus 4.7/4.8). Sam model dobierasz komendą <code>/model</code> — od najszybszych (Haiku) po najmocniejsze (Opus).</p>
+          <p><strong>Aktualizacja:</strong> dawniej <code>think</code> / <code>megathink</code> / <code>ultrathink</code> mapowały na sztywne budżety tokenów (~4K / 10K / 32K). Dziś podstawą jest komenda <code>/effort</code>, która trzyma wybrany poziom między turami. Słowa-klucze w prompcie (jak <code>ultrathink</code>) to już tylko jednorazowy zastrzyk na konkretną odpowiedź — nie zmieniają ustawienia sesji i nie są stałym budżetem. Na Opusie 4.8 domyślnym poziomem jest <code>high</code>; głębsze myślenie (<code>xhigh</code>, <code>max</code>) rezerwuj na realnie trudne decyzje: architektura, refactoring na dużą skalę, niejasne błędy. W menu <code>/effort</code> jest też tryb <code>ultracode</code> — łączy najwyższy poziom myślenia (xhigh) ze stałą zgodą na uruchamianie wieloagentowych workflow, dostępny na modelach wspierających xhigh (Opus 4.7/4.8). Sam model dobierasz komendą <code>/model</code> — od najszybszych (Haiku) po najmocniejsze (Opus).</p>
         </div>
         <h3>Subagenci — delegowanie i praca równoległa</h3>
         <p>Agent może odpalić <strong>subagenta</strong> do wyodrębnionego zadania — przeszukania kodu, weryfikacji zmiany, researchu — który pracuje w osobnym kontekście. Główna rozmowa się nie zaśmieca, a kilka subagentów może działać równolegle. Możesz definiować własnych: z własnym promptem systemowym i ograniczonym zestawem narzędzi.</p>
