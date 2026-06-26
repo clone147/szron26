@@ -600,6 +600,14 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 .deck-empty__title { font-family: var(--font-display); font-weight: 600; font-size: var(--text-l); color: var(--color-text-inv); margin: 0; }
 .deck-empty__hint { font-size: var(--text-s); color: var(--color-text-inv-2); margin: 0 0 var(--space-xs); }
 
+/* slajd „tylko obraz" (np. zaimportowana prezentacja Keynote) — obraz wypełnia cały slajd */
+.deck-canvas.is-media { padding: 0; gap: 0; }
+.deck-canvas.is-media .deck-canvas__img { max-width: 100%; max-height: 100%; width: 100%; height: 100%; object-fit: contain; border-radius: 0; filter: none; }
+.stage-slide.is-media { padding: 0; gap: 0; }
+.stage-slide.is-media .stage-img { max-width: 100%; max-height: 100%; width: 100%; height: 100%; object-fit: contain; }
+.deck-thumb.is-media .deck-thumb__inner { padding: 0; }
+.deck-thumb.is-media .deck-thumb__inner img { max-width: 100%; max-height: 100%; width: 100%; height: 100%; object-fit: cover; }
+
 /* ── prawy inspektor (tło) ── */
 .deck-inspector__head { flex: none; padding: var(--space-sm) var(--space-sm) var(--space-xs); }
 .deck-inspector__title { display: block; font-family: var(--font-display); font-weight: 600; font-size: var(--text-s); }
