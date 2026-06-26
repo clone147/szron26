@@ -97,6 +97,22 @@ export async function updatePassword(password) {
   return { error: error ? error.message : null };
 }
 
+// Bucket na obrazki slajdów i tła (public read; zapis tylko dla zespołu — RLS storage.objects).
+export const SLIDES_BUCKET = 'strefa-slajdy';
+
+// Upload obrazka do bucketa slajdów. `kind`: 'slides' (obrazek slajdu) lub 'bg' (tło decku).
+// Zwraca { url, path } albo { error }.
+export async function uploadSlideImage(file, trainingId, kind = 'slides') {
+  const ext = (file.name.split('.').pop() || 'png').toLowerCase();
+  const path = `${trainingId}/${kind}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const sb = getClient();
+  const { error } = await sb.storage.from(SLIDES_BUCKET)
+    .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+  if (error) return { error: error.message };
+  const { data } = sb.storage.from(SLIDES_BUCKET).getPublicUrl(path);
+  return { url: data.publicUrl, path };
+}
+
 // Strażnik strony strefy: jeśli brak sesji lub e-mail spoza allowlisty → redirect na login.
 // Zwraca usera, gdy dostęp OK (albo nic nie zwraca i przekierowuje).
 export async function requireAuth(loginPath = '/strefa/login') {

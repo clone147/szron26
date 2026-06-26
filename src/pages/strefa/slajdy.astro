@@ -1,0 +1,30 @@
+---
+import Strefa from '../../layouts/Strefa.astro';
+---
+<Strefa title="Edytor slajdów" active="">
+  <div class="strefa-head">
+    <div>
+      <p class="strefa-eyebrow">Strefa zamknięta</p>
+      <h1 id="deck-title">Edytor slajdów</h1>
+      <p>Dodawaj slajdy, ustaw tło i uruchom prezentację pełnoekranową.</p>
+    </div>
+    <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center">
+      <a class="strefa-btn strefa-btn--ghost strefa-btn--sm" href="/strefa/szkolenia">← Szkolenia</a>
+      <button class="strefa-btn strefa-btn--accent" id="btn-present">▶ Prezentacja</button>
+    </div>
+  </div>
+
+  <div class="slides-editor" id="editor"></div>
+  <div class="slides-strip" id="strip"></div>
+
+  <div class="slides-stage" id="stage" hidden></div>
+  <div id="modal-root"></div>
+  <div class="strefa-toasts" id="toasts" aria-live="polite"></div>
+
+  <input type="file" id="slide-img-input" accept="image/*" hidden />
+  <input type="file" id="bg-img-input" accept="image/*" hidden />
+
+  <script>
+    import '../../lib/strefa-slajdy.js';
+  </script>
+</Strefa>
