@@ -104,25 +104,32 @@ async function load() {
 }
 
 function scheduleSave(id, patch) {
-  clearTimeout(saveTimers.get(id));
-  saveTimers.set(id, setTimeout(() => {
-    saveTimers.delete(id);
+  const key = id + '|' + Object.keys(patch).join(','); // osobny timer dla tekstu i notatek
+  clearTimeout(saveTimers.get(key));
+  saveTimers.set(key, setTimeout(() => {
+    saveTimers.delete(key);
     sb.from('training_slides').update(patch).eq('id', id).then(({ error }) => { if (error) toast('Błąd zapisu', error.message, 'err'); });
   }, 600));
 }
 function flushSave(id, patch) {
-  clearTimeout(saveTimers.get(id));
-  saveTimers.delete(id);
+  const key = id + '|' + Object.keys(patch).join(',');
+  clearTimeout(saveTimers.get(key));
+  saveTimers.delete(key);
   sb.from('training_slides').update(patch).eq('id', id).then(({ error }) => { if (error) toast('Błąd zapisu', error.message, 'err'); });
 }
-// Zapisuje bieżącą zawartość pola tekstowego do pamięci + planuje zapis (przed re-renderem/zmianą slajdu).
-function captureText() {
+// Zapisuje bieżącą zawartość pola tekstu i notatek do pamięci + planuje zapis (przed re-renderem/zmianą slajdu).
+function captureEdits() {
+  const s = slides[current];
+  if (!s) return;
   const el = document.getElementById('slide-text');
-  if (!el || !slides[current]) return;
-  const val = el.innerText;
-  if (val !== (slides[current].text || '')) {
-    slides[current].text = val;
-    scheduleSave(slides[current].id, { text: val });
+  if (el) {
+    const val = el.innerText;
+    if (val !== (s.text || '')) { s.text = val; scheduleSave(s.id, { text: val }); }
+  }
+  const nel = document.getElementById('slide-notes');
+  if (nel) {
+    const nv = nel.value;
+    if (nv !== (s.notes || '')) { s.notes = nv; scheduleSave(s.id, { notes: nv }); }
   }
 }
 
@@ -185,6 +192,10 @@ function renderEditor() {
         ${s.image_url ? `<img class="deck-canvas__img" src="${esc(s.image_url)}" alt="">` : ''}
         ${media ? '' : `<div class="deck-canvas__text" id="slide-text" contenteditable="true" data-ph="Wpisz tekst slajdu…" role="textbox" aria-multiline="true">${esc(s.text || '')}</div>`}
       </div>
+    </div>
+    <div class="deck-notes">
+      <label class="deck-notes__label" for="slide-notes">Notatki prezentera</label>
+      <textarea class="deck-notes__field" id="slide-notes" placeholder="Notatki dla prezentera — widoczne tylko tu, nie na slajdzie…">${esc(s.notes || '')}</textarea>
     </div>`;
   applyCanvasBg();
   bindCanvas();
@@ -202,12 +213,17 @@ function bindCanvas() {
   }
   $('#btn-slide-img')?.addEventListener('click', () => $('#slide-img-input').click());
   $('#btn-slide-img-del')?.addEventListener('click', async () => {
-    captureText();
+    captureEdits();
     slides[current].image_url = null;
     const { error } = await sb.from('training_slides').update({ image_url: null }).eq('id', slides[current].id);
     if (error) return toast('Błąd', error.message, 'err');
     redraw();
   });
+  const nta = $('#slide-notes');
+  if (nta) {
+    nta.addEventListener('input', () => { slides[current].notes = nta.value; scheduleSave(slides[current].id, { notes: nta.value }); });
+    nta.addEventListener('blur', () => { flushSave(slides[current].id, { notes: nta.value }); });
+  }
 }
 
 /* prawy inspektor: tło */
@@ -245,7 +261,7 @@ function renderInspector() {
 
 function bindInspector() {
   $$('.bg-chip').forEach((b) => b.addEventListener('click', async () => {
-    captureText();
+    captureEdits();
     await saveBg({ slides_bg_color: b.dataset.bg, slides_bg_image: null });
     redraw();
   }));
@@ -257,13 +273,13 @@ function bindInspector() {
     const h = $('#bg-hex'); if (h) h.textContent = ci.value.toUpperCase();
   });
   ci?.addEventListener('change', async () => {
-    captureText();
+    captureEdits();
     await saveBg({ slides_bg_color: ci.value, slides_bg_image: null });
     redraw();
   });
   $('#btn-bg-img')?.addEventListener('click', () => $('#bg-img-input').click());
   $('#btn-bg-clear')?.addEventListener('click', async () => {
-    captureText();
+    captureEdits();
     await saveBg({ slides_bg_color: null, slides_bg_image: null });
     redraw();
   });
@@ -337,14 +353,14 @@ function bindStrip() {
 
 function selectSlide(idx) {
   if (idx === current) return;
-  captureText();
+  captureEdits();
   current = idx;
   redraw();
 }
 
 /* ── CRUD / reorder ── */
 async function addSlide() {
-  captureText();
+  captureEdits();
   const { data, error } = await sb.from('training_slides')
     .insert({ training_id: trainingId, position: slides.length, text: '', image_url: null })
     .select().single();
@@ -379,7 +395,7 @@ async function renumber() {
 async function moveSlide(idx, dir) {
   const j = dir === 'up' ? idx - 1 : idx + 1;
   if (j < 0 || j >= slides.length) return;
-  captureText();
+  captureEdits();
   const movedId = slides[idx].id;
   [slides[idx], slides[j]] = [slides[j], slides[idx]];
   current = slides.findIndex((s) => s.id === movedId);
@@ -414,7 +430,7 @@ function bindFileInputs() {
 
 async function handleSlideImage(file) {
   if (!slides[current]) return;
-  captureText();
+  captureEdits();
   toast('Wgrywanie…', file.name);
   const res = await uploadSlideImage(file, trainingId, 'slides');
   if (res.error) return toast('Błąd uploadu', res.error, 'err');
@@ -429,7 +445,7 @@ async function handleBgImage(file) {
   toast('Wgrywanie tła…', file.name);
   const res = await uploadSlideImage(file, trainingId, 'bg');
   if (res.error) return toast('Błąd uploadu', res.error, 'err');
-  captureText();
+  captureEdits();
   await saveBg({ slides_bg_image: res.url, slides_bg_color: null });
   redraw();
   toast('Gotowe', 'Tło ustawione', 'ok');
@@ -456,7 +472,7 @@ function onPaste(e) {
 let presentIdx = 0;
 function startPresent() {
   if (!slides.length) return toast('Brak slajdów', 'Dodaj choć jeden slajd', 'err');
-  captureText();
+  captureEdits();
   presentIdx = current;
   const stage = $('#stage');
   stage.hidden = false;

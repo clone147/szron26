@@ -569,6 +569,19 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 .deck-toolbar__counter { font-family: var(--font-display); font-weight: 600; font-size: var(--text-caption); color: var(--color-text-inv-2); font-variant-numeric: tabular-nums; padding: .2rem .6rem; border-radius: 999px; background: var(--color-ink-3); }
 .deck-stage .strefa-btn svg { width: 15px; height: 15px; flex: none; }
 
+/* notatki prezentera (pod slajdem) */
+.deck-notes { flex: none; display: flex; flex-direction: column; gap: .3rem; }
+.deck-notes__label { font-size: var(--text-caption); font-weight: 600; color: var(--color-text-inv-2); text-transform: uppercase; letter-spacing: .08em; }
+.deck-notes__field {
+  width: 100%; resize: none; height: 4.5rem; min-height: 0;
+  background: var(--color-ink-2); color: var(--color-text-inv);
+  border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm);
+  padding: .5rem .7rem; font-family: var(--font-body); font-size: var(--text-s); line-height: 1.45;
+  outline: none; transition: border-color var(--dur-1) var(--ease-out), box-shadow var(--dur-1) var(--ease-out);
+}
+.deck-notes__field:focus-visible { border-color: var(--color-accent); box-shadow: 0 0 0 2px var(--color-accent-soft); }
+.deck-notes__field::placeholder { color: var(--color-text-inv-3); }
+
 .deck-canvas-wrap { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: var(--space-2xs); container-type: size; }
 .deck-canvas {
   position: relative; aspect-ratio: 16 / 9; height: auto;
