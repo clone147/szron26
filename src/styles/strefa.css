@@ -496,10 +496,19 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 .strefa-main:has(.slides-workspace) { max-width: none; }
 .slides-workspace {
   --rail-w: 12rem; --inspector-w: 18rem;
-  --ws-h: clamp(24rem, calc(100vh - 17rem), 56rem);
   display: grid;
   grid-template-columns: var(--rail-w) minmax(0, 1fr) var(--inspector-w);
-  gap: var(--space-md); height: var(--ws-h); margin-bottom: 0;
+  gap: var(--space-md); margin-bottom: 0;
+}
+/* desktop: edytor wypełnia całą wysokość okna pod górnym paskiem (bez luki u dołu) */
+@media (min-width: 60.01rem) {
+  .strefa-main:has(.slides-workspace) {
+    display: flex; flex-direction: column;
+    height: calc(100vh - 3.75rem - 1px);
+    padding-bottom: var(--space-md);
+    overflow: hidden;
+  }
+  .slides-workspace { flex: 1; min-height: 0; }
 }
 .deck-rail, .deck-inspector {
   display: flex; flex-direction: column; min-height: 0;
