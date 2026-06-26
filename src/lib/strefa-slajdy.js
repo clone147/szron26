@@ -432,6 +432,23 @@ async function handleBgImage(file) {
   toast('Gotowe', 'Tło ustawione', 'ok');
 }
 
+// Wklejenie obrazka ze schowka (Ctrl/Cmd+V) → wstaw na aktywny slajd jak przyciskiem „Obrazek".
+function onPaste(e) {
+  if (!slides.length || !slides[current]) return;     // brak slajdu do wklejenia
+  if (!$('#stage').hidden) return;                    // trwa prezentacja
+  if ($('#modal-root')?.children.length) return;      // otwarty dialog
+  const items = e.clipboardData?.items;
+  if (!items) return;
+  for (const it of items) {
+    if (it.kind === 'file' && it.type && it.type.startsWith('image/')) {
+      const file = it.getAsFile();
+      if (file) { e.preventDefault(); handleSlideImage(file); }
+      return;                                          // obsłużony obrazek — nie wklejaj jako tekst
+    }
+  }
+  // brak obrazka w schowku → zwykłe wklejenie tekstu w polu przebiega normalnie
+}
+
 /* ── tryb prezentacji (Fullscreen API) ── */
 let presentIdx = 0;
 function startPresent() {
@@ -507,6 +524,7 @@ async function init() {
   if (!user || !isAllowed(user.email)) return; // layout przekieruje na /strefa/login
   if (!trainingId) { location.replace('/strefa/szkolenia'); return; }
   bindFileInputs();
+  document.addEventListener('paste', onPaste);
   $('#btn-present').addEventListener('click', startPresent);
   $('#btn-add-slide').addEventListener('click', addSlide);
   await load();
