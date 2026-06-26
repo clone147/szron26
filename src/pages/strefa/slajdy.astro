@@ -2,20 +2,35 @@
 import Strefa from '../../layouts/Strefa.astro';
 ---
 <Strefa title="Edytor slajdów" active="">
-  <div class="strefa-head">
+  <div class="strefa-head slides-head">
     <div>
-      <p class="strefa-eyebrow">Strefa zamknięta</p>
+      <p class="strefa-eyebrow">Strefa zamknięta · Edytor</p>
       <h1 id="deck-title">Edytor slajdów</h1>
-      <p>Dodawaj slajdy, ustaw tło i uruchom prezentację pełnoekranową.</p>
     </div>
-    <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center">
+    <div class="slides-head__actions">
+      <span class="slides-head__count" id="deck-count">0 slajdów</span>
       <a class="strefa-btn strefa-btn--ghost strefa-btn--sm" href="/strefa/szkolenia">← Szkolenia</a>
-      <button class="strefa-btn strefa-btn--accent" id="btn-present">▶ Prezentacja</button>
+      <button class="strefa-btn strefa-btn--accent" id="btn-present" type="button">▶ Prezentacja</button>
     </div>
   </div>
 
-  <div class="slides-editor" id="editor"></div>
-  <div class="slides-strip" id="strip"></div>
+  <div class="slides-workspace" id="workspace">
+    <aside class="deck-rail">
+      <div class="deck-rail__head">
+        <span class="deck-rail__title">Slajdy</span>
+        <span class="deck-rail__count" id="rail-count">0</span>
+      </div>
+      <div class="deck-rail__scroll" id="strip" role="listbox" aria-label="Slajdy"></div>
+      <button class="deck-rail__add" id="btn-add-slide" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Slajd
+      </button>
+    </aside>
+
+    <section class="deck-stage" id="editor-stage"></section>
+
+    <aside class="deck-inspector" id="editor-inspector"></aside>
+  </div>
 
   <div class="slides-stage" id="stage" hidden></div>
   <div id="modal-root"></div>

@@ -1,6 +1,7 @@
 // Edytor slajdów dla szkoleń (strefa zamknięta SZRON).
 // Osobny widok wchodzony z /strefa/szkolenia (przycisk Play). Dane w schemacie `strefa`:
 // tabela `training_slides` (tekst + obrazek + kolejność) oraz tło decku w kolumnach na `trainings`.
+// Workspace 3-panele: lewy filmstrip (drag&drop) + centralny canvas + prawy inspektor tła.
 // Tryb prezentacji przez Fullscreen API. Jednoosobowa edycja jednego decku — bez Realtime.
 import { getClient, getSessionUser, isAllowed, uploadSlideImage } from './supabase.js';
 
@@ -12,6 +13,22 @@ const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const norm = (c) => String(c || '').trim().toLowerCase();
 const toHex = (c) => (/^#[0-9a-f]{6}$/i.test(String(c || '')) ? c : null);
+const plSlajdy = (n) => {
+  if (n === 1) return 'slajd';
+  const d = n % 10, h = n % 100;
+  return (d >= 2 && d <= 4 && !(h >= 12 && h <= 14)) ? 'slajdy' : 'slajdów';
+};
+
+/* ── ikony (16px viewBox, currentColor) ── */
+const ICO = {
+  img: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>',
+  up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg>',
+  down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+  grip: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/></svg>',
+  empty: '<svg class="deck-empty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M12 9v4M10 11h4"/></svg>',
+};
 
 /* ── toasty ── */
 function toast(title, body = '', kind = '') {
@@ -61,6 +78,7 @@ let training = null;          // { id, name, slides_bg_color, slides_bg_image }
 let slides = [];              // [{ id, position, text, image_url }]
 let current = 0;              // aktywny slajd w edytorze
 const saveTimers = new Map(); // slideId -> timeout (debounce zapisu tekstu)
+let dragFrom = -1;            // indeks przeciąganej miniatury
 
 // Presety tła (hex — kompatybilne z <input type="color">).
 const BG_PRESETS = [
@@ -121,52 +139,52 @@ async function saveBg(patch) {
   if (error) toast('Błąd tła', error.message, 'err');
 }
 
-/* ── render: edytor ── */
-function bgPanelHTML() {
-  const hasBg = !!(training.slides_bg_image || training.slides_bg_color);
-  const activeColor = training.slides_bg_image ? '' : norm(training.slides_bg_color);
-  return `
-    <div class="bg-panel">
-      <span class="bg-panel__label">Tło — całe szkolenie</span>
-      <div class="bg-swatches">
-        ${BG_PRESETS.map((p) => `<button class="bg-swatch ${activeColor === norm(p.value) ? 'is-active' : ''}" data-bg="${p.value}" title="${esc(p.name)}" style="background:${p.value}"></button>`).join('')}
-      </div>
-      <label class="bg-colorpick" title="Własny kolor">
-        <input type="color" id="bg-color" value="${toHex(training.slides_bg_color) || '#14181f'}" />
-        <span>Własny</span>
-      </label>
-      <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-bg-img">${training.slides_bg_image ? 'Zmień obrazek tła' : 'Obrazek tła'}</button>
-      ${hasBg ? `<button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-bg-clear">Usuń tło</button>` : ''}
-    </div>`;
+/* ── render (4 części) ── */
+function redraw() { renderEditor(); renderInspector(); renderStrip(); updateCounts(); }
+
+function updateCounts() {
+  const n = slides.length;
+  const dc = $('#deck-count'); if (dc) dc.textContent = `${n} ${plSlajdy(n)}`;
+  const rc = $('#rail-count'); if (rc) rc.textContent = String(n);
 }
 
+/* centrum: toolbar + canvas */
 function renderEditor() {
-  const ed = $('#editor');
+  const stage = $('#editor-stage');
   if (!slides.length) {
-    ed.innerHTML = `
-      <div class="slide-canvas slide-canvas--empty" id="canvas">
-        <div class="slide-empty">Brak slajdów. Dodaj pierwszy przyciskiem <strong>+ Slajd</strong> poniżej.</div>
-      </div>
-      ${bgPanelHTML()}`;
+    stage.innerHTML = `
+      <div class="deck-canvas-wrap">
+        <div class="deck-canvas is-empty" id="canvas">
+          <div class="deck-empty">
+            ${ICO.empty}
+            <p class="deck-empty__title">Pusty deck</p>
+            <p class="deck-empty__hint">Zacznij od pierwszego slajdu — tekst i tło dodasz za chwilę.</p>
+            <button class="strefa-btn strefa-btn--accent" id="btn-add-first" type="button">+ Dodaj pierwszy slajd</button>
+          </div>
+        </div>
+      </div>`;
     applyCanvasBg();
-    bindBgPanel();
+    $('#btn-add-first')?.addEventListener('click', addSlide);
     return;
   }
   const s = slides[current];
-  ed.innerHTML = `
-    <div class="slide-canvas" id="canvas">
-      ${s.image_url ? `<img class="slide-img" src="${esc(s.image_url)}" alt="">` : ''}
-      <div class="slide-text" id="slide-text" contenteditable="true" data-ph="Wpisz tekst slajdu…">${esc(s.text || '')}</div>
+  stage.innerHTML = `
+    <div class="deck-toolbar">
+      <div class="deck-toolbar__group">
+        <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-slide-img" type="button">${ICO.img}<span>${s.image_url ? 'Zmień obrazek' : 'Obrazek'}</span></button>
+        ${s.image_url ? `<button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-slide-img-del" type="button">${ICO.trash}<span>Usuń</span></button>` : ''}
+      </div>
+      <span class="deck-toolbar__spacer"></span>
+      <span class="deck-toolbar__counter">${current + 1} / ${slides.length}</span>
     </div>
-    <div class="slide-toolbar">
-      <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-slide-img">${s.image_url ? 'Zmień obrazek' : '+ Obrazek'}</button>
-      ${s.image_url ? `<button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-slide-img-del">Usuń obrazek</button>` : ''}
-      <span class="slide-counter">Slajd ${current + 1} / ${slides.length}</span>
-    </div>
-    ${bgPanelHTML()}`;
+    <div class="deck-canvas-wrap">
+      <div class="deck-canvas" id="canvas">
+        ${s.image_url ? `<img class="deck-canvas__img" src="${esc(s.image_url)}" alt="">` : ''}
+        <div class="deck-canvas__text" id="slide-text" contenteditable="true" data-ph="Wpisz tekst slajdu…" role="textbox" aria-multiline="true">${esc(s.text || '')}</div>
+      </div>
+    </div>`;
   applyCanvasBg();
   bindCanvas();
-  bindBgPanel();
 }
 
 function bindCanvas() {
@@ -185,72 +203,143 @@ function bindCanvas() {
     slides[current].image_url = null;
     const { error } = await sb.from('training_slides').update({ image_url: null }).eq('id', slides[current].id);
     if (error) return toast('Błąd', error.message, 'err');
-    renderEditor(); renderStrip();
+    redraw();
   });
 }
 
-function bindBgPanel() {
-  $$('.bg-swatch').forEach((b) => b.addEventListener('click', async () => {
+/* prawy inspektor: tło */
+function renderInspector() {
+  const host = $('#editor-inspector');
+  const hasBg = !!(training.slides_bg_image || training.slides_bg_color);
+  const activeColor = training.slides_bg_image ? '' : norm(training.slides_bg_color);
+  host.innerHTML = `
+    <div class="deck-inspector__head">
+      <span class="deck-inspector__title">Tło</span>
+      <span class="deck-inspector__sub">całe szkolenie</span>
+    </div>
+    <div class="deck-inspector__preview" id="bg-preview"></div>
+    <div class="deck-field">
+      <span class="deck-field__label">Kolory</span>
+      <div class="bg-grid">
+        ${BG_PRESETS.map((p) => `<button class="bg-chip ${activeColor === norm(p.value) ? 'is-active' : ''}" data-bg="${p.value}" title="${esc(p.name)}" style="background:${p.value}" type="button"></button>`).join('')}
+      </div>
+    </div>
+    <div class="deck-field">
+      <label class="bg-custom" for="bg-color" title="Własny kolor">
+        <input type="color" id="bg-color" value="${toHex(training.slides_bg_color) || '#14181f'}">
+        <span class="bg-custom__txt">Własny kolor</span>
+        <span class="bg-custom__hex" id="bg-hex">${(toHex(training.slides_bg_color) || '').toUpperCase()}</span>
+      </label>
+    </div>
+    <div class="deck-field deck-field--actions">
+      <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-bg-img" type="button">${training.slides_bg_image ? 'Zmień obrazek tła' : 'Obrazek tła'}</button>
+      ${hasBg ? `<button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-bg-clear" type="button">Usuń tło</button>` : ''}
+    </div>`;
+  const prev = $('#bg-preview');
+  if (prev) prev.style.background = bgValue();
+  bindInspector();
+}
+
+function bindInspector() {
+  $$('.bg-chip').forEach((b) => b.addEventListener('click', async () => {
     captureText();
     await saveBg({ slides_bg_color: b.dataset.bg, slides_bg_image: null });
-    renderEditor(); renderStrip();
+    redraw();
   }));
   const ci = $('#bg-color');
-  // live preview podczas wybierania
-  ci?.addEventListener('input', () => { const c = $('#canvas'); if (c) c.style.background = ci.value; });
+  // live preview podczas wybierania (bez re-renderu)
+  ci?.addEventListener('input', () => {
+    const c = $('#canvas'); if (c) c.style.background = ci.value;
+    const p = $('#bg-preview'); if (p) p.style.background = ci.value;
+    const h = $('#bg-hex'); if (h) h.textContent = ci.value.toUpperCase();
+  });
   ci?.addEventListener('change', async () => {
     captureText();
     await saveBg({ slides_bg_color: ci.value, slides_bg_image: null });
-    renderEditor(); renderStrip();
+    redraw();
   });
   $('#btn-bg-img')?.addEventListener('click', () => $('#bg-img-input').click());
   $('#btn-bg-clear')?.addEventListener('click', async () => {
     captureText();
     await saveBg({ slides_bg_color: null, slides_bg_image: null });
-    renderEditor(); renderStrip();
+    redraw();
   });
 }
 
-/* ── render: pasek miniatur ── */
+/* lewy rail: filmstrip miniatur */
 function renderStrip() {
   const strip = $('#strip');
   strip.innerHTML = slides.map((s, i) => `
-    <div class="slide-thumb ${i === current ? 'is-active' : ''}" data-idx="${i}">
-      <div class="slide-thumb__inner">
+    <div class="deck-thumb ${i === current ? 'is-active' : ''}" data-idx="${i}" draggable="true" role="option" aria-selected="${i === current}" tabindex="0">
+      <div class="deck-thumb__inner">
         ${s.image_url ? `<img src="${esc(s.image_url)}" alt="">` : ''}
-        <span class="slide-thumb__txt">${esc((s.text || '').slice(0, 60))}</span>
+        <span class="deck-thumb__txt">${esc((s.text || '').slice(0, 60))}</span>
       </div>
-      <span class="slide-thumb__num">${i + 1}</span>
-      <div class="slide-thumb__tools">
-        <button class="slide-thumb__btn" data-move="prev" title="W lewo" ${i === 0 ? 'disabled' : ''}>◀</button>
-        <button class="slide-thumb__btn" data-move="next" title="W prawo" ${i === slides.length - 1 ? 'disabled' : ''}>▶</button>
-        <button class="slide-thumb__btn slide-thumb__btn--del" data-del title="Usuń slajd">✕</button>
+      <span class="deck-thumb__num">${i + 1}</span>
+      <div class="deck-thumb__tools">
+        <button class="deck-thumb__btn" data-move="up" title="W górę" ${i === 0 ? 'disabled' : ''}>${ICO.up}</button>
+        <button class="deck-thumb__btn" data-move="down" title="W dół" ${i === slides.length - 1 ? 'disabled' : ''}>${ICO.down}</button>
+        <button class="deck-thumb__btn deck-thumb__btn--del" data-del title="Usuń slajd">${ICO.x}</button>
       </div>
-    </div>`).join('') +
-    `<button class="slide-thumb slide-thumb--add" data-add-slide title="Dodaj slajd"><span>+ Slajd</span></button>`;
+      <span class="deck-thumb__grip" aria-hidden="true">${ICO.grip}</span>
+    </div>`).join('');
   // tło miniatur = tło decku
-  $$('.slide-thumb__inner', strip).forEach((el) => { el.style.background = bgValue(); });
+  $$('.deck-thumb__inner', strip).forEach((el) => { el.style.background = bgValue(); });
   bindStrip();
 }
 
 function bindStrip() {
   const strip = $('#strip');
   strip.querySelectorAll('[data-idx]').forEach((thumb) => {
+    const idx = +thumb.dataset.idx;
+
     thumb.addEventListener('click', (e) => {
       const moveBtn = e.target.closest('[data-move]');
-      if (moveBtn) { e.stopPropagation(); moveSlide(+thumb.dataset.idx, moveBtn.dataset.move); return; }
-      if (e.target.closest('[data-del]')) { e.stopPropagation(); deleteSlide(+thumb.dataset.idx); return; }
-      const idx = +thumb.dataset.idx;
-      if (idx === current) return;
-      captureText();
-      current = idx;
-      renderEditor(); renderStrip();
+      if (moveBtn) { e.stopPropagation(); moveSlide(idx, moveBtn.dataset.move); return; }
+      if (e.target.closest('[data-del]')) { e.stopPropagation(); deleteSlide(idx); return; }
+      selectSlide(idx);
+    });
+    thumb.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectSlide(idx); }
+    });
+
+    // drag & drop reorder
+    thumb.addEventListener('dragstart', (e) => {
+      dragFrom = idx; thumb.classList.add('is-dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      try { e.dataTransfer.setData('text/plain', String(idx)); } catch (_) { /* noop */ }
+    });
+    thumb.addEventListener('dragend', () => {
+      dragFrom = -1;
+      strip.querySelectorAll('.deck-thumb').forEach((t) => t.classList.remove('is-dragging', 'is-drop-before', 'is-drop-after'));
+    });
+    thumb.addEventListener('dragover', (e) => {
+      if (dragFrom < 0 || dragFrom === idx) return;
+      e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+      const r = thumb.getBoundingClientRect();
+      const after = e.clientY > r.top + r.height / 2;
+      thumb.classList.toggle('is-drop-after', after);
+      thumb.classList.toggle('is-drop-before', !after);
+    });
+    thumb.addEventListener('dragleave', () => { thumb.classList.remove('is-drop-before', 'is-drop-after'); });
+    thumb.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (dragFrom < 0 || dragFrom === idx) return;
+      const r = thumb.getBoundingClientRect();
+      const after = e.clientY > r.top + r.height / 2;
+      dropReorder(dragFrom, idx + (after ? 1 : 0));
     });
   });
-  strip.querySelector('[data-add-slide]')?.addEventListener('click', addSlide);
 }
 
-/* ── CRUD slajdów ── */
+function selectSlide(idx) {
+  if (idx === current) return;
+  captureText();
+  current = idx;
+  redraw();
+}
+
+/* ── CRUD / reorder ── */
 async function addSlide() {
   captureText();
   const { data, error } = await sb.from('training_slides')
@@ -259,7 +348,7 @@ async function addSlide() {
   if (error) return toast('Błąd', error.message, 'err');
   slides.push(data);
   current = slides.length - 1;
-  renderEditor(); renderStrip();
+  redraw();
   $('#slide-text')?.focus();
 }
 
@@ -272,7 +361,7 @@ async function deleteSlide(idx) {
   slides.splice(idx, 1);
   if (current >= slides.length) current = Math.max(0, slides.length - 1);
   await renumber();
-  renderEditor(); renderStrip();
+  redraw();
   toast('Usunięto', 'Slajd skasowany', 'ok');
 }
 
@@ -283,14 +372,28 @@ async function renumber() {
   if (ops.length) await Promise.all(ops);
 }
 
+// Przesunięcie strzałką (fallback dla drag&drop). dir: 'up' | 'down'.
 async function moveSlide(idx, dir) {
-  const j = dir === 'prev' ? idx - 1 : idx + 1;
+  const j = dir === 'up' ? idx - 1 : idx + 1;
   if (j < 0 || j >= slides.length) return;
   captureText();
   const movedId = slides[idx].id;
   [slides[idx], slides[j]] = [slides[j], slides[idx]];
   current = slides.findIndex((s) => s.id === movedId);
-  renderEditor(); renderStrip();
+  redraw();
+  await renumber();
+}
+
+// Przeniesienie przez drag&drop: z indeksu `from` na pozycję `target` (przed elementem o tym indeksie).
+async function dropReorder(from, target) {
+  if (from < 0 || from >= slides.length) return;
+  const movedId = slides[from].id;
+  const [m] = slides.splice(from, 1);
+  if (target > from) target -= 1;                 // korekta po usunięciu źródła
+  target = Math.max(0, Math.min(slides.length, target));
+  slides.splice(target, 0, m);
+  current = slides.findIndex((s) => s.id === movedId);
+  redraw();
   await renumber();
 }
 
@@ -315,7 +418,7 @@ async function handleSlideImage(file) {
   slides[current].image_url = res.url;
   const { error } = await sb.from('training_slides').update({ image_url: res.url }).eq('id', slides[current].id);
   if (error) return toast('Błąd', error.message, 'err');
-  renderEditor(); renderStrip();
+  redraw();
   toast('Gotowe', 'Obrazek dodany', 'ok');
 }
 
@@ -325,7 +428,7 @@ async function handleBgImage(file) {
   if (res.error) return toast('Błąd uploadu', res.error, 'err');
   captureText();
   await saveBg({ slides_bg_image: res.url, slides_bg_color: null });
-  renderEditor(); renderStrip();
+  redraw();
   toast('Gotowe', 'Tło ustawione', 'ok');
 }
 
@@ -346,19 +449,24 @@ function startPresent() {
 function renderStage() {
   const stage = $('#stage');
   const s = slides[presentIdx];
+  const total = slides.length;
   stage.style.background = bgValue();
+  const dots = total <= 12
+    ? slides.map((_, i) => `<span class="stage-dot ${i === presentIdx ? 'is-current' : ''}" data-go="${i}"></span>`).join('')
+    : '';
   stage.innerHTML = `
     <button class="stage-nav stage-prev" aria-label="Poprzedni slajd" ${presentIdx === 0 ? 'disabled' : ''}>◀</button>
     <div class="stage-slide">
       ${s.image_url ? `<img class="stage-img" src="${esc(s.image_url)}" alt="">` : ''}
       <div class="stage-text">${esc(s.text || '').replace(/\n/g, '<br>')}</div>
     </div>
-    <button class="stage-nav stage-next" aria-label="Następny slajd" ${presentIdx === slides.length - 1 ? 'disabled' : ''}>▶</button>
+    <button class="stage-nav stage-next" aria-label="Następny slajd" ${presentIdx === total - 1 ? 'disabled' : ''}>▶</button>
     <button class="stage-exit" aria-label="Zamknij prezentację">✕</button>
-    <span class="stage-counter">${presentIdx + 1} / ${slides.length}</span>`;
+    <div class="stage-progress">${dots}<span class="stage-count-txt">${presentIdx + 1} / ${total}</span></div>`;
   stage.querySelector('.stage-prev').addEventListener('click', () => goPresent(-1));
   stage.querySelector('.stage-next').addEventListener('click', () => goPresent(1));
   stage.querySelector('.stage-exit').addEventListener('click', exitPresent);
+  stage.querySelectorAll('[data-go]').forEach((d) => d.addEventListener('click', () => { presentIdx = +d.dataset.go; renderStage(); }));
 }
 
 function goPresent(d) {
@@ -400,6 +508,7 @@ async function init() {
   if (!trainingId) { location.replace('/strefa/szkolenia'); return; }
   bindFileInputs();
   $('#btn-present').addEventListener('click', startPresent);
+  $('#btn-add-slide').addEventListener('click', addSlide);
   await load();
   if (!training) {
     toast('Nie znaleziono', 'Szkolenie nie istnieje lub brak dostępu', 'err');
@@ -407,8 +516,7 @@ async function init() {
     return;
   }
   document.getElementById('deck-title').textContent = training.name;
-  renderEditor();
-  renderStrip();
+  redraw();
 }
 
 init();
