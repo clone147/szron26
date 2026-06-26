@@ -550,6 +550,7 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 
 /* tryb prezentacji (pełny ekran) */
 .slides-stage { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: var(--color-ink); }
+.slides-stage[hidden] { display: none; }
 .stage-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(1rem, 4vh, 2.5rem); width: 100%; height: 100%; padding: clamp(1.5rem, 6vw, 5rem); }
 .stage-img { max-width: 78%; max-height: 60%; object-fit: contain; border-radius: var(--radius-sm); }
 .stage-text { text-align: center; color: var(--color-text-inv); font-family: var(--font-display); font-weight: 500; font-size: clamp(1.6rem, 5vw, 4rem); line-height: 1.2; max-width: 24ch; text-shadow: 0 2px 20px oklch(0% 0 0 / .4); }
