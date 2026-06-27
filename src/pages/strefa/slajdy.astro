@@ -8,7 +8,10 @@ import Strefa from '../../layouts/Strefa.astro';
       <h1 id="deck-title">Edytor slajdów</h1>
     </div>
     <div class="slides-head__actions">
+      <span class="slides-status" id="save-status" aria-live="polite"></span>
       <span class="slides-head__count" id="deck-count">0 slajdów</span>
+      <button class="strefa-iconbtn" id="btn-undo" type="button" title="Cofnij (⌘Z)" disabled aria-label="Cofnij"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg></button>
+      <button class="strefa-iconbtn" id="btn-redo" type="button" title="Ponów (⌘⇧Z)" disabled aria-label="Ponów"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h1"/></svg></button>
       <a class="strefa-btn strefa-btn--ghost strefa-btn--sm" href="/strefa/szkolenia">← Szkolenia</a>
       <button class="strefa-btn strefa-btn--accent" id="btn-present" type="button">▶ Prezentacja</button>
     </div>

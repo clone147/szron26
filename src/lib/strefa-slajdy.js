@@ -1,13 +1,14 @@
-// Edytor slajdów dla szkoleń (strefa zamknięta SZRON).
-// Osobny widok wchodzony z /strefa/szkolenia (przycisk Play). Dane w schemacie `strefa`:
-// tabela `training_slides` (tekst + obrazek + kolejność) oraz tło decku w kolumnach na `trainings`.
-// Workspace 3-panele: lewy filmstrip (drag&drop) + centralny canvas + prawy inspektor tła.
-// Tryb prezentacji przez Fullscreen API. Jednoosobowa edycja jednego decku — bez Realtime.
+// Edytor slajdów SZRON — v2 (model obiektowy). Faza 0: dokument sceny `content`,
+// wspólny renderer (edytor/miniatury/prezentacja), autosave całego content, undo/redo.
 import { getClient, getSessionUser, isAllowed, uploadSlideImage } from './supabase.js';
+import { SLIDE_W, slideToContent, contentToPatch, newObject, textToHtml } from './slajdy/slide-model.js';
+import { mountSlide, applyScale } from './slajdy/slide-renderer.js';
+import { createHistory } from './slajdy/slide-store.js';
 
 const sb = getClient();
+const clone = (x) => (typeof structuredClone === 'function' ? structuredClone(x) : JSON.parse(JSON.stringify(x)));
 
-/* ── helpery DOM (spójne ze strefa-szkolenia.js) ── */
+/* ── helpery DOM ── */
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -19,8 +20,8 @@ const plSlajdy = (n) => {
   return (d >= 2 && d <= 4 && !(h >= 12 && h <= 14)) ? 'slajdy' : 'slajdów';
 };
 
-/* ── ikony (16px viewBox, currentColor) ── */
 const ICO = {
+  text: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5h16v2M9 5v14M7 19h4"/></svg>',
   img: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>',
   trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>',
   up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg>',
@@ -28,9 +29,11 @@ const ICO = {
   x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
   grip: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/></svg>',
   empty: '<svg class="deck-empty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M12 9v4M10 11h4"/></svg>',
+  undo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>',
+  redo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h1"/></svg>',
 };
 
-/* ── toasty ── */
+/* ── toasty / modale ── */
 function toast(title, body = '', kind = '') {
   const wrap = $('#toasts');
   const t = document.createElement('div');
@@ -39,8 +42,6 @@ function toast(title, body = '', kind = '') {
   wrap.appendChild(t);
   setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(() => t.remove(), 300); }, 3800);
 }
-
-/* ── modale ── */
 function openModal(html) {
   const root = $('#modal-root');
   root.innerHTML = `<div class="strefa-modal"><div class="strefa-modal__scrim" data-close></div><div class="strefa-modal__box" role="dialog" aria-modal="true">${html}</div></div>`;
@@ -74,23 +75,31 @@ function confirmDialog(message, okLabel = 'Usuń', danger = true) {
 
 /* ── stan ── */
 const trainingId = new URLSearchParams(location.search).get('t');
-let training = null;          // { id, name, slides_bg_color, slides_bg_image }
-let slides = [];              // [{ id, position, text, image_url }]
-let current = 0;              // aktywny slajd w edytorze
-const saveTimers = new Map(); // slideId -> timeout (debounce zapisu tekstu)
-let dragFrom = -1;            // indeks przeciąganej miniatury
+let training = null;
+let slides = [];            // wiersze DB z domateralizowanym `.content`
+let current = 0;
+const saveTimers = new Map();
+let dragFrom = -1;
+const history = createHistory();
+let editorRO = null;
 
-// Presety tła (hex — kompatybilne z <input type="color">).
 const BG_PRESETS = [
-  { name: 'Grafit', value: '#14181f' },
-  { name: 'Granat', value: '#0f1f4d' },
-  { name: 'Stal', value: '#334155' },
-  { name: 'Pomarańcz', value: '#f97316' },
-  { name: 'Biały', value: '#ffffff' },
-  { name: 'Czarny', value: '#000000' },
+  { name: 'Grafit', value: '#14181f' }, { name: 'Granat', value: '#0f1f4d' }, { name: 'Stal', value: '#334155' },
+  { name: 'Pomarańcz', value: '#f97316' }, { name: 'Biały', value: '#ffffff' }, { name: 'Czarny', value: '#000000' },
 ];
 
-/* ── DB ── */
+/* ── tło decku (CSS background do renderera) ── */
+function deckBgCss() {
+  if (training.slides_bg_image) return `url("${training.slides_bg_image}") center / cover no-repeat`;
+  return training.slides_bg_color || 'var(--color-ink)';
+}
+async function saveDeckBg(patch) {
+  Object.assign(training, patch);
+  const { error } = await sb.from('trainings').update(patch).eq('id', trainingId);
+  if (error) toast('Błąd tła', error.message, 'err');
+}
+
+/* ── DB load ── */
 async function load() {
   const { data: t, error: te } = await sb.from('trainings')
     .select('id,name,slides_bg_color,slides_bg_image').eq('id', trainingId).single();
@@ -99,140 +108,170 @@ async function load() {
   const { data: s } = await sb.from('training_slides')
     .select('*').eq('training_id', trainingId).order('position').order('created_at');
   slides = s || [];
+  slides.forEach((row) => { row.content = slideToContent(row); history.reset(row.id, clone(row.content)); });
 }
 
+/* ── status zapisu ── */
+let statusTimer = null;
+function setStatus(state) {
+  const el = $('#save-status'); if (!el) return;
+  clearTimeout(statusTimer);
+  el.className = 'slides-status' + (state === 'saving' ? ' is-saving' : state === 'error' ? ' is-error' : ' is-saved');
+  if (state === 'saving') el.textContent = 'Zapisywanie…';
+  else if (state === 'error') el.textContent = 'Błąd zapisu';
+  else { el.textContent = 'Zapisano'; statusTimer = setTimeout(() => { el.textContent = ''; el.className = 'slides-status'; }, 1600); }
+}
+
+/* ── zapis content + notatek ── */
+function saveContentNow(s) {
+  sb.from('training_slides').update(contentToPatch(s.content)).eq('id', s.id)
+    .then(({ error }) => { if (error) { toast('Błąd zapisu', error.message, 'err'); setStatus('error'); } else setStatus('saved'); });
+}
+function scheduleSaveContent(s) {
+  setStatus('saving');
+  const key = s.id + '|content';
+  clearTimeout(saveTimers.get(key));
+  saveTimers.set(key, setTimeout(() => { saveTimers.delete(key); saveContentNow(s); }, 600));
+}
+function flushSaveContent(s) {
+  const key = s.id + '|content';
+  if (!saveTimers.has(key)) return;
+  clearTimeout(saveTimers.get(key)); saveTimers.delete(key);
+  saveContentNow(s);
+}
 function scheduleSave(id, patch) {
-  const key = id + '|' + Object.keys(patch).join(','); // osobny timer dla tekstu i notatek
+  setStatus('saving');
+  const key = id + '|' + Object.keys(patch).join(',');
   clearTimeout(saveTimers.get(key));
   saveTimers.set(key, setTimeout(() => {
     saveTimers.delete(key);
-    sb.from('training_slides').update(patch).eq('id', id).then(({ error }) => { if (error) toast('Błąd zapisu', error.message, 'err'); });
+    sb.from('training_slides').update(patch).eq('id', id).then(({ error }) => { if (error) { toast('Błąd zapisu', error.message, 'err'); setStatus('error'); } else setStatus('saved'); });
   }, 600));
 }
 function flushSave(id, patch) {
   const key = id + '|' + Object.keys(patch).join(',');
-  clearTimeout(saveTimers.get(key));
-  saveTimers.delete(key);
-  sb.from('training_slides').update(patch).eq('id', id).then(({ error }) => { if (error) toast('Błąd zapisu', error.message, 'err'); });
+  clearTimeout(saveTimers.get(key)); saveTimers.delete(key);
+  sb.from('training_slides').update(patch).eq('id', id).then(({ error }) => { if (error) { toast('Błąd zapisu', error.message, 'err'); setStatus('error'); } else setStatus('saved'); });
 }
-// Zapisuje bieżącą zawartość pola tekstu i notatek do pamięci + planuje zapis (przed re-renderem/zmianą slajdu).
-function captureEdits() {
+
+// Wczytaj zawartość edytowalnych obiektów tekstowych z DOM do modelu. Zwraca true, gdy zmiana.
+function captureTextDom() {
+  const s = slides[current]; if (!s) return false;
+  let changed = false;
+  $$('#canvas .slide-obj__text[contenteditable]').forEach((el) => {
+    const id = el.closest('.slide-obj')?.dataset.id;
+    const obj = s.content.objects.find((o) => o.id === id);
+    if (!obj) return;
+    const html = textToHtml(el.innerText); // Faza 0: plain text
+    if ((obj.richText || '') !== html) { obj.richText = html; changed = true; }
+  });
+  return changed;
+}
+function flushCurrent() {
+  const s = slides[current]; if (!s) return;
+  captureTextDom();
+  flushSaveContent(s);
+  const nta = $('#slide-notes');
+  if (nta && nta.value !== (s.notes || '')) { s.notes = nta.value; flushSave(s.id, { notes: nta.value }); }
+}
+
+/* ── historia / undo-redo ── */
+function pushHistory() { const s = slides[current]; if (s) { history.push(s.id, clone(s.content)); updateUndoButtons(); } }
+function updateUndoButtons() {
   const s = slides[current];
-  if (!s) return;
-  const el = document.getElementById('slide-text');
-  if (el) {
-    const val = el.innerText;
-    if (val !== (s.text || '')) { s.text = val; scheduleSave(s.id, { text: val }); }
-  }
-  const nel = document.getElementById('slide-notes');
-  if (nel) {
-    const nv = nel.value;
-    if (nv !== (s.notes || '')) { s.notes = nv; scheduleSave(s.id, { notes: nv }); }
-  }
+  const u = $('#btn-undo'), r = $('#btn-redo');
+  if (u) u.disabled = !s || !history.canUndo(s.id);
+  if (r) r.disabled = !s || !history.canRedo(s.id);
+}
+function doUndo() {
+  const s = slides[current]; if (!s) return;
+  captureTextDom();
+  const snap = history.undo(s.id); if (!snap) return;
+  s.content = clone(snap); saveContentNow(s); redraw();
+}
+function doRedo() {
+  const s = slides[current]; if (!s) return;
+  const snap = history.redo(s.id); if (!snap) return;
+  s.content = clone(snap); saveContentNow(s); redraw();
 }
 
-/* ── tło decku ── */
-function bgValue() {
-  if (training.slides_bg_image) return `url("${training.slides_bg_image}") center / cover no-repeat`;
-  return training.slides_bg_color || 'var(--color-ink)';
-}
-function applyCanvasBg() {
-  const c = document.getElementById('canvas');
-  if (c) c.style.background = bgValue();
-}
-async function saveBg(patch) {
-  Object.assign(training, patch);
-  const { error } = await sb.from('trainings').update(patch).eq('id', trainingId);
-  if (error) toast('Błąd tła', error.message, 'err');
-}
-
-/* ── render (4 części) ── */
-function redraw() { renderEditor(); renderInspector(); renderStrip(); updateCounts(); }
-
+/* ── render ── */
+function redraw() { renderEditor(); renderInspector(); renderStrip(); updateCounts(); updateUndoButtons(); }
 function updateCounts() {
   const n = slides.length;
   const dc = $('#deck-count'); if (dc) dc.textContent = `${n} ${plSlajdy(n)}`;
   const rc = $('#rail-count'); if (rc) rc.textContent = String(n);
 }
+function rescaleAll() { $$('.slide-stage').forEach((st) => applyScale(st.parentElement, st)); }
 
-/* centrum: toolbar + canvas */
 function renderEditor() {
   const stage = $('#editor-stage');
   if (!slides.length) {
     stage.innerHTML = `
       <div class="deck-canvas-wrap">
-        <div class="deck-canvas is-empty" id="canvas">
+        <div class="slide-viewport is-empty" style="display:grid;place-items:center">
           <div class="deck-empty">
             ${ICO.empty}
             <p class="deck-empty__title">Pusty deck</p>
-            <p class="deck-empty__hint">Zacznij od pierwszego slajdu — tekst i tło dodasz za chwilę.</p>
+            <p class="deck-empty__hint">Zacznij od pierwszego slajdu.</p>
             <button class="strefa-btn strefa-btn--accent" id="btn-add-first" type="button">+ Dodaj pierwszy slajd</button>
           </div>
         </div>
       </div>`;
-    applyCanvasBg();
     $('#btn-add-first')?.addEventListener('click', addSlide);
     return;
   }
   const s = slides[current];
+  const hasBgImg = s.content.background.type === 'image';
   stage.innerHTML = `
     <div class="deck-toolbar">
       <div class="deck-toolbar__group">
-        <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-slide-img" type="button">${ICO.img}<span>${s.image_url ? 'Zmień obrazek' : 'Obrazek'}</span></button>
-        ${s.image_url ? `<button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-slide-img-del" type="button">${ICO.trash}<span>Usuń</span></button>` : ''}
+        <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-slide-img" type="button">${ICO.img}<span>${hasBgImg ? 'Zmień obrazek' : 'Obrazek'}</span></button>
+        ${hasBgImg ? `<button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-slide-img-del" type="button">${ICO.trash}<span>Usuń</span></button>` : ''}
       </div>
       <span class="deck-toolbar__spacer"></span>
       <span class="deck-toolbar__counter">${current + 1} / ${slides.length}</span>
     </div>
     <div class="deck-canvas-wrap">
-      <div class="deck-canvas${s.image_url ? ' has-bg' : ''}" id="canvas">
-        ${s.image_url ? `<img class="deck-canvas__bg" src="${esc(s.image_url)}" alt="">` : ''}
-        <div class="deck-canvas__text" id="slide-text" contenteditable="true" data-ph="Wpisz tekst slajdu…" role="textbox" aria-multiline="true">${esc(s.text || '')}</div>
-      </div>
+      <div class="slide-viewport" id="canvas"></div>
     </div>
     <div class="deck-notes">
       <label class="deck-notes__label" for="slide-notes">Notatki prezentera</label>
       <textarea class="deck-notes__field" id="slide-notes" placeholder="Notatki dla prezentera — widoczne tylko tu, nie na slajdzie…">${esc(s.notes || '')}</textarea>
     </div>`;
-  applyCanvasBg();
+  const host = $('#canvas');
+  mountSlide(host, s.content, { deckBg: deckBgCss(), editable: true, observe: false });
+  if (editorRO) { editorRO.disconnect(); editorRO = null; }
+  const st = host.querySelector('.slide-stage');
+  if (st && 'ResizeObserver' in window) { editorRO = new ResizeObserver(() => applyScale(host, st)); editorRO.observe(host); }
   bindCanvas();
 }
 
 function bindCanvas() {
-  const txt = $('#slide-text');
-  if (txt) {
-    txt.addEventListener('input', () => {
-      const val = txt.innerText;
-      slides[current].text = val;
-      scheduleSave(slides[current].id, { text: val });
-    });
-    txt.addEventListener('blur', () => { flushSave(slides[current].id, { text: txt.innerText }); });
-  }
+  const s = slides[current];
+  $$('#canvas .slide-obj__text[contenteditable]').forEach((el) => {
+    el.addEventListener('input', () => { captureTextDom(); scheduleSaveContent(s); });
+    el.addEventListener('blur', () => { if (captureTextDom()) flushSaveContent(s); pushHistory(); });
+  });
   $('#btn-slide-img')?.addEventListener('click', () => $('#slide-img-input').click());
-  $('#btn-slide-img-del')?.addEventListener('click', async () => {
-    captureEdits();
-    slides[current].image_url = null;
-    const { error } = await sb.from('training_slides').update({ image_url: null }).eq('id', slides[current].id);
-    if (error) return toast('Błąd', error.message, 'err');
-    redraw();
+  $('#btn-slide-img-del')?.addEventListener('click', () => {
+    s.content.background = { type: 'none' };
+    saveContentNow(s); pushHistory(); redraw();
   });
   const nta = $('#slide-notes');
   if (nta) {
-    nta.addEventListener('input', () => { slides[current].notes = nta.value; scheduleSave(slides[current].id, { notes: nta.value }); });
-    nta.addEventListener('blur', () => { flushSave(slides[current].id, { notes: nta.value }); });
+    nta.addEventListener('input', () => { s.notes = nta.value; scheduleSave(s.id, { notes: nta.value }); });
+    nta.addEventListener('blur', () => { s.notes = nta.value; flushSave(s.id, { notes: nta.value }); });
   }
 }
 
-/* prawy inspektor: tło */
+/* prawy inspektor: tło decku */
 function renderInspector() {
   const host = $('#editor-inspector');
   const hasBg = !!(training.slides_bg_image || training.slides_bg_color);
   const activeColor = training.slides_bg_image ? '' : norm(training.slides_bg_color);
   host.innerHTML = `
-    <div class="deck-inspector__head">
-      <span class="deck-inspector__title">Tło</span>
-      <span class="deck-inspector__sub">całe szkolenie</span>
-    </div>
+    <div class="deck-inspector__head"><span class="deck-inspector__title">Tło</span><span class="deck-inspector__sub">całe szkolenie</span></div>
     <div class="deck-inspector__preview" id="bg-preview"></div>
     <div class="deck-field">
       <span class="deck-field__label">Kolory</span>
@@ -251,46 +290,29 @@ function renderInspector() {
       <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-bg-img" type="button">${training.slides_bg_image ? 'Zmień obrazek tła' : 'Obrazek tła'}</button>
       ${hasBg ? `<button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-bg-clear" type="button">Usuń tło</button>` : ''}
     </div>`;
-  const prev = $('#bg-preview');
-  if (prev) prev.style.background = bgValue();
+  const prev = $('#bg-preview'); if (prev) prev.style.background = deckBgCss();
   bindInspector();
 }
-
 function bindInspector() {
-  $$('.bg-chip').forEach((b) => b.addEventListener('click', async () => {
-    captureEdits();
-    await saveBg({ slides_bg_color: b.dataset.bg, slides_bg_image: null });
-    redraw();
-  }));
+  $$('.bg-chip').forEach((b) => b.addEventListener('click', async () => { await saveDeckBg({ slides_bg_color: b.dataset.bg, slides_bg_image: null }); redraw(); }));
   const ci = $('#bg-color');
-  // live preview podczas wybierania (bez re-renderu)
   ci?.addEventListener('input', () => {
-    const c = $('#canvas'); if (c) c.style.background = ci.value;
     const p = $('#bg-preview'); if (p) p.style.background = ci.value;
     const h = $('#bg-hex'); if (h) h.textContent = ci.value.toUpperCase();
+    const st = $('#canvas .slide-stage .slide-bg'); // live preview na slajdzie gdy tło dziedziczone
+    if (st && slides[current]?.content.background.type === 'none') st.style.background = ci.value;
   });
-  ci?.addEventListener('change', async () => {
-    captureEdits();
-    await saveBg({ slides_bg_color: ci.value, slides_bg_image: null });
-    redraw();
-  });
+  ci?.addEventListener('change', async () => { await saveDeckBg({ slides_bg_color: ci.value, slides_bg_image: null }); redraw(); });
   $('#btn-bg-img')?.addEventListener('click', () => $('#bg-img-input').click());
-  $('#btn-bg-clear')?.addEventListener('click', async () => {
-    captureEdits();
-    await saveBg({ slides_bg_color: null, slides_bg_image: null });
-    redraw();
-  });
+  $('#btn-bg-clear')?.addEventListener('click', async () => { await saveDeckBg({ slides_bg_color: null, slides_bg_image: null }); redraw(); });
 }
 
-/* lewy rail: filmstrip miniatur */
+/* lewy rail: filmstrip miniatur (renderowany wspólnym rendererem) */
 function renderStrip() {
   const strip = $('#strip');
   strip.innerHTML = slides.map((s, i) => `
-    <div class="deck-thumb ${i === current ? 'is-active' : ''}${s.image_url ? ' has-bg' : ''}" data-idx="${i}" draggable="true" role="option" aria-selected="${i === current}" tabindex="0">
-      <div class="deck-thumb__inner">
-        ${s.image_url ? `<img class="deck-thumb__bg" src="${esc(s.image_url)}" alt="">` : ''}
-        <span class="deck-thumb__txt">${esc((s.text || '').slice(0, 60))}</span>
-      </div>
+    <div class="deck-thumb ${i === current ? 'is-active' : ''}" data-idx="${i}" draggable="true" role="option" aria-selected="${i === current}" tabindex="0">
+      <div class="deck-thumb__inner" data-thumb="${i}"></div>
       <span class="deck-thumb__num">${i + 1}</span>
       <div class="deck-thumb__tools">
         <button class="deck-thumb__btn" data-move="up" title="W górę" ${i === 0 ? 'disabled' : ''}>${ICO.up}</button>
@@ -299,50 +321,36 @@ function renderStrip() {
       </div>
       <span class="deck-thumb__grip" aria-hidden="true">${ICO.grip}</span>
     </div>`).join('');
-  // tło miniatur = tło decku
-  $$('.deck-thumb__inner', strip).forEach((el) => { el.style.background = bgValue(); });
+  const dbg = deckBgCss();
+  slides.forEach((s, i) => {
+    const h = strip.querySelector(`[data-thumb="${i}"]`);
+    if (h) mountSlide(h, s.content, { deckBg: dbg, editable: false, observe: false });
+  });
   bindStrip();
 }
-
 function bindStrip() {
   const strip = $('#strip');
   strip.querySelectorAll('[data-idx]').forEach((thumb) => {
     const idx = +thumb.dataset.idx;
-
     thumb.addEventListener('click', (e) => {
       const moveBtn = e.target.closest('[data-move]');
       if (moveBtn) { e.stopPropagation(); moveSlide(idx, moveBtn.dataset.move); return; }
       if (e.target.closest('[data-del]')) { e.stopPropagation(); deleteSlide(idx); return; }
       selectSlide(idx);
     });
-    thumb.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectSlide(idx); }
-    });
-
-    // drag & drop reorder
-    thumb.addEventListener('dragstart', (e) => {
-      dragFrom = idx; thumb.classList.add('is-dragging');
-      e.dataTransfer.effectAllowed = 'move';
-      try { e.dataTransfer.setData('text/plain', String(idx)); } catch (_) { /* noop */ }
-    });
-    thumb.addEventListener('dragend', () => {
-      dragFrom = -1;
-      strip.querySelectorAll('.deck-thumb').forEach((t) => t.classList.remove('is-dragging', 'is-drop-before', 'is-drop-after'));
-    });
+    thumb.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectSlide(idx); } });
+    thumb.addEventListener('dragstart', (e) => { dragFrom = idx; thumb.classList.add('is-dragging'); e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', String(idx)); } catch (_) {} });
+    thumb.addEventListener('dragend', () => { dragFrom = -1; strip.querySelectorAll('.deck-thumb').forEach((t) => t.classList.remove('is-dragging', 'is-drop-before', 'is-drop-after')); });
     thumb.addEventListener('dragover', (e) => {
       if (dragFrom < 0 || dragFrom === idx) return;
       e.preventDefault(); e.dataTransfer.dropEffect = 'move';
-      const r = thumb.getBoundingClientRect();
-      const after = e.clientY > r.top + r.height / 2;
-      thumb.classList.toggle('is-drop-after', after);
-      thumb.classList.toggle('is-drop-before', !after);
+      const r = thumb.getBoundingClientRect(); const after = e.clientY > r.top + r.height / 2;
+      thumb.classList.toggle('is-drop-after', after); thumb.classList.toggle('is-drop-before', !after);
     });
     thumb.addEventListener('dragleave', () => { thumb.classList.remove('is-drop-before', 'is-drop-after'); });
     thumb.addEventListener('drop', (e) => {
-      e.preventDefault();
-      if (dragFrom < 0 || dragFrom === idx) return;
-      const r = thumb.getBoundingClientRect();
-      const after = e.clientY > r.top + r.height / 2;
+      e.preventDefault(); if (dragFrom < 0 || dragFrom === idx) return;
+      const r = thumb.getBoundingClientRect(); const after = e.clientY > r.top + r.height / 2;
       dropReorder(dragFrom, idx + (after ? 1 : 0));
     });
   });
@@ -350,62 +358,57 @@ function bindStrip() {
 
 function selectSlide(idx) {
   if (idx === current) return;
-  captureEdits();
+  flushCurrent();
   current = idx;
   redraw();
 }
 
 /* ── CRUD / reorder ── */
 async function addSlide() {
-  captureEdits();
+  flushCurrent();
+  const starter = { version: 1, background: { type: 'none' }, objects: [newObject('text', { x: 80, y: 0, w: SLIDE_W - 160, h: 1080, valign: 'middle', align: 'center', size: 96, richText: '', z: 0 })] };
   const { data, error } = await sb.from('training_slides')
-    .insert({ training_id: trainingId, position: slides.length, text: '', image_url: null })
-    .select().single();
+    .insert({ training_id: trainingId, position: slides.length, ...contentToPatch(starter) }).select().single();
   if (error) return toast('Błąd', error.message, 'err');
+  data.content = starter;
   slides.push(data);
   current = slides.length - 1;
+  history.reset(data.id, clone(starter));
   redraw();
-  $('#slide-text')?.focus();
+  $('#canvas .slide-obj__text[contenteditable]')?.focus();
 }
-
 async function deleteSlide(idx) {
-  const s = slides[idx];
-  if (!s) return;
+  const s = slides[idx]; if (!s) return;
   if (!(await confirmDialog('Usunąć ten slajd?'))) return;
   const { error } = await sb.from('training_slides').delete().eq('id', s.id);
   if (error) return toast('Błąd', error.message, 'err');
+  history.drop(s.id);
   slides.splice(idx, 1);
   if (current >= slides.length) current = Math.max(0, slides.length - 1);
   await renumber();
   redraw();
   toast('Usunięto', 'Slajd skasowany', 'ok');
 }
-
-// Wyrównuje position do indeksów 0..n-1 (po usunięciu / przeniesieniu). Zapisuje tylko zmienione.
 async function renumber() {
   const ops = [];
   slides.forEach((s, i) => { if (s.position !== i) { s.position = i; ops.push(sb.from('training_slides').update({ position: i }).eq('id', s.id)); } });
   if (ops.length) await Promise.all(ops);
 }
-
-// Przesunięcie strzałką (fallback dla drag&drop). dir: 'up' | 'down'.
 async function moveSlide(idx, dir) {
   const j = dir === 'up' ? idx - 1 : idx + 1;
   if (j < 0 || j >= slides.length) return;
-  captureEdits();
+  flushCurrent();
   const movedId = slides[idx].id;
   [slides[idx], slides[j]] = [slides[j], slides[idx]];
   current = slides.findIndex((s) => s.id === movedId);
   redraw();
   await renumber();
 }
-
-// Przeniesienie przez drag&drop: z indeksu `from` na pozycję `target` (przed elementem o tym indeksie).
 async function dropReorder(from, target) {
   if (from < 0 || from >= slides.length) return;
   const movedId = slides[from].id;
   const [m] = slides.splice(from, 1);
-  if (target > from) target -= 1;                 // korekta po usunięciu źródła
+  if (target > from) target -= 1;
   target = Math.max(0, Math.min(slides.length, target));
   slides.splice(target, 0, m);
   current = slides.findIndex((s) => s.id === movedId);
@@ -413,144 +416,122 @@ async function dropReorder(from, target) {
   await renumber();
 }
 
-/* ── upload obrazków ── */
+/* ── upload / paste obrazka (Faza 0: jako tło slajdu) ── */
 function bindFileInputs() {
-  $('#slide-img-input').addEventListener('change', async (e) => {
-    const file = e.target.files?.[0]; e.target.value = '';
-    if (file) await handleSlideImage(file);
-  });
-  $('#bg-img-input').addEventListener('change', async (e) => {
-    const file = e.target.files?.[0]; e.target.value = '';
-    if (file) await handleBgImage(file);
-  });
+  $('#slide-img-input').addEventListener('change', async (e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) await handleSlideImage(f); });
+  $('#bg-img-input').addEventListener('change', async (e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) await handleBgImage(f); });
 }
-
 async function handleSlideImage(file) {
-  if (!slides[current]) return;
-  captureEdits();
-  toast('Wgrywanie…', file.name);
+  const s = slides[current]; if (!s) return;
+  captureTextDom();
+  toast('Wgrywanie…', file.name); setStatus('saving');
   const res = await uploadSlideImage(file, trainingId, 'slides');
-  if (res.error) return toast('Błąd uploadu', res.error, 'err');
-  slides[current].image_url = res.url;
-  const { error } = await sb.from('training_slides').update({ image_url: res.url }).eq('id', slides[current].id);
-  if (error) return toast('Błąd', error.message, 'err');
-  redraw();
+  if (res.error) { setStatus('error'); return toast('Błąd uploadu', res.error, 'err'); }
+  s.content.background = { type: 'image', value: res.url, fit: 'contain' };
+  saveContentNow(s); pushHistory(); redraw();
   toast('Gotowe', 'Obrazek dodany', 'ok');
 }
-
 async function handleBgImage(file) {
-  toast('Wgrywanie tła…', file.name);
+  toast('Wgrywanie tła…', file.name); setStatus('saving');
   const res = await uploadSlideImage(file, trainingId, 'bg');
-  if (res.error) return toast('Błąd uploadu', res.error, 'err');
-  captureEdits();
-  await saveBg({ slides_bg_image: res.url, slides_bg_color: null });
+  if (res.error) { setStatus('error'); return toast('Błąd uploadu', res.error, 'err'); }
+  await saveDeckBg({ slides_bg_image: res.url, slides_bg_color: null });
   redraw();
   toast('Gotowe', 'Tło ustawione', 'ok');
 }
-
-// Wklejenie obrazka ze schowka (Ctrl/Cmd+V) → wstaw na aktywny slajd jak przyciskiem „Obrazek".
 function onPaste(e) {
-  if (!slides.length || !slides[current]) return;     // brak slajdu do wklejenia
-  if (!$('#stage').hidden) return;                    // trwa prezentacja
-  if ($('#modal-root')?.children.length) return;      // otwarty dialog
-  const items = e.clipboardData?.items;
-  if (!items) return;
+  if (!slides.length || !slides[current]) return;
+  if (!$('#stage').hidden) return;
+  if ($('#modal-root')?.children.length) return;
+  const items = e.clipboardData?.items; if (!items) return;
   for (const it of items) {
     if (it.kind === 'file' && it.type && it.type.startsWith('image/')) {
       const file = it.getAsFile();
       if (file) { e.preventDefault(); handleSlideImage(file); }
-      return;                                          // obsłużony obrazek — nie wklejaj jako tekst
+      return;
     }
   }
-  // brak obrazka w schowku → zwykłe wklejenie tekstu w polu przebiega normalnie
 }
 
 /* ── tryb prezentacji (Fullscreen API) ── */
 let presentIdx = 0;
 function startPresent() {
   if (!slides.length) return toast('Brak slajdów', 'Dodaj choć jeden slajd', 'err');
-  captureEdits();
+  flushCurrent();
   presentIdx = current;
   const stage = $('#stage');
   stage.hidden = false;
   renderStage();
   const req = stage.requestFullscreen || stage.webkitRequestFullscreen;
-  if (req) req.call(stage).catch(() => { /* zostajemy w fixed-overlay fallback */ });
+  if (req) req.call(stage).catch(() => {});
   document.addEventListener('keydown', onPresentKey);
 }
-
 function renderStage() {
   const stage = $('#stage');
   const s = slides[presentIdx];
   const total = slides.length;
-  stage.style.background = bgValue();
-  const dots = total <= 12
-    ? slides.map((_, i) => `<span class="stage-dot ${i === presentIdx ? 'is-current' : ''}" data-go="${i}"></span>`).join('')
-    : '';
+  const dots = total <= 12 ? slides.map((_, i) => `<span class="stage-dot ${i === presentIdx ? 'is-current' : ''}" data-go="${i}"></span>`).join('') : '';
   stage.innerHTML = `
     <button class="stage-nav stage-prev" aria-label="Poprzedni slajd" ${presentIdx === 0 ? 'disabled' : ''}>◀</button>
-    <div class="stage-slide${s.image_url ? ' has-bg' : ''}">
-      ${s.image_url ? `<img class="stage-bg" src="${esc(s.image_url)}" alt="">` : ''}
-      <div class="stage-text">${esc(s.text || '').replace(/\n/g, '<br>')}</div>
-    </div>
+    <div class="slide-viewport" id="stage-vp"></div>
     <button class="stage-nav stage-next" aria-label="Następny slajd" ${presentIdx === total - 1 ? 'disabled' : ''}>▶</button>
     <button class="stage-exit" aria-label="Zamknij prezentację">✕</button>
     <div class="stage-progress">${dots}<span class="stage-count-txt">${presentIdx + 1} / ${total}</span></div>`;
+  const host = $('#stage-vp');
+  mountSlide(host, s.content, { deckBg: deckBgCss(), editable: false, observe: false });
+  applyScale(host, host.querySelector('.slide-stage'));
   stage.querySelector('.stage-prev').addEventListener('click', () => goPresent(-1));
   stage.querySelector('.stage-next').addEventListener('click', () => goPresent(1));
   stage.querySelector('.stage-exit').addEventListener('click', exitPresent);
   stage.querySelectorAll('[data-go]').forEach((d) => d.addEventListener('click', () => { presentIdx = +d.dataset.go; renderStage(); }));
 }
-
-function goPresent(d) {
-  presentIdx = Math.max(0, Math.min(slides.length - 1, presentIdx + d));
-  renderStage();
-}
-
+function goPresent(d) { presentIdx = Math.max(0, Math.min(slides.length - 1, presentIdx + d)); renderStage(); }
 function onPresentKey(e) {
   if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); goPresent(1); }
   else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goPresent(-1); }
   else if (e.key === 'Escape') exitPresent();
 }
-
 function exitPresent() {
   const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
-  if (fsEl) {
-    const exit = document.exitFullscreen || document.webkitExitFullscreen;
-    if (exit) exit.call(document); // fullscreenchange posprząta
-  } else {
-    closeStage();
-  }
+  if (fsEl) { const exit = document.exitFullscreen || document.webkitExitFullscreen; if (exit) exit.call(document); }
+  else closeStage();
 }
-
 function closeStage() {
   const stage = $('#stage');
   if (stage.hidden) return;
-  stage.hidden = true;
-  stage.innerHTML = '';
+  stage.hidden = true; stage.innerHTML = '';
   document.removeEventListener('keydown', onPresentKey);
 }
-
 document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) closeStage(); });
 document.addEventListener('webkitfullscreenchange', () => { if (!document.webkitFullscreenElement) closeStage(); });
+
+/* ── klawiatura globalna (undo/redo) ── */
+function onKeyGlobal(e) {
+  if (!$('#stage').hidden) return;                       // prezentacja
+  if ($('#modal-root')?.children.length) return;         // dialog
+  const ae = document.activeElement;
+  const editing = ae && (ae.isContentEditable || ae.tagName === 'TEXTAREA' || ae.tagName === 'INPUT');
+  if (editing) return;                                   // w polu tekstowym → natywne undo
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) doRedo(); else doUndo(); }
+}
 
 /* ── init ── */
 async function init() {
   const user = await getSessionUser();
-  if (!user || !isAllowed(user.email)) return; // layout przekieruje na /strefa/login
+  if (!user || !isAllowed(user.email)) return;
   if (!trainingId) { location.replace('/strefa/szkolenia'); return; }
   bindFileInputs();
   document.addEventListener('paste', onPaste);
+  document.addEventListener('keydown', onKeyGlobal);
+  window.addEventListener('resize', rescaleAll);
+  window.addEventListener('beforeunload', () => { try { flushCurrent(); } catch (_) {} });
   $('#btn-present').addEventListener('click', startPresent);
   $('#btn-add-slide').addEventListener('click', addSlide);
+  $('#btn-undo')?.addEventListener('click', doUndo);
+  $('#btn-redo')?.addEventListener('click', doRedo);
   await load();
-  if (!training) {
-    toast('Nie znaleziono', 'Szkolenie nie istnieje lub brak dostępu', 'err');
-    setTimeout(() => location.replace('/strefa/szkolenia'), 1500);
-    return;
-  }
+  if (!training) { toast('Nie znaleziono', 'Szkolenie nie istnieje lub brak dostępu', 'err'); setTimeout(() => location.replace('/strefa/szkolenia'), 1500); return; }
   document.getElementById('deck-title').textContent = training.name;
   redraw();
 }
-
 init();

@@ -552,7 +552,7 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 .deck-thumb:hover { border-color: var(--color-text-inv-3); }
 .deck-thumb.is-active { border-color: var(--color-accent); box-shadow: 0 0 0 2px var(--color-accent), 0 6px 18px -8px var(--color-accent-glow); }
 .deck-thumb.is-active::before { content: ""; position: absolute; left: 0; top: 18%; bottom: 18%; width: 3px; border-radius: 0 3px 3px 0; background: var(--color-accent); z-index: 2; }
-.deck-thumb__inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2rem; padding: .4rem; }
+.deck-thumb__inner { position: absolute; inset: 0; overflow: hidden; }
 .deck-thumb__txt { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 500; font-size: .58rem; line-height: 1.12; color: var(--color-text-inv); text-align: center; max-height: 2.3em; overflow: hidden; text-shadow: 0 1px 6px oklch(0% 0 0 / .5); }
 .deck-thumb__num { position: absolute; top: .3rem; left: .35rem; z-index: 2; font-family: var(--font-display); font-weight: 700; font-size: .6rem; color: var(--color-text-inv-2); background: oklch(0% 0 0 / .5); border-radius: 999px; padding: .05rem .4rem; line-height: 1.4; backdrop-filter: blur(2px); }
 .deck-thumb__tools { position: absolute; top: .3rem; right: .3rem; z-index: 3; display: flex; gap: .2rem; opacity: 0; transform: translateY(-2px); transition: opacity var(--dur-1) var(--ease-out), transform var(--dur-1) var(--ease-out); }
@@ -591,6 +591,39 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 .deck-notes__field::placeholder { color: var(--color-text-inv-3); }
 
 .deck-canvas-wrap { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: var(--space-2xs); container-type: size; }
+
+/* ── edytor obiektowy v2: warstwa slajdu (stała przestrzeń 1920×1080, skalowana) ── */
+.slide-viewport {
+  position: relative; aspect-ratio: 16 / 9;
+  width: min(100cqw, calc(100cqh * 16 / 9));
+  overflow: hidden; border-radius: var(--radius-card); border: 1px solid var(--color-line-dark);
+  background: var(--color-ink);
+  box-shadow: 0 1px 0 0 oklch(100% 0 0 / .06) inset, 0 24px 60px -20px oklch(0% 0 0 / .55), 0 4px 16px -8px oklch(0% 0 0 / .4);
+}
+.slide-stage { position: absolute; top: 0; left: 0; transform-origin: top left; }
+.slide-bg { position: absolute; inset: 0; }
+.slide-bg__img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.slide-obj { position: absolute; box-sizing: border-box; }
+.slide-obj--text { display: flex; }
+.slide-obj__text {
+  max-width: 100%; max-height: 100%; overflow: hidden;
+  white-space: pre-wrap; word-break: break-word; outline: none;
+  letter-spacing: -.01em; text-shadow: 0 1px 14px oklch(0% 0 0 / .4);
+}
+.slide-obj__text[contenteditable] { cursor: text; }
+.slide-obj__text[contenteditable]:focus-visible { box-shadow: 0 0 0 3px var(--color-accent); }
+/* placeholder tylko w edytorze (contenteditable); nigdy na miniaturze/prezentacji */
+.slide-obj__text[contenteditable]:empty::before { content: attr(data-ph); color: var(--color-text-inv-3); }
+.slide-stage.has-bg-image .slide-obj__text[contenteditable]:empty::before { content: none; }
+/* miniatura: slide-viewport bez ramki/cienia, nieinteraktywna */
+.deck-thumb .slide-viewport { border: none; border-radius: 0; box-shadow: none; pointer-events: none; width: 100%; height: 100%; }
+/* prezentacja: slide-viewport dopasowany 16:9 do ekranu, bez ramki */
+.slides-stage .slide-viewport { border: none; border-radius: 0; box-shadow: none; width: min(100vw, calc(100vh * 16 / 9)); height: auto; max-width: none; }
+/* status zapisu w nagłówku */
+.slides-status { font-size: var(--text-caption); color: var(--color-text-inv-3); font-variant-numeric: tabular-nums; min-width: 6.5rem; text-align: right; }
+.slides-status.is-saving { color: var(--color-text-inv-2); }
+.slides-status.is-saved { color: oklch(72% 0.16 150); }
+.slides-status.is-error { color: oklch(72% 0.18 25); }
 .deck-canvas {
   position: relative; aspect-ratio: 16 / 9; height: auto;
   width: min(100cqw, calc(100cqh * 16 / 9));
