@@ -38,8 +38,8 @@ function textStyle(o) {
 }
 
 export function renderObject(o, { editable = false } = {}) {
-  const box = `position:absolute;left:${o.x}px;top:${o.y}px;width:${o.w}px;height:${o.h}px;`
-    + `transform:rotate(${o.rotation || 0}deg);opacity:${o.opacity ?? 1};z-index:${o.z || 0};`;
+  const box = `position:absolute;left:0;top:0;width:${o.w}px;height:${o.h}px;`
+    + `transform:translate(${o.x}px,${o.y}px) rotate(${o.rotation || 0}deg);opacity:${o.opacity ?? 1};z-index:${o.z || 0};`;
   if (o.type === 'text') {
     const ce = editable ? ' contenteditable="true" data-edit="text"' : '';
     return `<div class="slide-obj slide-obj--text" data-id="${o.id}" style="${box}align-items:${VALIGN_ITEMS[o.valign] || 'center'};justify-content:${ALIGN_JUSTIFY[o.align] || 'center'}">`

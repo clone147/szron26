@@ -1,9 +1,10 @@
 // Edytor slajdów SZRON — v2 (model obiektowy). Faza 0: dokument sceny `content`,
 // wspólny renderer (edytor/miniatury/prezentacja), autosave całego content, undo/redo.
 import { getClient, getSessionUser, isAllowed, uploadSlideImage } from './supabase.js';
-import { SLIDE_W, slideToContent, contentToPatch, newObject, textToHtml } from './slajdy/slide-model.js';
+import { SLIDE_W, SLIDE_H, slideToContent, contentToPatch, newObject, textToHtml, genId } from './slajdy/slide-model.js';
 import { mountSlide, applyScale } from './slajdy/slide-renderer.js';
 import { createHistory } from './slajdy/slide-store.js';
+import { createObjectEditor } from './slajdy/slide-editor.js';
 
 const sb = getClient();
 const clone = (x) => (typeof structuredClone === 'function' ? structuredClone(x) : JSON.parse(JSON.stringify(x)));
@@ -82,6 +83,7 @@ const saveTimers = new Map();
 let dragFrom = -1;
 const history = createHistory();
 let editorRO = null;
+let objEditor = null;       // kontroler Moveable bieżącego canvasu
 
 const BG_PRESETS = [
   { name: 'Grafit', value: '#14181f' }, { name: 'Granat', value: '#0f1f4d' }, { name: 'Stal', value: '#334155' },
@@ -222,12 +224,11 @@ function renderEditor() {
     return;
   }
   const s = slides[current];
-  const hasBgImg = s.content.background.type === 'image';
   stage.innerHTML = `
     <div class="deck-toolbar">
       <div class="deck-toolbar__group">
-        <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-slide-img" type="button">${ICO.img}<span>${hasBgImg ? 'Zmień obrazek' : 'Obrazek'}</span></button>
-        ${hasBgImg ? `<button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-slide-img-del" type="button">${ICO.trash}<span>Usuń</span></button>` : ''}
+        <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-add-text" type="button">${ICO.text}<span>Tekst</span></button>
+        <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-add-img" type="button">${ICO.img}<span>Obrazek</span></button>
       </div>
       <span class="deck-toolbar__spacer"></span>
       <span class="deck-toolbar__counter">${current + 1} / ${slides.length}</span>
@@ -240,29 +241,67 @@ function renderEditor() {
       <textarea class="deck-notes__field" id="slide-notes" placeholder="Notatki dla prezentera — widoczne tylko tu, nie na slajdzie…">${esc(s.notes || '')}</textarea>
     </div>`;
   const host = $('#canvas');
-  mountSlide(host, s.content, { deckBg: deckBgCss(), editable: true, observe: false });
+  mountSlide(host, s.content, { deckBg: deckBgCss(), editable: false, observe: false });
   if (editorRO) { editorRO.disconnect(); editorRO = null; }
   const st = host.querySelector('.slide-stage');
-  if (st && 'ResizeObserver' in window) { editorRO = new ResizeObserver(() => applyScale(host, st)); editorRO.observe(host); }
-  bindCanvas();
+  if (st && 'ResizeObserver' in window) { editorRO = new ResizeObserver(() => { applyScale(host, st); objEditor?.updateRect(); }); editorRO.observe(host); }
+  if (objEditor) objEditor.destroy();
+  objEditor = createObjectEditor({ host, getSlide: () => slides[current], commit: editorCommit });
+  bindEditorChrome();
 }
 
-function bindCanvas() {
+function editorCommit() { const s = slides[current]; if (!s) return; scheduleSaveContent(s); pushHistory(); }
+
+function bindEditorChrome() {
   const s = slides[current];
-  $$('#canvas .slide-obj__text[contenteditable]').forEach((el) => {
-    el.addEventListener('input', () => { captureTextDom(); scheduleSaveContent(s); });
-    el.addEventListener('blur', () => { if (captureTextDom()) flushSaveContent(s); pushHistory(); });
-  });
-  $('#btn-slide-img')?.addEventListener('click', () => $('#slide-img-input').click());
-  $('#btn-slide-img-del')?.addEventListener('click', () => {
-    s.content.background = { type: 'none' };
-    saveContentNow(s); pushHistory(); redraw();
-  });
+  $('#btn-add-text')?.addEventListener('click', insertText);
+  $('#btn-add-img')?.addEventListener('click', () => $('#slide-img-input').click());
   const nta = $('#slide-notes');
   if (nta) {
     nta.addEventListener('input', () => { s.notes = nta.value; scheduleSave(s.id, { notes: nta.value }); });
     nta.addEventListener('blur', () => { s.notes = nta.value; flushSave(s.id, { notes: nta.value }); });
   }
+}
+
+/* ── obiekty: wstawianie / operacje ── */
+function addObject(s, obj, { edit = false } = {}) {
+  obj.z = s.content.objects.length;
+  s.content.objects.push(obj);
+  scheduleSaveContent(s); pushHistory();
+  renderEditor();
+  setTimeout(() => { if (edit) objEditor?.enterTextEdit(obj.id); else objEditor?.select(obj.id); }, 20);
+}
+function insertText() {
+  const s = slides[current]; if (!s) return;
+  const obj = newObject('text', { x: 560, y: 460, w: 800, h: 160, size: 64, align: 'center', valign: 'middle', richText: '' });
+  addObject(s, obj, { edit: true });
+}
+function imageDims(url) {
+  return new Promise((res) => { const im = new Image(); im.onload = () => res({ w: im.naturalWidth, h: im.naturalHeight }); im.onerror = () => res({ w: 0, h: 0 }); im.src = url; });
+}
+function deleteSelectedObject() {
+  const s = slides[current]; const id = objEditor?.selected(); if (!s || !id) return;
+  const i = s.content.objects.findIndex((o) => o.id === id);
+  if (i < 0) return;
+  s.content.objects.splice(i, 1);
+  s.content.objects.forEach((o, k) => { o.z = k; });
+  objEditor.clear();
+  scheduleSaveContent(s); pushHistory(); renderEditor();
+}
+function duplicateSelectedObject() {
+  const s = slides[current]; const id = objEditor?.selected(); if (!s || !id) return;
+  const src = s.content.objects.find((o) => o.id === id); if (!src) return;
+  const copy = { ...JSON.parse(JSON.stringify(src)), id: genId(), x: src.x + 24, y: src.y + 24 };
+  addObject(s, copy);
+}
+function nudgeSelected(dx, dy) {
+  const s = slides[current]; const id = objEditor?.selected(); if (!s || !id) return;
+  const o = s.content.objects.find((x) => x.id === id); if (!o) return;
+  o.x += dx; o.y += dy;
+  const el = $(`#canvas .slide-obj[data-id="${id}"]`);
+  if (el) el.style.transform = `translate(${o.x}px,${o.y}px) rotate(${o.rotation || 0}deg)`;
+  objEditor.updateRect();
+  scheduleSaveContent(s); pushHistory();
 }
 
 /* prawy inspektor: tło decku */
@@ -423,12 +462,15 @@ function bindFileInputs() {
 }
 async function handleSlideImage(file) {
   const s = slides[current]; if (!s) return;
-  captureTextDom();
   toast('Wgrywanie…', file.name); setStatus('saving');
   const res = await uploadSlideImage(file, trainingId, 'slides');
   if (res.error) { setStatus('error'); return toast('Błąd uploadu', res.error, 'err'); }
-  s.content.background = { type: 'image', value: res.url, fit: 'contain' };
-  saveContentNow(s); pushHistory(); redraw();
+  const dim = await imageDims(res.url);
+  const aspect = (dim.w && dim.h) ? dim.w / dim.h : 16 / 9;
+  let w = 1000, h = Math.round(w / aspect);
+  if (h > 760) { h = 760; w = Math.round(h * aspect); }
+  const obj = newObject('image', { src: res.url, w, h, x: Math.round((SLIDE_W - w) / 2), y: Math.round((SLIDE_H - h) / 2), fit: 'contain', naturalW: dim.w, naturalH: dim.h });
+  addObject(s, obj);
   toast('Gotowe', 'Obrazek dodany', 'ok');
 }
 async function handleBgImage(file) {
@@ -510,9 +552,19 @@ function onKeyGlobal(e) {
   if (!$('#stage').hidden) return;                       // prezentacja
   if ($('#modal-root')?.children.length) return;         // dialog
   const ae = document.activeElement;
-  const editing = ae && (ae.isContentEditable || ae.tagName === 'TEXTAREA' || ae.tagName === 'INPUT');
-  if (editing) return;                                   // w polu tekstowym → natywne undo
-  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) doRedo(); else doUndo(); }
+  const editing = (ae && (ae.isContentEditable || ae.tagName === 'TEXTAREA' || ae.tagName === 'INPUT')) || objEditor?.isEditing();
+  if (editing) return;                                   // w polu tekstowym → natywne zachowanie
+  const k = e.key.toLowerCase();
+  if ((e.metaKey || e.ctrlKey) && k === 'z') { e.preventDefault(); if (e.shiftKey) doRedo(); else doUndo(); return; }
+  if ((e.metaKey || e.ctrlKey) && k === 'd') { e.preventDefault(); duplicateSelectedObject(); return; }
+  const hasSel = !!objEditor?.selected();
+  if (hasSel && (e.key === 'Delete' || e.key === 'Backspace')) { e.preventDefault(); deleteSelectedObject(); return; }
+  if (hasSel && e.key.startsWith('Arrow')) {
+    e.preventDefault(); const step = e.shiftKey ? 20 : 2;
+    nudgeSelected(e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0, e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0);
+    return;
+  }
+  if (e.key === 'Escape' && hasSel) { objEditor.clear(); }
 }
 
 /* ── init ── */

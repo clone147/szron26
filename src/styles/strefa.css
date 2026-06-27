@@ -615,6 +615,11 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 /* placeholder tylko w edytorze (contenteditable); nigdy na miniaturze/prezentacji */
 .slide-obj__text[contenteditable]:empty::before { content: attr(data-ph); color: var(--color-text-inv-3); }
 .slide-stage.has-bg-image .slide-obj__text[contenteditable]:empty::before { content: none; }
+/* edytor obiektów (Moveable): kontener nieprzycinający + kursory */
+.deck-canvas-wrap { position: relative; }
+.slide-obj { cursor: move; }
+.slide-obj--text.is-editing, .slide-obj--text.is-editing .slide-obj__text { cursor: text; }
+.slide-obj.is-selected { outline: 1px solid var(--color-accent); outline-offset: 0; }
 /* miniatura: slide-viewport bez ramki/cienia, nieinteraktywna */
 .deck-thumb .slide-viewport { border: none; border-radius: 0; box-shadow: none; pointer-events: none; width: 100%; height: 100%; }
 /* prezentacja: slide-viewport dopasowany 16:9 do ekranu, bez ramki */

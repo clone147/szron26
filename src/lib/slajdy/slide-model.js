@@ -84,8 +84,9 @@ export function slideToContent(row) {
 
 // Pochodne do zapisu w DB (cache): pierwszy tekst + pierwszy obraz/tło.
 export function deriveText(content) {
-  const t = (content.objects || []).find((o) => o.type === 'text');
-  return t ? htmlToText(t.richText).slice(0, 500) : '';
+  return (content.objects || [])
+    .filter((o) => o.type === 'text')
+    .map((o) => htmlToText(o.richText)).filter(Boolean).join('\n').slice(0, 500);
 }
 export function deriveImage(content) {
   if (content.background && content.background.type === 'image') return content.background.value || null;

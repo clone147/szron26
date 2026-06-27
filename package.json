@@ -13,6 +13,7 @@
     "@supabase/supabase-js": "^2.108.1",
     "astro": "^5.6.0",
     "flatpickr": "^4.6.13",
+    "moveable": "^0.53.0",
     "qrcode-generator": "^1.5.2"
   }
 }
