@@ -2,7 +2,7 @@
 // wspólny renderer (edytor/miniatury/prezentacja), autosave całego content, undo/redo.
 import { getClient, getSessionUser, isAllowed, uploadSlideImage } from './supabase.js';
 import { SLIDE_W, SLIDE_H, slideToContent, contentToPatch, newObject, sanitizeHtml, textToHtml, genId } from './slajdy/slide-model.js';
-import { mountSlide, applyScale } from './slajdy/slide-renderer.js';
+import { mountSlide, applyScale, renderSlideInner } from './slajdy/slide-renderer.js';
 import { createHistory } from './slajdy/slide-store.js';
 import { createObjectEditor } from './slajdy/slide-editor.js';
 
@@ -656,6 +656,9 @@ function renderObjectInspector(o) {
     <div class="deck-field"><span class="deck-field__label">Krycie <b id="oi-op-val">${Math.round((o.opacity ?? 1) * 100)}%</b></span>
       <input type="range" id="oi-opacity" min="0" max="100" value="${Math.round((o.opacity ?? 1) * 100)}">
     </div>
+    <div class="deck-field"><span class="deck-field__label">Animacja wejścia</span>
+      <select class="oi-select" id="oi-anim">${[['none', 'Brak'], ['fade', 'Pojawienie'], ['slide', 'Wsunięcie'], ['scale', 'Skala']].map(([v, l]) => `<option value="${v}" ${(o.anim || 'none') === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+    </div>
     <div class="oi-grid">
       <label class="oi-num"><span>X</span><input type="number" id="oi-px" value="${Math.round(o.x)}"></label>
       <label class="oi-num"><span>Y</span><input type="number" id="oi-py" value="${Math.round(o.y)}"></label>
@@ -726,6 +729,7 @@ function bindObjectInspector(o) {
 
   $('#oi-opacity')?.addEventListener('input', (e) => { o.opacity = (+e.target.value) / 100; const b = el(); if (b) b.style.opacity = o.opacity; const v = $('#oi-op-val'); if (v) v.textContent = e.target.value + '%'; live(); });
   $('#oi-opacity')?.addEventListener('change', commit);
+  $('#oi-anim')?.addEventListener('change', (e) => { o.anim = e.target.value === 'none' ? undefined : e.target.value; scheduleSaveContent(s); pushHistory(); });
 
   const geo = () => { const b = el(); if (b) { b.style.transform = `translate(${o.x}px,${o.y}px) rotate(${o.rotation || 0}deg)`; b.style.width = o.w + 'px'; b.style.height = o.h + 'px'; } objEditor?.updateRect(); };
   $('#oi-px')?.addEventListener('input', (e) => { o.x = +e.target.value || 0; geo(); live(); });
@@ -742,7 +746,11 @@ function renderInspector() {
   const hasBg = !!(training.slides_bg_image || training.slides_bg_color);
   const activeColor = training.slides_bg_image ? '' : norm(training.slides_bg_color);
   host.innerHTML = `
-    <div class="deck-inspector__head"><span class="deck-inspector__title">Tło</span><span class="deck-inspector__sub">całe szkolenie</span></div>
+    ${slides.length ? `<div class="deck-inspector__head"><span class="deck-inspector__title">Slajd ${current + 1}</span><span class="deck-inspector__sub">przejście</span></div>
+    <div class="deck-field"><span class="deck-field__label">Przejście wejścia</span>
+      <select class="oi-select" id="slide-trans">${[['none', 'Brak'], ['fade', 'Wygaszenie'], ['push', 'Wsunięcie']].map(([v, l]) => `<option value="${v}" ${(slides[current]?.content.transition || 'none') === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+    </div>` : ''}
+    <div class="deck-inspector__head"${slides.length ? ' style="margin-top:var(--space-lg)"' : ''}><span class="deck-inspector__title">Tło</span><span class="deck-inspector__sub">całe szkolenie</span></div>
     <div class="deck-inspector__preview" id="bg-preview"></div>
     <div class="deck-field">
       <span class="deck-field__label">Kolory</span>
@@ -783,6 +791,7 @@ function bindInspector() {
   $('#btn-bg-clear')?.addEventListener('click', async () => { await saveDeckBg({ slides_bg_color: null, slides_bg_image: null }); redraw(); });
   $('#theme-accent')?.addEventListener('change', (e) => saveTheme({ accent: e.target.value }));
   $('#theme-text')?.addEventListener('change', (e) => saveTheme({ textColor: e.target.value }));
+  $('#slide-trans')?.addEventListener('change', (e) => { const s = slides[current]; if (s) { s.content.transition = e.target.value; scheduleSaveContent(s); pushHistory(); } });
 }
 
 /* lewy rail: filmstrip miniatur (renderowany wspólnym rendererem) */
@@ -935,42 +944,130 @@ function onPaste(e) {
 }
 
 /* ── tryb prezentacji (Fullscreen API) ── */
-let presentIdx = 0;
+let presentIdx = 0, buildStep = 0;
+let presenterWin = null, presenterTimer = null, presentStart = 0;
 function startPresent() {
   if (!slides.length) return toast('Brak slajdów', 'Dodaj choć jeden slajd', 'err');
   flushCurrent();
-  presentIdx = current;
+  presentIdx = current; buildStep = 0;
   const stage = $('#stage');
   stage.hidden = false;
-  renderStage();
+  renderStage(false);
   const req = stage.requestFullscreen || stage.webkitRequestFullscreen;
   if (req) req.call(stage).catch(() => {});
   document.addEventListener('keydown', onPresentKey);
 }
-function renderStage() {
+function animObjects(content) { return (content.objects || []).filter((o) => o.anim && o.anim !== 'none').sort((a, b) => (a.z || 0) - (b.z || 0)); }
+function applyBuilds(host, content, step) {
+  animObjects(content).forEach((o, i) => {
+    const el = host.querySelector(`.slide-obj[data-id="${o.id}"]`);
+    if (!el) return;
+    if (i < step) { if (i === step - 1) el.classList.add('build-in-' + o.anim); }
+    else el.style.visibility = 'hidden';
+  });
+}
+function renderStage(animate) {
   const stage = $('#stage');
   const s = slides[presentIdx];
   const total = slides.length;
   const dots = total <= 12 ? slides.map((_, i) => `<span class="stage-dot ${i === presentIdx ? 'is-current' : ''}" data-go="${i}"></span>`).join('') : '';
   stage.innerHTML = `
-    <button class="stage-nav stage-prev" aria-label="Poprzedni slajd" ${presentIdx === 0 ? 'disabled' : ''}>◀</button>
+    <button class="stage-nav stage-prev" aria-label="Poprzedni" ${presentIdx === 0 && buildStep === 0 ? 'disabled' : ''}>◀</button>
     <div class="slide-viewport" id="stage-vp"></div>
-    <button class="stage-nav stage-next" aria-label="Następny slajd" ${presentIdx === total - 1 ? 'disabled' : ''}>▶</button>
+    <button class="stage-nav stage-next" aria-label="Następny">▶</button>
     <button class="stage-exit" aria-label="Zamknij prezentację">✕</button>
+    <button class="stage-presenter" aria-label="Widok prezentera (P)" title="Widok prezentera (P)">▣</button>
     <div class="stage-progress">${dots}<span class="stage-count-txt">${presentIdx + 1} / ${total}</span></div>`;
   const host = $('#stage-vp');
   mountSlide(host, s.content, { deckBg: deckBgCss(), editable: false, observe: false });
   applyScale(host, host.querySelector('.slide-stage'));
-  stage.querySelector('.stage-prev').addEventListener('click', () => goPresent(-1));
-  stage.querySelector('.stage-next').addEventListener('click', () => goPresent(1));
+  applyBuilds(host, s.content, buildStep);
+  if (animate && s.content.transition && s.content.transition !== 'none') { void host.offsetWidth; host.classList.add('stage-trans-' + s.content.transition); }
+  stage.querySelector('.stage-prev').addEventListener('click', prevStep);
+  stage.querySelector('.stage-next').addEventListener('click', nextStep);
   stage.querySelector('.stage-exit').addEventListener('click', exitPresent);
-  stage.querySelectorAll('[data-go]').forEach((d) => d.addEventListener('click', () => { presentIdx = +d.dataset.go; renderStage(); }));
+  stage.querySelector('.stage-presenter').addEventListener('click', openPresenter);
+  stage.querySelectorAll('[data-go]').forEach((d) => d.addEventListener('click', () => { presentIdx = +d.dataset.go; buildStep = 0; renderStage(true); }));
+  renderPresenter();
 }
-function goPresent(d) { presentIdx = Math.max(0, Math.min(slides.length - 1, presentIdx + d)); renderStage(); }
+function nextStep() {
+  const cnt = animObjects(slides[presentIdx].content).length;
+  if (buildStep < cnt) { buildStep++; renderStage(false); } else goPresent(1);
+}
+function prevStep() {
+  if (buildStep > 0) { buildStep--; renderStage(false); } else goPresent(-1);
+}
+function goPresent(d) {
+  const ni = Math.max(0, Math.min(slides.length - 1, presentIdx + d));
+  if (ni === presentIdx) return;
+  presentIdx = ni; buildStep = 0; renderStage(true);
+}
 function onPresentKey(e) {
-  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); goPresent(1); }
-  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goPresent(-1); }
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); nextStep(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prevStep(); }
   else if (e.key === 'Escape') exitPresent();
+  else if (e.key.toLowerCase() === 'p') { e.preventDefault(); openPresenter(); }
+}
+
+/* ── presenter view (drugie okno: bieżący + następny + notatki + zegar) ── */
+const PRESENTER_CSS = `*{box-sizing:border-box;margin:0}
+body{background:#0b0d12;color:#e8eaed;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;height:100vh;display:grid;grid-template-rows:auto 1fr auto;gap:14px;padding:16px;overflow:hidden}
+.pv-top{display:flex;align-items:center;justify-content:space-between;font-size:14px;color:#9aa0aa}
+.pv-timer{font-size:24px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums}
+.pv-main{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;min-height:0}
+.pv-col{display:flex;flex-direction:column;gap:8px;min-height:0}
+.pv-label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#9aa0aa}
+.pv-screen{position:relative;aspect-ratio:16/9;width:100%;background:#000;border:1px solid #2a2f3a;border-radius:8px;overflow:hidden}
+.pv-notes{flex:1;overflow:auto;background:#14181f;border:1px solid #2a2f3a;border-radius:8px;padding:14px;font-size:21px;line-height:1.5;white-space:pre-wrap}
+.pv-bottom{display:flex;align-items:center;justify-content:center;gap:12px}
+.pv-btn{background:#1c2230;border:1px solid #2a2f3a;color:#e8eaed;font-size:16px;padding:10px 24px;border-radius:8px;cursor:pointer}
+.pv-btn:hover{background:#262d3d}
+.slide-stage{position:absolute;top:0;left:0;transform-origin:top left}
+.slide-bg{position:absolute;inset:0}.slide-bg__img{position:absolute;inset:0;width:100%;height:100%}
+.slide-obj{position:absolute;box-sizing:border-box}.slide-obj--text{display:flex}
+.slide-obj__text{max-width:100%;max-height:100%;overflow:hidden;white-space:pre-wrap;word-break:break-word}
+.slide-obj__text ul,.slide-obj__text ol{margin:0;padding-left:1.3em;text-align:left}`;
+function openPresenter() {
+  if (presenterWin && !presenterWin.closed) { presenterWin.focus(); return; }
+  presenterWin = window.open('', 'szron-presenter', 'width=1200,height=820');
+  if (!presenterWin) { toast('Popup zablokowany', 'Zezwól na okno prezentera w przeglądarce', 'err'); return; }
+  presenterWin.document.write(`<!doctype html><html lang="pl"><head><meta charset="utf-8"><title>Prezenter — SZRON</title><style>${PRESENTER_CSS}</style></head><body>
+    <div class="pv-top"><span id="pv-count"></span><span class="pv-timer" id="pv-timer">0:00</span></div>
+    <div class="pv-main">
+      <div class="pv-col"><span class="pv-label">Bieżący slajd</span><div class="pv-screen" id="pv-cur"></div></div>
+      <div class="pv-col"><span class="pv-label">Następny</span><div class="pv-screen" id="pv-next"></div><span class="pv-label" style="margin-top:6px">Notatki prezentera</span><div class="pv-notes" id="pv-notes"></div></div>
+    </div>
+    <div class="pv-bottom"><button class="pv-btn" id="pv-prev">◀ Wstecz</button><button class="pv-btn" id="pv-next-btn">Dalej ▶</button></div>
+  </body></html>`);
+  presenterWin.document.close();
+  presentStart = Date.now();
+  presenterWin.document.getElementById('pv-prev').addEventListener('click', prevStep);
+  presenterWin.document.getElementById('pv-next-btn').addEventListener('click', nextStep);
+  presenterWin.addEventListener('keydown', onPresentKey);
+  presenterWin.addEventListener('beforeunload', () => { if (presenterTimer) { clearInterval(presenterTimer); presenterTimer = null; } });
+  if (presenterTimer) clearInterval(presenterTimer);
+  presenterTimer = setInterval(updatePresenterTimer, 1000);
+  renderPresenter();
+}
+function updatePresenterTimer() {
+  if (!presenterWin || presenterWin.closed) { if (presenterTimer) { clearInterval(presenterTimer); presenterTimer = null; } return; }
+  const el = presenterWin.document.getElementById('pv-timer'); if (!el) return;
+  const sec = Math.floor((Date.now() - presentStart) / 1000);
+  el.textContent = `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+}
+function renderPresenter() {
+  if (!presenterWin || presenterWin.closed) return;
+  const doc = presenterWin.document; const dbg = deckBgCss();
+  const fill = (id, content) => {
+    const host = doc.getElementById(id); if (!host) return;
+    if (!content) { host.innerHTML = '<div style="position:absolute;inset:0;display:grid;place-items:center;color:#5a616e;font-size:15px">— koniec —</div>'; return; }
+    host.innerHTML = `<div class="slide-stage" style="width:${SLIDE_W}px;height:${SLIDE_H}px">${renderSlideInner(content, { deckBg: dbg })}</div>`;
+    const st = host.querySelector('.slide-stage'); if (st) st.style.transform = `scale(${host.clientWidth / SLIDE_W})`;
+  };
+  fill('pv-cur', slides[presentIdx]?.content);
+  fill('pv-next', slides[presentIdx + 1]?.content);
+  const notes = doc.getElementById('pv-notes'); if (notes) notes.textContent = slides[presentIdx]?.notes || '— brak notatek —';
+  const count = doc.getElementById('pv-count'); if (count) count.textContent = `Slajd ${presentIdx + 1} / ${slides.length}`;
 }
 function exitPresent() {
   const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
@@ -982,6 +1079,9 @@ function closeStage() {
   if (stage.hidden) return;
   stage.hidden = true; stage.innerHTML = '';
   document.removeEventListener('keydown', onPresentKey);
+  if (presenterTimer) { clearInterval(presenterTimer); presenterTimer = null; }
+  if (presenterWin && !presenterWin.closed) presenterWin.close();
+  presenterWin = null;
 }
 document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) closeStage(); });
 document.addEventListener('webkitfullscreenchange', () => { if (!document.webkitFullscreenElement) closeStage(); });

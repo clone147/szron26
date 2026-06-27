@@ -90,7 +90,7 @@ export function migrateContent(content) {
   const objects = content.objects.map((o, i) => ({ ...o, z: Number.isFinite(o.z) ? o.z : i }))
     .sort((a, b) => a.z - b.z)
     .map((o, i) => ({ ...o, z: i }));
-  return { version: CONTENT_VERSION, background: bg, objects };
+  return { version: CONTENT_VERSION, background: bg, objects, transition: content.transition || 'none' };
 }
 
 // Lazy-migracja: wiersz DB (legacy text/image_url) → dokument sceny.
@@ -111,7 +111,7 @@ export function slideToContent(row) {
     bg: (row && row.image_url && text) ? 'rgba(0,0,0,0.45)' : null,
     z: 0,
   })];
-  return { version: CONTENT_VERSION, background, objects };
+  return { version: CONTENT_VERSION, background, objects, transition: 'none' };
 }
 
 // Pochodne do zapisu w DB (cache): pierwszy tekst + pierwszy obraz/tło.

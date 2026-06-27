@@ -636,6 +636,22 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 .layout-card { aspect-ratio: 16 / 9; border: 1px solid var(--color-line-dark); background: var(--color-ink); color: var(--color-text-inv-2); border-radius: var(--radius-sm); cursor: pointer; font-size: var(--text-s); font-weight: 500; transition: border-color var(--dur-1, .15s), color var(--dur-1, .15s); }
 .layout-card:hover { border-color: var(--color-accent); color: var(--color-text-inv); }
 
+/* przejścia slajdów (prezentacja) */
+@keyframes stage-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes stage-push { from { opacity: 0; transform: translateX(60px) } to { opacity: 1; transform: none } }
+.slides-stage .slide-viewport.stage-trans-fade { animation: stage-fade .45s ease; }
+.slides-stage .slide-viewport.stage-trans-push { animation: stage-push .5s cubic-bezier(.2, .7, .2, 1); }
+/* builds — animacje wejścia obiektów */
+@keyframes build-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes build-slide { from { opacity: 0; transform: translateY(40px) } to { opacity: 1; transform: none } }
+@keyframes build-scale { from { opacity: 0; transform: scale(.6) } to { opacity: 1; transform: none } }
+.slide-obj.build-in-fade, .slide-obj.build-in-slide, .slide-obj.build-in-scale { animation: build-fade .4s ease both; }
+.slide-obj.build-in-slide > * { animation: build-slide .45s cubic-bezier(.2, .7, .2, 1) both; }
+.slide-obj.build-in-scale > * { animation: build-scale .4s cubic-bezier(.2, .7, .2, 1) both; }
+/* przycisk widoku prezentera */
+.stage-presenter { position: absolute; top: 1.1rem; right: 3.7rem; width: 2.2rem; height: 2.2rem; display: grid; place-items: center; background: oklch(100% 0 0 / .08); border: none; border-radius: 50%; color: #fff; cursor: pointer; font-size: 1rem; z-index: 5; }
+.stage-presenter:hover { background: oklch(100% 0 0 / .16); }
+
 /* inspektor obiektu (prawy panel przy zaznaczeniu) */
 .deck-obj-x { display: inline-grid; place-items: center; width: 1.7rem; height: 1.7rem; border: none; background: transparent; color: var(--color-text-inv-3); cursor: pointer; border-radius: var(--radius-sm); }
 .deck-obj-x:hover { background: oklch(100% 0 0 / .07); color: var(--color-text-inv); }
