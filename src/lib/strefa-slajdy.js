@@ -521,6 +521,136 @@ function openLayoutPicker() {
   const box = openModal(`<div class="strefa-modal__body"><h3 style="margin:0 0 var(--space-md)">Nowy slajd z layoutu</h3><div class="layout-grid">${Object.keys(LAYOUTS).map((n) => `<button class="layout-card" data-layout="${esc(n)}" type="button">${esc(n)}</button>`).join('')}</div></div>`);
   box.querySelectorAll('[data-layout]').forEach((b) => b.addEventListener('click', () => { closeModal(); applyLayout(b.dataset.layout); }));
 }
+
+/* ── ⌘K paleta poleceń / „/" quick-insert ── */
+function commandList() {
+  const cmds = [
+    { label: '＋ Nowy slajd', kw: 'dodaj slide', run: addSlide },
+    { label: 'Wstaw tekst', kw: 'insert text', run: insertText },
+    { label: 'Wstaw obrazek', kw: 'insert image grafika', run: () => $('#slide-img-input').click() },
+    { label: 'Wstaw kształt — prostokąt', kw: 'shape rect', run: () => objEditor?.setDrawMode('rect') },
+    { label: 'Wstaw kształt — elipsa', kw: 'shape ellipse koło', run: () => objEditor?.setDrawMode('ellipse') },
+    { label: 'Wstaw kształt — strzałka', kw: 'shape arrow', run: () => objEditor?.setDrawMode('arrow') },
+    { label: 'Layouty…', kw: 'layout szablon', run: openLayoutPicker },
+    { label: 'AI: zrób slajd z promptu', kw: 'ai generate sztuczna', run: openAiSlide },
+    { label: 'Rozpocznij prezentację', kw: 'present play', run: startPresent },
+    { label: 'Widok prezentera', kw: 'presenter notatki', run: () => { startPresent(); setTimeout(openPresenter, 350); } },
+    { label: 'Eksport do PDF', kw: 'export pdf druk', run: exportPDF },
+    { label: 'Eksport slajdu do PNG', kw: 'export png obraz', run: exportPNG },
+    { label: 'Kopiuj link do prezentacji', kw: 'share link udostepnij', run: copyShareLink },
+  ];
+  slides.forEach((s, i) => cmds.push({ label: `Idź do slajdu ${i + 1}`, kw: 'goto slajd ' + (s.text || '').slice(0, 30), run: () => selectSlide(i) }));
+  return cmds;
+}
+function openCommandPalette(initialQuery = '') {
+  const box = openModal(`<div class="cmdk"><input class="cmdk__input" id="cmdk-input" placeholder="Szukaj polecenia lub wstaw…" autocomplete="off" spellcheck="false"><div class="cmdk__list" id="cmdk-list"></div></div>`);
+  const input = $('#cmdk-input'); const list = $('#cmdk-list');
+  let items = []; let active = 0;
+  const setActive = (i) => { active = Math.max(0, Math.min(items.length - 1, i)); list.querySelectorAll('.cmdk__item').forEach((b, k) => b.classList.toggle('is-active', k === active)); list.children[active]?.scrollIntoView({ block: 'nearest' }); };
+  const render = () => {
+    const q = input.value.trim().toLowerCase();
+    items = commandList().filter((c) => !q || (c.label + ' ' + (c.kw || '')).toLowerCase().includes(q));
+    list.innerHTML = items.map((c, i) => `<button class="cmdk__item ${i === 0 ? 'is-active' : ''}" data-i="${i}" type="button">${esc(c.label)}</button>`).join('') || '<div class="cmdk__empty">Brak wyników</div>';
+    active = 0;
+    list.querySelectorAll('.cmdk__item').forEach((b) => { b.addEventListener('click', () => { const c = items[+b.dataset.i]; closeModal(); setTimeout(() => c?.run(), 0); }); });
+  };
+  input.addEventListener('input', render);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActive(active + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(active - 1); }
+    else if (e.key === 'Enter') { e.preventDefault(); const c = items[active]; closeModal(); setTimeout(() => c?.run(), 0); }
+  });
+  input.value = initialQuery; render(); input.focus();
+}
+
+/* ── eksport ── */
+const EXPORT_SLIDE_CSS = `.slide-stage{position:absolute;top:0;left:0;transform-origin:top left}
+.slide-bg{position:absolute;inset:0}.slide-bg__img{position:absolute;inset:0;width:100%;height:100%}
+.slide-obj{position:absolute;box-sizing:border-box}.slide-obj--text{display:flex}
+.slide-obj__text{max-width:100%;max-height:100%;overflow:hidden;white-space:pre-wrap;word-break:break-word;letter-spacing:-.01em}
+.slide-obj__text ul,.slide-obj__text ol{margin:0;padding-left:1.3em;text-align:left}.slide-obj__text a{color:inherit}`;
+function exportPDF() {
+  const w = window.open('', 'szron-export', 'width=1280,height=760');
+  if (!w) return toast('Popup zablokowany', 'Zezwól na okno wydruku', 'err');
+  const dbg = deckBgCss();
+  const pages = slides.map((s) => `<div class="pg"><div class="slide-stage" style="width:${SLIDE_W}px;height:${SLIDE_H}px">${renderSlideInner(s.content, { deckBg: dbg })}</div></div>`).join('');
+  w.document.write(`<!doctype html><html lang="pl"><head><meta charset="utf-8"><title>${esc(training.name)}</title><style>
+    *{margin:0;box-sizing:border-box}body{background:#fff}
+    .pg{position:relative;width:100vw;aspect-ratio:16/9;overflow:hidden;background:#000;page-break-after:always;break-after:page}
+    ${EXPORT_SLIDE_CSS}
+    @page{size:landscape;margin:0}
+  </style></head><body>${pages}<scr` + `ipt>window.onload=function(){document.querySelectorAll('.pg').forEach(function(p){var st=p.querySelector('.slide-stage');if(st)st.style.transform='scale('+(p.clientWidth/${SLIDE_W})+')';});setTimeout(function(){window.print();},400);};</scr` + `ipt></body></html>`);
+  w.document.close();
+  toast('Eksport PDF', 'Wybierz „Zapisz jako PDF" w oknie wydruku', 'ok');
+}
+function exportPNG() {
+  const s = slides[current]; if (!s) return;
+  const inner = renderSlideInner(s.content, { deckBg: deckBgCss() });
+  const html = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${SLIDE_W}px;height:${SLIDE_H}px;position:relative"><style>${EXPORT_SLIDE_CSS}</style>${inner}</div>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${SLIDE_W}" height="${SLIDE_H}"><foreignObject width="100%" height="100%">${html}</foreignObject></svg>`;
+  const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas'); canvas.width = SLIDE_W; canvas.height = SLIDE_H;
+    try {
+      const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0);
+      const a = document.createElement('a'); a.href = canvas.toDataURL('image/png'); a.download = `slajd-${current + 1}.png`; a.click();
+      toast('Gotowe', 'PNG pobrany', 'ok');
+    } catch (e) { toast('PNG nieudany', 'Slajd z obrazem — użyj eksportu PDF', 'err'); }
+    URL.revokeObjectURL(url);
+  };
+  img.onerror = () => { toast('PNG nieudany', 'Spróbuj eksportu PDF', 'err'); URL.revokeObjectURL(url); };
+  img.src = url;
+}
+function copyShareLink() {
+  const url = location.href;
+  if (navigator.clipboard) navigator.clipboard.writeText(url).then(() => toast('Skopiowano link', 'Otworzą go członkowie zespołu', 'ok'), () => toast('Link', url, 'ok'));
+  else toast('Link', url, 'ok');
+}
+
+/* ── AI: zrób slajd z promptu (Edge Function strefa-ai-slide → Claude) ── */
+function openAiSlide() {
+  const box = openModal(`<div class="strefa-modal__body">
+    <h3 style="margin:0 0 var(--space-sm)">AI — zrób slajd z promptu</h3>
+    <p style="margin:0 0 var(--space-md);color:var(--color-text-inv-2);font-size:var(--text-s)">Opisz slajd — AI ułoży tekst i layout w stylu decku.</p>
+    <textarea class="deck-notes__field" id="ai-prompt" rows="3" placeholder="np. Tytuł „Zalety AI w programowaniu" + 3 punkty korzyści"></textarea>
+    <div class="strefa-actions-row" style="margin-top:var(--space-md)"><button class="strefa-btn strefa-btn--ghost" data-no type="button">Anuluj</button><button class="strefa-btn strefa-btn--accent" id="ai-go" type="button">Generuj</button></div>
+    <div id="ai-status" style="margin-top:var(--space-sm);font-size:var(--text-s);color:var(--color-text-inv-2)"></div></div>`);
+  box.querySelector('[data-no]').addEventListener('click', closeModal);
+  box.querySelector('#ai-prompt').focus();
+  box.querySelector('#ai-go').addEventListener('click', async () => {
+    const prompt = box.querySelector('#ai-prompt').value.trim(); if (!prompt) return;
+    const status = box.querySelector('#ai-status'); const go = box.querySelector('#ai-go');
+    status.textContent = 'Generuję…'; go.disabled = true;
+    try {
+      const { data, error } = await sb.functions.invoke('strefa-ai-slide', { body: { prompt, theme: theme() } });
+      if (error) {
+        let msg = error.message || 'błąd funkcji';
+        try { if (error.context && typeof error.context.json === 'function') { const b = await error.context.json(); if (b && b.error) msg = b.error; } } catch (_) {}
+        throw new Error(msg);
+      }
+      if (!data || !data.content || !Array.isArray(data.content.objects)) throw new Error(data && data.error ? data.error : 'zła odpowiedź AI');
+      closeModal();
+      await insertAiSlide(data.content);
+    } catch (e) { status.textContent = 'Błąd: ' + (e.message || 'nie udało się'); go.disabled = false; }
+  });
+}
+async function insertAiSlide(content) {
+  flushCurrent();
+  const objs = (content.objects || []).slice(0, 16).map((o) => {
+    const type = o.type === 'image' ? 'image' : o.type === 'shape' ? 'shape' : 'text';
+    const obj = newObject(type, o);
+    if (type === 'text') obj.richText = sanitizeHtml(o.richText || textToHtml(o.text || ''));
+    return obj;
+  });
+  objs.forEach((o, i) => { o.z = i; });
+  const full = { version: 1, background: content.background && content.background.type ? content.background : { type: 'none' }, objects: objs, transition: 'none' };
+  const { data, error } = await sb.from('training_slides').insert({ training_id: trainingId, position: slides.length, ...contentToPatch(full) }).select().single();
+  if (error) return toast('Błąd', error.message, 'err');
+  data.content = full; slides.push(data); current = slides.length - 1;
+  history.reset(data.id, clone(full)); redraw();
+  toast('Gotowe', 'AI utworzyło slajd', 'ok');
+}
 function imageDims(url) {
   return new Promise((res) => { const im = new Image(); im.onload = () => res({ w: im.naturalWidth, h: im.naturalHeight }); im.onerror = () => res({ w: 0, h: 0 }); im.src = url; });
 }
@@ -1090,9 +1220,11 @@ document.addEventListener('webkitfullscreenchange', () => { if (!document.webkit
 function onKeyGlobal(e) {
   if (!$('#stage').hidden) return;                       // prezentacja
   if ($('#modal-root')?.children.length) return;         // dialog
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openCommandPalette(); return; }
   const ae = document.activeElement;
   const editing = (ae && (ae.isContentEditable || ae.tagName === 'TEXTAREA' || ae.tagName === 'INPUT')) || objEditor?.isEditing();
   if (editing) return;                                   // w polu tekstowym → natywne zachowanie
+  if (e.key === '/') { e.preventDefault(); openCommandPalette('Wstaw'); return; }   // slash quick-insert
   const k = e.key.toLowerCase();
   if ((e.metaKey || e.ctrlKey) && k === 'z') { e.preventDefault(); if (e.shiftKey) doRedo(); else doUndo(); return; }
   if ((e.metaKey || e.ctrlKey) && k === 'd') { e.preventDefault(); duplicateSelectedObject(); return; }
