@@ -204,7 +204,7 @@ function updateCounts() {
   const dc = $('#deck-count'); if (dc) dc.textContent = `${n} ${plSlajdy(n)}`;
   const rc = $('#rail-count'); if (rc) rc.textContent = String(n);
 }
-function rescaleAll() { $$('.slide-stage').forEach((st) => applyScale(st.parentElement, st)); }
+function rescaleAll() { $$('.slide-stage').forEach((st) => applyScale(st.parentElement, st)); objEditor?.updateRect(); positionObjBar(); }
 
 function renderEditor() {
   const stage = $('#editor-stage');
@@ -235,6 +235,7 @@ function renderEditor() {
     </div>
     <div class="deck-canvas-wrap">
       <div class="slide-viewport" id="canvas"></div>
+      <div class="obj-bar" id="obj-bar" hidden></div>
     </div>
     <div class="deck-notes">
       <label class="deck-notes__label" for="slide-notes">Notatki prezentera</label>
@@ -246,15 +247,100 @@ function renderEditor() {
   const st = host.querySelector('.slide-stage');
   if (st && 'ResizeObserver' in window) { editorRO = new ResizeObserver(() => { applyScale(host, st); objEditor?.updateRect(); }); editorRO.observe(host); }
   if (objEditor) objEditor.destroy();
+  stopBarTracking(); { const b = $('#obj-bar'); if (b) b.hidden = true; }
   objEditor = createObjectEditor({ host, getSlide: () => slides[current], commit: editorCommit, onSelect: renderRightPanel, onEmptyDblClick: insertTextAt });
   bindEditorChrome();
   bindCanvasDrop(host);
 }
 
-// prawy panel: właściwości zaznaczonego obiektu albo tło decku
-function renderRightPanel(model) { if (model) renderObjectInspector(model); else renderInspector(); }
+// prawy panel: właściwości zaznaczonego obiektu / grupy / tło decku
+function renderRightPanel(model) {
+  if (model && model.multi) renderMultiInspector(model.ids);
+  else if (model) renderObjectInspector(model);
+  else renderInspector();
+  renderObjBar(model);
+}
 
-function editorCommit() { const s = slides[current]; if (!s) return; scheduleSaveContent(s); pushHistory(); }
+/* pływający pasek kontekstowy nad zaznaczeniem */
+function renderObjBar(model) {
+  const bar = $('#obj-bar'); if (!bar) return;
+  if (!model) { bar.hidden = true; bar.innerHTML = ''; return; }
+  const isText = !model.multi && model.type === 'text';
+  bar.innerHTML = model.multi
+    ? `<button data-act="dup" title="Duplikuj (⌘D)">⧉</button><button data-act="del" class="obj-bar__del" title="Usuń (Delete)">${ICO.trash}</button>`
+    : `${isText ? `<button data-act="edit" title="Edytuj tekst">${ICO.text}</button>` : ''}<button data-act="dup" title="Duplikuj (⌘D)">⧉</button><button data-act="front" title="Na wierzch">⤒</button><button data-act="back" title="Na spód">⤓</button><button data-act="del" class="obj-bar__del" title="Usuń (Delete)">${ICO.trash}</button>`;
+  bar.querySelectorAll('button').forEach((b) => b.addEventListener('pointerdown', (e) => e.stopPropagation()));
+  bar.querySelectorAll('button').forEach((b) => b.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const a = b.dataset.act;
+    if (a === 'edit' && !model.multi) objEditor.enterTextEdit(model.id);
+    else if (a === 'dup') duplicateSelectedObject();
+    else if (a === 'front') zorder('front');
+    else if (a === 'back') zorder('back');
+    else if (a === 'del') deleteSelectedObject();
+  }));
+  positionObjBar();
+}
+function stopBarTracking() { const b = $('#obj-bar'); if (b) b.hidden = true; }
+function positionObjBar() {
+  const bar = $('#obj-bar'); if (!bar) return;
+  const ids = objEditor?.selectedIds() || [];
+  if (!ids.length || objEditor.isEditing()) { bar.hidden = true; return; }
+  const wrap = $('.deck-canvas-wrap'); if (!wrap) return;
+  const wr = wrap.getBoundingClientRect();
+  let minL = Infinity, minT = Infinity, maxR = -Infinity;
+  ids.forEach((id) => { const el = $(`#canvas .slide-obj[data-id="${id}"]`); if (!el) return; const r = el.getBoundingClientRect(); minL = Math.min(minL, r.left); minT = Math.min(minT, r.top); maxR = Math.max(maxR, r.right); });
+  if (!isFinite(minL)) { bar.hidden = true; return; }
+  bar.hidden = false;
+  const cx = (minL + maxR) / 2 - wr.left;
+  let top = minT - wr.top - bar.offsetHeight - 12;
+  if (top < 2) top = minT - wr.top + 8;
+  bar.style.left = `${cx}px`;
+  bar.style.top = `${Math.max(2, top)}px`;
+}
+function renderMultiInspector(ids) {
+  const host = $('#editor-inspector');
+  host.innerHTML = `
+    <div class="deck-inspector__head"><span class="deck-inspector__title">${ids.length} obiektów</span>
+      <button class="deck-obj-x" id="oi-x" title="Odznacz (Esc)">${ICO.x}</button></div>
+    <div class="oi-row">
+      <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="oi-dup">Duplikuj</button>
+      <button class="strefa-btn strefa-btn--ghost strefa-btn--sm oi-danger" id="oi-del">${ICO.trash}<span>Usuń</span></button>
+    </div>
+    <div class="deck-field"><span class="deck-field__label">Wyrównaj</span>
+      <div class="oi-seg" id="oi-align-multi">
+        <button data-a="left" title="Do lewej">⇤</button>
+        <button data-a="hcenter" title="Środek →">⇔</button>
+        <button data-a="right" title="Do prawej">⇥</button>
+        <button data-a="top" title="Do góry">⤒</button>
+        <button data-a="vcenter" title="Środek ↓">⇕</button>
+        <button data-a="bottom" title="Do dołu">⤓</button>
+      </div>
+    </div>`;
+  $('#oi-x')?.addEventListener('click', () => objEditor.clear());
+  $('#oi-dup')?.addEventListener('click', duplicateSelectedObject);
+  $('#oi-del')?.addEventListener('click', deleteSelectedObject);
+  $('#oi-align-multi')?.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => alignSelected(b.dataset.a)));
+}
+function alignSelected(mode) {
+  const s = slides[current]; const ids = objEditor?.selectedIds() || []; if (ids.length < 2) return;
+  const objs = ids.map((id) => s.content.objects.find((o) => o.id === id)).filter(Boolean);
+  const minX = Math.min(...objs.map((o) => o.x)), maxX = Math.max(...objs.map((o) => o.x + o.w));
+  const minY = Math.min(...objs.map((o) => o.y)), maxY = Math.max(...objs.map((o) => o.y + o.h));
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  objs.forEach((o) => {
+    if (mode === 'left') o.x = Math.round(minX);
+    else if (mode === 'right') o.x = Math.round(maxX - o.w);
+    else if (mode === 'hcenter') o.x = Math.round(cx - o.w / 2);
+    else if (mode === 'top') o.y = Math.round(minY);
+    else if (mode === 'bottom') o.y = Math.round(maxY - o.h);
+    else if (mode === 'vcenter') o.y = Math.round(cy - o.h / 2);
+  });
+  scheduleSaveContent(s); pushHistory(); renderEditor();
+  setTimeout(() => objEditor.selectMany(ids), 20);
+}
+
+function editorCommit() { const s = slides[current]; if (!s) return; scheduleSaveContent(s); pushHistory(); positionObjBar(); }
 
 function bindEditorChrome() {
   const s = slides[current];
@@ -284,26 +370,32 @@ function imageDims(url) {
   return new Promise((res) => { const im = new Image(); im.onload = () => res({ w: im.naturalWidth, h: im.naturalHeight }); im.onerror = () => res({ w: 0, h: 0 }); im.src = url; });
 }
 function deleteSelectedObject() {
-  const s = slides[current]; const id = objEditor?.selected(); if (!s || !id) return;
-  const i = s.content.objects.findIndex((o) => o.id === id);
-  if (i < 0) return;
-  s.content.objects.splice(i, 1);
+  const s = slides[current]; const ids = objEditor?.selectedIds() || []; if (!s || !ids.length) return;
+  s.content.objects = s.content.objects.filter((o) => !ids.includes(o.id));
   s.content.objects.forEach((o, k) => { o.z = k; });
   objEditor.clear();
   scheduleSaveContent(s); pushHistory(); renderEditor();
 }
 function duplicateSelectedObject() {
-  const s = slides[current]; const id = objEditor?.selected(); if (!s || !id) return;
-  const src = s.content.objects.find((o) => o.id === id); if (!src) return;
-  const copy = { ...JSON.parse(JSON.stringify(src)), id: genId(), x: src.x + 24, y: src.y + 24 };
-  addObject(s, copy);
+  const s = slides[current]; const ids = objEditor?.selectedIds() || []; if (!s || !ids.length) return;
+  const newIds = [];
+  ids.forEach((id) => {
+    const src = s.content.objects.find((o) => o.id === id); if (!src) return;
+    const copy = { ...JSON.parse(JSON.stringify(src)), id: genId(), x: src.x + 24, y: src.y + 24, z: s.content.objects.length };
+    s.content.objects.push(copy); newIds.push(copy.id);
+  });
+  if (!newIds.length) return;
+  scheduleSaveContent(s); pushHistory(); renderEditor();
+  setTimeout(() => objEditor.selectMany(newIds), 20);
 }
 function nudgeSelected(dx, dy) {
-  const s = slides[current]; const id = objEditor?.selected(); if (!s || !id) return;
-  const o = s.content.objects.find((x) => x.id === id); if (!o) return;
-  o.x += dx; o.y += dy;
-  const el = $(`#canvas .slide-obj[data-id="${id}"]`);
-  if (el) el.style.transform = `translate(${o.x}px,${o.y}px) rotate(${o.rotation || 0}deg)`;
+  const s = slides[current]; const ids = objEditor?.selectedIds() || []; if (!s || !ids.length) return;
+  ids.forEach((id) => {
+    const o = s.content.objects.find((x) => x.id === id); if (!o) return;
+    o.x += dx; o.y += dy;
+    const el = $(`#canvas .slide-obj[data-id="${id}"]`);
+    if (el) el.style.transform = `translate(${o.x}px,${o.y}px) rotate(${o.rotation || 0}deg)`;
+  });
   objEditor.updateRect();
   scheduleSaveContent(s); pushHistory();
 }
@@ -693,7 +785,7 @@ function onKeyGlobal(e) {
   const k = e.key.toLowerCase();
   if ((e.metaKey || e.ctrlKey) && k === 'z') { e.preventDefault(); if (e.shiftKey) doRedo(); else doUndo(); return; }
   if ((e.metaKey || e.ctrlKey) && k === 'd') { e.preventDefault(); duplicateSelectedObject(); return; }
-  const hasSel = !!objEditor?.selected();
+  const hasSel = (objEditor?.selectedIds() || []).length > 0;
   if (hasSel && (e.key === 'Delete' || e.key === 'Backspace')) { e.preventDefault(); deleteSelectedObject(); return; }
   if (hasSel && e.key.startsWith('Arrow')) {
     e.preventDefault(); const step = e.shiftKey ? 20 : 2;

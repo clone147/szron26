@@ -1,6 +1,7 @@
 // Kontroler interakcji edytora obiektów.
-// Drag ciała obiektu: własny handler pointer (kontrola skali + snapping do osi/krawędzi slajdu i innych obiektów).
-// Skala/rotacja: Moveable (uchwyty + snapping). Edycja tekstu: dwuklik.
+// Selekcja: pojedyncza, Shift+klik (multi), marquee (gumka na pustym).
+// Drag ciała (też grupy) = własny handler pointer (kontrola skali + snapping). Skala/rotacja pojedynczego = Moveable.
+// Edycja tekstu: dwuklik.
 import Moveable from 'moveable';
 import { SLIDE_W, SLIDE_H, textToHtml } from './slide-model.js';
 
@@ -9,21 +10,23 @@ const parseTransform = (t) => {
   const rot = /rotate\(\s*([-\d.]+)deg\s*\)/.exec(t || '');
   return { x: tx ? +tx[1] : 0, y: tx ? +tx[2] : 0, rot: rot ? +rot[1] : 0 };
 };
-const SNAP = 10; // próg snappingu w przestrzeni 1920
+const SNAP = 10;
 
-// opts: { host (.slide-viewport), getSlide()→{content}, commit()→zapis+historia, onSelect(model|null) }
+// opts: { host, getSlide()→{content}, commit(), onSelect(model|{multi,ids}|null), onEmptyDblClick(x,y) }
 export function createObjectEditor(opts) {
   const { host, getSlide, commit, onSelect } = opts;
-  const container = host.parentElement; // .deck-canvas-wrap (position:relative w CSS)
+  const container = host.parentElement;
   let moveable = null;
-  let selectedId = null;
+  let selected = [];          // ids zaznaczonych obiektów
   let editingId = null;
   let drag = null;
+  let marquee = null;
 
   const stage = () => host.querySelector('.slide-stage');
   const elOf = (id) => stage()?.querySelector(`.slide-obj[data-id="${id}"]`);
   const modelOf = (id) => (getSlide()?.content.objects || []).find((o) => o.id === id);
   const scaleNow = () => (host.clientWidth / SLIDE_W) || 1;
+  const selectedEls = () => selected.map(elOf).filter(Boolean);
 
   function initMoveable() {
     moveable = new Moveable(container, {
@@ -49,7 +52,7 @@ export function createObjectEditor(opts) {
 
   function refreshGuidelines() {
     if (!moveable) return;
-    moveable.elementGuidelines = Array.from(stage().querySelectorAll('.slide-obj')).filter((e) => e.dataset.id !== selectedId);
+    moveable.elementGuidelines = Array.from(stage().querySelectorAll('.slide-obj')).filter((e) => !selected.includes(e.dataset.id));
   }
 
   function commitFromEl(target) {
@@ -62,25 +65,28 @@ export function createObjectEditor(opts) {
     commit();
   }
 
-  function setSelection(id) {
+  // zastosuj `selected` → klasy, cele Moveable, callback
+  function applyTargets() {
     if (editingId) return;
-    selectedId = id || null;
     if (!moveable) initMoveable();
     stage()?.querySelectorAll('.slide-obj.is-selected').forEach((n) => n.classList.remove('is-selected'));
-    const el = selectedId ? elOf(selectedId) : null;
-    if (el) el.classList.add('is-selected');
+    const els = selectedEls();
+    els.forEach((e) => e.classList.add('is-selected'));
+    moveable.resizable = selected.length === 1;
+    moveable.rotatable = selected.length === 1;
     refreshGuidelines();
-    moveable.target = el || null;
-    if (el) moveable.updateRect();
-    onSelect && onSelect(selectedId ? modelOf(selectedId) : null);
+    moveable.target = els.length ? (els.length === 1 ? els[0] : els) : null;
+    if (els.length) moveable.updateRect();
+    onSelect && onSelect(selected.length === 1 ? modelOf(selected[0]) : (selected.length > 1 ? { multi: true, ids: [...selected] } : null));
   }
+  function setSingle(id) { selected = id ? [id] : []; applyTargets(); }
+  function toggle(id) { const i = selected.indexOf(id); if (i >= 0) selected.splice(i, 1); else selected.push(id); applyTargets(); }
 
-  // snapping pozycji obiektu (x,y) do osi/krawędzi slajdu i innych obiektów
-  function snapXY(id, x, y, w, h) {
+  function snapXY(ids, x, y, w, h) {
     const vLines = [0, SLIDE_W / 2, SLIDE_W];
     const hLines = [0, SLIDE_H / 2, SLIDE_H];
     (getSlide().content.objects || []).forEach((o) => {
-      if (o.id === id) return;
+      if (ids.includes(o.id)) return;
       vLines.push(o.x, o.x + o.w / 2, o.x + o.w);
       hLines.push(o.y, o.y + o.h / 2, o.y + o.h);
     });
@@ -88,40 +94,83 @@ export function createObjectEditor(opts) {
     [x, x + w / 2, x + w].forEach((val) => vLines.forEach((L) => { const d = Math.abs(val - L); if (d <= SNAP && (!bV || d < bV.d)) bV = { d, shift: L - val }; }));
     let bH = null;
     [y, y + h / 2, y + h].forEach((val) => hLines.forEach((L) => { const d = Math.abs(val - L); if (d <= SNAP && (!bH || d < bH.d)) bH = { d, shift: L - val }; }));
-    return { x: Math.round(bV ? x + bV.shift : x), y: Math.round(bH ? y + bH.shift : y) };
+    return { dx: bV ? bV.shift : 0, dy: bH ? bH.shift : 0 };
   }
 
-  // własny drag ciała obiektu (pointer)
+  function stagePoint(e) {
+    const st = stage(); const r = st.getBoundingClientRect(); const sc = scaleNow();
+    return { x: (e.clientX - r.left) / sc, y: (e.clientY - r.top) / sc };
+  }
+
   function onPointerDown(e) {
     if (editingId) return;
-    if (e.target.closest('.moveable-control, .moveable-line, .moveable-rotation, .moveable-control-box')) return; // uchwyt → Moveable
+    if (e.target.closest('.moveable-control, .moveable-line, .moveable-rotation, .moveable-control-box')) return;
     const objEl = e.target.closest('.slide-obj');
-    if (!objEl) { setSelection(null); return; }
-    if (objEl.dataset.id !== selectedId) setSelection(objEl.dataset.id);
-    const m = modelOf(objEl.dataset.id); if (!m || m.locked) return;
-    drag = { id: m.id, el: objEl, sx: e.clientX, sy: e.clientY, ox: m.x, oy: m.y, scale: scaleNow(), rot: m.rotation || 0, nx: m.x, ny: m.y, moved: false };
+    if (!objEl) {                                    // pusty → marquee
+      if (!e.shiftKey) setSingle(null);
+      const p = stagePoint(e);
+      marquee = { x0: p.x, y0: p.y, x1: p.x, y1: p.y, add: e.shiftKey, base: [...selected] };
+      ensureMarqueeEl();
+      window.addEventListener('pointermove', onMarqueeMove);
+      window.addEventListener('pointerup', onMarqueeUp);
+      return;
+    }
+    const id = objEl.dataset.id;
+    if (e.shiftKey) { toggle(id); return; }
+    if (!selected.includes(id)) setSingle(id);
+    // drag (grupa, jeśli >1 zaznaczone)
+    const m = modelOf(id); if (!m || m.locked) return;
+    const items = selected.map((sid) => { const mm = modelOf(sid); return mm ? { id: sid, el: elOf(sid), ox: mm.x, oy: mm.y, rot: mm.rotation || 0, w: mm.w, h: mm.h } : null; }).filter(Boolean);
+    drag = { items, primary: id, sx: e.clientX, sy: e.clientY, scale: scaleNow(), moved: false };
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
   }
   function onPointerMove(e) {
     if (!drag) return;
-    const dx = (e.clientX - drag.sx) / drag.scale;
-    const dy = (e.clientY - drag.sy) / drag.scale;
+    let dx = (e.clientX - drag.sx) / drag.scale;
+    let dy = (e.clientY - drag.sy) / drag.scale;
     if (!drag.moved && Math.hypot(dx, dy) < 3) return;
     drag.moved = true;
-    const snapped = snapXY(drag.id, drag.ox + dx, drag.oy + dy, drag.el.offsetWidth, drag.el.offsetHeight);
-    drag.nx = snapped.x; drag.ny = snapped.y;
-    drag.el.style.transform = `translate(${drag.nx}px,${drag.ny}px) rotate(${drag.rot}deg)`;
+    const prim = drag.items.find((it) => it.id === drag.primary);
+    const snap = snapXY(selected, prim.ox + dx, prim.oy + dy, prim.w, prim.h);
+    dx += snap.dx; dy += snap.dy;
+    drag.items.forEach((it) => {
+      it.nx = Math.round(it.ox + dx); it.ny = Math.round(it.oy + dy);
+      if (it.el) it.el.style.transform = `translate(${it.nx}px,${it.ny}px) rotate(${it.rot}deg)`;
+    });
     if (moveable && moveable.target) moveable.updateRect();
   }
   function onPointerUp() {
     window.removeEventListener('pointermove', onPointerMove);
     window.removeEventListener('pointerup', onPointerUp);
     if (drag && drag.moved) {
-      const m = modelOf(drag.id);
-      if (m) { m.x = drag.nx; m.y = drag.ny; if (moveable) moveable.updateRect(); commit(); }
+      drag.items.forEach((it) => { const m = modelOf(it.id); if (m && it.nx != null) { m.x = it.nx; m.y = it.ny; } });
+      if (moveable) moveable.updateRect();
+      commit();
     }
     drag = null;
+  }
+
+  // marquee (gumka)
+  let marqueeEl = null;
+  function ensureMarqueeEl() { if (!marqueeEl) { marqueeEl = document.createElement('div'); marqueeEl.className = 'slide-marquee'; } stage().appendChild(marqueeEl); }
+  function onMarqueeMove(e) {
+    if (!marquee) return;
+    const p = stagePoint(e); marquee.x1 = p.x; marquee.y1 = p.y;
+    const x = Math.min(marquee.x0, marquee.x1), y = Math.min(marquee.y0, marquee.y1);
+    const w = Math.abs(marquee.x1 - marquee.x0), h = Math.abs(marquee.y1 - marquee.y0);
+    if (marqueeEl) { marqueeEl.style.cssText = `position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px;`; }
+    const hit = (getSlide().content.objects || []).filter((o) => o.x < x + w && o.x + o.w > x && o.y < y + h && o.y + o.h > y).map((o) => o.id);
+    selected = marquee.add ? Array.from(new Set([...marquee.base, ...hit])) : hit;
+    stage()?.querySelectorAll('.slide-obj.is-selected').forEach((n) => n.classList.remove('is-selected'));
+    selectedEls().forEach((el) => el.classList.add('is-selected'));
+  }
+  function onMarqueeUp() {
+    window.removeEventListener('pointermove', onMarqueeMove);
+    window.removeEventListener('pointerup', onMarqueeUp);
+    if (marqueeEl) { marqueeEl.remove(); }
+    marquee = null;
+    applyTargets();
   }
 
   function enterTextEdit(id) {
@@ -142,7 +191,7 @@ export function createObjectEditor(opts) {
       const m = modelOf(id);
       const html = textToHtml(txt.innerText);
       if (m && (m.richText || '') !== html) { m.richText = html; commit(); }
-      setSelection(id);
+      setSingle(id);
     };
     txt.addEventListener('blur', finish);
   }
@@ -151,21 +200,25 @@ export function createObjectEditor(opts) {
   host.addEventListener('dblclick', (e) => {
     const txtEl = e.target.closest('.slide-obj--text');
     if (txtEl) { enterTextEdit(txtEl.dataset.id); return; }
-    if (e.target.closest('.slide-obj')) return;       // inny obiekt — nic
-    if (opts.onEmptyDblClick) {                        // pusty canvas → nowe pole tekstowe w miejscu
-      const st = stage(); if (!st) return;
-      const r = st.getBoundingClientRect(); const sc = scaleNow();
-      opts.onEmptyDblClick(Math.round((e.clientX - r.left) / sc), Math.round((e.clientY - r.top) / sc));
-    }
+    if (e.target.closest('.slide-obj')) return;
+    if (opts.onEmptyDblClick) { const p = stagePoint(e); opts.onEmptyDblClick(Math.round(p.x), Math.round(p.y)); }
   });
 
   return {
-    select(id) { setSelection(id); },
-    clear() { setSelection(null); },
-    selected: () => selectedId,
+    select(id) { setSingle(id); },
+    selectMany(ids) { selected = [...ids]; applyTargets(); },
+    clear() { setSingle(null); },
+    selected: () => (selected.length === 1 ? selected[0] : null),
+    selectedIds: () => [...selected],
     isEditing: () => !!editingId,
     enterTextEdit,
     updateRect() { if (moveable && moveable.target) moveable.updateRect(); },
-    destroy() { window.removeEventListener('pointermove', onPointerMove); window.removeEventListener('pointerup', onPointerUp); if (moveable) { moveable.destroy(); moveable = null; } selectedId = null; editingId = null; drag = null; },
+    destroy() {
+      window.removeEventListener('pointermove', onPointerMove); window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointermove', onMarqueeMove); window.removeEventListener('pointerup', onMarqueeUp);
+      if (marqueeEl) marqueeEl.remove();
+      if (moveable) { moveable.destroy(); moveable = null; }
+      selected = []; editingId = null; drag = null; marquee = null;
+    },
   };
 }

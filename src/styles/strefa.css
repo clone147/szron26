@@ -621,6 +621,7 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 .slide-obj--text.is-editing, .slide-obj--text.is-editing .slide-obj__text { cursor: text; }
 .slide-obj.is-selected { outline: 1px solid var(--color-accent); outline-offset: 0; }
 .slide-viewport.is-drop { outline: 2px dashed var(--color-accent); outline-offset: -4px; }
+.slide-marquee { position: absolute; background: oklch(70% 0.17 250 / .14); border: 1px solid oklch(70% 0.17 250 / .8); z-index: 9; pointer-events: none; }
 
 /* inspektor obiektu (prawy panel przy zaznaczeniu) */
 .deck-obj-x { display: inline-grid; place-items: center; width: 1.7rem; height: 1.7rem; border: none; background: transparent; color: var(--color-text-inv-3); cursor: pointer; border-radius: var(--radius-sm); }
@@ -638,6 +639,14 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 .oi-seg button { flex: 1; border: none; background: transparent; color: var(--color-text-inv-2); padding: .4rem; border-radius: calc(var(--radius-sm) - 2px); cursor: pointer; font-size: var(--text-caption); }
 .oi-seg button.is-active { background: var(--color-accent); color: #fff; }
 .oi-check { display: flex; align-items: center; gap: .45rem; font-size: var(--text-caption); color: var(--color-text-inv-2); margin-bottom: var(--space-xs); cursor: pointer; }
+
+/* pływający pasek kontekstowy nad zaznaczeniem */
+.obj-bar { position: absolute; transform: translateX(-50%); display: flex; gap: 2px; background: var(--color-ink-2); border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); padding: 3px; box-shadow: 0 8px 24px -8px oklch(0% 0 0 / .6); z-index: 12; }
+.obj-bar[hidden] { display: none; }
+.obj-bar button { display: inline-grid; place-items: center; width: 1.9rem; height: 1.9rem; border: none; background: transparent; color: var(--color-text-inv-2); cursor: pointer; border-radius: calc(var(--radius-sm) - 2px); font-size: 1rem; line-height: 1; }
+.obj-bar button:hover { background: oklch(100% 0 0 / .08); color: var(--color-text-inv); }
+.obj-bar button svg { width: 16px; height: 16px; }
+.obj-bar__del:hover { color: oklch(72% 0.18 25); }
 /* miniatura: slide-viewport bez ramki/cienia, nieinteraktywna */
 .deck-thumb .slide-viewport { border: none; border-radius: 0; box-shadow: none; pointer-events: none; width: 100%; height: 100%; }
 /* prezentacja: slide-viewport dopasowany 16:9 do ekranu, bez ramki */
