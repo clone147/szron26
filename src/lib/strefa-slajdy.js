@@ -18,8 +18,6 @@ const plSlajdy = (n) => {
   const d = n % 10, h = n % 100;
   return (d >= 2 && d <= 4 && !(h >= 12 && h <= 14)) ? 'slajdy' : 'slajdów';
 };
-// Slajd „tylko obraz" (np. zaimportowana prezentacja) — obraz wypełnia cały slajd, bez pola tekstu.
-const isMedia = (s) => !!s.image_url && !(s.text || '').trim();
 
 /* ── ikony (16px viewBox, currentColor) ── */
 const ICO = {
@@ -177,7 +175,6 @@ function renderEditor() {
     return;
   }
   const s = slides[current];
-  const media = isMedia(s); // slajd tylko z obrazem → obraz wypełnia slajd (bez pola tekstu)
   stage.innerHTML = `
     <div class="deck-toolbar">
       <div class="deck-toolbar__group">
@@ -188,9 +185,9 @@ function renderEditor() {
       <span class="deck-toolbar__counter">${current + 1} / ${slides.length}</span>
     </div>
     <div class="deck-canvas-wrap">
-      <div class="deck-canvas${media ? ' is-media' : ''}" id="canvas">
-        ${s.image_url ? `<img class="deck-canvas__img" src="${esc(s.image_url)}" alt="">` : ''}
-        ${media ? '' : `<div class="deck-canvas__text" id="slide-text" contenteditable="true" data-ph="Wpisz tekst slajdu…" role="textbox" aria-multiline="true">${esc(s.text || '')}</div>`}
+      <div class="deck-canvas${s.image_url ? ' has-bg' : ''}" id="canvas">
+        ${s.image_url ? `<img class="deck-canvas__bg" src="${esc(s.image_url)}" alt="">` : ''}
+        <div class="deck-canvas__text" id="slide-text" contenteditable="true" data-ph="Wpisz tekst slajdu…" role="textbox" aria-multiline="true">${esc(s.text || '')}</div>
       </div>
     </div>
     <div class="deck-notes">
@@ -289,10 +286,10 @@ function bindInspector() {
 function renderStrip() {
   const strip = $('#strip');
   strip.innerHTML = slides.map((s, i) => `
-    <div class="deck-thumb ${i === current ? 'is-active' : ''}${isMedia(s) ? ' is-media' : ''}" data-idx="${i}" draggable="true" role="option" aria-selected="${i === current}" tabindex="0">
+    <div class="deck-thumb ${i === current ? 'is-active' : ''}${s.image_url ? ' has-bg' : ''}" data-idx="${i}" draggable="true" role="option" aria-selected="${i === current}" tabindex="0">
       <div class="deck-thumb__inner">
-        ${s.image_url ? `<img src="${esc(s.image_url)}" alt="">` : ''}
-        ${isMedia(s) ? '' : `<span class="deck-thumb__txt">${esc((s.text || '').slice(0, 60))}</span>`}
+        ${s.image_url ? `<img class="deck-thumb__bg" src="${esc(s.image_url)}" alt="">` : ''}
+        <span class="deck-thumb__txt">${esc((s.text || '').slice(0, 60))}</span>
       </div>
       <span class="deck-thumb__num">${i + 1}</span>
       <div class="deck-thumb__tools">
@@ -492,9 +489,9 @@ function renderStage() {
     : '';
   stage.innerHTML = `
     <button class="stage-nav stage-prev" aria-label="Poprzedni slajd" ${presentIdx === 0 ? 'disabled' : ''}>◀</button>
-    <div class="stage-slide${isMedia(s) ? ' is-media' : ''}">
-      ${s.image_url ? `<img class="stage-img" src="${esc(s.image_url)}" alt="">` : ''}
-      ${isMedia(s) ? '' : `<div class="stage-text">${esc(s.text || '').replace(/\n/g, '<br>')}</div>`}
+    <div class="stage-slide${s.image_url ? ' has-bg' : ''}">
+      ${s.image_url ? `<img class="stage-bg" src="${esc(s.image_url)}" alt="">` : ''}
+      <div class="stage-text">${esc(s.text || '').replace(/\n/g, '<br>')}</div>
     </div>
     <button class="stage-nav stage-next" aria-label="Następny slajd" ${presentIdx === total - 1 ? 'disabled' : ''}>▶</button>
     <button class="stage-exit" aria-label="Zamknij prezentację">✕</button>
