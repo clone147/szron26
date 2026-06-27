@@ -178,8 +178,7 @@ function captureTextDom() {
 }
 function flushCurrent() {
   const s = slides[current]; if (!s) return;
-  captureTextDom();
-  flushSaveContent(s);
+  if (captureTextDom()) saveContentNow(s); else flushSaveContent(s);   // wymuś zapis gdy capture coś zmienił
   const nta = $('#slide-notes');
   if (nta && nta.value !== (s.notes || '')) { s.notes = nta.value; flushSave(s.id, { notes: nta.value }); }
 }
@@ -265,11 +264,15 @@ function renderEditor() {
   if (editorRO) { editorRO.disconnect(); editorRO = null; }
   const st = host.querySelector('.slide-stage');
   if (st && 'ResizeObserver' in window) { editorRO = new ResizeObserver(() => { applyScale(host, st); objEditor?.updateRect(); }); editorRO.observe(host); }
+  const keepIds = objEditor ? objEditor.selectedIds() : [];
   if (objEditor) objEditor.destroy();
   stopBarTracking(); { const b = $('#obj-bar'); if (b) b.hidden = true; }
   objEditor = createObjectEditor({ host, getSlide: () => slides[current], commit: editorCommit, onSelect: renderRightPanel, onEmptyDblClick: insertTextAt, onEditStart: showFmtBar, onEditEnd: hideFmtBar, onDrawShape });
   bindEditorChrome();
   bindCanvasDrop(host);
+  // przywróć selekcję synchronicznie (koniec migotania) — tylko obiekty które nadal istnieją
+  const stillThere = keepIds.filter((id) => s.content.objects.some((o) => o.id === id));
+  if (stillThere.length) objEditor.selectMany(stillThere);
 }
 
 // prawy panel: właściwości zaznaczonego obiektu / grupy / tło decku
@@ -585,6 +588,8 @@ function exportPDF() {
 }
 function exportPNG() {
   const s = slides[current]; if (!s) return;
+  const hasImg = (s.content.objects || []).some((o) => o.type === 'image') || (s.content.background && s.content.background.type === 'image');
+  if (hasImg) return toast('PNG niedostępny', 'Slajd z obrazem — użyj eksportu PDF', 'err');
   const inner = renderSlideInner(s.content, { deckBg: deckBgCss() });
   const html = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${SLIDE_W}px;height:${SLIDE_H}px;position:relative"><style>${EXPORT_SLIDE_CSS}</style>${inner}</div>`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${SLIDE_W}" height="${SLIDE_H}"><foreignObject width="100%" height="100%">${html}</foreignObject></svg>`;
@@ -850,7 +855,7 @@ function bindObjectInspector(o) {
   // kształt
   $('#oi-kind')?.addEventListener('change', (e) => { o.kind = e.target.value; if (o.kind !== 'rect') o.radius = 0; refreshObject(o.id); });
   $('#oi-fill')?.addEventListener('change', (e) => { o.fill = e.target.value; refreshObject(o.id); });
-  $('#oi-srad')?.addEventListener('input', (e) => { o.radius = +e.target.value || 0; const b = el(); if (b) b.style.borderRadius = o.radius + 'px'; live(); });
+  $('#oi-srad')?.addEventListener('input', (e) => { o.radius = +e.target.value || 0; const b = el()?.querySelector('.slide-shape-fill'); if (b) b.style.borderRadius = o.radius + 'px'; live(); });
   $('#oi-srad')?.addEventListener('change', commit);
   $('#oi-stroke-on')?.addEventListener('change', (e) => { o.stroke = e.target.checked ? { color: '#ffffff', width: 3 } : null; refreshObject(o.id); });
   $('#oi-stroke-color')?.addEventListener('change', (e) => { if (o.stroke) o.stroke.color = e.target.value; refreshObject(o.id); });
@@ -1079,6 +1084,8 @@ let presenterWin = null, presenterTimer = null, presentStart = 0;
 function startPresent() {
   if (!slides.length) return toast('Brak slajdów', 'Dodaj choć jeden slajd', 'err');
   flushCurrent();
+  objEditor?.clear();      // schowaj uchwyty Moveable edytora (inaczej prześwitują przez prezentację)
+  hideFmtBar();
   presentIdx = current; buildStep = 0;
   const stage = $('#stage');
   stage.hidden = false;
@@ -1122,10 +1129,26 @@ function renderStage(animate) {
 }
 function nextStep() {
   const cnt = animObjects(slides[presentIdx].content).length;
-  if (buildStep < cnt) { buildStep++; renderStage(false); } else goPresent(1);
+  if (buildStep < cnt) { buildStep++; stepBuilds(true); } else goPresent(1);
 }
 function prevStep() {
-  if (buildStep > 0) { buildStep--; renderStage(false); } else goPresent(-1);
+  if (buildStep > 0) { buildStep--; stepBuilds(false); } else goPresent(-1);
+}
+// kroki buildów na ISTNIEJĄCYM DOM (bez remountu) — animacja odpala się raz, cofanie tylko ukrywa
+function stepBuilds(forward) {
+  const host = $('#stage-vp'); if (!host) return;
+  animObjects(slides[presentIdx].content).forEach((o, i) => {
+    const el = host.querySelector(`.slide-obj[data-id="${o.id}"]`);
+    if (!el) return;
+    if (i < buildStep) {
+      el.style.visibility = 'visible';
+      if (forward && i === buildStep - 1) { el.classList.remove('build-in-' + o.anim); void el.offsetWidth; el.classList.add('build-in-' + o.anim); }
+    } else {
+      el.style.visibility = 'hidden';
+      el.classList.remove('build-in-fade', 'build-in-slide', 'build-in-scale');
+    }
+  });
+  const prev = $('.stage-prev'); if (prev) prev.disabled = (presentIdx === 0 && buildStep === 0);
 }
 function goPresent(d) {
   const ni = Math.max(0, Math.min(slides.length - 1, presentIdx + d));
@@ -1201,8 +1224,8 @@ function renderPresenter() {
 }
 function exitPresent() {
   const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
-  if (fsEl) { const exit = document.exitFullscreen || document.webkitExitFullscreen; if (exit) exit.call(document); }
-  else closeStage();
+  if (fsEl) { const exit = document.exitFullscreen || document.webkitExitFullscreen; if (exit) { try { exit.call(document); } catch (_) {} } }
+  closeStage();   // zawsze zamykaj jawnie (nie polegaj na fullscreenchange)
 }
 function closeStage() {
   const stage = $('#stage');
@@ -1213,8 +1236,15 @@ function closeStage() {
   if (presenterWin && !presenterWin.closed) presenterWin.close();
   presenterWin = null;
 }
-document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) closeStage(); });
-document.addEventListener('webkitfullscreenchange', () => { if (!document.webkitFullscreenElement) closeStage(); });
+// Wyjście z fullscreen zamyka prezentację — CHYBA że to przez otwarcie okna prezentera
+// (window.open odbiera fullscreen); wtedy zostajemy w trybie overlay z aktywnym presenterem.
+function onFsChange() {
+  if (document.fullscreenElement || document.webkitFullscreenElement) return;
+  if (presenterWin && !presenterWin.closed) return;
+  closeStage();
+}
+document.addEventListener('fullscreenchange', onFsChange);
+document.addEventListener('webkitfullscreenchange', onFsChange);
 
 /* ── klawiatura globalna (undo/redo) ── */
 function onKeyGlobal(e) {

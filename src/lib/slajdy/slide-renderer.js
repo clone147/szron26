@@ -47,7 +47,7 @@ export function renderObject(o, { editable = false } = {}) {
   }
   if (o.type === 'image') {
     return `<div class="slide-obj slide-obj--image" data-id="${o.id}" style="${box}">`
-      + `<img src="${esc(o.src)}" alt="${esc(o.alt || '')}" style="width:100%;height:100%;object-fit:${o.fit === 'contain' ? 'contain' : 'cover'};border-radius:${o.radius || 0}px"></div>`;
+      + `<img src="${esc(o.src)}" alt="${esc(o.alt || '')}" draggable="false" style="width:100%;height:100%;object-fit:${o.fit === 'contain' ? 'contain' : 'cover'};border-radius:${o.radius || 0}px"></div>`;
   }
   if (o.type === 'shape') {
     const k = o.kind || 'rect';
@@ -55,7 +55,8 @@ export function renderObject(o, { editable = false } = {}) {
     if (k === 'rect' || k === 'ellipse') {
       const strokeCss = o.stroke ? `border:${o.stroke.width || 2}px solid ${esc(o.stroke.color || '#fff')};` : '';
       const rad = k === 'ellipse' ? '50%' : `${o.radius || 0}px`;
-      return `<div class="slide-obj slide-obj--shape" data-id="${o.id}" style="${box}background:${esc(fill)};${strokeCss}border-radius:${rad}"></div>`;
+      // wypełnienie w wewnętrznym dziecku → istnieje `> *` dla keyframe build-slide/scale/fade
+      return `<div class="slide-obj slide-obj--shape" data-id="${o.id}" style="${box}"><div class="slide-shape-fill" style="position:absolute;inset:0;background:${esc(fill)};${strokeCss}border-radius:${rad}"></div></div>`;
     }
     const sw = (o.stroke && o.stroke.width) || 4;
     const stk = o.stroke ? esc(o.stroke.color || '#fff') : 'none';
