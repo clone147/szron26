@@ -50,10 +50,20 @@ export function renderObject(o, { editable = false } = {}) {
       + `<img src="${esc(o.src)}" alt="${esc(o.alt || '')}" style="width:100%;height:100%;object-fit:${o.fit === 'contain' ? 'contain' : 'cover'};border-radius:${o.radius || 0}px"></div>`;
   }
   if (o.type === 'shape') {
-    const fill = o.fill ? esc(o.fill) : 'transparent';
-    const stroke = o.stroke ? `border:${o.stroke.width || 2}px solid ${esc(o.stroke.color || '#fff')};` : '';
-    const rad = o.kind === 'ellipse' ? '50%' : `${o.radius || 0}px`;
-    return `<div class="slide-obj slide-obj--shape" data-id="${o.id}" style="${box}background:${fill};${stroke}border-radius:${rad}"></div>`;
+    const k = o.kind || 'rect';
+    const fill = o.fill || 'transparent';
+    if (k === 'rect' || k === 'ellipse') {
+      const strokeCss = o.stroke ? `border:${o.stroke.width || 2}px solid ${esc(o.stroke.color || '#fff')};` : '';
+      const rad = k === 'ellipse' ? '50%' : `${o.radius || 0}px`;
+      return `<div class="slide-obj slide-obj--shape" data-id="${o.id}" style="${box}background:${esc(fill)};${strokeCss}border-radius:${rad}"></div>`;
+    }
+    const sw = (o.stroke && o.stroke.width) || 4;
+    const stk = o.stroke ? esc(o.stroke.color || '#fff') : 'none';
+    let svg;
+    if (k === 'triangle') svg = `<polygon points="50,3 97,97 3,97" fill="${esc(fill)}" stroke="${stk}" stroke-width="${o.stroke ? (o.stroke.width || 2) : 0}" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`;
+    else if (k === 'line') svg = `<line x1="2" y1="50" x2="98" y2="50" stroke="${esc(o.fill || '#ffffff')}" stroke-width="${sw}" vector-effect="non-scaling-stroke" stroke-linecap="round"/>`;
+    else svg = `<line x1="3" y1="50" x2="84" y2="50" stroke="${esc(o.fill || '#ffffff')}" stroke-width="${sw}" vector-effect="non-scaling-stroke" stroke-linecap="round"/><polygon points="82,40 99,50 82,60" fill="${esc(o.fill || '#ffffff')}"/>`;
+    return `<div class="slide-obj slide-obj--shape" data-id="${o.id}" style="${box}"><svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">${svg}</svg></div>`;
   }
   return '';
 }

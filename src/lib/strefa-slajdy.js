@@ -1,7 +1,7 @@
 // Edytor slajdów SZRON — v2 (model obiektowy). Faza 0: dokument sceny `content`,
 // wspólny renderer (edytor/miniatury/prezentacja), autosave całego content, undo/redo.
 import { getClient, getSessionUser, isAllowed, uploadSlideImage } from './supabase.js';
-import { SLIDE_W, SLIDE_H, slideToContent, contentToPatch, newObject, sanitizeHtml, genId } from './slajdy/slide-model.js';
+import { SLIDE_W, SLIDE_H, slideToContent, contentToPatch, newObject, sanitizeHtml, textToHtml, genId } from './slajdy/slide-model.js';
 import { mountSlide, applyScale } from './slajdy/slide-renderer.js';
 import { createHistory } from './slajdy/slide-store.js';
 import { createObjectEditor } from './slajdy/slide-editor.js';
@@ -100,11 +100,18 @@ async function saveDeckBg(patch) {
   const { error } = await sb.from('trainings').update(patch).eq('id', trainingId);
   if (error) toast('Błąd tła', error.message, 'err');
 }
+// motyw decku (jeden punkt prawdy: akcent / kolor tekstu / font dla nowych obiektów + paleta)
+function theme() { return { accent: '#f97316', textColor: '#ffffff', font: 'helvetica', ...(training.slides_theme || {}) }; }
+async function saveTheme(patch) {
+  training.slides_theme = { ...theme(), ...patch };
+  const { error } = await sb.from('trainings').update({ slides_theme: training.slides_theme }).eq('id', trainingId);
+  if (error) toast('Błąd motywu', error.message, 'err');
+}
 
 /* ── DB load ── */
 async function load() {
   const { data: t, error: te } = await sb.from('trainings')
-    .select('id,name,slides_bg_color,slides_bg_image').eq('id', trainingId).single();
+    .select('id,name,slides_bg_color,slides_bg_image,slides_theme').eq('id', trainingId).single();
   training = te ? null : t;
   if (!training) return;
   const { data: s } = await sb.from('training_slides')
@@ -229,6 +236,17 @@ function renderEditor() {
       <div class="deck-toolbar__group">
         <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-add-text" type="button">${ICO.text}<span>Tekst</span></button>
         <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-add-img" type="button">${ICO.img}<span>Obrazek</span></button>
+        <div class="deck-shape-wrap">
+          <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-add-shape" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8" rx="1"/><circle cx="16" cy="16" r="5"/></svg><span>Kształt</span></button>
+          <div class="deck-shape-menu" id="shape-menu" hidden>
+            <button data-shape="rect" type="button">▭ Prostokąt</button>
+            <button data-shape="ellipse" type="button">◯ Elipsa</button>
+            <button data-shape="triangle" type="button">△ Trójkąt</button>
+            <button data-shape="line" type="button">— Linia</button>
+            <button data-shape="arrow" type="button">→ Strzałka</button>
+          </div>
+        </div>
+        <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-layouts" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12"/></svg><span>Layout</span></button>
       </div>
       <span class="deck-toolbar__spacer"></span>
       <span class="deck-toolbar__counter">${current + 1} / ${slides.length}</span>
@@ -249,7 +267,7 @@ function renderEditor() {
   if (st && 'ResizeObserver' in window) { editorRO = new ResizeObserver(() => { applyScale(host, st); objEditor?.updateRect(); }); editorRO.observe(host); }
   if (objEditor) objEditor.destroy();
   stopBarTracking(); { const b = $('#obj-bar'); if (b) b.hidden = true; }
-  objEditor = createObjectEditor({ host, getSlide: () => slides[current], commit: editorCommit, onSelect: renderRightPanel, onEmptyDblClick: insertTextAt, onEditStart: showFmtBar, onEditEnd: hideFmtBar });
+  objEditor = createObjectEditor({ host, getSlide: () => slides[current], commit: editorCommit, onSelect: renderRightPanel, onEmptyDblClick: insertTextAt, onEditStart: showFmtBar, onEditEnd: hideFmtBar, onDrawShape });
   bindEditorChrome();
   bindCanvasDrop(host);
 }
@@ -446,6 +464,9 @@ function bindEditorChrome() {
   const s = slides[current];
   $('#btn-add-text')?.addEventListener('click', insertText);
   $('#btn-add-img')?.addEventListener('click', () => $('#slide-img-input').click());
+  $('#btn-add-shape')?.addEventListener('click', (e) => { e.stopPropagation(); $('#shape-menu')?.toggleAttribute('hidden'); });
+  $('#shape-menu')?.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { $('#shape-menu').hidden = true; objEditor?.setDrawMode(b.dataset.shape); }));
+  $('#btn-layouts')?.addEventListener('click', openLayoutPicker);
   const nta = $('#slide-notes');
   if (nta) {
     nta.addEventListener('input', () => { s.notes = nta.value; scheduleSave(s.id, { notes: nta.value }); });
@@ -463,8 +484,42 @@ function addObject(s, obj, { edit = false } = {}) {
 }
 function insertText() {
   const s = slides[current]; if (!s) return;
-  const obj = newObject('text', { x: 560, y: 460, w: 800, h: 160, size: 64, align: 'center', valign: 'middle', richText: '' });
+  const obj = newObject('text', { x: 560, y: 460, w: 800, h: 160, size: 64, align: 'center', valign: 'middle', richText: '', color: theme().textColor, font: theme().font });
   addObject(s, obj, { edit: true });
+}
+function onDrawShape(kind, rect) {
+  const s = slides[current]; if (!s) return;
+  const isLine = kind === 'line' || kind === 'arrow';
+  const obj = newObject('shape', { kind, x: rect.x, y: rect.y, w: rect.w, h: rect.h, fill: isLine ? theme().textColor : theme().accent, stroke: null, radius: kind === 'rect' ? 12 : 0 });
+  addObject(s, obj);
+}
+function refreshObject(id) { const s = slides[current]; if (!s) return; scheduleSaveContent(s); pushHistory(); renderEditor(); setTimeout(() => objEditor?.select(id), 20); }
+
+/* ── layouty slajdów (wstawiane jako gotowy slajd) ── */
+function ltxt(text, props) { return newObject('text', { ...props, richText: textToHtml(text) }); }
+const LAYOUTS = {
+  'Tytuł': () => [ltxt('Tytuł prezentacji', { x: 160, y: 400, w: 1600, h: 200, size: 128, weight: 700, font: 'display', align: 'center' }), ltxt('Podtytuł', { x: 160, y: 624, w: 1600, h: 120, size: 56, align: 'center', color: '#94a3b8' })],
+  'Tytuł + treść': () => [ltxt('Nagłówek', { x: 140, y: 110, w: 1640, h: 170, size: 88, weight: 700, font: 'display', align: 'left' }), ltxt('Pierwszy punkt\nDrugi punkt\nTrzeci punkt', { x: 140, y: 330, w: 1640, h: 620, size: 52, align: 'left', valign: 'top' })],
+  'Dwie kolumny': () => [ltxt('Nagłówek', { x: 140, y: 110, w: 1640, h: 170, size: 88, weight: 700, font: 'display', align: 'left' }), ltxt('Kolumna pierwsza', { x: 140, y: 330, w: 780, h: 620, size: 46, align: 'left', valign: 'top' }), ltxt('Kolumna druga', { x: 1000, y: 330, w: 780, h: 620, size: 46, align: 'left', valign: 'top' })],
+  'Cytat': () => [ltxt('„Inspirujący cytat w tym miejscu."', { x: 220, y: 360, w: 1480, h: 360, size: 84, weight: 600, font: 'display', align: 'center' }), ltxt('— Autor', { x: 220, y: 740, w: 1480, h: 100, size: 44, align: 'center', color: '#94a3b8' })],
+  'Sekcja': () => [ltxt('Sekcja', { x: 160, y: 440, w: 1600, h: 200, size: 140, weight: 700, font: 'display', align: 'center' })],
+  'Pusty': () => [],
+};
+async function applyLayout(name) {
+  const make = LAYOUTS[name]; if (!make) return;
+  flushCurrent();
+  const objs = make(); objs.forEach((o, i) => { o.z = i; });
+  const content = { version: 1, background: { type: 'none' }, objects: objs };
+  const { data, error } = await sb.from('training_slides').insert({ training_id: trainingId, position: slides.length, ...contentToPatch(content) }).select().single();
+  if (error) return toast('Błąd', error.message, 'err');
+  data.content = content; slides.push(data); current = slides.length - 1;
+  history.reset(data.id, clone(content));
+  redraw();
+  toast('Dodano slajd', name, 'ok');
+}
+function openLayoutPicker() {
+  const box = openModal(`<div class="strefa-modal__body"><h3 style="margin:0 0 var(--space-md)">Nowy slajd z layoutu</h3><div class="layout-grid">${Object.keys(LAYOUTS).map((n) => `<button class="layout-card" data-layout="${esc(n)}" type="button">${esc(n)}</button>`).join('')}</div></div>`);
+  box.querySelectorAll('[data-layout]').forEach((b) => b.addEventListener('click', () => { closeModal(); applyLayout(b.dataset.layout); }));
 }
 function imageDims(url) {
   return new Promise((res) => { const im = new Image(); im.onload = () => res({ w: im.naturalWidth, h: im.naturalHeight }); im.onerror = () => res({ w: 0, h: 0 }); im.src = url; });
@@ -502,7 +557,7 @@ function nudgeSelected(dx, dy) {
 function insertTextAt(cx, cy) {
   const s = slides[current]; if (!s) return;
   const w = 800, h = 160;
-  const obj = newObject('text', { x: Math.round(cx - w / 2), y: Math.round(cy - h / 2), w, h, size: 64, align: 'center', valign: 'middle', richText: '' });
+  const obj = newObject('text', { x: Math.round(cx - w / 2), y: Math.round(cy - h / 2), w, h, size: 64, align: 'center', valign: 'middle', richText: '', color: theme().textColor, font: theme().font });
   addObject(s, obj, { edit: true });
 }
 function zorder(dir) {
@@ -542,10 +597,10 @@ function objElById(id) { return $(`#canvas .slide-obj[data-id="${id}"]`); }
 
 function renderObjectInspector(o) {
   const host = $('#editor-inspector');
-  const isText = o.type === 'text', isImg = o.type === 'image';
+  const isText = o.type === 'text', isImg = o.type === 'image', isShape = o.type === 'shape';
   host.innerHTML = `
     <div class="deck-inspector__head">
-      <span class="deck-inspector__title">${isText ? 'Tekst' : isImg ? 'Obrazek' : 'Obiekt'}</span>
+      <span class="deck-inspector__title">${isText ? 'Tekst' : isImg ? 'Obrazek' : isShape ? 'Kształt' : 'Obiekt'}</span>
       <button class="deck-obj-x" id="oi-x" title="Odznacz (Esc)">${ICO.x}</button>
     </div>
     <div class="oi-row">
@@ -568,7 +623,7 @@ function renderObjectInspector(o) {
         <label class="oi-num"><span>Interlinia</span><input type="number" id="oi-lh" value="${o.lineHeight || 1.18}" min="0.8" max="3" step="0.05"></label>
         <label class="oi-num oi-num--color"><span>Kolor</span><input type="color" id="oi-color" value="${toHex(o.color) || '#ffffff'}"></label>
       </div>
-      <div class="oi-pal" id="oi-pal">${TEXT_PALETTE.map((c) => `<button class="oi-pal__chip" data-c="${c}" style="background:${c}" title="${c}" type="button"></button>`).join('')}</div>
+      <div class="oi-pal" id="oi-pal">${[theme().accent, ...TEXT_PALETTE.filter((c) => norm(c) !== norm(theme().accent))].map((c) => `<button class="oi-pal__chip" data-c="${c}" style="background:${c}" title="${c}" type="button"></button>`).join('')}</div>
       <div class="deck-field"><span class="deck-field__label">Wyrównanie</span>
         <div class="oi-seg" id="oi-align">
           <button data-al="left" class="${o.align === 'left' ? 'is-active' : ''}">≡L</button>
@@ -586,6 +641,17 @@ function renderObjectInspector(o) {
         </div>
       </div>
       <label class="oi-num"><span>Zaokrąglenie rogów</span><input type="number" id="oi-radius" value="${o.radius || 0}" min="0" max="400"></label>
+    ` : ''}
+    ${isShape ? `
+      <div class="deck-field"><span class="deck-field__label">Kształt</span>
+        <select class="oi-select" id="oi-kind">${[['rect', 'Prostokąt'], ['ellipse', 'Elipsa'], ['triangle', 'Trójkąt'], ['line', 'Linia'], ['arrow', 'Strzałka']].map(([k, l]) => `<option value="${k}" ${(o.kind || 'rect') === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
+      </div>
+      <div class="oi-row">
+        <label class="oi-num oi-num--color"><span>${o.kind === 'line' || o.kind === 'arrow' ? 'Kolor' : 'Wypełnienie'}</span><input type="color" id="oi-fill" value="${toHex(o.fill) || '#f97316'}"></label>
+        ${(o.kind || 'rect') === 'rect' ? `<label class="oi-num"><span>Zaokrąglenie</span><input type="number" id="oi-srad" value="${o.radius || 0}" min="0" max="400"></label>` : ''}
+      </div>
+      ${o.kind !== 'line' && o.kind !== 'arrow' ? `<label class="oi-check"><input type="checkbox" id="oi-stroke-on" ${o.stroke ? 'checked' : ''}> Obramowanie</label>
+      ${o.stroke ? `<div class="oi-row"><label class="oi-num oi-num--color"><span>Kolor</span><input type="color" id="oi-stroke-color" value="${toHex(o.stroke.color) || '#ffffff'}"></label><label class="oi-num"><span>Grubość</span><input type="number" id="oi-stroke-w" value="${o.stroke.width || 2}" min="1" max="40"></label></div>` : ''}` : `<label class="oi-num"><span>Grubość linii</span><input type="number" id="oi-line-w" value="${(o.stroke && o.stroke.width) || 4}" min="1" max="60"></label>`}
     ` : ''}
     <div class="deck-field"><span class="deck-field__label">Krycie <b id="oi-op-val">${Math.round((o.opacity ?? 1) * 100)}%</b></span>
       <input type="range" id="oi-opacity" min="0" max="100" value="${Math.round((o.opacity ?? 1) * 100)}">
@@ -648,6 +714,15 @@ function bindObjectInspector(o) {
   }));
   $('#oi-radius')?.addEventListener('input', (e) => { o.radius = +e.target.value || 0; const img = el()?.querySelector('img'); if (img) img.style.borderRadius = o.radius + 'px'; live(); });
   $('#oi-radius')?.addEventListener('change', commit);
+  // kształt
+  $('#oi-kind')?.addEventListener('change', (e) => { o.kind = e.target.value; if (o.kind !== 'rect') o.radius = 0; refreshObject(o.id); });
+  $('#oi-fill')?.addEventListener('change', (e) => { o.fill = e.target.value; refreshObject(o.id); });
+  $('#oi-srad')?.addEventListener('input', (e) => { o.radius = +e.target.value || 0; const b = el(); if (b) b.style.borderRadius = o.radius + 'px'; live(); });
+  $('#oi-srad')?.addEventListener('change', commit);
+  $('#oi-stroke-on')?.addEventListener('change', (e) => { o.stroke = e.target.checked ? { color: '#ffffff', width: 3 } : null; refreshObject(o.id); });
+  $('#oi-stroke-color')?.addEventListener('change', (e) => { if (o.stroke) o.stroke.color = e.target.value; refreshObject(o.id); });
+  $('#oi-stroke-w')?.addEventListener('change', (e) => { if (o.stroke) o.stroke.width = +e.target.value || 2; refreshObject(o.id); });
+  $('#oi-line-w')?.addEventListener('change', (e) => { o.stroke = { color: o.fill, width: +e.target.value || 4 }; refreshObject(o.id); });
 
   $('#oi-opacity')?.addEventListener('input', (e) => { o.opacity = (+e.target.value) / 100; const b = el(); if (b) b.style.opacity = o.opacity; const v = $('#oi-op-val'); if (v) v.textContent = e.target.value + '%'; live(); });
   $('#oi-opacity')?.addEventListener('change', commit);
@@ -685,6 +760,11 @@ function renderInspector() {
     <div class="deck-field deck-field--actions">
       <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-bg-img" type="button">${training.slides_bg_image ? 'Zmień obrazek tła' : 'Obrazek tła'}</button>
       ${hasBg ? `<button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-bg-clear" type="button">Usuń tło</button>` : ''}
+    </div>
+    <div class="deck-inspector__head" style="margin-top:var(--space-lg)"><span class="deck-inspector__title">Motyw</span><span class="deck-inspector__sub">domyślne obiektów</span></div>
+    <div class="oi-row">
+      <label class="oi-num oi-num--color"><span>Akcent</span><input type="color" id="theme-accent" value="${toHex(theme().accent) || '#f97316'}"></label>
+      <label class="oi-num oi-num--color"><span>Kolor tekstu</span><input type="color" id="theme-text" value="${toHex(theme().textColor) || '#ffffff'}"></label>
     </div>`;
   const prev = $('#bg-preview'); if (prev) prev.style.background = deckBgCss();
   bindInspector();
@@ -701,6 +781,8 @@ function bindInspector() {
   ci?.addEventListener('change', async () => { await saveDeckBg({ slides_bg_color: ci.value, slides_bg_image: null }); redraw(); });
   $('#btn-bg-img')?.addEventListener('click', () => $('#bg-img-input').click());
   $('#btn-bg-clear')?.addEventListener('click', async () => { await saveDeckBg({ slides_bg_color: null, slides_bg_image: null }); redraw(); });
+  $('#theme-accent')?.addEventListener('change', (e) => saveTheme({ accent: e.target.value }));
+  $('#theme-text')?.addEventListener('change', (e) => saveTheme({ textColor: e.target.value }));
 }
 
 /* lewy rail: filmstrip miniatur (renderowany wspólnym rendererem) */
@@ -938,6 +1020,7 @@ async function init() {
   bindFileInputs();
   document.addEventListener('paste', onPaste);
   document.addEventListener('keydown', onKeyGlobal);
+  document.addEventListener('click', (e) => { const m = $('#shape-menu'); if (m && !m.hidden && !e.target.closest('.deck-shape-wrap')) m.hidden = true; });
   window.addEventListener('resize', rescaleAll);
   window.addEventListener('beforeunload', () => { try { flushCurrent(); } catch (_) {} });
   $('#btn-present').addEventListener('click', startPresent);

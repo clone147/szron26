@@ -21,6 +21,9 @@ export function createObjectEditor(opts) {
   let editingId = null;
   let drag = null;
   let marquee = null;
+  let drawMode = null;
+  let draw = null;
+  let drawEl = null;
 
   const stage = () => host.querySelector('.slide-stage');
   const elOf = (id) => stage()?.querySelector(`.slide-obj[data-id="${id}"]`);
@@ -105,8 +108,38 @@ export function createObjectEditor(opts) {
     return { x: (e.clientX - r.left) / sc, y: (e.clientY - r.top) / sc };
   }
 
+  // tryb rysowania kształtu (drag-to-draw)
+  function ensureDrawEl() { if (!drawEl) { drawEl = document.createElement('div'); drawEl.className = 'slide-draw'; } stage().appendChild(drawEl); }
+  function startDraw(e) {
+    const p = stagePoint(e); draw = { x0: p.x, y0: p.y, x1: p.x, y1: p.y };
+    ensureDrawEl();
+    window.addEventListener('pointermove', onDrawMove);
+    window.addEventListener('pointerup', onDrawUp);
+  }
+  function onDrawMove(e) {
+    if (!draw) return;
+    const p = stagePoint(e); draw.x1 = p.x; draw.y1 = p.y;
+    const x = Math.min(draw.x0, draw.x1), y = Math.min(draw.y0, draw.y1);
+    const w = Math.abs(draw.x1 - draw.x0), h = Math.abs(draw.y1 - draw.y0);
+    if (drawEl) drawEl.style.cssText = `position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px;`;
+  }
+  function onDrawUp() {
+    window.removeEventListener('pointermove', onDrawMove);
+    window.removeEventListener('pointerup', onDrawUp);
+    if (drawEl) drawEl.remove();
+    const kind = drawMode;
+    if (draw && kind) {
+      let x = Math.min(draw.x0, draw.x1), y = Math.min(draw.y0, draw.y1);
+      let w = Math.abs(draw.x1 - draw.x0), h = Math.abs(draw.y1 - draw.y0);
+      if (w < 16 || h < 16) { w = 360; h = (kind === 'line' || kind === 'arrow') ? 8 : 240; x = draw.x0 - w / 2; y = draw.y0 - h / 2; }
+      opts.onDrawShape && opts.onDrawShape(kind, { x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(Math.max(h, kind === 'line' || kind === 'arrow' ? 8 : h)) });
+    }
+    draw = null; drawMode = null; host.classList.remove('is-drawing');
+  }
+
   function onPointerDown(e) {
     if (editingId) return;
+    if (drawMode) { e.preventDefault(); startDraw(e); return; }
     if (e.target.closest('.moveable-control, .moveable-line, .moveable-rotation, .moveable-control-box')) return;
     const objEl = e.target.closest('.slide-obj');
     if (!objEl) {                                    // pusty → marquee
@@ -217,13 +250,16 @@ export function createObjectEditor(opts) {
     selectedIds: () => [...selected],
     isEditing: () => !!editingId,
     enterTextEdit,
+    setDrawMode(kind) { drawMode = kind || null; host.classList.toggle('is-drawing', !!kind); },
     updateRect() { if (moveable && moveable.target) moveable.updateRect(); },
     destroy() {
       window.removeEventListener('pointermove', onPointerMove); window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointermove', onMarqueeMove); window.removeEventListener('pointerup', onMarqueeUp);
+      window.removeEventListener('pointermove', onDrawMove); window.removeEventListener('pointerup', onDrawUp);
       if (marqueeEl) marqueeEl.remove();
+      if (drawEl) drawEl.remove();
       if (moveable) { moveable.destroy(); moveable = null; }
-      selected = []; editingId = null; drag = null; marquee = null;
+      selected = []; editingId = null; drag = null; marquee = null; drawMode = null;
     },
   };
 }
