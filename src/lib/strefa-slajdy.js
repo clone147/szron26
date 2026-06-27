@@ -246,9 +246,13 @@ function renderEditor() {
   const st = host.querySelector('.slide-stage');
   if (st && 'ResizeObserver' in window) { editorRO = new ResizeObserver(() => { applyScale(host, st); objEditor?.updateRect(); }); editorRO.observe(host); }
   if (objEditor) objEditor.destroy();
-  objEditor = createObjectEditor({ host, getSlide: () => slides[current], commit: editorCommit });
+  objEditor = createObjectEditor({ host, getSlide: () => slides[current], commit: editorCommit, onSelect: renderRightPanel, onEmptyDblClick: insertTextAt });
   bindEditorChrome();
+  bindCanvasDrop(host);
 }
+
+// prawy panel: właściwości zaznaczonego obiektu albo tło decku
+function renderRightPanel(model) { if (model) renderObjectInspector(model); else renderInspector(); }
 
 function editorCommit() { const s = slides[current]; if (!s) return; scheduleSaveContent(s); pushHistory(); }
 
@@ -302,6 +306,138 @@ function nudgeSelected(dx, dy) {
   if (el) el.style.transform = `translate(${o.x}px,${o.y}px) rotate(${o.rotation || 0}deg)`;
   objEditor.updateRect();
   scheduleSaveContent(s); pushHistory();
+}
+function insertTextAt(cx, cy) {
+  const s = slides[current]; if (!s) return;
+  const w = 800, h = 160;
+  const obj = newObject('text', { x: Math.round(cx - w / 2), y: Math.round(cy - h / 2), w, h, size: 64, align: 'center', valign: 'middle', richText: '' });
+  addObject(s, obj, { edit: true });
+}
+function zorder(dir) {
+  const s = slides[current]; const id = objEditor?.selected(); if (!s || !id) return;
+  const objs = s.content.objects.slice().sort((a, b) => a.z - b.z);
+  const i = objs.findIndex((o) => o.id === id); if (i < 0) return;
+  const [m] = objs.splice(i, 1);
+  let j = dir === 'front' ? objs.length : dir === 'back' ? 0 : dir === 'forward' ? Math.min(objs.length, i + 1) : Math.max(0, i - 1);
+  objs.splice(j, 0, m);
+  objs.forEach((o, k) => { o.z = k; });
+  scheduleSaveContent(s); pushHistory(); renderEditor();
+  setTimeout(() => objEditor?.select(id), 20);
+}
+function bindCanvasDrop(host) {
+  host.addEventListener('dragover', (e) => { if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) { e.preventDefault(); host.classList.add('is-drop'); } });
+  host.addEventListener('dragleave', (e) => { if (e.target === host) host.classList.remove('is-drop'); });
+  host.addEventListener('drop', (e) => {
+    host.classList.remove('is-drop');
+    const file = e.dataTransfer?.files?.[0];
+    if (file && file.type.startsWith('image/')) { e.preventDefault(); handleSlideImage(file); }
+  });
+}
+
+/* prawy inspektor: właściwości zaznaczonego obiektu */
+const FONTS = [['helvetica', 'Helvetica'], ['display', 'Nagłówkowy'], ['body', 'Tekstowy']];
+const FONT_CSS = { helvetica: "'Helvetica Neue', Helvetica, Arial, sans-serif", display: 'var(--font-display)', body: 'var(--font-body)' };
+function objElById(id) { return $(`#canvas .slide-obj[data-id="${id}"]`); }
+
+function renderObjectInspector(o) {
+  const host = $('#editor-inspector');
+  const isText = o.type === 'text', isImg = o.type === 'image';
+  host.innerHTML = `
+    <div class="deck-inspector__head">
+      <span class="deck-inspector__title">${isText ? 'Tekst' : isImg ? 'Obrazek' : 'Obiekt'}</span>
+      <button class="deck-obj-x" id="oi-x" title="Odznacz (Esc)">${ICO.x}</button>
+    </div>
+    <div class="oi-row">
+      <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="oi-dup">Duplikuj</button>
+      <button class="strefa-btn strefa-btn--ghost strefa-btn--sm oi-danger" id="oi-del">${ICO.trash}<span>Usuń</span></button>
+    </div>
+    <div class="oi-row">
+      <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="oi-front" title="Na wierzch">⤒ Wierzch</button>
+      <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="oi-back" title="Na spód">⤓ Spód</button>
+    </div>
+    ${isText ? `
+      <div class="deck-field"><span class="deck-field__label">Czcionka</span>
+        <select class="oi-select" id="oi-font">${FONTS.map(([v, l]) => `<option value="${v}" ${o.font === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+      </div>
+      <div class="oi-row">
+        <label class="oi-num"><span>Rozmiar</span><input type="number" id="oi-size" value="${o.size || 64}" min="8" max="400"></label>
+        <label class="oi-num oi-num--color"><span>Kolor</span><input type="color" id="oi-color" value="${toHex(o.color) || '#ffffff'}"></label>
+      </div>
+      <div class="deck-field"><span class="deck-field__label">Wyrównanie</span>
+        <div class="oi-seg" id="oi-align">
+          <button data-al="left" class="${o.align === 'left' ? 'is-active' : ''}">≡L</button>
+          <button data-al="center" class="${(o.align || 'center') === 'center' ? 'is-active' : ''}">≡C</button>
+          <button data-al="right" class="${o.align === 'right' ? 'is-active' : ''}">R≡</button>
+        </div>
+      </div>
+      <label class="oi-check"><input type="checkbox" id="oi-bold" ${(+o.weight) >= 600 ? 'checked' : ''}> Pogrubienie</label>
+    ` : ''}
+    ${isImg ? `
+      <div class="deck-field"><span class="deck-field__label">Dopasowanie</span>
+        <div class="oi-seg" id="oi-fit">
+          <button data-fit="contain" class="${o.fit !== 'cover' ? 'is-active' : ''}">Zmieść</button>
+          <button data-fit="cover" class="${o.fit === 'cover' ? 'is-active' : ''}">Wypełnij</button>
+        </div>
+      </div>
+      <label class="oi-num"><span>Zaokrąglenie rogów</span><input type="number" id="oi-radius" value="${o.radius || 0}" min="0" max="400"></label>
+    ` : ''}
+    <div class="deck-field"><span class="deck-field__label">Krycie <b id="oi-op-val">${Math.round((o.opacity ?? 1) * 100)}%</b></span>
+      <input type="range" id="oi-opacity" min="0" max="100" value="${Math.round((o.opacity ?? 1) * 100)}">
+    </div>
+    <div class="oi-grid">
+      <label class="oi-num"><span>X</span><input type="number" id="oi-px" value="${Math.round(o.x)}"></label>
+      <label class="oi-num"><span>Y</span><input type="number" id="oi-py" value="${Math.round(o.y)}"></label>
+      <label class="oi-num"><span>Szer.</span><input type="number" id="oi-pw" value="${Math.round(o.w)}"></label>
+      <label class="oi-num"><span>Wys.</span><input type="number" id="oi-ph" value="${Math.round(o.h)}"></label>
+      <label class="oi-num"><span>Obrót°</span><input type="number" id="oi-rot" value="${Math.round(o.rotation || 0)}"></label>
+    </div>`;
+  bindObjectInspector(o);
+}
+
+function bindObjectInspector(o) {
+  const s = slides[current];
+  const el = () => objElById(o.id);
+  const txt = () => el()?.querySelector('.slide-obj__text');
+  const live = () => { scheduleSaveContent(s); objEditor?.updateRect(); };
+  const commit = () => { pushHistory(); };
+
+  $('#oi-x')?.addEventListener('click', () => objEditor.clear());
+  $('#oi-dup')?.addEventListener('click', duplicateSelectedObject);
+  $('#oi-del')?.addEventListener('click', deleteSelectedObject);
+  $('#oi-front')?.addEventListener('click', () => zorder('front'));
+  $('#oi-back')?.addEventListener('click', () => zorder('back'));
+
+  $('#oi-font')?.addEventListener('change', (e) => { o.font = e.target.value; const t = txt(); if (t) t.style.fontFamily = FONT_CSS[o.font]; live(); commit(); });
+  $('#oi-size')?.addEventListener('input', (e) => { o.size = +e.target.value || 64; const t = txt(); if (t) t.style.fontSize = o.size + 'px'; live(); });
+  $('#oi-size')?.addEventListener('change', commit);
+  $('#oi-color')?.addEventListener('input', (e) => { o.color = e.target.value; const t = txt(); if (t) t.style.color = o.color; live(); });
+  $('#oi-color')?.addEventListener('change', commit);
+  $('#oi-align')?.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+    o.align = b.dataset.al; $('#oi-align').querySelectorAll('button').forEach((x) => x.classList.toggle('is-active', x === b));
+    const box = el(); const t = txt();
+    if (box) box.style.justifyContent = { left: 'flex-start', center: 'center', right: 'flex-end' }[o.align];
+    if (t) t.style.textAlign = o.align;
+    live(); commit();
+  }));
+  $('#oi-bold')?.addEventListener('change', (e) => { o.weight = e.target.checked ? 700 : 500; const t = txt(); if (t) t.style.fontWeight = o.weight; live(); commit(); });
+
+  $('#oi-fit')?.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+    o.fit = b.dataset.fit; $('#oi-fit').querySelectorAll('button').forEach((x) => x.classList.toggle('is-active', x === b));
+    const img = el()?.querySelector('img'); if (img) img.style.objectFit = o.fit; live(); commit();
+  }));
+  $('#oi-radius')?.addEventListener('input', (e) => { o.radius = +e.target.value || 0; const img = el()?.querySelector('img'); if (img) img.style.borderRadius = o.radius + 'px'; live(); });
+  $('#oi-radius')?.addEventListener('change', commit);
+
+  $('#oi-opacity')?.addEventListener('input', (e) => { o.opacity = (+e.target.value) / 100; const b = el(); if (b) b.style.opacity = o.opacity; const v = $('#oi-op-val'); if (v) v.textContent = e.target.value + '%'; live(); });
+  $('#oi-opacity')?.addEventListener('change', commit);
+
+  const geo = () => { const b = el(); if (b) { b.style.transform = `translate(${o.x}px,${o.y}px) rotate(${o.rotation || 0}deg)`; b.style.width = o.w + 'px'; b.style.height = o.h + 'px'; } objEditor?.updateRect(); };
+  $('#oi-px')?.addEventListener('input', (e) => { o.x = +e.target.value || 0; geo(); live(); });
+  $('#oi-py')?.addEventListener('input', (e) => { o.y = +e.target.value || 0; geo(); live(); });
+  $('#oi-pw')?.addEventListener('input', (e) => { o.w = Math.max(20, +e.target.value || 20); geo(); live(); });
+  $('#oi-ph')?.addEventListener('input', (e) => { o.h = Math.max(20, +e.target.value || 20); geo(); live(); });
+  $('#oi-rot')?.addEventListener('input', (e) => { o.rotation = +e.target.value || 0; geo(); live(); });
+  ['#oi-px', '#oi-py', '#oi-pw', '#oi-ph', '#oi-rot'].forEach((sel) => $(sel)?.addEventListener('change', commit));
 }
 
 /* prawy inspektor: tło decku */
@@ -405,7 +541,8 @@ function selectSlide(idx) {
 /* ── CRUD / reorder ── */
 async function addSlide() {
   flushCurrent();
-  const starter = { version: 1, background: { type: 'none' }, objects: [newObject('text', { x: 80, y: 0, w: SLIDE_W - 160, h: 1080, valign: 'middle', align: 'center', size: 96, richText: '', z: 0 })] };
+  // Nowy slajd = pusty canvas (obiekty dodaje się świadomie: + Tekst / + Obrazek / dwuklik).
+  const starter = { version: 1, background: { type: 'none' }, objects: [] };
   const { data, error } = await sb.from('training_slides')
     .insert({ training_id: trainingId, position: slides.length, ...contentToPatch(starter) }).select().single();
   if (error) return toast('Błąd', error.message, 'err');
@@ -414,7 +551,6 @@ async function addSlide() {
   current = slides.length - 1;
   history.reset(data.id, clone(starter));
   redraw();
-  $('#canvas .slide-obj__text[contenteditable]')?.focus();
 }
 async function deleteSlide(idx) {
   const s = slides[idx]; if (!s) return;

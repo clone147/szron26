@@ -36,6 +36,7 @@ export function createObjectEditor(opts) {
       horizontalGuidelines: [0, SLIDE_H / 2, SLIDE_H],
     });
     moveable
+      .on('resizeStart', ({ inputEvent }) => { moveable.keepRatio = !!(inputEvent && inputEvent.shiftKey); })
       .on('resize', ({ target, width, height, drag: d }) => {
         target.style.width = `${Math.max(20, width)}px`;
         target.style.height = `${Math.max(20, height)}px`;
@@ -148,8 +149,14 @@ export function createObjectEditor(opts) {
 
   host.addEventListener('pointerdown', onPointerDown);
   host.addEventListener('dblclick', (e) => {
-    const objEl = e.target.closest('.slide-obj--text');
-    if (objEl) enterTextEdit(objEl.dataset.id);
+    const txtEl = e.target.closest('.slide-obj--text');
+    if (txtEl) { enterTextEdit(txtEl.dataset.id); return; }
+    if (e.target.closest('.slide-obj')) return;       // inny obiekt — nic
+    if (opts.onEmptyDblClick) {                        // pusty canvas → nowe pole tekstowe w miejscu
+      const st = stage(); if (!st) return;
+      const r = st.getBoundingClientRect(); const sc = scaleNow();
+      opts.onEmptyDblClick(Math.round((e.clientX - r.left) / sc), Math.round((e.clientY - r.top) / sc));
+    }
   });
 
   return {

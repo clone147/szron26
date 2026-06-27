@@ -620,6 +620,24 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 .slide-obj { cursor: move; }
 .slide-obj--text.is-editing, .slide-obj--text.is-editing .slide-obj__text { cursor: text; }
 .slide-obj.is-selected { outline: 1px solid var(--color-accent); outline-offset: 0; }
+.slide-viewport.is-drop { outline: 2px dashed var(--color-accent); outline-offset: -4px; }
+
+/* inspektor obiektu (prawy panel przy zaznaczeniu) */
+.deck-obj-x { display: inline-grid; place-items: center; width: 1.7rem; height: 1.7rem; border: none; background: transparent; color: var(--color-text-inv-3); cursor: pointer; border-radius: var(--radius-sm); }
+.deck-obj-x:hover { background: oklch(100% 0 0 / .07); color: var(--color-text-inv); }
+.deck-obj-x svg { width: 15px; height: 15px; }
+.oi-row { display: flex; gap: var(--space-2xs); margin-bottom: var(--space-xs); }
+.oi-row > * { flex: 1; justify-content: center; }
+.oi-row .strefa-btn svg { width: 15px; height: 15px; flex: none; }
+.oi-danger:hover { color: oklch(72% 0.18 25); }
+.oi-num { display: flex; flex-direction: column; gap: .25rem; flex: 1; font-size: var(--text-caption); color: var(--color-text-inv-3); }
+.oi-num--color input[type=color] { height: 2.1rem; padding: 0; border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); background: none; cursor: pointer; }
+.oi-num input[type=number], .oi-select { width: 100%; background: oklch(100% 0 0 / .05); border: 1px solid var(--color-line-dark); color: var(--color-text-inv); border-radius: var(--radius-sm); padding: .4rem .55rem; font: inherit; }
+.oi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2xs); margin-top: var(--space-2xs); }
+.oi-seg { display: flex; gap: 2px; background: oklch(100% 0 0 / .05); padding: 2px; border-radius: var(--radius-sm); }
+.oi-seg button { flex: 1; border: none; background: transparent; color: var(--color-text-inv-2); padding: .4rem; border-radius: calc(var(--radius-sm) - 2px); cursor: pointer; font-size: var(--text-caption); }
+.oi-seg button.is-active { background: var(--color-accent); color: #fff; }
+.oi-check { display: flex; align-items: center; gap: .45rem; font-size: var(--text-caption); color: var(--color-text-inv-2); margin-bottom: var(--space-xs); cursor: pointer; }
 /* miniatura: slide-viewport bez ramki/cienia, nieinteraktywna */
 .deck-thumb .slide-viewport { border: none; border-radius: 0; box-shadow: none; pointer-events: none; width: 100%; height: 100%; }
 /* prezentacja: slide-viewport dopasowany 16:9 do ekranu, bez ramki */
