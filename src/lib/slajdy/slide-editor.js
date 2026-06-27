@@ -80,7 +80,10 @@ export function createObjectEditor(opts) {
     onSelect && onSelect(selected.length === 1 ? modelOf(selected[0]) : (selected.length > 1 ? { multi: true, ids: [...selected] } : null));
   }
   function setSingle(id) { selected = id ? [id] : []; applyTargets(); }
-  function toggle(id) { const i = selected.indexOf(id); if (i >= 0) selected.splice(i, 1); else selected.push(id); applyTargets(); }
+  // selekcja świadoma grup: klik w obiekt z grupą zaznacza całą grupę
+  function groupIds(id) { const m = modelOf(id); if (m && m.group) return (getSlide().content.objects || []).filter((o) => o.group === m.group).map((o) => o.id); return [id]; }
+  function selectGroup(id) { selected = groupIds(id); applyTargets(); }
+  function toggleGroup(id) { const g = groupIds(id); const allIn = g.every((i) => selected.includes(i)); if (allIn) selected = selected.filter((i) => !g.includes(i)); else g.forEach((i) => { if (!selected.includes(i)) selected.push(i); }); applyTargets(); }
 
   function snapXY(ids, x, y, w, h) {
     const vLines = [0, SLIDE_W / 2, SLIDE_W];
@@ -116,8 +119,8 @@ export function createObjectEditor(opts) {
       return;
     }
     const id = objEl.dataset.id;
-    if (e.shiftKey) { toggle(id); return; }
-    if (!selected.includes(id)) setSingle(id);
+    if (e.shiftKey) { toggleGroup(id); return; }
+    if (!selected.includes(id)) selectGroup(id);
     // drag (grupa, jeśli >1 zaznaczone)
     const m = modelOf(id); if (!m || m.locked) return;
     const items = selected.map((sid) => { const mm = modelOf(sid); return mm ? { id: sid, el: elOf(sid), ox: mm.x, oy: mm.y, rot: mm.rotation || 0, w: mm.w, h: mm.h } : null; }).filter(Boolean);

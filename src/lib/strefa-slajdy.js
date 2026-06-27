@@ -361,11 +361,24 @@ function renderMultiInspector(ids) {
         <button data-a="vcenter" title="Środek ↓">⇕</button>
         <button data-a="bottom" title="Do dołu">⤓</button>
       </div>
+    </div>
+    <div class="deck-field"><span class="deck-field__label">Rozłóż równo (≥3)</span>
+      <div class="oi-seg" id="oi-dist">
+        <button data-d="h" title="Poziomo">⇿</button>
+        <button data-d="v" title="Pionowo">⇳</button>
+      </div>
+    </div>
+    <div class="oi-row">
+      <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="oi-group">Grupuj</button>
+      <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="oi-ungroup">Rozgrupuj</button>
     </div>`;
   $('#oi-x')?.addEventListener('click', () => objEditor.clear());
   $('#oi-dup')?.addEventListener('click', duplicateSelectedObject);
   $('#oi-del')?.addEventListener('click', deleteSelectedObject);
   $('#oi-align-multi')?.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => alignSelected(b.dataset.a)));
+  $('#oi-dist')?.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => distributeSelected(b.dataset.d)));
+  $('#oi-group')?.addEventListener('click', groupSelected);
+  $('#oi-ungroup')?.addEventListener('click', ungroupSelected);
 }
 function alignSelected(mode) {
   const s = slides[current]; const ids = objEditor?.selectedIds() || []; if (ids.length < 2) return;
@@ -383,6 +396,48 @@ function alignSelected(mode) {
   });
   scheduleSaveContent(s); pushHistory(); renderEditor();
   setTimeout(() => objEditor.selectMany(ids), 20);
+}
+function distributeSelected(axis) {
+  const s = slides[current]; const ids = objEditor?.selectedIds() || []; if (ids.length < 3) return;
+  const objs = ids.map((id) => s.content.objects.find((o) => o.id === id)).filter(Boolean);
+  const k = axis === 'h' ? 'x' : 'y';
+  objs.sort((a, b) => a[k] - b[k]);
+  const min = objs[0][k], max = objs[objs.length - 1][k], step = (max - min) / (objs.length - 1);
+  objs.forEach((o, i) => { o[k] = Math.round(min + step * i); });
+  scheduleSaveContent(s); pushHistory(); renderEditor();
+  setTimeout(() => objEditor.selectMany(ids), 20);
+}
+function groupSelected() {
+  const s = slides[current]; const ids = objEditor?.selectedIds() || []; if (ids.length < 2) return;
+  const gid = genId();
+  ids.forEach((id) => { const o = s.content.objects.find((x) => x.id === id); if (o) o.group = gid; });
+  scheduleSaveContent(s); pushHistory();
+  renderRightPanel({ multi: true, ids });
+}
+function ungroupSelected() {
+  const s = slides[current]; const ids = objEditor?.selectedIds() || []; if (!ids.length) return;
+  ids.forEach((id) => { const o = s.content.objects.find((x) => x.id === id); if (o) delete o.group; });
+  scheduleSaveContent(s); pushHistory();
+}
+let clipboard = null;
+function copySelected() {
+  const s = slides[current]; const ids = objEditor?.selectedIds() || []; if (!ids.length) return;
+  clipboard = ids.map((id) => s.content.objects.find((o) => o.id === id)).filter(Boolean).map((o) => JSON.parse(JSON.stringify(o)));
+}
+function pasteClipboard() {
+  const s = slides[current]; if (!clipboard || !clipboard.length || !s) return;
+  const groupMap = {}; const newIds = [];
+  clipboard.forEach((src) => {
+    const copy = { ...JSON.parse(JSON.stringify(src)), id: genId(), x: src.x + 28, y: src.y + 28, z: s.content.objects.length };
+    if (copy.group) { groupMap[src.group] = groupMap[src.group] || genId(); copy.group = groupMap[src.group]; }
+    s.content.objects.push(copy); newIds.push(copy.id);
+  });
+  scheduleSaveContent(s); pushHistory(); renderEditor();
+  setTimeout(() => objEditor.selectMany(newIds), 20);
+}
+function selectAllObjects() {
+  const s = slides[current]; if (!s || !s.content.objects.length) return;
+  objEditor.selectMany(s.content.objects.map((o) => o.id));
 }
 
 function editorCommit() { const s = slides[current]; if (!s) return; scheduleSaveContent(s); pushHistory(); positionObjBar(); }
@@ -859,6 +914,12 @@ function onKeyGlobal(e) {
   const k = e.key.toLowerCase();
   if ((e.metaKey || e.ctrlKey) && k === 'z') { e.preventDefault(); if (e.shiftKey) doRedo(); else doUndo(); return; }
   if ((e.metaKey || e.ctrlKey) && k === 'd') { e.preventDefault(); duplicateSelectedObject(); return; }
+  if ((e.metaKey || e.ctrlKey) && k === 'g') { e.preventDefault(); if (e.shiftKey) ungroupSelected(); else groupSelected(); return; }
+  if ((e.metaKey || e.ctrlKey) && k === 'a') { e.preventDefault(); selectAllObjects(); return; }
+  if ((e.metaKey || e.ctrlKey) && k === 'c') { if ((objEditor?.selectedIds() || []).length) { e.preventDefault(); copySelected(); } return; }
+  if ((e.metaKey || e.ctrlKey) && k === 'v') { if (clipboard) { e.preventDefault(); pasteClipboard(); } return; }
+  if ((e.metaKey || e.ctrlKey) && e.key === ']') { e.preventDefault(); zorder(e.shiftKey ? 'front' : 'forward'); return; }
+  if ((e.metaKey || e.ctrlKey) && e.key === '[') { e.preventDefault(); zorder(e.shiftKey ? 'back' : 'backward'); return; }
   const hasSel = (objEditor?.selectedIds() || []).length > 0;
   if (hasSel && (e.key === 'Delete' || e.key === 'Backspace')) { e.preventDefault(); deleteSelectedObject(); return; }
   if (hasSel && e.key.startsWith('Arrow')) {
