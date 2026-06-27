@@ -1,7 +1,7 @@
 // Edytor slajdów SZRON — v2 (model obiektowy). Faza 0: dokument sceny `content`,
 // wspólny renderer (edytor/miniatury/prezentacja), autosave całego content, undo/redo.
 import { getClient, getSessionUser, isAllowed, uploadSlideImage } from './supabase.js';
-import { SLIDE_W, SLIDE_H, slideToContent, contentToPatch, newObject, textToHtml, genId } from './slajdy/slide-model.js';
+import { SLIDE_W, SLIDE_H, slideToContent, contentToPatch, newObject, sanitizeHtml, genId } from './slajdy/slide-model.js';
 import { mountSlide, applyScale } from './slajdy/slide-renderer.js';
 import { createHistory } from './slajdy/slide-store.js';
 import { createObjectEditor } from './slajdy/slide-editor.js';
@@ -164,7 +164,7 @@ function captureTextDom() {
     const id = el.closest('.slide-obj')?.dataset.id;
     const obj = s.content.objects.find((o) => o.id === id);
     if (!obj) return;
-    const html = textToHtml(el.innerText); // Faza 0: plain text
+    const html = sanitizeHtml(el.innerHTML); // rich text (allowlista)
     if ((obj.richText || '') !== html) { obj.richText = html; changed = true; }
   });
   return changed;
@@ -236,6 +236,7 @@ function renderEditor() {
     <div class="deck-canvas-wrap">
       <div class="slide-viewport" id="canvas"></div>
       <div class="obj-bar" id="obj-bar" hidden></div>
+      <div class="fmt-bar" id="fmt-bar" hidden></div>
     </div>
     <div class="deck-notes">
       <label class="deck-notes__label" for="slide-notes">Notatki prezentera</label>
@@ -248,7 +249,7 @@ function renderEditor() {
   if (st && 'ResizeObserver' in window) { editorRO = new ResizeObserver(() => { applyScale(host, st); objEditor?.updateRect(); }); editorRO.observe(host); }
   if (objEditor) objEditor.destroy();
   stopBarTracking(); { const b = $('#obj-bar'); if (b) b.hidden = true; }
-  objEditor = createObjectEditor({ host, getSlide: () => slides[current], commit: editorCommit, onSelect: renderRightPanel, onEmptyDblClick: insertTextAt });
+  objEditor = createObjectEditor({ host, getSlide: () => slides[current], commit: editorCommit, onSelect: renderRightPanel, onEmptyDblClick: insertTextAt, onEditStart: showFmtBar, onEditEnd: hideFmtBar });
   bindEditorChrome();
   bindCanvasDrop(host);
 }
@@ -298,6 +299,50 @@ function positionObjBar() {
   bar.style.left = `${cx}px`;
   bar.style.top = `${Math.max(2, top)}px`;
 }
+
+/* pasek formatowania tekstu (rich text) — widoczny w trybie edycji */
+let savedRange = null;
+function saveRange() { const s = getSelection(); if (s && s.rangeCount) savedRange = s.getRangeAt(0).cloneRange(); }
+function restoreRange() { if (savedRange) { const s = getSelection(); s.removeAllRanges(); s.addRange(savedRange); } }
+function showFmtBar(id) {
+  const bar = $('#fmt-bar'); if (!bar) return;
+  bar.innerHTML = `
+    <button data-cmd="bold" title="Pogrubienie (⌘B)"><b>B</b></button>
+    <button data-cmd="italic" title="Kursywa (⌘I)"><i>I</i></button>
+    <button data-cmd="underline" title="Podkreślenie (⌘U)"><u>U</u></button>
+    <span class="fmt-sep"></span>
+    <button data-cmd="insertUnorderedList" title="Lista punktowana">•</button>
+    <button data-cmd="insertOrderedList" title="Lista numerowana">1.</button>
+    <button data-link title="Wstaw link">🔗</button>
+    <span class="fmt-sep"></span>
+    <label class="fmt-color" title="Kolor tekstu"><span>A</span><input type="color" id="fmt-color" value="#ffffff"></label>`;
+  bar.querySelectorAll('button[data-cmd]').forEach((b) => b.addEventListener('mousedown', (e) => {
+    e.preventDefault(); document.execCommand(b.dataset.cmd, false, null);
+  }));
+  bar.querySelector('[data-link]')?.addEventListener('mousedown', (e) => {
+    e.preventDefault(); saveRange();
+    const url = window.prompt('Adres linku:', 'https://');
+    if (url && /^(https?:|mailto:)/i.test(url)) { restoreRange(); document.execCommand('createLink', false, url); }
+  });
+  const ci = $('#fmt-color');
+  ci?.addEventListener('mousedown', saveRange);
+  ci?.addEventListener('input', (e) => { restoreRange(); document.execCommand('foreColor', false, e.target.value); });
+  const txt = $(`#canvas .slide-obj[data-id="${id}"] .slide-obj__text`);
+  txt?.addEventListener('keyup', saveRange);
+  txt?.addEventListener('mouseup', saveRange);
+  positionFmtBar(id);
+  bar.hidden = false;
+}
+function positionFmtBar(id) {
+  const bar = $('#fmt-bar'); const el = $(`#canvas .slide-obj[data-id="${id}"]`); const wrap = $('.deck-canvas-wrap');
+  if (!bar || !el || !wrap) return;
+  const wr = wrap.getBoundingClientRect(); const r = el.getBoundingClientRect();
+  bar.style.left = `${(r.left + r.right) / 2 - wr.left}px`;
+  let top = r.top - wr.top - bar.offsetHeight - 12;
+  if (top < 2) top = r.bottom - wr.top + 12;
+  bar.style.top = `${Math.max(2, top)}px`;
+}
+function hideFmtBar() { const bar = $('#fmt-bar'); if (bar) bar.hidden = true; savedRange = null; }
 function renderMultiInspector(ids) {
   const host = $('#editor-inspector');
   host.innerHTML = `
@@ -429,6 +474,15 @@ function bindCanvasDrop(host) {
 /* prawy inspektor: właściwości zaznaczonego obiektu */
 const FONTS = [['helvetica', 'Helvetica'], ['display', 'Nagłówkowy'], ['body', 'Tekstowy']];
 const FONT_CSS = { helvetica: "'Helvetica Neue', Helvetica, Arial, sans-serif", display: 'var(--font-display)', body: 'var(--font-body)' };
+// presety stylów tekstu (spięte z wyglądem decku)
+const TEXT_STYLES = {
+  'Tytuł': { size: 128, weight: 700, align: 'center', font: 'display' },
+  'Podtytuł': { size: 72, weight: 600, align: 'center', font: 'helvetica' },
+  'Treść': { size: 48, weight: 500, align: 'left', font: 'helvetica' },
+  'Cytat': { size: 64, weight: 500, align: 'center', font: 'display' },
+  'Podpis': { size: 30, weight: 500, align: 'center', font: 'helvetica' },
+};
+const TEXT_PALETTE = ['#ffffff', '#000000', '#f97316', '#94a3b8', '#0f1f4d', '#14181f'];
 function objElById(id) { return $(`#canvas .slide-obj[data-id="${id}"]`); }
 
 function renderObjectInspector(o) {
@@ -448,13 +502,18 @@ function renderObjectInspector(o) {
       <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="oi-back" title="Na spód">⤓ Spód</button>
     </div>
     ${isText ? `
+      <div class="deck-field"><span class="deck-field__label">Styl tekstu</span>
+        <select class="oi-select" id="oi-style"><option value="">— styl —</option>${Object.keys(TEXT_STYLES).map((n) => `<option value="${n}">${n}</option>`).join('')}</select>
+      </div>
       <div class="deck-field"><span class="deck-field__label">Czcionka</span>
         <select class="oi-select" id="oi-font">${FONTS.map(([v, l]) => `<option value="${v}" ${o.font === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
       </div>
       <div class="oi-row">
         <label class="oi-num"><span>Rozmiar</span><input type="number" id="oi-size" value="${o.size || 64}" min="8" max="400"></label>
+        <label class="oi-num"><span>Interlinia</span><input type="number" id="oi-lh" value="${o.lineHeight || 1.18}" min="0.8" max="3" step="0.05"></label>
         <label class="oi-num oi-num--color"><span>Kolor</span><input type="color" id="oi-color" value="${toHex(o.color) || '#ffffff'}"></label>
       </div>
+      <div class="oi-pal" id="oi-pal">${TEXT_PALETTE.map((c) => `<button class="oi-pal__chip" data-c="${c}" style="background:${c}" title="${c}" type="button"></button>`).join('')}</div>
       <div class="deck-field"><span class="deck-field__label">Wyrównanie</span>
         <div class="oi-seg" id="oi-align">
           <button data-al="left" class="${o.align === 'left' ? 'is-active' : ''}">≡L</button>
@@ -504,6 +563,21 @@ function bindObjectInspector(o) {
   $('#oi-size')?.addEventListener('change', commit);
   $('#oi-color')?.addEventListener('input', (e) => { o.color = e.target.value; const t = txt(); if (t) t.style.color = o.color; live(); });
   $('#oi-color')?.addEventListener('change', commit);
+  $('#oi-lh')?.addEventListener('input', (e) => { o.lineHeight = +e.target.value || 1.18; const t = txt(); if (t) t.style.lineHeight = o.lineHeight; live(); });
+  $('#oi-lh')?.addEventListener('change', commit);
+  $('#oi-style')?.addEventListener('change', (e) => {
+    const preset = TEXT_STYLES[e.target.value]; if (!preset) return;
+    Object.assign(o, preset);
+    const t = txt(), box = el();
+    if (t) { t.style.fontFamily = FONT_CSS[o.font]; t.style.fontSize = o.size + 'px'; t.style.fontWeight = o.weight; t.style.textAlign = o.align; }
+    if (box) box.style.justifyContent = { left: 'flex-start', center: 'center', right: 'flex-end' }[o.align];
+    live(); commit(); renderObjectInspector(o);
+  });
+  $('#oi-pal')?.querySelectorAll('.oi-pal__chip').forEach((c) => c.addEventListener('click', () => {
+    o.color = c.dataset.c; const t = txt(); if (t) t.style.color = o.color;
+    const ci = $('#oi-color'); if (ci) ci.value = toHex(o.color) || '#ffffff';
+    live(); commit();
+  }));
   $('#oi-align')?.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
     o.align = b.dataset.al; $('#oi-align').querySelectorAll('button').forEach((x) => x.classList.toggle('is-active', x === b));
     const box = el(); const t = txt();

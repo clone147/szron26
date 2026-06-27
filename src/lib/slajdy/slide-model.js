@@ -31,6 +31,38 @@ export function htmlToText(html) {
     .trim();
 }
 
+// ── sanitizer rich-text (allowlista) — czyści HTML z contenteditable przed zapisem ──
+const ALLOWED_TAGS = new Set(['P', 'BR', 'B', 'STRONG', 'I', 'EM', 'U', 'S', 'UL', 'OL', 'LI', 'SPAN', 'DIV', 'A']);
+const ALLOWED_STYLE = ['color', 'font-size', 'font-weight', 'font-style', 'text-decoration', 'text-align'];
+const TAG_MAP = { STRONG: 'b', EM: 'i', DIV: 'div' };
+function cleanStyle(value) {
+  return String(value || '').split(';').map((s) => s.trim()).filter(Boolean)
+    .filter((s) => ALLOWED_STYLE.includes(s.split(':')[0].trim().toLowerCase()))
+    .join('; ');
+}
+function cleanInto(src, dst) {
+  src.childNodes.forEach((node) => {
+    if (node.nodeType === 3) { dst.appendChild(document.createTextNode(node.nodeValue)); return; }
+    if (node.nodeType !== 1) return;
+    const tag = node.tagName;
+    if (!ALLOWED_TAGS.has(tag)) { cleanInto(node, dst); return; } // niedozwolony → rozwiń dzieci
+    const el = document.createElement(TAG_MAP[tag] || tag.toLowerCase());
+    const st = cleanStyle(node.getAttribute && node.getAttribute('style'));
+    if (st) el.setAttribute('style', st);
+    if (tag === 'A') { const href = node.getAttribute('href'); if (href && /^(https?:|mailto:)/i.test(href)) { el.setAttribute('href', href); el.setAttribute('target', '_blank'); el.setAttribute('rel', 'noopener'); } }
+    cleanInto(node, el);
+    dst.appendChild(el);
+  });
+}
+// Oczyść HTML do dozwolonego podzbioru (do zapisu w richText). Wymaga DOM (browser).
+export function sanitizeHtml(html) {
+  if (typeof document === 'undefined') return String(html || '');
+  const body = new DOMParser().parseFromString(String(html || ''), 'text/html').body;
+  const out = document.createElement('div');
+  cleanInto(body, out);
+  return out.innerHTML;
+}
+
 // Domyślny obiekt danego typu (px w przestrzeni 1920×1080).
 export function newObject(type, props = {}) {
   const base = {

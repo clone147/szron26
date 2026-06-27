@@ -3,7 +3,7 @@
 // Drag ciała (też grupy) = własny handler pointer (kontrola skali + snapping). Skala/rotacja pojedynczego = Moveable.
 // Edycja tekstu: dwuklik.
 import Moveable from 'moveable';
-import { SLIDE_W, SLIDE_H, textToHtml } from './slide-model.js';
+import { SLIDE_W, SLIDE_H, sanitizeHtml } from './slide-model.js';
 
 const parseTransform = (t) => {
   const tx = /translate\(\s*([-\d.]+)px\s*,\s*([-\d.]+)px\s*\)/.exec(t || '');
@@ -183,13 +183,15 @@ export function createObjectEditor(opts) {
     txt.setAttribute('contenteditable', 'true');
     txt.focus();
     try { const r = document.createRange(); r.selectNodeContents(txt); r.collapse(false); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); } catch (_) {}
+    opts.onEditStart && opts.onEditStart(id);
     const finish = () => {
       txt.removeEventListener('blur', finish);
       txt.removeAttribute('contenteditable');
       el.classList.remove('is-editing');
       editingId = null;
+      opts.onEditEnd && opts.onEditEnd(id);
       const m = modelOf(id);
-      const html = textToHtml(txt.innerText);
+      const html = sanitizeHtml(txt.innerHTML);
       if (m && (m.richText || '') !== html) { m.richText = html; commit(); }
       setSingle(id);
     };
