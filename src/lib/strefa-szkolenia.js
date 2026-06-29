@@ -557,6 +557,7 @@ async function addParticipant(tid, inputs, btn) {
 /* ── modal QR samozapisu ── */
 function qrModal(t) {
   const url = `${window.location.origin}/zapis?t=${t.id}`;
+  const screenUrl = `${window.location.origin}/qr?t=${t.id}`;
   const box = openModal(`
     <div class="strefa-modal__head">
       <div><h2>Kod QR — samozapis</h2><p>${esc(t.name)}</p></div>
@@ -564,13 +565,27 @@ function qrModal(t) {
     </div>
     <div class="strefa-modal__body" style="text-align:center">
       <div id="qrbox" style="background:#fff;padding:18px;border-radius:14px;display:inline-block;line-height:0"></div>
-      <p style="color:var(--color-text-inv-2);font-size:var(--text-s);margin:var(--space-md) auto 0;max-width:34ch">Uczestnik skanuje telefonem i dopisuje się do listy tego szkolenia.</p>
-      <div style="display:flex;gap:.4rem;margin-top:var(--space-md)">
-        <input class="strefa-input" id="qr-link" readonly value="${esc(url)}" style="text-align:center">
-        <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="qr-copy">Kopiuj</button>
+      <p style="color:var(--color-text-inv-2);font-size:var(--text-s);margin:var(--space-md) auto 0;max-width:40ch">Uczestnik skanuje telefonem i dopisuje się do listy. Nie masz wydruku? Otwórz <strong>ekran z kodem QR</strong> na dowolnym iPadzie i pokaż go sali.</p>
+
+      <div style="margin-top:var(--space-md);text-align:left">
+        <p style="font-size:var(--text-caption);color:var(--color-text-inv-3);margin:0 0 .25rem">Ekran z kodem QR — pokaż na iPadzie</p>
+        <div style="display:flex;gap:.4rem">
+          <input class="strefa-input" id="qr-screen-link" readonly value="${esc(screenUrl)}" style="text-align:center">
+          <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="qr-screen-copy">Kopiuj</button>
+        </div>
       </div>
-      <div class="strefa-actions-row" style="justify-content:center">
-        <a class="strefa-btn strefa-btn--accent strefa-btn--sm" href="${esc(url)}" target="_blank" rel="noopener">Otwórz stronę zapisu →</a>
+
+      <div style="margin-top:.7rem;text-align:left">
+        <p style="font-size:var(--text-caption);color:var(--color-text-inv-3);margin:0 0 .25rem">Link strony zapisu (bezpośredni)</p>
+        <div style="display:flex;gap:.4rem">
+          <input class="strefa-input" id="qr-link" readonly value="${esc(url)}" style="text-align:center">
+          <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="qr-copy">Kopiuj</button>
+        </div>
+      </div>
+
+      <div class="strefa-actions-row" style="justify-content:center;margin-top:var(--space-md)">
+        <a class="strefa-btn strefa-btn--accent strefa-btn--sm" href="${esc(screenUrl)}" target="_blank" rel="noopener">Otwórz ekran QR →</a>
+        <a class="strefa-btn strefa-btn--ghost strefa-btn--sm" href="${esc(url)}" target="_blank" rel="noopener">Strona zapisu →</a>
       </div>
     </div>`);
   box.querySelectorAll('[data-close-x]').forEach((b) => b.addEventListener('click', closeModal));
@@ -585,10 +600,12 @@ function qrModal(t) {
   } catch (e) {
     $('#qrbox', box).innerHTML = '<p style="color:#b00;margin:0">Nie udało się wygenerować kodu QR.</p>';
   }
-  $('#qr-copy', box).addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(url); toast('Skopiowano', 'Link w schowku', 'ok'); }
-    catch (e) { $('#qr-link', box).select(); }
+  const bindCopy = (btnSel, inputSel, val) => $(btnSel, box)?.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(val); toast('Skopiowano', 'Link w schowku', 'ok'); }
+    catch (e) { $(inputSel, box)?.select(); }
   });
+  bindCopy('#qr-copy', '#qr-link', url);
+  bindCopy('#qr-screen-copy', '#qr-screen-link', screenUrl);
 }
 
 /* ── modal szkolenia (dodaj/edytuj) ── */

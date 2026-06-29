@@ -1,0 +1,96 @@
+---
+import '../styles/main.css';
+import '../styles/strefa.css';
+---
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Kod QR — zapis na szkolenie · SZRON</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+  <style>
+    [hidden]{display:none!important}
+    .qr-screen{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(.8rem,2.2vmin,1.6rem);padding:clamp(1rem,4vmin,3rem);text-align:center}
+    .qr-screen__brand{display:flex;align-items:center;gap:.5rem;opacity:.85}
+    .qr-screen__brand img{height:24px;width:auto}
+    .qr-screen__brand span{font-family:var(--font-display);font-weight:600;letter-spacing:.04em;color:var(--color-text-inv-2)}
+    .qr-screen__wrap{display:flex;flex-direction:column;align-items:center;gap:inherit}
+    .qr-screen__name{font-family:var(--font-display);font-weight:600;font-size:clamp(1.4rem,4.6vmin,2.6rem);margin:0;line-height:1.12;color:var(--color-text-inv)}
+    .qr-screen__meta{color:var(--color-text-inv-3);font-size:clamp(.85rem,2vmin,1.1rem);margin:0}
+    .qr-screen__meta:empty{display:none}
+    .qr-screen__card{background:#fff;border-radius:clamp(14px,2.5vmin,28px);padding:clamp(14px,3vmin,32px);width:min(72vmin,560px);aspect-ratio:1;display:flex;align-items:center;justify-content:center;box-shadow:0 18px 60px rgba(0,0,0,.35)}
+    .qr-screen__card svg{width:100%;height:100%;display:block}
+    .qr-screen__hint{font-size:clamp(1rem,2.6vmin,1.4rem);font-weight:500;color:var(--color-text-inv);margin:0;max-width:26ch}
+    .qr-screen__url{font-size:clamp(.78rem,1.8vmin,1rem);color:var(--color-text-inv-3);margin:0;word-break:break-all}
+    .qr-screen__bad{max-width:38ch}
+  </style>
+</head>
+<body class="strefa-body">
+  <main class="qr-screen">
+    <div class="qr-screen__brand"><img src="/img/logo-dark.svg" alt="SZRON" /><span>SZRON</span></div>
+
+    <div id="qr-wrap" class="qr-screen__wrap">
+      <h1 class="qr-screen__name" id="qr-name">Zapis na szkolenie</h1>
+      <p class="qr-screen__meta" id="qr-meta"></p>
+      <div class="qr-screen__card" id="qr-box"></div>
+      <p class="qr-screen__hint">Zeskanuj telefonem, żeby dopisać się do listy.</p>
+      <p class="qr-screen__url" id="qr-url"></p>
+    </div>
+
+    <div id="qr-bad" class="qr-screen__wrap qr-screen__bad" hidden>
+      <h1 class="qr-screen__name">Nieprawidłowy link</h1>
+      <p class="qr-screen__meta">Brak identyfikatora szkolenia w adresie. Wygeneruj link ponownie w strefie: Szkolenia → Kod QR.</p>
+    </div>
+  </main>
+
+  <script>
+    import qrcode from 'qrcode-generator';
+
+    const t = new URLSearchParams(location.search).get('t');
+    const wrap = document.getElementById('qr-wrap');
+    const bad = document.getElementById('qr-bad');
+
+    if (!t) {
+      wrap.hidden = true;
+      bad.hidden = false;
+    } else {
+      const regUrl = location.origin + '/zapis?t=' + encodeURIComponent(t);
+      const boxEl = document.getElementById('qr-box');
+      try {
+        const qr = qrcode(0, 'M');
+        qr.addData(regUrl);
+        qr.make();
+        boxEl.innerHTML = qr.createSvgTag({ cellSize: 8, margin: 1, scalable: true });
+        const svg = boxEl.querySelector('svg');
+        if (svg) { svg.removeAttribute('width'); svg.removeAttribute('height'); }
+      } catch (e) {
+        boxEl.textContent = 'Nie udało się wygenerować kodu QR.';
+      }
+      document.getElementById('qr-url').textContent = regUrl.replace(/^https?:\/\//, '');
+
+      // best-effort: dociągnij nazwę i metadane szkolenia (ten sam endpoint co /zapis)
+      const SB = 'https://sttluvcbucpxzbcsuigw.supabase.co';
+      const ANON = 'sb_publishable_X5xi2HxbmVnbxmCNd8us4Q_Dr6eXvo0';
+      fetch(SB + '/functions/v1/strefa-self-register?t=' + encodeURIComponent(t), { headers: { apikey: ANON } })
+        .then((r) => r.json())
+        .then((d) => {
+          if (!d || !d.name) return;
+          document.title = 'Kod QR — ' + d.name + ' · SZRON';
+          document.getElementById('qr-name').textContent = d.name;
+          const parts = [];
+          try {
+            if (d.training_date) parts.push(new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(d.training_date)));
+          } catch (e) {}
+          if (d.location) parts.push(d.location);
+          document.getElementById('qr-meta').textContent = parts.join(' · ');
+        })
+        .catch(() => {});
+    }
+  </script>
+</body>
+</html>
