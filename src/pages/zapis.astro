@@ -13,6 +13,18 @@ import '../styles/strefa.css';
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+  <style>
+    /* Formularz zapisu — komfort na telefonach i iPadach */
+    .zapis-form .strefa-input { font-size: 16px; padding: .65rem .85rem; border-radius: 12px; min-height: 44px; }
+    .zapis-form .strefa-field label { font-size: .85rem; }
+    #f-submit { width: 100%; padding: .85rem; font-size: 1.02rem; min-height: 48px; margin-top: .15rem; }
+    @media (max-width: 520px) {
+      .strefa-login { padding: var(--space-md); align-items: start; }
+      .strefa-login__card { padding: var(--space-lg); }
+      .strefa-login__brand { margin-bottom: var(--space-lg); }
+      .strefa-grid2 { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body class="strefa-body">
   <div class="strefa-login">
@@ -32,17 +44,21 @@ import '../styles/strefa.css';
           <h1 id="tr-name" style="font-family:var(--font-display);font-weight:600;font-size:1.4rem;margin:0 0 .25rem"></h1>
           <p id="tr-meta" style="color:var(--color-text-inv-3);font-size:var(--text-caption);margin:0 0 var(--space-lg)"></p>
 
-          <div id="msg" hidden></div>
+          <div id="msg" role="alert" hidden></div>
 
-          <form id="reg-form" style="display:flex;flex-direction:column;gap:var(--space-md)">
+          <p style="color:var(--color-text-inv-3);font-size:var(--text-caption);margin:0 0 .2rem">Pola z gwiazdką (*) są wymagane — reszta opcjonalnie.</p>
+
+          <form id="reg-form" class="zapis-form" style="display:flex;flex-direction:column;gap:var(--space-md)">
             <div class="strefa-grid2">
-              <div class="strefa-field"><label for="f-first">Imię *</label><input class="strefa-input" id="f-first" autocomplete="given-name" required /></div>
-              <div class="strefa-field"><label for="f-last">Nazwisko *</label><input class="strefa-input" id="f-last" autocomplete="family-name" required /></div>
+              <div class="strefa-field"><label for="f-first">Imię *</label><input class="strefa-input" id="f-first" autocomplete="given-name" autocapitalize="words" required /></div>
+              <div class="strefa-field"><label for="f-last">Nazwisko *</label><input class="strefa-input" id="f-last" autocomplete="family-name" autocapitalize="words" required /></div>
             </div>
-            <div class="strefa-field"><label for="f-pos">Stanowisko</label><input class="strefa-input" id="f-pos" autocomplete="organization-title" /></div>
-            <div class="strefa-field"><label for="f-email">E-mail</label><input class="strefa-input" id="f-email" type="email" autocomplete="email" /></div>
-            <div class="strefa-field"><label for="f-phone">Telefon</label><input class="strefa-input" id="f-phone" type="tel" autocomplete="tel" /></div>
-            <button type="submit" class="strefa-btn strefa-btn--accent" id="f-submit" style="width:100%;padding:.7rem;font-size:1rem">Dodaj mnie do listy</button>
+            <div class="strefa-field"><label for="f-pos">Stanowisko</label><input class="strefa-input" id="f-pos" autocomplete="organization-title" placeholder="np. Embedded Developer" /></div>
+            <div class="strefa-field"><label for="f-project">Główny projekt</label><input class="strefa-input" id="f-project" autocomplete="off" placeholder="np. sterownik napędu, aplikacja serwisowa" /></div>
+            <div class="strefa-field"><label for="f-tech">Technologia, w której głównie pracujesz</label><input class="strefa-input" id="f-tech" autocomplete="off" autocapitalize="off" placeholder="np. C/C++, Python, React, STM32" /></div>
+            <div class="strefa-field"><label for="f-email">E-mail</label><input class="strefa-input" id="f-email" type="email" inputmode="email" autocapitalize="off" autocomplete="email" /></div>
+            <div class="strefa-field"><label for="f-phone">Telefon</label><input class="strefa-input" id="f-phone" type="tel" inputmode="tel" autocomplete="tel" /></div>
+            <button type="submit" class="strefa-btn strefa-btn--accent" id="f-submit">Dodaj mnie do listy</button>
           </form>
         </div>
 
@@ -104,7 +120,7 @@ import '../styles/strefa.css';
         var btn = document.getElementById('f-submit');
         var first = document.getElementById('f-first').value.trim();
         var last = document.getElementById('f-last').value.trim();
-        if (!first || !last) return showErr('Podaj imię i nazwisko.');
+        if (!first || !last) { showErr('Podaj imię i nazwisko.'); document.getElementById(!first ? 'f-first' : 'f-last').focus(); return; }
         btn.disabled = true; btn.textContent = 'Dodaję…';
         try {
           var r = await fetch(FN, {
@@ -113,6 +129,8 @@ import '../styles/strefa.css';
             body: JSON.stringify({
               training_id: t, first_name: first, last_name: last,
               position: document.getElementById('f-pos').value.trim(),
+              main_project: document.getElementById('f-project').value.trim(),
+              main_technology: document.getElementById('f-tech').value.trim(),
               email: document.getElementById('f-email').value.trim(),
               phone: document.getElementById('f-phone').value.trim(),
             }),

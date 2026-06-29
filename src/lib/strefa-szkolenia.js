@@ -41,7 +41,7 @@ let editing = false;
 
 const SUBS = ['Claude', 'Gemini', 'ChatGPT', 'Github Copilot', 'Brak'];
 // kolumny nawigowane klawiaturą (kolejność = lewo/prawo)
-const NAV = ['attendance', 'first_name', 'last_name', 'position', 'email', 'phone'];
+const NAV = ['attendance', 'first_name', 'last_name', 'position', 'main_project', 'main_technology', 'email', 'phone'];
 const MAXC = NAV.length - 1; // ostatni indeks kolumny edytowalnej
 
 /* ── toasty ── */
@@ -103,7 +103,7 @@ function commitTrainings(arr) {
 // Sygnatura danych — do wykrycia, czy cokolwiek się zmieniło (bez tego nie ruszamy DOM).
 function sigOf(arr) {
   return JSON.stringify((arr || []).map((t) => [t.id, t.name, t.training_date, t.location, t.description,
-    (t.participants || []).map((p) => [p.id, p.first_name, p.last_name, p.position, p.email, p.phone, p.attendance_confirmed, p.subscription, p.subscription_start_date])]));
+    (t.participants || []).map((p) => [p.id, p.first_name, p.last_name, p.position, p.main_project, p.main_technology, p.email, p.phone, p.attendance_confirmed, p.subscription, p.subscription_start_date])]));
 }
 async function loadData() {
   try { commitTrainings(await fetchTrainings()); }
@@ -155,7 +155,7 @@ async function dbUpdatePart(pid, patch) {
 function matches(p, t) {
   if (!query) return true;
   const q = query.toLowerCase();
-  return [p.first_name, p.last_name, p.position, p.email, p.phone, p.subscription, t.name, t.location].some((v) => String(v || '').toLowerCase().includes(q));
+  return [p.first_name, p.last_name, p.position, p.main_project, p.main_technology, p.email, p.phone, p.subscription, t.name, t.location].some((v) => String(v || '').toLowerCase().includes(q));
 }
 function visibleParts(t) { return query ? t.participants.filter((p) => matches(p, t)) : t.participants; }
 
@@ -184,8 +184,10 @@ function rowHTML(p, r) {
     <td data-col="first_name" data-r="${r}" data-c="1">${cellInner(p, 'first_name')}</td>
     <td data-col="last_name" data-r="${r}" data-c="2">${cellInner(p, 'last_name')}</td>
     <td data-col="position" data-r="${r}" data-c="3">${cellInner(p, 'position')}</td>
-    <td data-col="email" data-r="${r}" data-c="4">${cellInner(p, 'email')}</td>
-    <td data-col="phone" data-r="${r}" data-c="5">${cellInner(p, 'phone')}</td>
+    <td data-col="main_project" data-r="${r}" data-c="4">${cellInner(p, 'main_project')}</td>
+    <td data-col="main_technology" data-r="${r}" data-c="5">${cellInner(p, 'main_technology')}</td>
+    <td data-col="email" data-r="${r}" data-c="6">${cellInner(p, 'email')}</td>
+    <td data-col="phone" data-r="${r}" data-c="7">${cellInner(p, 'phone')}</td>
     <td class="col-sub"><div class="dcell" data-act="sub" title="Edytuj abonament / notatki" style="cursor:pointer">${subBadge(p)}</div></td>
     <td class="col-actions"><div class="dcell">
       ${p.phone ? `<a class="strefa-iconbtn strefa-iconbtn--call" href="tel:${esc(telHref(p.phone))}" title="Zadzwoń: ${esc(p.phone)}">${ICO.phone}</a>` : ''}
@@ -201,7 +203,7 @@ function gridHTML(t) {
   const rows = parts.map((p, i) => rowHTML(p, i)).join('');
   const body = parts.length
     ? rows
-    : `<tr><td colspan="9" class="dgrid-empty">${query ? 'Brak pasujących uczestników.' : 'Brak uczestników. Dodaj poniżej.'}</td></tr>`;
+    : `<tr><td colspan="11" class="dgrid-empty">${query ? 'Brak pasujących uczestników.' : 'Brak uczestników. Dodaj poniżej.'}</td></tr>`;
   return `
     ${selCount ? `<div class="strefa-toolbar" style="margin-bottom:.6rem">
       <span class="strefa-chip strefa-chip--count">Zaznaczono: ${selCount}</span>
@@ -213,16 +215,18 @@ function gridHTML(t) {
       <table class="dgrid">
         <thead><tr>
           <th class="col-sel"><input type="checkbox" data-sel-all aria-label="Zaznacz wszystkich"></th>
-          <th class="col-check">Obecność</th><th>Imię</th><th>Nazwisko</th><th>Stanowisko</th><th>E-mail</th><th>Telefon</th><th>Abonament</th><th class="col-actions"></th>
+          <th class="col-check">Obecność</th><th>Imię</th><th>Nazwisko</th><th>Stanowisko</th><th>Główny projekt</th><th>Technologia</th><th>E-mail</th><th>Telefon</th><th>Abonament</th><th class="col-actions"></th>
         </tr></thead>
         <tbody>${body}</tbody>
         <tr class="dgrid-add">
           <td></td>
-          <td colspan="8">
+          <td colspan="10">
             <div style="display:flex;gap:.4rem;padding:.35rem .5rem;flex-wrap:wrap;align-items:center">
               <input class="strefa-input" data-add="first_name" placeholder="Imię" style="width:7rem">
               <input class="strefa-input" data-add="last_name" placeholder="Nazwisko" style="width:8rem">
               <input class="strefa-input" data-add="position" placeholder="Stanowisko" style="width:8rem">
+              <input class="strefa-input" data-add="main_project" placeholder="Główny projekt" style="width:9rem">
+              <input class="strefa-input" data-add="main_technology" placeholder="Technologia" style="width:9rem">
               <input class="strefa-input" data-add="email" type="email" placeholder="E-mail" style="width:11rem">
               <input class="strefa-input" data-add="phone" type="tel" placeholder="Telefon" style="width:8rem">
               <button class="strefa-btn strefa-btn--accent strefa-btn--sm" data-add-go>Dodaj</button>
@@ -545,7 +549,8 @@ async function addParticipant(tid, inputs, btn) {
   try {
     const { error } = await sb.from('participants').insert({
       training_id: tid, first_name: vals.first_name || '—', last_name: vals.last_name || '—',
-      position: vals.position || null, email: vals.email || null, phone: vals.phone || null, attendance_confirmed: false,
+      position: vals.position || null, main_project: vals.main_project || null, main_technology: vals.main_technology || null,
+      email: vals.email || null, phone: vals.phone || null, attendance_confirmed: false,
     });
     if (error) { toast('Błąd', error.message, 'err'); if (btn) btn.disabled = false; return; }
     await loadData(); openIds.add(tid); renderAll();
