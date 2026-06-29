@@ -2,7 +2,7 @@
 import Interior from '../layouts/Interior.astro';
 ---
 <Interior
-  updated="2026-06-25"
+  updated="2026-06-29"
   title="Claude Code i Git — automatyczne commity | Akademia SZRON"
   description="Jak Claude Code prowadzi kontrolę wersji: automatyczne commity, porządkowanie historii, konflikty, Pull Requesty i bisect. Praktyczne komendy i pułapki."
   eyebrow="Akademia · Claude Code i Git"
@@ -67,7 +67,8 @@ claude "rozwiaz konflikty w plikach i zachowaj najlepsze rozwiazania z obu wersj
         <pre><code>claude "stworz PR z opisem zmian"</code></pre>
 
         <h3>Recenzja kodu komendą /code-review</h3>
-        <p>Wbudowana komenda <code>/code-review</code> recenzuje diff prosto w terminalu — szuka bugów oraz miejsc do poprawy pod kątem reuse, uproszczenia i wydajności. Jako cel podajesz ścieżkę, numer PR, nazwę gałęzi albo zakres refów (np. <code>main...feature</code>). Flaga <code>--comment</code> publikuje uwagi jako komentarze inline na PR, a <code>--fix</code> od razu nanosi proponowane poprawki.</p>
+        <p>Wbudowana komenda <code>/code-review</code> recenzuje diff prosto w terminalu — szuka bugów oraz miejsc do poprawy pod kątem reuse, uproszczenia i wydajności. Domyślnie bierze commity Twojej gałęzi wyprzedzające upstream plus to, czego jeszcze nie zacommitowałeś. Jako cel możesz podać ścieżkę, numer PR, nazwę gałęzi albo zakres refów (np. <code>main...feature</code>). Flaga <code>--comment</code> publikuje uwagi jako komentarze inline na PR, a <code>--fix</code> od razu nanosi proponowane poprawki.</p>
+        <div class="callout"><p><strong>Aktualizacja:</strong> Niższy poziom effort daje mniej, ale pewniejszych uwag; <code>high</code> i <code>max</code> idą szerzej i mogą zwrócić więcej niepewnych. Bez podanego effort review bierze ten z bieżącej sesji. Potrzebujesz głębszego przeglądu? <code>/code-review ultra --fix</code> odpala ultrareview w chmurze i nanosi poprawki w drzewie roboczym, gdy tylko wyniki wrócą do sesji.</p></div>
         <pre><code># Recenzja zakresu refow
 claude /code-review main...feature
 

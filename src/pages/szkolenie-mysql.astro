@@ -5,7 +5,7 @@ import Interior from '../layouts/Interior.astro';
   title="MySQL MCP Server + Claude Code | Akademia SZRON"
   description="Podłącz MySQL lub MariaDB do Claude Code przez MCP: instalacja serwera, konfiguracja .env, domyślnie wyłączone operacje zapisu i pułapki wersji."
   eyebrow="Akademia · MySQL MCP Server"
-  updated="2026-06-25"
+  updated="2026-06-29"
   heading="MySQL MCP Server: agent na bazie MySQL i MariaDB."
   lead="MCP-Server-MySQL daje Claude Code bezpośredni dostęp do baz MySQL i MariaDB: zapytania SQL, podgląd struktury, tworzenie tabel i zarządzanie danymi. Operacje zapisu są domyślnie wyłączone — włączasz je świadomie, flaga po fladze."
 >
@@ -42,7 +42,7 @@ node --version</code></pre>
         <h2>Instalacja serwera</h2>
         <p>Repo nie wymaga instalacji globalnej. Najprościej uruchamiać serwer przez <code>npx</code> — pobiera i odpala aktualną wersję bez dbania o ścieżki:</p>
         <pre><code>npx -y @benborla29/mcp-server-mysql</code></pre>
-        <div class="callout"><p><strong>Aktualizacja:</strong> nie pinuj wersji 2.0.2 — taki tag nie istnieje. Najnowsza to v2.0.9 (czerwiec 2026). Zamiast <code>npm install -g</code> czy pinowania podwersji używaj <code>npx</code>, który zawsze sięga po aktualne wydanie.</p></div>
+        <div class="callout"><p><strong>Aktualizacja:</strong> najnowsze wydanie to v2.0.9 (czerwiec 2026). Zamiast pinować konkretną podwersję czy instalować globalnie przez <code>npm install -g</code>, uruchamiaj serwer przez <code>npx</code> — zawsze sięgnie po aktualne wydanie z npm.</p></div>
 
         <h2>Konfiguracja środowiska (.env)</h2>
         <p>Utwórz plik .env z danymi połączenia i uprawnieniami:</p>

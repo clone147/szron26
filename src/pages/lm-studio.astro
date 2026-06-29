@@ -9,7 +9,7 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
   eyebrow="Akademia · Lokalne modele"
   heading="LM Studio — modele LLM bez chmury, na Twoim sprzęcie."
   lead="Darmowa aplikacja desktop do uruchamiania zaawansowanych modeli językowych lokalnie: pełna prywatność, zgodność z RODO, API zgodne z OpenAI na localhost. Poniżej instalacja, korzyści dla firm oraz modele, które warto znać."
-  updated="2026-06-20"
+  updated="2026-06-29"
 >
   <!-- proof -->
   <section class="sect" style="padding-bottom:0">
@@ -57,7 +57,7 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
       <div class="prose rv">
         <p>Przejdź na <a href="https://lmstudio.ai">lmstudio.ai</a> i pobierz wersję dla swojego systemu (macOS, Windows lub Linux).</p>
         <ul>
-          <li><strong>Aktualna wersja:</strong> linia 0.4.x (m.in. 0.4.16 z czerwca 2026).</li>
+          <li><strong>Aktualna wersja:</strong> linia 0.4.x (stabilne 0.4.18 z 26 czerwca 2026).</li>
           <li><strong>Rozmiar instalatora:</strong> około 400 MB.</li>
           <li><strong>Wymagania rekomendowane:</strong> 16 GB RAM oraz 4 GB+ VRAM.</li>
           <li><strong>Po instalacji:</strong> wybierz model z wbudowanej biblioteki, pobierz go i uruchom lokalnie.</li>
@@ -88,12 +88,15 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
     <div class="container">
       <div class="sect-head">
         <p class="eyebrow rv" data-scramble>04 / Model · MiniMax (agenty)</p>
-        <h2 class="sect-title ws" id="minimax">MiniMax M2 i nowsze — mistrzowie agentów.</h2>
+        <h2 class="sect-title ws" id="minimax">Od MiniMax M2 do M3 — mistrzowie agentów.</h2>
       </div>
       <div class="prose rv">
-        <p>MiniMax M2 został wydany 27 października 2025. To architektura MoE: <strong>230B parametrów total, 10B aktywnych</strong>, na licencji MIT, w czołówce rankingu Artificial Analysis. Koszt rzędu $0.30/$1.20 za milion tokenów to ułamek ceny modeli komercyjnych. Wersja M2.1 ukazała się 23 grudnia 2025, a jej następcą jest <strong>MiniMax M2.7</strong> (marzec 2026) — to aktualne wydanie linii.</p>
+        <p>MiniMax M2 wyszedł 27 października 2025. To architektura MoE: <strong>230B parametrów total, 10B aktywnych</strong>, na licencji MIT, w czołówce rankingu Artificial Analysis. Koszt rzędu $0.30/$1.20 za milion tokenów to ułamek ceny modeli komercyjnych. Linia rozwinęła się szybko: M2.1 (22 grudnia 2025), M2.5 (luty 2026), a potem M2.7 (18 marca 2026). Najnowszy w rodzinie jest jednak <strong>MiniMax M3</strong> z 1 czerwca 2026 — to już osobny krok, nie kolejny punkt w linii M2.</p>
         <div class="callout">
-          <p><strong>Status LM Studio:</strong> wsparcie dla MiniMax M2 zostało dodane w wersji 0.3.31 — działa od tego wydania w górę. Dla starszych wersji alternatywy to <code>vLLM</code> oraz <code>SGLang</code> (zalecany dla parsowania wywołań narzędzi).</p>
+          <p><strong>MiniMax M3 (czerwiec 2026):</strong> MoE ~428B / ~22B aktywnych, mechanizm rzadkiej uwagi MSA, kontekst do 1M tokenów i natywna multimodalność (tekst, obraz, wideo). Cennik API to $0.60/$2.40 za milion tokenów, wagi są otwarte na licencji minimax-community.</p>
+        </div>
+        <div class="callout">
+          <p><strong>Status LM Studio:</strong> M2 ma natywne wsparcie od wersji 0.3.31 (MLX na Macu, GGUF na PC, łącznie z parsowaniem wywołań narzędzi). Dla M3 obsługa w llama.cpp jest na razie wstępna (build z PR), więc na lokalne uruchomienie poza <code>vLLM</code> i <code>SGLang</code> trzeba poczekać na stabilny build. Dla starszych wersji LM Studio te dwa silniki pozostają alternatywą.</p>
         </div>
       </div>
     </div>
@@ -110,7 +113,7 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
         <ul>
           <li><strong>LM Studio</strong> — demokratyzuje dostęp do LLM, idealne dla branż z wymogami prywatności; API zgodne z OpenAI na <code>localhost:1234</code>.</li>
           <li><strong>Linia GLM-5</strong> — aktualny lider kodowania open-weight (przewyższa GLM 4.7), licencja MIT, kontekst do 1M tokenów.</li>
-          <li><strong>MiniMax M2 / M2.7</strong> — mistrz zadań agentowych, MoE 230B/10B, działa w LM Studio 0.3.31+, ułamek ceny modeli komercyjnych.</li>
+          <li><strong>MiniMax M2 / M3</strong> — mistrz zadań agentowych; M2 (MoE 230B/10B) działa lokalnie w LM Studio od 0.3.31+, M3 (MoE ~428B, 1M kontekstu, multimodal) to najnowszy krok linii. Ułamek ceny modeli komercyjnych.</li>
         </ul>
       </div>
     </div>

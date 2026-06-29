@@ -7,7 +7,7 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
   title="OpenAI Codex CLI — instalacja i komendy | Akademia SZRON"
   description="Przewodnik po OpenAI Codex CLI: instalacja przez npm, config.toml, tryby zatwierdzania, komendy sesji, MCP i kontrola przeglądarki. Agent kodujący w terminalu."
   eyebrow="Akademia · Narzędzia agentowe"
-  updated="2026-06-25"
+  updated="2026-06-29"
   heading="OpenAI Codex CLI — autonomiczny agent w terminalu."
   lead="Codex CLI to open-source agent kodujący napędzany rodziną GPT-5-Codex: buduje projekty od zera, refaktoryzuje, debuguje i integruje się z MCP. Poniżej instalacja, plik konfiguracyjny, tryby zatwierdzania i komendy, które realnie wykorzystujemy."
 >
@@ -30,7 +30,7 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
         <h2 class="sect-title sect-title--s ws" id="czym">Agent, który prowadzi projekt od zera po produkcję.</h2>
       </div>
       <div class="prose rv">
-        <p>OpenAI Codex CLI to agent do autonomicznego kodowania w terminalu. Open-source na licencji Apache 2.0, napisany w Rust, działa na macOS, Linux i Windows. Modelu nie musisz wybierać — po zalogowaniu kontem ChatGPT Codex sam sięga po rekomendowany wariant z rodziny GPT-5.x. Stan na połowę 2026: GPT-5.5 to najnowszy model frontier, obok niego GPT-5.4 i szybszy GPT-5.4-mini. Dedykowana linia „-codex" (gpt-5.3-codex, gpt-5.2) została w maju 2026 wycofana z listy wyboru dla logujących się przez ChatGPT. GPT-5-Codex z września 2025 oraz o3 i codex-1 to już zamknięty rozdział.</p>
+        <p>OpenAI Codex CLI to agent do autonomicznego kodowania w terminalu. Open-source na licencji Apache 2.0, napisany w Rust, działa na macOS, Linux i Windows. Modelu nie musisz wybierać — po zalogowaniu kontem ChatGPT Codex sam sięga po rekomendowany wariant z rodziny GPT-5.x. Stan na połowę 2026: domyślnym punktem startu jest GPT-5.5 (najnowszy model frontier), obok niego GPT-5.4 i szybszy GPT-5.4-mini. Dedykowana linia „-codex" (gpt-5.3-codex, gpt-5.2) została w maju 2026 wycofana z listy wyboru dla logujących się przez ChatGPT. GPT-5-Codex z września 2025 oraz o3 i codex-1 to już zamknięty rozdział.</p>
         <p>Kluczowe możliwości:</p>
         <ul>
           <li>Budowanie projektów od zera.</li>
@@ -56,9 +56,10 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
       <div class="prose rv">
         <p>Codex nie jest przywiązany do jednego modelu. Domyślnie bierze rekomendowany wariant rodziny GPT-5.x, a Ty przełączasz się między nimi w locie — komendą <code>/model</code>. Stan na połowę 2026:</p>
         <ul>
-          <li><strong>GPT-5.5</strong> — najnowszy model frontier, do najcięższego kodowania.</li>
+          <li><strong>GPT-5.5</strong> — najnowszy model frontier, domyślny punkt startu do większości zadań w Codeksie.</li>
           <li><strong>GPT-5.4</strong> — model flagowy do codziennej pracy.</li>
-          <li><strong>GPT-5.4-mini</strong> — gdy zależy Ci na szybkości i koszcie.</li>
+          <li><strong>GPT-5.4-mini</strong> — gdy zależy Ci na szybkości i koszcie; nadaje się też pod subagentów.</li>
+          <li><strong>GPT-5.3-codex-spark</strong> — tekstowy research preview pod błyskawiczne, niemal natychmiastowe iteracje; dostępny dla kont ChatGPT Pro.</li>
         </ul>
         <p>Osobna linia „-codex" (gpt-5.3-codex, gpt-5.2) zniknęła z listy wyboru przy logowaniu kontem ChatGPT. Model dynamicznie alokuje czas „myślenia" i dostosowuje zasoby do skomplikowania problemu — od krótkich odpowiedzi po długie sesje nad złożonym zadaniem.</p>
       </div>
@@ -125,13 +126,14 @@ sandbox_mode = "workspace-write" # "read-only", "workspace-write", "danger-full-
           <li><strong>sandbox_mode</strong> — zakres działań: <code>read-only</code>, <code>workspace-write</code> (zapis w katalogu projektu), <code>danger-full-access</code>.</li>
         </ul>
         <h3>3. Serwery MCP</h3>
-        <pre><code>[[mcp.servers]]
-type = "remote"
-url = "https://example.com/mcp"
+        <p>Każdy serwer to osobna tabela <code>[mcp_servers.NAZWA]</code> — nie tablica <code>[[...]]</code>. Serwer lokalny (stdio) opisujesz przez <code>command</code> i <code>args</code>, zdalny przez <code>url</code>:</p>
+        <pre><code>[mcp_servers.context7]
+command = "npx"
+args = ["-y", "&#64;upstash/context7-mcp"]
 
-[[mcp.servers]]
-type = "local"
-command = "/path/to/mcp-server"</code></pre>
+[mcp_servers.figma]
+url = "https://mcp.figma.com/mcp"
+bearer_token_env_var = "FIGMA_OAUTH_TOKEN"</code></pre>
       </div>
     </div>
   </section>
@@ -190,6 +192,9 @@ args = ["chrome-devtools-mcp&#64;latest"]</code></pre>
         <pre><code>Otworz localhost:3000, sprawdz czy sa bledy w konsoli i napraw je w kodzie</code></pre>
         <div class="callout">
           <p><strong>Podgląd:</strong> komenda <code>/status</code> w sesji Codex pokazuje wszystkie zainstalowane serwery MCP i ich status. Pełną listę serwerów MCP znajdziesz na <a href="https://github.com/modelcontextprotocol/servers">github.com/modelcontextprotocol/servers</a>.</p>
+        </div>
+        <div class="callout">
+          <p><strong>Aktualizacja:</strong> od wersji 0.142.2 (czerwiec 2026) narzędzia z serwerów MCP domyślnie przechodzą przez wyszukiwanie narzędzi (tool search), o ile model i provider to obsługują. Poprawia to wykrywanie narzędzi przy dużej liczbie serwerów, a dla starszych modeli zachowuje dotychczasowe zachowanie.</p>
         </div>
       </div>
     </div>

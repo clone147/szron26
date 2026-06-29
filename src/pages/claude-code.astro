@@ -7,7 +7,7 @@ import Interior from '../layouts/Interior.astro';
   eyebrow="Akademia · Programowanie agentowe"
   heading="Claude Code — agent kodowania w terminalu, od pierwszej instalacji."
   lead="Czym jest agent kodowania, jak go zainstalować w aktualny sposób i jak ułożyć z nim codzienny workflow. Uczymy tego, czego sami używamy w pracy z klientami — na realnych komendach, bez teorii dla teorii."
-  updated="2026-06-25"
+  updated="2026-06-29"
 >
   <!-- proof -->
   <section class="sect" style="padding-bottom:0">
@@ -120,12 +120,12 @@ claude
           <thead><tr><th scope="col">Mechanizm</th><th scope="col">Co robi</th><th scope="col">Zasięg</th></tr></thead>
           <tbody>
             <tr><td><strong>/effort</strong> (low / medium / high / max)</td><td>ustawia, jak głęboko agent myśli</td><td>cała sesja, aż zmienisz</td></tr>
-            <tr><td><strong>/effort xhigh</strong></td><td>jeszcze głębiej, na najmocniejszych modelach (Opus 4.7/4.8)</td><td>cała sesja</td></tr>
+            <tr><td><strong>/effort xhigh</strong></td><td>jeszcze głębiej, na najmocniejszych modelach (Fable 5, Opus 4.7/4.8)</td><td>cała sesja</td></tr>
             <tr><td><strong>ultrathink</strong> / <strong>think</strong> (w treści promptu)</td><td>jednorazowo podbija myślenie na tę jedną odpowiedź</td><td>tylko bieżący prompt</td></tr>
           </tbody>
         </table>
         <div class="callout">
-          <p><strong>Aktualizacja:</strong> dawniej <code>think</code> / <code>megathink</code> / <code>ultrathink</code> mapowały na sztywne budżety tokenów (~4K / 10K / 32K). Dziś podstawą jest komenda <code>/effort</code>, która trzyma wybrany poziom między turami. Słowa-klucze w prompcie (jak <code>ultrathink</code>) to już tylko jednorazowy zastrzyk na konkretną odpowiedź — nie zmieniają ustawienia sesji i nie są stałym budżetem. Na Opusie 4.8 domyślnym poziomem jest <code>high</code>; głębsze myślenie (<code>xhigh</code>, <code>max</code>) rezerwuj na realnie trudne decyzje: architektura, refactoring na dużą skalę, niejasne błędy. W menu <code>/effort</code> jest też tryb <code>ultracode</code> — łączy najwyższy poziom myślenia (xhigh) ze stałą zgodą na uruchamianie wieloagentowych workflow, dostępny na modelach wspierających xhigh (Opus 4.7/4.8). Sam model dobierasz komendą <code>/model</code> — od najszybszych (Haiku) po najmocniejsze (Opus).</p>
+          <p><strong>Aktualizacja:</strong> dawniej <code>think</code> / <code>megathink</code> / <code>ultrathink</code> mapowały na sztywne budżety tokenów (~4K / 10K / 32K). Dziś podstawą jest komenda <code>/effort</code>, która trzyma wybrany poziom między turami. Słowa-klucze w prompcie (jak <code>ultrathink</code>) to już tylko jednorazowy zastrzyk na konkretną odpowiedź — nie zmieniają ustawienia sesji i nie są stałym budżetem. Na Opusie 4.8 domyślnym poziomem jest <code>high</code>; głębsze myślenie (<code>xhigh</code>, <code>max</code>) rezerwuj na realnie trudne decyzje: architektura, refactoring na dużą skalę, niejasne błędy. W menu <code>/effort</code> jest też tryb <code>ultracode</code> — łączy najwyższy poziom myślenia (xhigh) ze stałą zgodą na uruchamianie wieloagentowych workflow, dostępny na modelach wspierających xhigh (Fable 5, Opus 4.7/4.8). Sam model dobierasz komendą <code>/model</code> — od najszybszych (Haiku) po najmocniejsze (Opus i Fable).</p>
         </div>
         <h3>Subagenci — delegowanie i praca równoległa</h3>
         <p>Agent może odpalić <strong>subagenta</strong> do wyodrębnionego zadania — przeszukania kodu, weryfikacji zmiany, researchu — który pracuje w osobnym kontekście. Główna rozmowa się nie zaśmieca, a kilka subagentów może działać równolegle. Możesz definiować własnych: z własnym promptem systemowym i ograniczonym zestawem narzędzi.</p>
@@ -149,7 +149,7 @@ claude
           <li><strong>Serwery MCP</strong> — łączenie agenta z bazami danych, API, przeglądarką i narzędziami zespołu.</li>
           <li><strong>IDE i aplikacja desktopowa</strong> — ten sam agent w terminalu, w rozszerzeniach do VS Code i JetBrains oraz w apce desktopowej. Pracujesz tam, gdzie ci wygodnie.</li>
           <li><strong>Przegląd kodu wieloma agentami</strong> — wbudowany code review, w którym osobni agenci niezależnie sprawdzają zmiany, zanim trafią do gałęzi.</li>
-          <li><strong>Alternatywni agenci</strong> — Codex CLI (OpenAI), Gemini CLI (Google — przenoszony na Antigravity CLI) oraz modele lokalne, gdy dane nie mogą opuścić firmy. Krajobraz CLI zmienia się szybko — szczegóły trzymamy w osobnych szkoleniach.</li>
+          <li><strong>Alternatywni agenci</strong> — Codex CLI (OpenAI), Antigravity CLI (Google — następca wygaszonego w czerwcu 2026 Gemini CLI dla użytkowników indywidualnych) oraz modele lokalne, gdy dane nie mogą opuścić firmy. Krajobraz CLI zmienia się szybko — szczegóły trzymamy w osobnych szkoleniach.</li>
           <li><strong>Bezpieczeństwo</strong> — praca z AI na firmowym kodzie bez wycieku: deny rules, sandbox i hooki.</li>
         </ul>
       </div>

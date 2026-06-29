@@ -5,7 +5,7 @@ import Interior from '../layouts/Interior.astro';
   title="Serwery MCP — Chrome DevTools MCP | Akademia SZRON"
   description="Model Context Protocol rozszerza Claude Code o zewnętrzne narzędzia. Instalacja Chrome DevTools MCP krok po kroku: Node LTS, Chrome i przykłady."
   eyebrow="Akademia · Serwery MCP"
-  updated="2026-06-20"
+  updated="2026-06-29"
   heading="Serwery MCP: rozszerz możliwości Claude Code."
   lead="Model Context Protocol to standardowy sposób łączenia narzędzi AI z zewnętrznymi systemami. Dzięki serwerom MCP Claude Code kontroluje przeglądarkę, sięga do baz danych i automatyzuje złożone zadania. Na warsztat bierzemy Chrome DevTools MCP — agent testuje i debuguje aplikacje webowe wprost w Chrome."
 >
@@ -58,13 +58,14 @@ node --version</code></pre>
         <div class="callout"><p><strong>Uwaga:</strong> po instalacji uruchom Claude Code ponownie, aby serwer MCP został wczytany.</p></div>
 
         <h3>Instalacja jako plugin (rekomendowana)</h3>
-        <p>Obecnie zalecanym sposobem jest instalacja przez marketplace pluginów. Jeśli serwer dodałeś wcześniej przez CLI, najpierw go usuń, a potem:</p>
+        <p>Zalecaną drogą jest plugin z marketplace — w pakiecie z serwerem MCP dostajesz Skills (umiejętności), których sama instalacja przez CLI nie dokłada. Jeśli serwer dodałeś wcześniej przez CLI, najpierw go usuń, żeby wpisy się nie dublowały, a potem:</p>
         <pre><code># jeśli był dodany przez CLI — najpierw usuń
 claude mcp remove chrome-devtools
 
 # w Claude Code:
 /plugin marketplace add ChromeDevTools/chrome-devtools-mcp
 /plugin install chrome-devtools-mcp@chrome-devtools-plugins</code></pre>
+        <div class="callout"><p><strong>Aktualizacja:</strong> po instalacji pluginu zrestartuj Claude Code i sprawdź dołączone Skills komendą <code>/skills</code>. Wymagania bez zmian: Node.js w aktualnej wersji LTS oraz Chrome w wersji stable lub nowszej.</p></div>
 
         <h2>Przykłady użycia</h2>
         <ul>

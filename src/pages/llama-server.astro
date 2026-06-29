@@ -7,7 +7,7 @@ const related = akademia.filter((a) => ['lm-studio', 'claude-code-bezpieczenstwo
   title="Lokalny LLM — llama-server | Akademia SZRON"
   description="Przewodnik po llama-server (llama.cpp): kompilacja z CUDA/Metal/ROCm, modele GGUF, continuous batching, flagi, WebUI i API zgodne z OpenAI. Modele w firmie."
   eyebrow="Akademia · Lokalne modele"
-  updated="2026-06-25"
+  updated="2026-06-29"
   heading="Lokalny LLM w firmie — llama-server od podstaw."
   lead="Jeśli szukasz maksymalnej wydajności, elastyczności i prawdziwej współbieżności na własnym sprzęcie, odpowiedzią jest llama-server z projektu llama.cpp. Poniżej kompilacja, modele GGUF, flagi uruchomienia i dostęp przez API zgodne z OpenAI."
 >
@@ -117,6 +117,9 @@ cmake --build build --config Release -j</code></pre>
         <div class="callout">
           <p><strong>Continuous batching domyślnie włączone:</strong> nie musisz już podawać <code>--cont-batching</code>. Aby wyłączyć, użyj <code>-nocb</code> lub <code>--no-cont-batching</code>.</p>
         </div>
+        <div class="callout">
+          <p><strong>Aktualizacja — tryb routera (wiele modeli na jednym serwerze):</strong> odpal <code>llama-server</code> bez <code>-m</code>, a wystartuje jako router. Zamiast jednego modelu na sztywno obsłuży wiele i ładuje je na żądanie. <code>--models-dir</code> wskazuje katalog z plikami GGUF, a <code>--models-preset</code> opisuje konfiguracje poszczególnych modeli w pliku <code>.ini</code>. Każde zapytanie trafia do właściwego modelu samo — przełączasz model bez restartu serwera.</p>
+        </div>
         <h3>Przykład pełnego polecenia</h3>
         <pre><code>./build/bin/llama-server \
   -m ./modele/Mistral-7B-v0.1.Q4_K_M.gguf \
@@ -143,6 +146,7 @@ cmake --build build --config Release -j</code></pre>
         <p>Dzięki continuous batching i fladze <code>--parallel</code> serwer nie blokuje się na jednym zapytaniu. Możesz otworzyć wiele kart w przeglądarce lub wysłać wiele zapytań API jednocześnie — serwer inteligentnie rozdzieli zasoby GPU i przetworzy wszystkie równolegle.</p>
         <h3>3. API zgodne z OpenAI</h3>
         <p>llama-server automatycznie udostępnia API zgodne ze standardem OpenAI (endpoint <code>/v1/</code>). Oznacza to, że podłączysz setki narzędzi (LangChain, Open WebUI, skrypty Python) do lokalnego serwera — wystarczy ustawić adres API na <code>http://127.0.0.1:8080/v1/</code>.</p>
+        <p>Jeśli zależy Ci na tool callingu, dodaj flagę <code>--jinja</code>. Każe ona serwerowi użyć szablonu czatu wbudowanego w model GGUF. To ona odblokowuje na <code>/v1/chat/completions</code> poprawne parsowanie wywołań narzędzi (pole <code>tool_calls</code>) i wydzielanie treści rozumowania do osobnego pola <code>reasoning_content</code>. Bez niej serwer zgaduje format heurystycznie i często przepuszcza znaczniki jako zwykły tekst.</p>
       </div>
     </div>
   </section>
