@@ -67,8 +67,7 @@ import '../styles/strefa.css';
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
           </div>
           <h1 style="font-family:var(--font-display);font-weight:600;font-size:1.3rem;margin:0 0 .4rem">Jesteś na liście!</h1>
-          <p id="done-name" style="color:var(--color-text-inv-2);font-size:var(--text-s);margin:0 0 var(--space-lg)"></p>
-          <button type="button" class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-again">Zapisz kolejną osobę</button>
+          <p id="done-name" style="color:var(--color-text-inv-2);font-size:var(--text-s);margin:0"></p>
         </div>
 
         <div id="state-bad" hidden style="text-align:center">
@@ -142,14 +141,6 @@ import '../styles/strefa.css';
         } catch (e) {
           showErr('Błąd połączenia. Spróbuj ponownie.'); btn.disabled = false; btn.textContent = 'Dodaj mnie do listy';
         }
-      });
-
-      document.getElementById('btn-again').addEventListener('click', function () {
-        document.getElementById('reg-form').reset();
-        var btn = document.getElementById('f-submit'); btn.disabled = false; btn.textContent = 'Dodaj mnie do listy';
-        msg.hidden = true;
-        show('state-form');
-        document.getElementById('f-first').focus();
       });
     })();
   </script>
