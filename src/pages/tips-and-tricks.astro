@@ -3,9 +3,9 @@ import Interior from '../layouts/Interior.astro';
 ---
 <Interior
   title="Claude Code — Tips & Tricks | Akademia SZRON"
-  description="Praktyczne wskazówki do Claude Code: powiadomienia przez hooki, pomijanie uprawnień, status line, wyłączenie auto-compact, tryb planowania i prompty."
+  description="Praktyczne wskazówki do Claude Code: powiadomienia przez hooki, pomijanie uprawnień, status line, kontrola kontekstu przez /context, checkpointy /rewind, własne slash-commands i Skills oraz tryb planowania i prompty."
   eyebrow="Akademia · Praktyka pracy z AI"
-  updated="2026-06-25"
+  updated="2026-06-29"
   heading="Claude Code — Tips & Tricks dla programistów."
   lead="Zestaw praktyk, skrótów i wzorców, które realnie przyspieszają codzienną pracę z agentem. Od powiadomień dźwiękowych po świadome zarządzanie kontekstem i optymalizację promptów — wszystko z naszej własnej praktyki."
 >
@@ -103,6 +103,7 @@ node ~/.claude/play.js ~/.claude/finish.wav</code></pre>
           <li><strong>Brak kontroli</strong> — nie wiesz, co zostało usunięte, i nie możesz tego naprawić.</li>
         </ul>
         <p>Wyłącz go przez <code>/config</code>: znajdź opcję „Auto-compact" i przełącz na <code>false</code> (spacją).</p>
+        <p>Zanim zdecydujesz, co przyciąć, sprawdź, gdzie ucieka okno. Komenda <code>/context</code> rysuje zużycie kontekstu jako kolorową siatkę i pokazuje, co zżera najwięcej — system prompt, otwarte pliki, narzędzia serwerów MCP czy rozrośnięty <code>CLAUDE.md</code> — razem z podpowiedziami optymalizacji i ostrzeżeniem, gdy zbliżasz się do limitu. <code>/context all</code> rozwija pełną rozpiskę pozycja po pozycji.</p>
         <div class="callout">
           <p><strong>Strategia kontekstu:</strong> gdy okno się zapełni, zamiast <code>/compact</code> użyj <code>/clear</code> i rozplanuj zadanie na nowo. Świeży start z lepszym planem daje znacznie wyższą skuteczność niż kompaktowanie. Po wyłączeniu auto-compact odzyskujesz około 20% kontekstu i agent nie gubi istotnych informacji.</p>
         </div>
@@ -161,6 +162,50 @@ DOBRZE: "Dodaj funkcje wysylki maili do uczestnikow w /trainings"
 ZLE: "Czy moglbys sprawdzic baze i powiedziec jakie sa wszystkie tabele i co robia?"
 DOBRZE: "Lista tabel w DB z opisami"</code></pre>
         <p>Możesz też poprosić agenta, by po każdym zadaniu sam podpowiadał lepszą wersję Twojego promptu — wpisz tę zasadę do <code>CLAUDE.md</code>, a każde zadanie stanie się darmową lekcją prompt engineeringu. Z czasem Twoje pierwsze prompty zbliżą się do tych zoptymalizowanych.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 rewind / checkpointy -->
+  <section class="sect" aria-labelledby="rewind">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>07 / Cofanie · Checkpointy</p>
+        <h2 id="rewind">/rewind — cofnij kod i rozmowę bez restartu.</h2>
+        <p>Agent poszedł w złą stronę, a zorientowałeś się dwa kroki za późno? Nie musisz zaczynać sesji od zera. Claude Code odkłada checkpointy w trakcie pracy, więc da się wrócić do stanu sprzed nieudanej zmiany. Służy do tego komenda <code>/rewind</code> (aliasy: <code>/checkpoint</code>, <code>/undo</code>): cofa rozmowę i/lub kod do wybranego punktu albo streszcza historię od zaznaczonej wiadomości.</p>
+        <p>Menu otwierasz komendą <code>/rewind</code> albo podwójnym <code>Esc</code>. Wybierasz wtedy, co przywrócić:</p>
+        <ul>
+          <li><strong>Tylko rozmowę</strong> — wracasz do wcześniejszego punktu dialogu, pliki zostają nietknięte.</li>
+          <li><strong>Tylko kod</strong> — odkręcasz zmiany w plikach, nie ruszając historii czatu.</li>
+          <li><strong>Jedno i drugie</strong> — pełny powrót do checkpointu.</li>
+        </ul>
+        <div class="callout">
+          <p><strong>Wskazówka:</strong> pojedynczy <code>Esc</code> przerywa pracę agenta w locie; podwójny <code>Esc</code> otwiera to samo menu cofania co <code>/rewind</code>. To szybsza pętla niż dorzucanie korekty kolejnym promptem na końcu — zwłaszcza gdy agent zdążył już naruszyć kilka plików.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 slash-commands i skills (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="komendy">
+    <div class="container">
+      <div class="prose rv">
+        <p class="eyebrow" data-scramble>08 / Automatyzacja · Slash-commands i Skills</p>
+        <h2 id="komendy">Własne komendy i Skills — biblioteka workflow zespołu.</h2>
+        <p>Wpisujesz w kółko ten sam prompt — „przejrzyj diff pod kątem bugów", „dodaj endpoint z obsługą błędów i typami"? Zamień go w komendę raz, wołaj jednym <code>/</code>. Plik markdown w katalogu <code>.claude/skills/&lt;nazwa&gt;/SKILL.md</code> tworzy komendę <code>/&lt;nazwa&gt;</code>. Starszy zapis <code>.claude/commands/&lt;nazwa&gt;.md</code> działa tak samo — w nowszych wersjach własne komendy zostały scalone ze Skills.</p>
+        <p>Każdy <code>SKILL.md</code> to nagłówek YAML (<code>name</code>, <code>description</code>) i treść w markdown z instrukcją:</p>
+        <pre><code>---
+name: code-review
+description: Przeglada diff pod katem bugow i luk bezpieczenstwa.
+---
+Przejrzyj zmiany w gicie. Zglos tylko realne bugi
+i podatnosci — zwiezle, bez czepiania sie nazewnictwa.</code></pre>
+        <p>Dwie rzeczy robią tu największą różnicę:</p>
+        <ul>
+          <li><strong>Zespół prosto z repo</strong> — wersję projektową trzymasz w <code>.claude/skills/</code> i komitujesz do repozytorium; każdy w zespole ma od ręki te same SOP-y. Wersja osobista (<code>~/.claude/skills/</code>) jedzie z Tobą po wszystkich projektach.</li>
+          <li><strong>Claude sam sięga po skill</strong> — pole <code>description</code> mówi agentowi, kiedy włączyć skill bez Twojego <code>/</code>. Komendę odpalasz ręcznie, skill może wskoczyć sam, gdy pasuje do zadania. Listę dostępnych masz pod <code>/skills</code>.</li>
+        </ul>
+        <p>Komendy przyjmują argumenty (<code>$ARGUMENTS</code>, <code>$1</code>, <code>$2</code>), więc jeden skill obsłuży wiele wariantów. Przykład z praktyki: skill <code>prototype</code>, który zamiast jednego widoku generuje od razu pięć wariantów UI obok siebie w jednym pliku — wybierasz najlepszy zamiast prosić o poprawki w nieskończoność.</p>
       </div>
     </div>
   </section>
