@@ -29,6 +29,22 @@ const ICO = {
   play: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>',
 };
 
+/* ── model etapów programisty (spójne z /strefa/programisci) ── */
+const STAGES = [
+  { n: 1, name: 'Początkujący' },
+  { n: 2, name: 'Kierujący' },
+  { n: 3, name: 'Operator' },
+  { n: 4, name: 'Dostrajający' },
+  { n: 5, name: 'Autonomiczny' },
+  { n: 6, name: 'Architekt AI' },
+];
+const STAGE_COLORS = ['oklch(68% 0.13 250)', 'oklch(75% 0.13 200)', 'oklch(77% 0.16 150)', 'oklch(83% 0.15 90)', 'oklch(72% 0.19 50)', 'oklch(66% 0.21 330)'];
+const stageColor = (n) => STAGE_COLORS[Math.max(1, Math.min(6, n || 1)) - 1];
+const stageName = (n) => (STAGES[(n || 1) - 1] || STAGES[0]).name;
+// dopasowanie uczestnik ↔ programista: normalizacja imienia+nazwiska (bez wielkości liter, diakrytyków, „ł")
+const foldName = (s) => String(s || '').trim().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/ł/g, 'l').replace(/\s+/g, ' ');
+const nameKey = (first, last) => (foldName(first) + ' ' + foldName(last)).trim();
+
 /* ── stan ── */
 let trainings = [];            // [{...t, participants:[...]}]
 const partMap = new Map();     // pid -> participant
@@ -38,6 +54,8 @@ const selected = new Map();     // tid -> Set(pid)
 let query = '';
 let activeTd = null;
 let editing = false;
+let developers = [];            // [{id, first_name, last_name, company_id, stage}] — z /strefa/programisci
+const devByName = new Map();    // nameKey -> developer (dopasowanie uczestnika do programisty)
 
 const SUBS = ['Claude', 'Gemini', 'ChatGPT', 'Github Copilot', 'Brak'];
 // kolumny nawigowane klawiaturą (kolejność = lewo/prawo)
@@ -100,14 +118,28 @@ function commitTrainings(arr) {
   trainings = arr; trMap.clear(); partMap.clear();
   for (const t of trainings) { trMap.set(t.id, t); for (const p of t.participants) partMap.set(p.id, p); }
 }
+async function fetchDevelopers() {
+  const { data, error } = await sb.from('developers').select('id, first_name, last_name, company_id, stage');
+  if (error) throw error;
+  return data || [];
+}
+function commitDevelopers(devs) {
+  developers = devs || [];
+  devByName.clear();
+  for (const d of developers) { const k = nameKey(d.first_name, d.last_name); if (k) devByName.set(k, d); }
+}
+const matchDev = (p) => devByName.get(nameKey(p.first_name, p.last_name)) || null;
+const devSig = (devs) => JSON.stringify((devs || []).map((d) => [d.id, d.first_name, d.last_name, d.company_id, d.stage]));
 // Sygnatura danych — do wykrycia, czy cokolwiek się zmieniło (bez tego nie ruszamy DOM).
 function sigOf(arr) {
   return JSON.stringify((arr || []).map((t) => [t.id, t.name, t.training_date, t.location, t.description,
     (t.participants || []).map((p) => [p.id, p.first_name, p.last_name, p.position, p.main_project, p.main_technology, p.email, p.phone, p.attendance_confirmed, p.subscription, p.subscription_start_date])]));
 }
 async function loadData() {
-  try { commitTrainings(await fetchTrainings()); }
-  catch (e) { toast('Błąd ładowania', e.message, 'err'); }
+  try {
+    const [trs, devs] = await Promise.all([fetchTrainings(), fetchDevelopers()]);
+    commitTrainings(trs); commitDevelopers(devs);
+  } catch (e) { toast('Błąd ładowania', e.message, 'err'); }
 }
 
 // Ciche auto-odświeżanie: renderuje WYŁĄCZNIE gdy dane serwera różnią się od lokalnych.
@@ -119,10 +151,10 @@ async function pollRefresh() {
   if (root && root.contains(document.activeElement)) return;
   polling = true;
   try {
-    const arr = await fetchTrainings();
-    if (sigOf(arr) !== sigOf(trainings)) {
+    const [arr, devs] = await Promise.all([fetchTrainings(), fetchDevelopers()]);
+    if (sigOf(arr) !== sigOf(trainings) || devSig(devs) !== devSig(developers)) {
       const y = window.scrollY;
-      commitTrainings(arr);
+      commitTrainings(arr); commitDevelopers(devs);
       renderAll();
       window.scrollTo({ top: y });
     }
@@ -140,6 +172,7 @@ async function startRealtime() {
   sb.channel('strefa-szkolenia-list')
     .on('postgres_changes', { event: '*', schema: 'strefa', table: 'participants' }, trigger)
     .on('postgres_changes', { event: '*', schema: 'strefa', table: 'trainings' }, trigger)
+    .on('postgres_changes', { event: '*', schema: 'strefa', table: 'developers' }, trigger)
     .subscribe((status) => { if (status === 'SUBSCRIBED') pollRefresh(); });
   // Bezpiecznik na wypadek zerwania socketu (rzadki fallback) + sync po powrocie do zakładki.
   setInterval(pollRefresh, 60000);
@@ -175,6 +208,17 @@ function cellInner(p, col) {
   const muted = !val ? ' dcell--muted' : '';
   return `<div class="dcell${muted}">${val ? esc(val) : '—'}</div>`;
 }
+// Kolumna „Etap (programista)": select etapu, gdy uczestnik pokrywa się z kimś w /strefa/programisci;
+// inaczej przycisk dodania go do listy programistów (z dialogiem wyboru firmy).
+function devStageCell(p) {
+  const d = matchDev(p);
+  if (!d) {
+    return `<div class="dcell"><button class="strefa-btn strefa-btn--ghost strefa-btn--sm" data-act="add-dev" title="Dodaj do listy programistów">${ICO.plus}<span style="margin-left:.25rem">do programistów</span></button></div>`;
+  }
+  const cur = Math.max(1, Math.min(6, d.stage || 1));
+  const opts = STAGES.map((s) => `<option value="${s.n}"${s.n === cur ? ' selected' : ''}>${s.n} · ${esc(s.name)}</option>`).join('');
+  return `<div class="dcell"><span class="stage-dot" style="background:${stageColor(cur)}"></span><select class="strefa-select part-stage" data-stage-dev="${esc(d.id)}" title="Etap programisty: ${esc(d.first_name)} ${esc(d.last_name)} — zmień">${opts}</select></div>`;
+}
 
 function rowHTML(p, r) {
   const sel = selected.get(p.training_id)?.has(p.id);
@@ -188,6 +232,7 @@ function rowHTML(p, r) {
     <td data-col="main_technology" data-r="${r}" data-c="5">${cellInner(p, 'main_technology')}</td>
     <td data-col="email" data-r="${r}" data-c="6">${cellInner(p, 'email')}</td>
     <td data-col="phone" data-r="${r}" data-c="7">${cellInner(p, 'phone')}</td>
+    <td class="col-devstage">${devStageCell(p)}</td>
     <td class="col-sub"><div class="dcell" data-act="sub" title="Edytuj abonament / notatki" style="cursor:pointer">${subBadge(p)}</div></td>
     <td class="col-actions"><div class="dcell">
       ${p.phone ? `<a class="strefa-iconbtn strefa-iconbtn--call" href="tel:${esc(telHref(p.phone))}" title="Zadzwoń: ${esc(p.phone)}">${ICO.phone}</a>` : ''}
@@ -203,7 +248,7 @@ function gridHTML(t) {
   const rows = parts.map((p, i) => rowHTML(p, i)).join('');
   const body = parts.length
     ? rows
-    : `<tr><td colspan="11" class="dgrid-empty">${query ? 'Brak pasujących uczestników.' : 'Brak uczestników. Dodaj poniżej.'}</td></tr>`;
+    : `<tr><td colspan="12" class="dgrid-empty">${query ? 'Brak pasujących uczestników.' : 'Brak uczestników. Dodaj poniżej.'}</td></tr>`;
   return `
     ${selCount ? `<div class="strefa-toolbar" style="margin-bottom:.6rem">
       <span class="strefa-chip strefa-chip--count">Zaznaczono: ${selCount}</span>
@@ -215,12 +260,12 @@ function gridHTML(t) {
       <table class="dgrid">
         <thead><tr>
           <th class="col-sel"><input type="checkbox" data-sel-all aria-label="Zaznacz wszystkich"></th>
-          <th class="col-check">Obecność</th><th>Imię</th><th>Nazwisko</th><th>Stanowisko</th><th>Główny projekt</th><th>Technologia</th><th>E-mail</th><th>Telefon</th><th>Abonament</th><th class="col-actions"></th>
+          <th class="col-check">Obecność</th><th>Imię</th><th>Nazwisko</th><th>Stanowisko</th><th>Główny projekt</th><th>Technologia</th><th>E-mail</th><th>Telefon</th><th class="col-devstage">Etap (programista)</th><th>Abonament</th><th class="col-actions"></th>
         </tr></thead>
         <tbody>${body}</tbody>
         <tr class="dgrid-add">
           <td></td>
-          <td colspan="10">
+          <td colspan="11">
             <div style="display:flex;gap:.4rem;padding:.35rem .5rem;flex-wrap:wrap;align-items:center">
               <input class="strefa-input" data-add="first_name" placeholder="Imię" style="width:7rem">
               <input class="strefa-input" data-add="last_name" placeholder="Nazwisko" style="width:8rem">
@@ -429,9 +474,16 @@ function bindGrids() {
       }
     });
 
+    // zmiana etapu programisty (select w kolumnie „Etap (programista)")
+    grid.addEventListener('change', (e) => {
+      const sel = e.target.closest('.part-stage');
+      if (sel) changeDevStage(sel);
+    });
+
     // nawigacja klawiaturą
     wrap.addEventListener('keydown', (e) => {
       if (editing) return;
+      if (e.target.closest('select, input, textarea')) return; // strzałki w polach (np. select etapu) nie sterują siatką
       if (!activeTd || !grid.contains(activeTd)) return;
       const td = activeTd; const col = td.dataset.col;
       let r = +td.dataset.r, c = +td.dataset.c; let handled = true;
@@ -533,6 +585,8 @@ async function rowAction(act, pid) {
     const { error } = await sb.from('participants').delete().eq('id', pid);
     if (error) return toast('Błąd', error.message, 'err');
     await loadData(); renderAll(); toast('Usunięto', 'Uczestnik skasowany', 'ok');
+  } else if (act === 'add-dev') {
+    addDevModal(partMap.get(pid));
   } else if (act === 'notes' || act === 'sub') {
     notesModal(pid);
   }
@@ -557,6 +611,68 @@ async function addParticipant(tid, inputs, btn) {
     setTimeout(() => $(`.strefa-tr[data-tid="${tid}"] [data-add="first_name"]`)?.focus(), 30);
     toast('Dodano', 'Uczestnik dopisany', 'ok');
   } finally { adding = false; }
+}
+
+/* ── programista: zmiana etapu + dodanie uczestnika do listy programistów ── */
+async function changeDevStage(sel) {
+  const devId = sel.dataset.stageDev;
+  const stage = Number(sel.value);
+  if (!devId || !(stage >= 1 && stage <= 6)) return;
+  const { error } = await sb.from('developers').update({ stage }).eq('id', devId);
+  if (error) { toast('Błąd', error.message, 'err'); return; }
+  const d = developers.find((x) => x.id === devId);
+  if (d) d.stage = stage;
+  const dot = sel.parentElement?.querySelector('.stage-dot');
+  if (dot) dot.style.background = stageColor(stage);
+  toast('Zapisano', `Etap ${stage} · ${stageName(stage)}`, 'ok');
+}
+
+async function addDevModal(p) {
+  if (!p) return;
+  let comps = [];
+  try {
+    const { data, error } = await sb.from('dev_companies').select('id, name').order('name', { ascending: true });
+    if (error) throw error;
+    comps = data || [];
+  } catch (e) { toast('Błąd', e.message, 'err'); return; }
+  const opts = comps.map((c) => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('') + '<option value="">— bez firmy —</option>';
+  const box = openModal(`
+    <div class="strefa-modal__head">
+      <div><h2>Dodaj do programistów</h2><p>${esc(p.first_name)} ${esc(p.last_name)}</p></div>
+      <button class="strefa-iconbtn" data-close-x>${ICO.x}</button>
+    </div>
+    <div class="strefa-modal__body">
+      <div class="strefa-field" style="margin-bottom:var(--space-md)">
+        <label for="ad-company">Firma</label>
+        <select class="strefa-select" id="ad-company">${opts}</select>
+      </div>
+      <p style="color:var(--color-text-inv-3);font-size:var(--text-caption);margin:0 0 var(--space-lg)">Utworzę profil w „Programiści" na etapie 1 (Początkujący), z danymi z zapisu: stanowisko, projekt, e-mail, telefon.</p>
+      <div class="strefa-actions-row" style="justify-content:flex-end">
+        <button class="strefa-btn strefa-btn--ghost" data-no>Anuluj</button>
+        <button class="strefa-btn strefa-btn--accent" data-yes>Dodaj programistę</button>
+      </div>
+    </div>`);
+  box.querySelectorAll('[data-close-x],[data-no]').forEach((b) => b.addEventListener('click', closeModal));
+  const yes = box.querySelector('[data-yes]');
+  yes.addEventListener('click', async () => {
+    yes.disabled = true;
+    const company_id = box.querySelector('#ad-company').value || null;
+    const { error } = await sb.from('developers').insert({
+      company_id,
+      first_name: p.first_name || '—',
+      last_name: p.last_name || '—',
+      position: p.position || null,
+      main_project: p.main_project || null,
+      email: p.email || null,
+      phone: p.phone || null,
+      stage: 1,
+    });
+    if (error) { toast('Błąd', error.message, 'err'); yes.disabled = false; return; }
+    closeModal();
+    await loadData();
+    renderAll();
+    toast('Dodano', `${p.first_name} ${p.last_name} → Programiści`, 'ok');
+  });
 }
 
 /* ── modal QR samozapisu ── */

@@ -62,6 +62,10 @@
 
 /* ── główny obszar ── */
 .strefa-main { max-width: 92rem; margin: 0 auto; padding: var(--space-xl) var(--container-pad) var(--space-3xl); }
+/* strony tabelowe: tabela + nagłówek na całą szerokość okna (nie wycentrowane) */
+.strefa-main[data-page="szkolenia"], .strefa-main[data-page="programisci"] { max-width: none; }
+body:has(.strefa-main[data-page="szkolenia"]) .strefa-top__inner,
+body:has(.strefa-main[data-page="programisci"]) .strefa-top__inner { max-width: none; }
 .strefa-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-lg); flex-wrap: wrap; margin-bottom: var(--space-xl); }
 .strefa-head h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.6rem, 3vw, 2.4rem); margin: 0 0 .25rem; letter-spacing: -.01em; }
 .strefa-head p { color: var(--color-text-inv-2); margin: 0; font-size: var(--text-s); max-width: 52ch; }
@@ -302,6 +306,10 @@
 .dgrid td.col-stage .dcell { cursor: pointer; }
 .dgrid td.col-skills, .dgrid th.col-skills { width: 9rem; }
 .dgrid td.col-skills .dcell { cursor: pointer; }
+.dgrid td.col-devstage, .dgrid th.col-devstage { width: 13rem; }
+.dgrid td.col-devstage .dcell { cursor: default; gap: .4rem; overflow: visible; }
+.dgrid td.col-devstage .strefa-select { padding: .25rem 1.7rem .25rem .55rem; font-size: var(--text-caption); }
+.dgrid .stage-dot { width: .6rem; height: .6rem; border-radius: 50%; flex: 0 0 auto; }
 
 /* chip etapu (kolor zależny od --sc) */
 .stage-chip {

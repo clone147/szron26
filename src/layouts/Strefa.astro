@@ -37,7 +37,7 @@ const { title = 'Strefa SZRON', active = '' } = Astro.props;
         </div>
       </div>
     </header>
-    <main class="strefa-main">
+    <main class="strefa-main" data-page={active}>
       <slot />
     </main>
   </div>
