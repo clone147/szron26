@@ -1,15 +1,22 @@
 ---
+import { getCollection } from 'astro:content';
 import Interior from '../layouts/Interior.astro';
 import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()
+);
+const MIESIACE_PL = ['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
+const fmt = (d) => `${d.getDate()} ${MIESIACE_PL[d.getMonth()]} ${d.getFullYear()}`;
 ---
 <Interior
   title="Blog — AI dla programistów | SZRON"
-  description="Praktyczne wpisy o narzędziach AI do kodowania: Cursor, Claude Code, Copilot, Codex, Gemini CLI, MCP. Porównania i wnioski z prawdziwych projektów — wkrótce."
-  eyebrow="Blog · wkrótce startujemy"
+  description="Praktyczne wpisy o narzędziach AI do kodowania: Cursor, Claude Code, Copilot, MCP, wdrożenia w zespołach dev. Porównania i wnioski z prawdziwych projektów."
+  eyebrow="Blog · AI dla programistów"
   heading="Blog SZRON. AI dla programistów, bez marketingu."
-  lead="Szykujemy miejsce na praktyczne wpisy o narzędziach AI do kodowania — porównania, wdrożenia i wnioski z prawdziwych projektów. Pierwsze teksty są w drodze. Zanim ruszą, najwięcej konkretu znajdziesz w Akademii i w naszych case studies."
+  lead="Praktyczne wpisy o narzędziach AI do kodowania — porównania, wdrożenia i wnioski z prawdziwych projektów. Piszemy to, co sami chcielibyśmy czytać."
 >
   <!-- proof -->
   <ProofStrip items={[
@@ -18,26 +25,30 @@ import CtaBand from '../components/CtaBand.astro';
     ['Bez marketingu', 'piszemy to, co sami chcielibyśmy czytać'],
   ]} />
 
-  <!-- 01 empty state -->
-  <section class="sect" aria-labelledby="wkrotce">
+  <!-- 01 wpisy -->
+  <section class="sect" aria-labelledby="wpisy">
     <div class="container">
-      <SectHead eyebrow="01 / Status · Wpisy w drodze" title="Pierwsze wpisy publikujemy wkrótce." id="wkrotce" small />
-      <div class="prose rv">
-        <p>Blog dopiero startuje — nie chcemy zapełniać go treścią dla samej treści. Zamiast tego przygotowujemy wpisy o tym, czym faktycznie zajmujemy się na co dzień: narzędziach AI do kodowania, sposobach pracy z agentami i wnioskach z konkretnych wdrożeń.</p>
-        <div class="callout"><p><strong>O czym będziemy pisać:</strong> porównania narzędzi (Cursor, Claude Code, Copilot, Codex, Gemini CLI), Context Engineering i MCP, wdrożenia AI w zespołach dev oraz wnioski z prawdziwych projektów.</p></div>
-        <p>Zanim opublikujemy pierwsze teksty, najwięcej praktycznej wiedzy znajdziesz w Akademii — to tam dzielimy się tym, czego uczymy na warsztatach. Konkretne efekty wdrożeń pokazujemy z kolei w case studies.</p>
+      <SectHead eyebrow={`01 / Wpisy · ${posts.length} tekstów`} title="Najnowsze wpisy." id="wpisy" small />
+      <div class="link-cards rv" style="grid-template-columns:repeat(auto-fill,minmax(20rem,1fr))">
+        {posts.map((p) => (
+          <a class="link-card" href={`/blog/${p.id}`}>
+            <p class="eyebrow" style="margin-bottom:.5rem">{p.data.category} · {fmt(p.data.publishedAt)}</p>
+            <h3>{p.data.title}</h3>
+            <p>{p.data.excerpt}</p>
+          </a>
+        ))}
       </div>
     </div>
   </section>
 
-  <!-- 02 w międzyczasie (ciemna) -->
+  <!-- 02 więcej konkretu (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="tymczasem">
     <div class="container">
-      <SectHead eyebrow="02 / W międzyczasie · Gdzie szukać konkretu" title="Zanim ruszy blog, zajrzyj tutaj." id="tymczasem" />
+      <SectHead eyebrow="02 / Więcej konkretu · Akademia i case studies" title="Blog to wycinek — reszta jest tutaj." id="tymczasem" />
       <div class="link-cards rv">
         <a class="link-card" href="/akademia">
           <h3>Akademia SZRON</h3>
-          <p>Program szkoleń z programowania z agentami AI — od podstaw po Context Engineering i MCP. Praktyka, którą później opiszemy też na blogu.</p>
+          <p>Program szkoleń z programowania z agentami AI — od podstaw po Context Engineering i MCP.</p>
         </a>
         <a class="link-card" href="/case-studies">
           <h3>Case studies</h3>
@@ -55,7 +66,7 @@ import CtaBand from '../components/CtaBand.astro';
   <CtaBand
     eyebrow="Kontakt"
     heading="Masz temat, o którym chciałbyś przeczytać? Powiedz nam."
-    text="Nie czekaj na pierwszy wpis — jeśli mierzysz się z konkretnym problemem przy AI w zespole, umów rozmowę. Odpowiemy wprost, a przy okazji podpowiemy, gdzie zacząć w Akademii."
+    text="Jeśli mierzysz się z konkretnym problemem przy AI w zespole, umów rozmowę. Odpowiemy wprost, a przy okazji podpowiemy, gdzie zacząć w Akademii."
     btnLabel="Zarezerwuj termin"
   />
 </Interior>

@@ -1,0 +1,113 @@
+---
+import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Faq from '../components/Faq.astro';
+
+const faq = [
+  { q: 'Ile kosztuje Context7?', a: 'Jest darmowy do użytku osobistego. API key (również darmowy) zwiększa limity requestów — pobierzesz go z context7.com/dashboard.' },
+  { q: 'Czy działa offline?', a: 'Nie. Context7 pobiera aktualną dokumentację ze źródeł oficjalnych przy każdym zapytaniu, więc wymaga połączenia z internetem.' },
+  { q: 'Jakie biblioteki są wspierane?', a: 'Ponad 6000 bibliotek i frameworków: JavaScript/TypeScript, Python, Go, Rust, Java, C#, PHP, Ruby — w tym React, Next.js, FastAPI i wiele innych.' },
+  { q: 'Jak często dokumentacja się aktualizuje?', a: 'W czasie rzeczywistym — Context7 pobiera najnowszą dokumentację przy każdym zapytaniu.' },
+  { q: 'Czy mogę dodać własną bibliotekę?', a: 'Tak — przez formularz na context7.com/add-package albo Pull Request na GitHubie projektu.' },
+  { q: 'Czy Context7 rozumie wersje bibliotek?', a: 'Tak. Podaj wersję w promptcie (np. „Next.js 14"), a dostaniesz dokumentację dla tej konkretnej wersji.' },
+];
+---
+<Interior
+  updated="2026-07-02"
+  title="Context7 + Claude Code — aktualna dokumentacja w promptach | Akademia SZRON"
+  description="Context7 to serwer MCP dostarczający aktualną dokumentację 6000+ bibliotek prosto do promptów AI. Instalacja (HTTP, npx, Docker), użycie, troubleshooting i FAQ."
+  eyebrow="Akademia · Context7 MCP"
+  heading="Context7: aktualna dokumentacja bibliotek prosto w promptach."
+  lead="Model językowy zna biblioteki z dnia odcięcia wiedzy — Context7 to serwer MCP od Upstash, który przy każdym zapytaniu dociąga świeżą, wersjonowaną dokumentację ze źródeł oficjalnych. Koniec z halucynowanym API: dopisujesz „use context7&quot; na końcu prompta i agent pracuje na faktach."
+  headingSmall
+>
+  <!-- proof -->
+  <ProofStrip items={[
+    ['6000+', 'wspieranych bibliotek i frameworków'],
+    ['Real-time', 'dokumentacja pobierana przy każdym zapytaniu'],
+    ['Darmowy', 'do użytku osobistego, z API key wyższe limity'],
+  ]} />
+
+  <!-- 01 treść -->
+  <section class="sect" aria-labelledby="intro">
+    <div class="container">
+      <SectHead eyebrow="01 / Narzędzie · Czym jest Context7" title="Mostek między AI a aktualną dokumentacją." id="intro" small />
+
+      <div class="prose rv">
+        <p>Context7 to serwer MCP, który dostarcza aktualną dokumentację i przykłady kodu bezpośrednio do promptów AI. Zamiast polegać na nieaktualnej wiedzy modelu, dynamicznie pobiera dokumentację ze źródeł oficjalnych przy każdym zapytaniu. Pod spodem działa pięcioetapowy pipeline: parsowanie źródeł (Markdown, MDX, Jupyter), wzbogacanie metadanymi przez LLM, embeddingi do semantic search, autorski reranking i cache w Redisie z sub-milisekundowym czasem odpowiedzi.</p>
+        <div class="callout"><p><strong>TL;DR:</strong> pobierz darmowy API key z <a href="https://context7.com/dashboard" target="_blank" rel="noopener">context7.com/dashboard</a> → <code>claude mcp add context7 -- npx -y @upstash/context7-mcp --api-key TWÓJ_KLUCZ</code> → restart Claude Code → dopisuj <code>use context7</code> na końcu promptów.</p></div>
+
+        <h2>Co to daje w praktyce</h2>
+        <ul>
+          <li><strong>Eliminuje halucynacje API.</strong> Agent dostaje zweryfikowane, aktualne sygnatury i przykłady ze źródeł oficjalnych — nie zgaduje z pamięci.</li>
+          <li><strong>Zero przełączania kontekstu.</strong> Dokumentacja przychodzi do prompta; nie skaczesz między edytorem a przeglądarką.</li>
+          <li><strong>Specyficzność wersji.</strong> Dokumentacja dla konkretnej wersji biblioteki, którą faktycznie masz w projekcie.</li>
+          <li><strong>Lepszy kod od ręki.</strong> AI generuje kod zgodny z bieżącymi najlepszymi praktykami danego frameworka.</li>
+        </ul>
+
+        <h2>Instalacja — trzy metody</h2>
+        <h3>1. HTTP transport (zalecana)</h3>
+        <p>Najprostsza konfiguracja — nie wymaga Node.js lokalnie. Potrzebny darmowy API key z <a href="https://context7.com/dashboard" target="_blank" rel="noopener">context7.com/dashboard</a> (załóż konto → skopiuj klucz).</p>
+        <pre><code>claude mcp add --transport http context7 https://mcp.context7.com/mcp \
+  --header "CONTEXT7_API_KEY: TWÓJ_KLUCZ"</code></pre>
+
+        <h3>2. Stdio transport (npx)</h3>
+        <p>Wymaga Node.js ≥ 18 oraz API key.</p>
+        <pre><code>claude mcp add context7 -- npx -y @upstash/context7-mcp --api-key TWÓJ_KLUCZ</code></pre>
+
+        <h3>3. Docker</h3>
+        <pre><code>docker pull mcp/context7
+docker run -i --rm mcp/context7</code></pre>
+
+        <h3>Weryfikacja</h3>
+        <pre><code>claude mcp list</code></pre>
+        <div class="callout"><p><strong>Wskazówka:</strong> po instalacji zrestartuj Claude Code, żeby zmiany weszły w życie.</p></div>
+
+        <h2>Jak używać</h2>
+        <p>Dodaj <code>use context7</code> na końcu prompta:</p>
+        <pre><code>Create a basic Next.js project with app router. use context7
+
+Implement FastAPI authentication. use context7</code></pre>
+        <ul>
+          <li><strong>„use context7" na końcu prompta</strong> — AI najpierw rozumie zadanie, potem dociąga dokumentację.</li>
+          <li><strong>Określaj wersję, gdy możesz</strong> — np. <code>Create a Next.js 14 project. use context7</code>.</li>
+          <li><strong>Dodawaj słowa kluczowe tematu</strong> — np. <code>React hooks best practices for state. use context7</code>.</li>
+          <li><strong>Weryfikuj źródła przy krytycznym kodzie</strong> — Context7 podaje skąd wziął dokumentację.</li>
+        </ul>
+
+        <h2>Rozwiązywanie problemów</h2>
+        <h3>Connection failed — spawn ENOENT</h3>
+        <p><code>spawn npx -y @upstash/context7-mcp@latest ENOENT</code> — sprawdź, czy Node.js ≥ 18 i npx są zainstalowane i w <code>PATH</code>. Alternatywnie przejdź na HTTP transport.</p>
+        <h3>MCP error -32000 (connection closed)</h3>
+        <p>Najprościej: użyj HTTP transportu — <code>claude mcp add --transport http context7 https://mcp.context7.com/mcp</code>.</p>
+        <h3>Działa, a po chwili „red status"</h3>
+        <p>Zrestartuj Claude Code, sprawdź logi (<code>claude mcp logs context7</code>) i zaktualizuj serwer do najnowszej wersji.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 FAQ (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="faq">
+    <div class="container">
+      <SectHead eyebrow="02 / FAQ · Najczęstsze pytania" title="Pytania o Context7." id="faq" />
+      <Faq items={faq} />
+    </div>
+  </section>
+
+  <!-- 03 powiązane szkolenia -->
+  <section class="sect" aria-labelledby="powiazane">
+    <div class="container">
+      <SectHead eyebrow="03 / Akademia · Czytaj dalej" title="Powiązane szkolenia." id="powiazane" small />
+      <div class="link-cards rv">
+        <a class="link-card" href="/serwery-mcp"><h3>Serwery MCP</h3><p>Chrome DevTools MCP i ekosystem serwerów MCP w codziennej pracy.</p></a>
+        <a class="link-card" href="/szkolenie-supabase-mcp"><h3>MCP Supabase</h3><p>Połączenie agenta z bazą Supabase — tryb read-only i bezpieczeństwo.</p></a>
+        <a class="link-card" href="/claude-code"><h3>Claude Code</h3><p>Instalacja, poziomy myślenia, workflow agentowy od podstaw.</p></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <CtaBand heading="Chcecie, żeby tak pracował cały Wasz zespół?" padTop={false} />
+</Interior>

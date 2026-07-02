@@ -1,0 +1,56 @@
+---
+import { getCollection, render } from 'astro:content';
+import Interior from '../../layouts/Interior.astro';
+import SectHead from '../../components/SectHead.astro';
+import CtaBand from '../../components/CtaBand.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post, posts } }));
+}
+
+const { post, posts } = Astro.props;
+const { Content } = await render(post);
+const iso = post.data.publishedAt.toISOString().slice(0, 10);
+const related = posts
+  .filter((p) => p.id !== post.id)
+  .sort((a, b) => (b.data.category === post.data.category ? 1 : 0) - (a.data.category === post.data.category ? 1 : 0))
+  .slice(0, 3);
+---
+<Interior
+  updated={iso}
+  title={`${post.data.title} | Blog SZRON`}
+  description={post.data.excerpt}
+  eyebrow={`Blog · ${post.data.category}`}
+  heading={post.data.title}
+  lead={post.data.excerpt}
+  headingSmall
+>
+  <!-- 01 treść wpisu -->
+  <section class="sect" aria-label="Treść wpisu">
+    <div class="container">
+      <div class="prose rv">
+        <Content />
+        <p><em>{post.data.author}</em></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 czytaj dalej (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="dalej">
+    <div class="container">
+      <SectHead eyebrow="02 / Blog · Czytaj dalej" title="Inne wpisy." id="dalej" small />
+      <div class="link-cards rv">
+        {related.map((p) => (
+          <a class="link-card" href={`/blog/${p.id}`}>
+            <h3>{p.data.title}</h3>
+            <p>{p.data.excerpt}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <CtaBand heading="Chcecie wdrożyć to u siebie? Porozmawiajmy." padTop={false} />
+</Interior>
