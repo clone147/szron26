@@ -1,5 +1,8 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
 import { akademia } from '../data/akademia.mjs';
 const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mcp'].includes(a.slug));
 ---
@@ -12,23 +15,16 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
   lead="Codex CLI to open-source agent kodujący napędzany rodziną GPT-5-Codex: buduje projekty od zera, refaktoryzuje, debuguje i integruje się z MCP. Poniżej instalacja, plik konfiguracyjny, tryby zatwierdzania i komendy, które realnie wykorzystujemy."
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>GPT-5.x</strong><span>rekomendowana rodzina modeli</span></div>
-        <div><strong>Open-source</strong><span>licencja Apache 2.0</span></div>
-        <div><strong>Rust</strong><span>natywny binarny CLI</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['GPT-5.x', 'rekomendowana rodzina modeli'],
+    ['Open-source', 'licencja Apache 2.0'],
+    ['Rust', 'natywny binarny CLI'],
+  ]} />
 
   <!-- 01 czym jest -->
   <section class="sect" aria-labelledby="czym">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Wprowadzenie · Czym jest</p>
-        <h2 class="sect-title sect-title--s ws" id="czym">Agent, który prowadzi projekt od zera po produkcję.</h2>
-      </div>
+      <SectHead eyebrow="01 / Wprowadzenie · Czym jest" title="Agent, który prowadzi projekt od zera po produkcję." id="czym" small />
       <div class="prose rv">
         <p>OpenAI Codex CLI to agent do autonomicznego kodowania w terminalu. Open-source na licencji Apache 2.0, napisany w Rust, działa na macOS, Linux i Windows. Modelu nie musisz wybierać — po zalogowaniu kontem ChatGPT Codex sam sięga po rekomendowany wariant z rodziny GPT-5.x. Stan na połowę 2026: domyślnym punktem startu jest GPT-5.5 (najnowszy model frontier), obok niego GPT-5.4 i szybszy GPT-5.4-mini. Dedykowana linia „-codex" (gpt-5.3-codex, gpt-5.2) została w maju 2026 wycofana z listy wyboru dla logujących się przez ChatGPT. GPT-5-Codex z września 2025 oraz o3 i codex-1 to już zamknięty rozdział.</p>
         <p>Kluczowe możliwości:</p>
@@ -49,10 +45,7 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
   <!-- 02 model (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="model">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Model · GPT-5.x</p>
-        <h2 class="sect-title ws" id="model">Rodzina modeli pod inżynierię oprogramowania.</h2>
-      </div>
+      <SectHead eyebrow="02 / Model · GPT-5.x" title="Rodzina modeli pod inżynierię oprogramowania." id="model" />
       <div class="prose rv">
         <p>Codex nie jest przywiązany do jednego modelu. Domyślnie bierze rekomendowany wariant rodziny GPT-5.x, a Ty przełączasz się między nimi w locie — komendą <code>/model</code>. Stan na połowę 2026:</p>
         <ul>
@@ -69,10 +62,7 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
   <!-- 03 instalacja -->
   <section class="sect" aria-labelledby="instalacja">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Instalacja · macOS, Linux, WSL</p>
-        <h2 class="sect-title sect-title--s ws" id="instalacja">Node.js 22+, a potem jedna komenda npm.</h2>
-      </div>
+      <SectHead eyebrow="03 / Instalacja · macOS, Linux, WSL" title="Node.js 22+, a potem jedna komenda npm." id="instalacja" small />
       <div class="prose rv">
         <h3>Wymagania systemowe</h3>
         <ul>
@@ -108,10 +98,7 @@ sudo apt-get install -y nodejs</code></pre>
   <!-- 04 konfiguracja (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="konfiguracja">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Konfiguracja · config.toml</p>
-        <h2 class="sect-title ws" id="konfiguracja">Jeden plik TOML: model, tryb i serwery MCP.</h2>
-      </div>
+      <SectHead eyebrow="04 / Konfiguracja · config.toml" title="Jeden plik TOML: model, tryb i serwery MCP." id="konfiguracja" />
       <div class="prose rv">
         <p>Plik konfiguracyjny: <code>~/.codex/config.toml</code>.</p>
         <h3>1. Domyślny model</h3>
@@ -141,10 +128,7 @@ bearer_token_env_var = "FIGMA_OAUTH_TOKEN"</code></pre>
   <!-- 05 komendy -->
   <section class="sect" aria-labelledby="komendy">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>05 / Komendy · Uruchamianie i sesja</p>
-        <h2 class="sect-title sect-title--s ws" id="komendy">Od trybu interaktywnego po konkretny prompt.</h2>
-      </div>
+      <SectHead eyebrow="05 / Komendy · Uruchamianie i sesja" title="Od trybu interaktywnego po konkretny prompt." id="komendy" small />
       <div class="prose rv">
         <h3>Uruchamianie</h3>
         <pre><code>codex                                  # tryb interaktywny
@@ -176,10 +160,7 @@ codex resume                           # wznowienie sesji</code></pre>
   <!-- 06 MCP (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="mcp">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>06 / MCP · Kontrola przeglądarki</p>
-        <h2 class="sect-title ws" id="mcp">ChromeDevTools MCP — Codex steruje Chrome.</h2>
-      </div>
+      <SectHead eyebrow="06 / MCP · Kontrola przeglądarki" title="ChromeDevTools MCP — Codex steruje Chrome." id="mcp" />
       <div class="prose rv">
         <p>Model Context Protocol to otwarty standard stworzony przez Anthropic, który pozwala agentom AI na bezpieczną integrację z narzędziami zewnętrznymi. ChromeDevTools MCP daje Codex pełną kontrolę przeglądarki Chrome — nawigację, wypełnianie formularzy, testowanie UI, screenshoty, debugowanie i wykonywanie JavaScript.</p>
         <h3>Instalacja MCP</h3>
@@ -203,10 +184,7 @@ args = ["chrome-devtools-mcp&#64;latest"]</code></pre>
   <!-- powiazane szkolenia -->
   <section class="sect" aria-labelledby="powiazane" style="padding-top:0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>Powiązane szkolenia</p>
-        <h2 class="sect-title sect-title--s ws" id="powiazane">Czytaj dalej w Akademii.</h2>
-      </div>
+      <SectHead eyebrow="Powiązane szkolenia" title="Czytaj dalej w Akademii." id="powiazane" small />
       <div class="link-cards rv">
         {related.map((a) => (
           <a class="link-card" href={`/${a.slug}`}>
@@ -219,20 +197,5 @@ args = ["chrome-devtools-mcp&#64;latest"]</code></pre>
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie tak pracować całym zespołem?</h2>
-      <p class="rv">Akademia to materiały. Wdrożenie to dwa kwartały na Waszym kodzie — z pomiarem efektu w DEVLens. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand heading="Chcecie tak pracować całym zespołem?" />
 </Interior>

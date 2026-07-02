@@ -1,5 +1,8 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
 ---
 <Interior
   title="Webinar: AI Strategy dla zarządu | SZRON"
@@ -11,23 +14,16 @@ import Interior from '../layouts/Interior.astro';
   heroAlt="Ciemny oszroniony ekran audytorium świecący pomarańczowo"
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>45 minut</strong><span>godz. 10:00–10:45, termin wkrótce</span></div>
-        <div><strong>Dla C-level</strong><span>CEO, CTO, CFO, zarząd</span></div>
-        <div><strong>Bezpłatnie</strong><span>nagranie również dla zapisanych</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['45 minut', 'godz. 10:00–10:45, termin wkrótce'],
+    ['Dla C-level', 'CEO, CTO, CFO, zarząd'],
+    ['Bezpłatnie', 'nagranie również dla zapisanych'],
+  ]} />
 
   <!-- 01 agenda (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="agenda">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Agenda · Co się wydarzy</p>
-        <h2 class="sect-title ws" id="agenda">Agenda webinaru — 45 minut, cztery bloki.</h2>
-      </div>
+      <SectHead eyebrow="01 / Agenda · Co się wydarzy" title="Agenda webinaru — 45 minut, cztery bloki." id="agenda" />
       <div class="steps">
         <article class="step rv"><p class="eyebrow">0–10 min · Dlaczego teraz?</p><h3>Co się zmieniło w AI</h3><p>Co się zmieniło w AI w ostatnim roku i dlaczego tempo przyspiesza. Konkretne przykłady z polskiego rynku.</p></article>
         <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">10–25 min · 4 błędy</p><h3>Czego unikać</h3><p>Błędy, które widzę u firm wchodzących w AI. Większość da się uniknąć — jeśli wiesz, na co uważać.</p></article>
@@ -40,10 +36,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 co wyniesiesz -->
   <section class="sect" aria-labelledby="korzysci">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Korzyści · Co wyniesiesz</p>
-        <h2 class="sect-title sect-title--s ws" id="korzysci">Co wyniesiesz z webinaru.</h2>
-      </div>
+      <SectHead eyebrow="02 / Korzyści · Co wyniesiesz" title="Co wyniesiesz z webinaru." id="korzysci" small />
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">01 / Gdzie AI zarabia</p>
@@ -77,10 +70,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 03 prowadzący (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="prowadzacy">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Prowadzący · Kto poprowadzi</p>
-        <h2 class="sect-title ws" id="prowadzacy">Prowadzący.</h2>
-      </div>
+      <SectHead eyebrow="03 / Prowadzący · Kto poprowadzi" title="Prowadzący." id="prowadzacy" />
       <div class="team rv">
         <article class="person">
           <div class="person__head">
@@ -97,20 +87,10 @@ import Interior from '../layouts/Interior.astro';
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Nie chcesz czekać na webinar?</h2>
-      <p class="rv">Umów indywidualną rozmowę — odpowiemy na Twoje pytania od razu. A jeśli nie możesz dołączyć na żywo, zapisz się mimo to: wyślemy nagranie po webinarze.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę teraz
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="Nie chcesz czekać na webinar?"
+    text="Umów indywidualną rozmowę — odpowiemy na Twoje pytania od razu. A jeśli nie możesz dołączyć na żywo, zapisz się mimo to: wyślemy nagranie po webinarze."
+    btnLabel="Umów rozmowę teraz"
+  />
 </Interior>

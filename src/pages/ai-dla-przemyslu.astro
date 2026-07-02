@@ -1,5 +1,9 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import BtnArrow from '../components/BtnArrow.astro';
+import CtaBand from '../components/CtaBand.astro';
 ---
 <Interior
   title="Modernizacja systemów przemysłowych — HMI/SCADA | SZRON"
@@ -13,10 +17,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 01 problem legacy -->
   <section class="sect" aria-labelledby="legacy">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Problem · Długowieczne aplikacje przemysłowe</p>
-        <h2 class="sect-title sect-title--s ws" id="legacy">Aplikacje rozwijane dwadzieścia, trzydzieści lat.</h2>
-      </div>
+      <SectHead eyebrow="01 / Problem · Długowieczne aplikacje przemysłowe" title="Aplikacje rozwijane dwadzieścia, trzydzieści lat." id="legacy" small />
       <div class="prose rv">
         <p>W przemyśle kod żyje dłużej niż maszyny, którymi steruje. Panel operatorski na bazie Qt 5 z mieszanką QWidget i QML, sterownik napisany pod konkretne urządzenie, SCADA z setkami tagów mapowanych ręcznie w Excelu — wszystko to działa, więc nikt tego nie rusza. A koszt utrzymania rośnie z każdym rokiem.</p>
         <p>Najczęściej spotykamy te same trzy objawy.</p>
@@ -44,27 +45,19 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 case HMI (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="case">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Realizacja · Panel HMI w energetyce</p>
-        <h2 class="sect-title ws" id="case">Nowy moduł w istniejącym panelu HMI. Dwa tygodnie. Klient kontynuuje sam.</h2>
-      </div>
+      <SectHead eyebrow="02 / Realizacja · Panel HMI w energetyce" title="Nowy moduł w istniejącym panelu HMI. Dwa tygodnie. Klient kontynuuje sam." id="case" />
       <p class="rv">Operator infrastruktury energetycznej średniego napięcia potrzebował nowego modułu raportowania w panelu operatorskim Qt/QML, działającym na stanowiskach w stacjach rozdzielczych. Moduł odkładany od półtora roku. Od pierwszego szkicu interfejsu do podpisu odbioru — dwa tygodnie. Migrację Qt 5 → Qt 6 zrobiliśmy przy okazji.</p>
       <figure class="quote-card rv">
         <blockquote>Nie zbudowaliśmy „panelu raportów" — zbudowaliśmy wzorzec, który zespół powiela. Pierwszy widok zrobiliśmy razem. Drugi zrobili sami, po code review wewnątrz zespołu. Trzeci i czwarty — nie wiedzieliśmy nawet, że już powstały, dopóki nie zobaczyliśmy ich w raporcie po trzech miesiącach.</blockquote>
         <figcaption><strong>Dlaczego to się udało</strong> — wniosek SZRON</figcaption>
       </figure>
-      <div class="proof-strip rv">
-        <div><strong>3–4× szybciej</strong><span>2 tygodnie zamiast 6–8 w wewnętrznym zespole</span></div>
-        <div><strong>3 widoki samodzielnie</strong><span>dorobione przez zespół po naszym wyjściu</span></div>
-        <div><strong>0% → 41%</strong><span>pokrycie testami QML</span></div>
-      </div>
+      <ProofStrip wrap={false} items={[
+        ['3–4× szybciej', '2 tygodnie zamiast 6–8 w wewnętrznym zespole'],
+        ['3 widoki samodzielnie', 'dorobione przez zespół po naszym wyjściu'],
+        ['0% → 41%', 'pokrycie testami QML'],
+      ]} />
       <div class="contact__cta rv">
-        <a class="btn btn--ghost" href="/case-studies/hmi">Pełny case: panel HMI w energetyce
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
+        <BtnArrow class="btn btn--ghost" href="/case-studies/hmi">Pełny case: panel HMI w energetyce</BtnArrow>
       </div>
     </div>
   </section>
@@ -72,10 +65,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 03 co modernizujemy -->
   <section class="sect" aria-labelledby="zakres">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Zakres · Co modernizujemy i jak</p>
-        <h2 class="sect-title sect-title--s ws" id="zakres">Co modernizujemy i jak.</h2>
-      </div>
+      <SectHead eyebrow="03 / Zakres · Co modernizujemy i jak" title="Co modernizujemy i jak." id="zakres" small />
       <dl class="def-rows rv">
         <div><dt>Panele HMI / SCADA<small>Qt 6 / QML, OPC UA</small></dt><dd>Migracja Qt 5 → Qt 6, wzorzec MVVM ze ścisłym rozdziałem logiki i widoku, integracja z istniejącą warstwą SCADA przez OPC UA. Eksport CSV, wizualizacja trendów.</dd></div>
         <div><dt>Sterowniki urządzeń<small>Firmware embedded</small></dt><dd>Kod sterujący konkretnym urządzeniem, często pisany pod jeden projekt. Porządkujemy strukturę, dodajemy testy, wypinamy logikę z warstwy sprzętowej — żeby dało się go rozwijać.</dd></div>
@@ -88,10 +78,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 04 ciągłość i bezpieczeństwo (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="ciaglosc">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Ruch · Ciągłość i bezpieczeństwo</p>
-        <h2 class="sect-title ws" id="ciaglosc">Modernizacja bez przerywania ruchu.</h2>
-      </div>
+      <SectHead eyebrow="04 / Ruch · Ciągłość i bezpieczeństwo" title="Modernizacja bez przerywania ruchu." id="ciaglosc" />
       <div class="callout rv">
         <p><strong>Zasada nadrzędna:</strong> system, który steruje produkcją, nie może zatrzymać się na czas migracji. Pracujemy tak, by w każdym momencie istniała działająca, sprawdzona wersja — a nowa wchodziła dopiero po testach na realnych danych.</p>
       </div>
@@ -107,33 +94,20 @@ import Interior from '../layouts/Interior.astro';
   <!-- 05 proof czasów dostarczania -->
   <section class="sect" aria-labelledby="czasy">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>05 / Tempo · Czasy dostarczania</p>
-        <h2 class="sect-title sect-title--s ws" id="czasy">Ile to trwa.</h2>
-      </div>
-      <div class="proof-strip rv">
-        <div><strong>30 minut</strong><span>bezpłatna diagnoza Waszego systemu</span></div>
-        <div><strong>2 tygodnie</strong><span>pilotażowy sprint — pierwszy zmodernizowany moduł</span></div>
-        <div><strong>1–3 miesiące</strong><span>pełne wdrożenie, zależnie od skali stacku</span></div>
-      </div>
+      <SectHead eyebrow="05 / Tempo · Czasy dostarczania" title="Ile to trwa." id="czasy" small />
+      <ProofStrip wrap={false} items={[
+        ['30 minut', 'bezpłatna diagnoza Waszego systemu'],
+        ['2 tygodnie', 'pilotażowy sprint — pierwszy zmodernizowany moduł'],
+        ['1–3 miesiące', 'pełne wdrożenie, zależnie od skali stacku'],
+      ]} />
     </div>
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Wasz system przemysłowy też wymaga modernizacji?</h2>
-      <p class="rv">30-minutowa rozmowa — pokażemy, czy migrację da się ogarnąć przy okazji nowego modułu, czy wymaga osobnego sprintu. Z transferem wiedzy włącznie.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę 30 min
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="Wasz system przemysłowy też wymaga modernizacji?"
+    text="30-minutowa rozmowa — pokażemy, czy migrację da się ogarnąć przy okazji nowego modułu, czy wymaga osobnego sprintu. Z transferem wiedzy włącznie."
+    btnLabel="Umów diagnozę 30 min"
+  />
 </Interior>

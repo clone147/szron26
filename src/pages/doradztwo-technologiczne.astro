@@ -1,5 +1,16 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+// FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html)
+const faq = [
+  { q: 'Czy musimy najpierw przejść dwa kwartały transformacji?', a: 'Nie. Doradztwo działa też samodzielnie — zaczynamy wtedy od pomiaru DEVLens i przeglądu technologii. Kwartał transformacji można dołożyć później, jeśli z danych wyjdzie, że ma sens.' },
+  { q: 'Jak zmierzycie, że doradztwo działa?', a: 'Tak jak wszystko u nas — w danych. DEVLens pokazuje produktywność zespołu w czasie, a roadmapa ma mierzalne punkty kontrolne: koszty licencji, czas dostarczania, liczba technologii w użyciu.' },
+  { q: 'Czym to się różni od zatrudnienia CTO albo architekta?', a: 'Nie zastępujemy Waszych ludzi — dajemy zarządowi niezależny głos z zewnątrz, bez polityki etatu i bez własnego interesu w wyborze technologii. A gdy trzeba, siadamy do kodu razem z zespołem.' },
+];
 ---
 <Interior
   title="Doradztwo technologiczne — doradca zarządu | SZRON"
@@ -11,23 +22,16 @@ import Interior from '../layouts/Interior.astro';
   heroAlt="Świetlista ścieżka obwodów wijąca się przez pole szronu"
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Jedna roadmapa</strong><span>technologiczna — zamiast osobnych tematów</span></div>
-        <div><strong>Decyzje na pomiarach</strong><span>DEVLens — dane z repozytoriów, nie opinie</span></div>
-        <div><strong>Bez uzależnienia</strong><span>od dostawcy — także od nas</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['Jedna roadmapa', 'technologiczna — zamiast osobnych tematów'],
+    ['Decyzje na pomiarach', 'DEVLens — dane z repozytoriów, nie opinie'],
+    ['Bez uzależnienia', 'od dostawcy — także od nas'],
+  ]} />
 
   <!-- 01 dla kogo -->
   <section class="sect" aria-labelledby="dlakogo">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Dla kogo · Sytuacja zarządu</p>
-        <h2 class="sect-title sect-title--s ws" id="dlakogo">Decyzje technologiczne zapadają u Was tak, jak dziesięć lat temu?</h2>
-      </div>
+      <SectHead eyebrow="01 / Dla kogo · Sytuacja zarządu" title="Decyzje technologiczne zapadają u Was tak, jak dziesięć lat temu?" id="dlakogo" small />
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">a</p>
@@ -51,10 +55,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 zakres (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="zakres">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Zakres · Co dostajecie</p>
-        <h2 class="sect-title ws" id="zakres">Zewnętrzny dział B+R. Bez kosztów etatów, bez polityki.</h2>
-      </div>
+      <SectHead eyebrow="02 / Zakres · Co dostajecie" title="Zewnętrzny dział B+R. Bez kosztów etatów, bez polityki." id="zakres" />
       <dl class="def-rows rv">
         <div><dt>Roadmapa technologiczna<small>Jeden plan zamiast osobnych tematów</small></dt><dd>Kwartalne przeglądy: modernizacja, AI, bezpieczeństwo, licencje i sprzęt spięte w jeden kierunek z priorytetami i budżetem.</dd></div>
         <div><dt>Pomiar produktywności<small>DEVLens — dane, nie opinie</small></dt><dd>Wykresy produktywności zespołu wprost z repozytoriów Git i SVN. Zarząd widzi efekt każdej decyzji technologicznej w danych.</dd></div>
@@ -68,10 +69,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 03 logika -->
   <section class="sect" aria-labelledby="logika">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Logika · Nowa logika wyboru technologii</p>
-        <h2 class="sect-title sect-title--s ws" id="logika">Technologia pod skuteczność agenta. Nie pod nawyki zespołu.</h2>
-      </div>
+      <SectHead eyebrow="03 / Logika · Nowa logika wyboru technologii" title="Technologia pod skuteczność agenta. Nie pod nawyki zespołu." id="logika" small />
       <table class="results-table rv">
         <thead><tr><th scope="col">Wczoraj</th><th scope="col">Dziś</th></tr></thead>
         <tbody>
@@ -87,63 +85,34 @@ import Interior from '../layouts/Interior.astro';
   <!-- 04 współpraca -->
   <section class="sect" aria-labelledby="wspolpraca" style="padding-top:0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Współpraca · Jak to wygląda</p>
-        <h2 class="sect-title ws" id="wspolpraca">Rytm kwartalny: pomiar → przegląd → decyzja → wdrożenie.</h2>
-      </div>
+      <SectHead eyebrow="04 / Współpraca · Jak to wygląda" title="Rytm kwartalny: pomiar → przegląd → decyzja → wdrożenie." id="wspolpraca" />
       <div class="steps">
         <article class="step rv"><p class="eyebrow">01 · Pomiar</p><h3>Dane na bieżąco</h3><p>DEVLens zbiera dane z repozytoriów na bieżąco. Raz na kwartał dochodzą rozmowy z zespołem i przegląd projektów.</p></article>
         <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Przegląd</p><h3>Spotkanie z zarządem</h3><p>Co się zmieniło w technologii, co u Was działa, gdzie uciekają pieniądze. Konkretne rekomendacje z priorytetami.</p></article>
         <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Decyzja</p><h3>Zarząd decyduje</h3><p>My dostarczamy dane, warianty i rekomendację. Bez presji, bez sprzedawania godzin.</p></article>
         <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Wdrożenie</p><h3>Z Waszym zespołem</h3><p>Zatwierdzone zmiany prowadzimy od PoC po produkcję. Trudne fragmenty bierzemy na siebie.</p></article>
       </div>
-      <div class="proof-strip rv">
-        <div><strong>Stała opłata miesięczna</strong><span>zakres ustalany kwartalnie</span></div>
-        <div><strong>Prowadzi Tomek</strong><span>z Maciejem w jego obszarach</span></div>
-        <div><strong>Start</strong><span>po dwóch kwartałach transformacji albo niezależnie</span></div>
-      </div>
+      <ProofStrip wrap={false} items={[
+        ['Stała opłata miesięczna', 'zakres ustalany kwartalnie'],
+        ['Prowadzi Tomek', 'z Maciejem w jego obszarach'],
+        ['Start', 'po dwóch kwartałach transformacji albo niezależnie'],
+      ]} />
     </div>
   </section>
 
   <!-- 05 FAQ -->
   <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>05 / FAQ · Pytania przed startem</p>
-        <h2 class="sect-title sect-title--s ws" id="faq-title">Pytania, które padają przed startem doradztwa.</h2>
-      </div>
-      <div class="faq rv">
-        <details>
-          <summary><span class="num">01</span> Czy musimy najpierw przejść dwa kwartały transformacji? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Nie. Doradztwo działa też samodzielnie — zaczynamy wtedy od pomiaru DEVLens i przeglądu technologii. Kwartał transformacji można dołożyć później, jeśli z danych wyjdzie, że ma sens.</p>
-        </details>
-        <details>
-          <summary><span class="num">02</span> Jak zmierzycie, że doradztwo działa? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Tak jak wszystko u nas — w danych. DEVLens pokazuje produktywność zespołu w czasie, a roadmapa ma mierzalne punkty kontrolne: koszty licencji, czas dostarczania, liczba technologii w użyciu.</p>
-        </details>
-        <details>
-          <summary><span class="num">03</span> Czym to się różni od zatrudnienia CTO albo architekta? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Nie zastępujemy Waszych ludzi — dajemy zarządowi niezależny głos z zewnątrz, bez polityki etatu i bez własnego interesu w wyborze technologii. A gdy trzeba, siadamy do kodu razem z zespołem.</p>
-        </details>
-      </div>
+      <SectHead eyebrow="05 / FAQ · Pytania przed startem" title="Pytania, które padają przed startem doradztwa." id="faq-title" small />
+      <Faq items={faq} />
     </div>
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">30 minut. Sprawdzimy, czy stałe doradztwo ma u Was sens.</h2>
-      <p class="rv">Pierwsza rozmowa jak przy modernizacji: konkretne pytania, zero sprzedaży. Jeśli z rozmowy wyjdzie, że wystarczą Wam dwa kwartały transformacji albo w ogóle nic — powiemy to wprost.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Zarezerwuj termin
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="30 minut. Sprawdzimy, czy stałe doradztwo ma u Was sens."
+    text="Pierwsza rozmowa jak przy modernizacji: konkretne pytania, zero sprzedaży. Jeśli z rozmowy wyjdzie, że wystarczą Wam dwa kwartały transformacji albo w ogóle nic — powiemy to wprost."
+    btnLabel="Zarezerwuj termin"
+  />
 </Interior>

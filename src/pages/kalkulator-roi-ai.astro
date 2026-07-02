@@ -1,5 +1,16 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+// FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowe bajty źródła (set:html)
+const faq = [
+  { q: 'Czy moje dane są bezpieczne?', a: 'Nic nie wysyłamy na serwer. Cały kalkulator działa w Twojej przeglądarce — możesz nawet odłączyć internet i dalej liczyć.' },
+  { q: 'Skąd te liczby?', a: 'Głównie z badań GitHub Copilot i z tego, co widzimy u naszych klientów. Badania mówią o ~56% wzroście produktywności. W praktyce bywa różnie — czasem więcej, czasem mniej. Kalkulator daje orientacyjny obraz, nie obietnicę.' },
+  { q: 'Co jeśli mam mniej niż 5 programistów?', a: 'Spokojnie — Foundation jest właśnie dla zespołów 1–10 osób. Mniejsze zespoły często widzą proporcjonalnie większy efekt, bo każda zaoszczędzona godzina bardziej się liczy.' },
+];
 ---
 <Interior
   title="Kalkulator ROI AI dla zespołów dev | SZRON"
@@ -9,23 +20,16 @@ import Interior from '../layouts/Interior.astro';
   lead="Kalkulator bazuje na danych z naszych projektów i badań GitHub. Każdy przypadek jest inny, ale to dobry punkt wyjścia. Wszystko liczy się lokalnie w Twojej przeglądarce — nic nie wysyłamy na serwer."
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>2 minuty</strong><span>pięć suwaków i gotowy wynik</span></div>
-        <div><strong>Dane lokalnie</strong><span>liczone w przeglądarce, nic nie wysyłamy</span></div>
-        <div><strong>Realne założenia</strong><span>~55% szybsze kodowanie wg badań GitHub Copilot</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['2 minuty', 'pięć suwaków i gotowy wynik'],
+    ['Dane lokalnie', 'liczone w przeglądarce, nic nie wysyłamy'],
+    ['Realne założenia', '~55% szybsze kodowanie wg badań GitHub Copilot'],
+  ]} />
 
   <!-- 01 kalkulator -->
   <section class="sect" aria-labelledby="kalk">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Kalkulator · Dane Twojego zespołu</p>
-        <h2 class="sect-title sect-title--s ws" id="kalk">Pięć suwaków. Twój wynik liczy się na bieżąco.</h2>
-      </div>
+      <SectHead eyebrow="01 / Kalkulator · Dane Twojego zespołu" title="Pięć suwaków. Twój wynik liczy się na bieżąco." id="kalk" small />
 
       <div class="roi rv">
         <div class="roi__panel">
@@ -86,10 +90,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 metodyka (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="metoda-roi">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Metodyka · Skąd te założenia</p>
-        <h2 class="sect-title ws" id="metoda-roi">Trzy źródła. Nie wymyślamy liczb — sprawdzamy je na żywych zespołach.</h2>
-      </div>
+      <SectHead eyebrow="02 / Metodyka · Skąd te założenia" title="Trzy źródła. Nie wymyślamy liczb — sprawdzamy je na żywych zespołach." id="metoda-roi" />
       <dl class="def-rows rv">
         <div><dt>GitHub Copilot Research<small>~56% szybsze kodowanie</small></dt><dd>W kontrolowanych testach kodowanie z asystentem AI jest około 56% szybsze. W praktyce zależy od projektu — czasem więcej, czasem mniej.</dd></div>
         <div><dt>McKinsey Digital 2024<small>Zwrot w 1,5–2 lata</small></dt><dd>Według ich danych inwestycja w AI zwraca się w ciągu 1,5–2 lat — z dużym zapasem.</dd></div>
@@ -101,10 +102,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 03 jak to liczymy -->
   <section class="sect" aria-labelledby="wzor">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Wzór · Jak powstaje liczba</p>
-        <h2 class="sect-title sect-title--s ws" id="wzor">Założenia w kalkulatorze, wprost.</h2>
-      </div>
+      <SectHead eyebrow="03 / Wzór · Jak powstaje liczba" title="Założenia w kalkulatorze, wprost." id="wzor" small />
       <table class="results-table rv">
         <thead><tr><th scope="col">Założenie</th><th scope="col">Wartość użyta w obliczeniu</th></tr></thead>
         <tbody>
@@ -121,44 +119,18 @@ import Interior from '../layouts/Interior.astro';
   <!-- 04 FAQ -->
   <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / FAQ · Najczęstsze pytania</p>
-        <h2 class="sect-title sect-title--s ws" id="faq-title">Zanim zaufasz liczbie.</h2>
-      </div>
-      <div class="faq rv">
-        <details>
-          <summary><span class="num">01</span> Czy moje dane są bezpieczne? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Nic nie wysyłamy na serwer. Cały kalkulator działa w Twojej przeglądarce — możesz nawet odłączyć internet i dalej liczyć.</p>
-        </details>
-        <details>
-          <summary><span class="num">02</span> Skąd te liczby? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Głównie z badań GitHub Copilot i z tego, co widzimy u naszych klientów. Badania mówią o ~56% wzroście produktywności. W praktyce bywa różnie — czasem więcej, czasem mniej. Kalkulator daje orientacyjny obraz, nie obietnicę.</p>
-        </details>
-        <details>
-          <summary><span class="num">03</span> Co jeśli mam mniej niż 5 programistów? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Spokojnie — Foundation jest właśnie dla zespołów 1–10 osób. Mniejsze zespoły często widzą proporcjonalnie większy efekt, bo każda zaoszczędzona godzina bardziej się liczy.</p>
-        </details>
-      </div>
+      <SectHead eyebrow="04 / FAQ · Najczęstsze pytania" title="Zanim zaufasz liczbie." id="faq-title" small />
+      <Faq items={faq} />
     </div>
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Liczby wyglądają dobrze? Pogadajmy o Waszym przypadku.</h2>
-      <p class="rv">Powiemy szczerze, czy widzimy potencjał i od czego zacząć. Konkretne pytania, zero sprzedaży — zanim cokolwiek obiecamy, chcemy zobaczyć Wasze repozytorium.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="Liczby wyglądają dobrze? Pogadajmy o Waszym przypadku."
+    text="Powiemy szczerze, czy widzimy potencjał i od czego zacząć. Konkretne pytania, zero sprzedaży — zanim cokolwiek obiecamy, chcemy zobaczyć Wasze repozytorium."
+    btnLabel="Umów rozmowę"
+  />
 
   <style>
     .roi { display: grid; gap: var(--space-xl); }

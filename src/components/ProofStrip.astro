@@ -1,0 +1,21 @@
+---
+// Pasek wyróżników pod hero. items: pary [strong, span].
+// wrap=false, gdy pasek siedzi wewnątrz innej sekcji (bez wrappera section+container).
+// UWAGA na białe znaki: w gałęziach ternary kompilator WYRZUCA statyczne białe znaki między tagami
+// (w .map() tylko skleja itemy), a build kompresuje resztę do pojedynczych spacji — dlatego
+// jawne {' '} i separator [i > 0 && ' ', …] odtwarzają wyjściowy HTML co do bajta.
+const { items, wrap = true } = Astro.props;
+---
+{wrap ? (
+  <section class="sect" style="padding-bottom:0">{' '}
+    <div class="container">{' '}
+      <div class="proof-strip rv">{' '}
+        {items.map(([b, s], i) => [i > 0 && ' ', <div><strong>{b}</strong><span>{s}</span></div>])}{' '}
+      </div>{' '}
+    </div>{' '}
+  </section>
+) : (
+  <div class="proof-strip rv">{' '}
+    {items.map(([b, s], i) => [i > 0 && ' ', <div><strong>{b}</strong><span>{s}</span></div>])}{' '}
+  </div>
+)}

@@ -47,6 +47,19 @@ export async function getSessionUser() {
   return data?.session?.user ?? null;
 }
 
+// Poczekaj na ustanowienie sesji (zdarzenie onAuthStateChange lub polling co 200 ms) —
+// po powrocie z OAuth/linku resetu wymiana kodu na sesję może jeszcze trwać. Zwraca usera lub null.
+export async function waitForSession(maxTries = 20) {
+  await new Promise((resolve) => {
+    const { data } = getClient().auth.onAuthStateChange((_e, session) => { if (session) resolve(); });
+    let tries = 0;
+    const iv = setInterval(async () => {
+      if (await getSessionUser() || ++tries > maxTries) { clearInterval(iv); data.subscription.unsubscribe(); resolve(); }
+    }, 200);
+  });
+  return getSessionUser();
+}
+
 // Logowanie e-mail/hasło
 export async function signInPassword(email, password) {
   const { data, error } = await getClient().auth.signInWithPassword({
@@ -123,4 +136,38 @@ export async function requireAuth(loginPath = '/strefa/login') {
     return null;
   }
   return user;
+}
+
+// Jak requireAuth, ale bez przekierowania (redirect robi layout) — strażnik skryptów stron strefy.
+export async function getTeamUser() {
+  const user = await getSessionUser();
+  return user && isAllowed(user.email) ? user : null;
+}
+
+/* ── realtime: wspólny wzorzec stron strefy ── */
+// Strażnik cichego auto-odświeżania: pomiń, gdy zakładka w tle, otwarty jest dialog/drawer,
+// albo user jest aktywny w kontenerze `rootId` (fokus w siatce).
+export function pollBlocked(rootId) {
+  if (document.hidden) return true;
+  if (document.getElementById('modal-root')?.children.length) return true;
+  const root = document.getElementById(rootId);
+  return !!(root && root.contains(document.activeElement));
+}
+
+// Subskrypcja kanału postgres_changes (schema `strefa`) ze wspólnym debounce 400 ms
+// (JEDEN timer na kanał — ostatni event w oknie wygrywa, także między handlerami per tabela),
+// odświeżeniem przy SUBSCRIBED, bezpiecznikiem setInterval 60 s (zerwany socket)
+// i syncem po powrocie do zakładki. `handlersByTable` nadpisuje handler dla wybranych tabel.
+export async function startRealtime(sb, channelName, tables, refresh, handlersByTable = {}) {
+  // Przekaż token sesji do Realtime (RLS) — pewność, że jest ustawiony przed subskrypcją.
+  try { const { data } = await sb.auth.getSession(); if (data?.session) sb.realtime.setAuth(data.session.access_token); } catch (e) { /* ignore */ }
+  let debounce;
+  const ch = sb.channel(channelName);
+  for (const table of tables) {
+    const handler = handlersByTable[table] || refresh;
+    ch.on('postgres_changes', { event: '*', schema: 'strefa', table }, () => { clearTimeout(debounce); debounce = setTimeout(handler, 400); });
+  }
+  ch.subscribe((status) => { if (status === 'SUBSCRIBED') refresh(); });
+  setInterval(refresh, 60000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
 }

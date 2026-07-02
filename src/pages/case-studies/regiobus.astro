@@ -1,5 +1,8 @@
 ---
 import Interior from '../../layouts/Interior.astro';
+import SectHead from '../../components/SectHead.astro';
+import ProofStrip from '../../components/ProofStrip.astro';
+import CtaBand from '../../components/CtaBand.astro';
 ---
 <Interior
   title="Case study: system biletowy NFC RegioBus | SZRON"
@@ -11,23 +14,16 @@ import Interior from '../../layouts/Interior.astro';
   heroAlt="Miejski autobus nocą za oszronioną szybą, światło walidatora NFC"
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>6 mc → 4 tyg</strong><span>czas dostarczenia</span></div>
-        <div><strong>3 z 4 osób uwolnione</strong><span>0 odejść · Java · Kotlin · NFC</span></div>
-        <div><strong>setki tys. PLN</strong><span>roczne oszczędności</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['6 mc → 4 tyg', 'czas dostarczenia'],
+    ['3 z 4 osób uwolnione', '0 odejść · Java · Kotlin · NFC'],
+    ['setki tys. PLN', 'roczne oszczędności'],
+  ]} />
 
   <!-- 01 kontekst -->
   <section class="sect" aria-labelledby="kontekst">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Kontekst klienta</p>
-        <h2 class="sect-title sect-title--s ws" id="kontekst">Monolit z 2008 roku, czteroosobowa drużyna i plan na pół roku.</h2>
-      </div>
+      <SectHead eyebrow="01 / Kontekst klienta" title="Monolit z 2008 roku, czteroosobowa drużyna i plan na pół roku." id="kontekst" small />
       <div class="prose rv">
         <p>RegioBus Systems obsługuje regionalne linie autobusowe na południu Polski — dziesiątki tysięcy pasażerów dziennie, kilkaset pojazdów, ponad dwadzieścia lat na rynku. System biletowy, na którym jeżdżą, powstał w 2008 roku jako monolit napisany w Javie 6, z mobilną aplikacją w starym Androidzie z 2014. Wszystko utrzymywała czteroosobowa drużyna: dwóch starszych deweloperów, którzy znali kod na pamięć, i dwóch młodszych, którzy uczyli się pojmować, dlaczego nic nie ma testów.</p>
         <p>Każda zmiana w kodzie zajmowała tygodnie — nie dlatego, że była trudna, ale dlatego, że nikt nie chciał ryzykować dotknięcia części, której nie rozumiał. Plan zarządu był ambitny: nowy system biletowy NFC, integracja z infrastrukturą operatorów płatności, otwarcie API dla aplikacji partnerskich. Czas: sześć miesięcy. Wycena od trzech zewnętrznych dostawców: 1.4–2.1 mln PLN.</p>
@@ -38,10 +34,7 @@ import Interior from '../../layouts/Interior.astro';
   <!-- 02 kto prowadził (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="kto">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Kto to prowadził</p>
-        <h2 class="sect-title ws" id="kto">Dwie osoby, jeden numer telefonu, code review we dwóch przez cały kwartał.</h2>
-      </div>
+      <SectHead eyebrow="02 / Kto to prowadził" title="Dwie osoby, jeden numer telefonu, code review we dwóch przez cały kwartał." id="kto" />
       <dl class="def-rows rv">
         <div><dt>Maciej Stopa<small>Lead operacyjny</small></dt><dd>Backend Spring Boot 3, warstwa mobile NFC w Kotlinie wraz z UI dla kierowców, migracja Oracle 11 → PostgreSQL 16. 12 lat w mobile, 5 w fintechu i transporcie, wcześniej platform owner u operatora płatności (4M+ MAU).</dd></div>
         <div><dt>Tomek Wojciechowski<small>AI workflow</small></dt><dd>Setup Claude Code, dwa custom MCP servery (DB read-only z białą listą + logi produkcyjne), CLAUDE.md (280 linii konwencji zespołu). Prowadził też wszystkie rozmowy z zarządem i CTO klienta.</dd></div>
@@ -52,10 +45,7 @@ import Interior from '../../layouts/Interior.astro';
   <!-- 03 co bolało -->
   <section class="sect" aria-labelledby="bol">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Problem · Co naprawdę bolało</p>
-        <h2 class="sect-title sect-title--s ws" id="bol">Pierwsze pytanie nie dotyczyło technologii.</h2>
-      </div>
+      <SectHead eyebrow="03 / Problem · Co naprawdę bolało" title="Pierwsze pytanie nie dotyczyło technologii." id="bol" small />
       <div class="prose rv">
         <p>Pierwsze pytanie podczas diagnozy nie dotyczyło technologii. Brzmiało: „Co się stanie z waszym zespołem, jak skończycie ten projekt?". Cisza w pokoju trwała kilkanaście sekund.</p>
         <ul>
@@ -70,10 +60,7 @@ import Interior from '../../layouts/Interior.astro';
   <!-- 04 podejście (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="podejscie">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Podejście SZRON</p>
-        <h2 class="sect-title ws" id="podejscie">3 miesiące, stała opłata, modernizacja z ich zespołem.</h2>
-      </div>
+      <SectHead eyebrow="04 / Podejście SZRON" title="3 miesiące, stała opłata, modernizacja z ich zespołem." id="podejscie" />
       <div class="prose rv">
         <p>Po dwóch dniach diagnozy zaproponowaliśmy alternatywę: 3 miesiące, stała opłata, modernizacja prowadzona z udziałem ich zespołu. Główne założenia, które wpisaliśmy do oferty:</p>
         <ul>
@@ -93,10 +80,7 @@ import Interior from '../../layouts/Interior.astro';
   <!-- 05 przebieg -->
   <section class="sect" aria-labelledby="przebieg">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>05 / Przebieg projektu · 4 tygodnie do produkcji</p>
-        <h2 class="sect-title ws" id="przebieg">Pierwsi pasażerowie w czwartym tygodniu.</h2>
-      </div>
+      <SectHead eyebrow="05 / Przebieg projektu · 4 tygodnie do produkcji" title="Pierwsi pasażerowie w czwartym tygodniu." id="przebieg" />
       <p class="rv">Plan kwartalny przewidywał 12 tygodni do pełnego wdrożenia z transferem wiedzy. Działający produkt zobaczył pierwszych pasażerów w czwartym tygodniu — pilotowo na jednej linii. Reszta kwartału to skalowanie, integracje i przekazanie.</p>
       <div class="steps">
         <article class="step rv"><p class="eyebrow">Tydzień 1</p><h3>Diagnoza i decyzje techniczne</h3><p>Czytanie istniejącego kodu, mapa zależności, pierwsze decyzje stack-owe. Setup CLAUDE.md, MCP serverów, parowanie z każdym z 4 programistów.</p></article>
@@ -112,15 +96,12 @@ import Interior from '../../layouts/Interior.astro';
   <!-- 06 wynik (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="wynik">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>06 / Wynik · W liczbach i w kulturze</p>
-        <h2 class="sect-title ws" id="wynik">W liczbach i w kulturze.</h2>
-      </div>
-      <div class="proof-strip rv">
-        <div><strong>~6× szybciej</strong><span>4 tygodnie zamiast 6 miesięcy do produktu</span></div>
-        <div><strong>0 odejść</strong><span>z 4 osób została 1 z AI, 3 przesunięto</span></div>
-        <div><strong>7% → 68%</strong><span>pokrycie testami (unit + integration)</span></div>
-      </div>
+      <SectHead eyebrow="06 / Wynik · W liczbach i w kulturze" title="W liczbach i w kulturze." id="wynik" />
+      <ProofStrip wrap={false} items={[
+        ['~6× szybciej', '4 tygodnie zamiast 6 miesięcy do produktu'],
+        ['0 odejść', 'z 4 osób została 1 z AI, 3 przesunięto'],
+        ['7% → 68%', 'pokrycie testami (unit + integration)'],
+      ]} />
       <dl class="def-rows rv">
         <div><dt>Czas do produktu<small>4 tygodnie</small></dt><dd>4 tygodnie zamiast 6 miesięcy (ok. 6× szybciej).</dd></div>
         <div><dt>Zespół utrzymaniowy<small>z 4 osób — 1 z AI</small></dt><dd>Z 4 osób przy starym systemie została 1 z asystentem AI. Pozostałych trzech przesunięto do nowych inicjatyw — zachowali pracę, dostali nowe wyzwania. 0 odejść z firmy.</dd></div>
@@ -138,10 +119,7 @@ import Interior from '../../layouts/Interior.astro';
   <!-- 07 stack -->
   <section class="sect" aria-labelledby="stack">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>07 / Stack technologiczny</p>
-        <h2 class="sect-title sect-title--s ws" id="stack">Dokładnie to, co utrzymują dalej.</h2>
-      </div>
+      <SectHead eyebrow="07 / Stack technologiczny" title="Dokładnie to, co utrzymują dalej." id="stack" small />
       <p class="rv">Zasada „nie kupuj zespołowi narzędzi, których nie utrzyma" przekłada się na konkretne wybory:</p>
       <dl class="def-rows rv">
         <div><dt>Backend<small>Java 21 · Spring Boot 3.2</small></dt><dd>Java 21, Spring Boot 3.2, Spring Data JPA, Flyway. Ten sam język, ale współczesny — żaden z programistów nie musiał uczyć się od zera.</dd></div>
@@ -156,10 +134,7 @@ import Interior from '../../layouts/Interior.astro';
   <!-- 08 co zostało (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="zostalo">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>08 / Co zostało po nas</p>
-        <h2 class="sect-title ws" id="zostalo">Po wyjściu z projektu zostawiliśmy cztery rzeczy.</h2>
-      </div>
+      <SectHead eyebrow="08 / Co zostało po nas" title="Po wyjściu z projektu zostawiliśmy cztery rzeczy." id="zostalo" />
       <div class="grid-cards">
         <article class="card-tile rv"><p class="eyebrow">01</p><h3>Działający system biletowy NFC</h3><p>Obsługujący 100% pasażerów RegioBus.</p></article>
         <article class="card-tile rv" style="--rv-d:.1s"><p class="eyebrow">02</p><h3>Programistę, który prowadzi rozwój samodzielnie</h3><p>Z asystentem AI jako narzędziem, nie jako zastępcą. Średnia: 3–4 mergowane PR-y dziennie, każdy z testami.</p></article>
@@ -175,20 +150,13 @@ import Interior from '../../layouts/Interior.astro';
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Macie podobny problem?</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Wasza aplikacja też planowana na pół roku?</h2>
-      <p class="rv">30-minutowa diagnoza wystarczy, żeby ocenić, czy taki sam skok jest możliwy u Was. Bez sprzedaży.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="/case-studies">Inne realizacje</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Macie podobny problem?"
+    heading="Wasza aplikacja też planowana na pół roku?"
+    text="30-minutowa diagnoza wystarczy, żeby ocenić, czy taki sam skok jest możliwy u Was. Bez sprzedaży."
+    btnLabel="Umów diagnozę"
+    ghostLabel="Inne realizacje"
+    ghostHref="/case-studies"
+    padTop={false}
+  />
 </Interior>

@@ -2,6 +2,20 @@
 import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import SectHead from '../components/SectHead.astro';
+import Faq from '../components/Faq.astro';
+import BtnArrow from '../components/BtnArrow.astro';
+
+// FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html), stąd np. T&amp;M
+const faq = [
+  { q: 'Co z bezpieczeństwem naszych danych?', a: 'Wasz kod nie idzie do publicznych modeli. Dla branż regulowanych — Bedrock w AWS, dane w Waszej VPC. Dla obronności i wrażliwego embedded — lokalne modele (Ollama, vLLM) na Waszych serwerach. Audit log każdej interakcji z AI. NDA podpisujemy przed pierwszą rozmową.' },
+  { q: 'Co jeśli zespół nie kupi tej zmiany?', a: 'Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny". Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. Opór znika, gdy programiści widzą, że dostarczają szybciej. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.' },
+  { q: 'Jak zmierzymy efekt?', a: 'DORA metrics jako baseline w tygodniu 1: czas od ticketu do PR, czas merge, bug escape rate, pokrycie testami. Mierzymy ponownie w tygodniu 12. Raport ROI dla zarządu — dashboard z twardymi liczbami.' },
+  { q: 'Ile to kosztuje?', a: 'Programy kwartalne nie są dla każdej firmy. Stała opłata kwartalna, zamknięty zakres, bez T&amp;M. Kwotę ustalamy po diagnozie i podajemy mailem w 48h.' },
+  { q: 'Czy stara aplikacja będzie działać w trakcie pilota?', a: 'Tak. Pilot wchodzi obok: dwa systemy równolegle, moduł po module, testy regresyjne na danych z produkcji. Wasza baza danych zostaje bez zmian.' },
+  { q: 'Czy to działa przy zespole 50+ osób?', a: 'Tak — falami. Nie szkolimy 50 osób naraz. Zaczynamy od jednego zespołu (5–10 osób) i pilota, wzorce zapisujemy w CLAUDE.md i standardach repo, a przeszkoleni programiści zostają championami kolejnych fal. Druga fala kosztuje mniej niż pierwsza, trzecia mniej niż druga.' },
+  { q: 'Kto będzie pracował przy naszym projekcie?', a: 'Dwóch ludzi: Tomek Wojciechowski i Maciej Stopa. Te same dwie osoby od diagnozy do przekazania. Bez wymiany konsultantów, bez ekspertów-fantomów w ofercie, których potem nie widać. Tomek prowadzi AI workflow i strategię, Maciej — backend, mobile i frontend. Każdy poważny PR przechodzi przez dwie pary oczu.' },
+];
 ---
 <Base>
   <Nav />
@@ -12,17 +26,12 @@ import Footer from '../components/Footer.astro';
     <h1 class="hero__title ws" style="margin-top: var(--space-lg)">Wasz zespół IT. 2–4&nbsp;razy szybszy. W&nbsp;dwa kwartały.</h1>
     <p class="hero__lead rv" style="--rv-d:.15s">Wdrażamy programowanie agentowe w zespołach IT dużych firm — na Waszym kodzie. Szkolimy zespół z AI, wprowadzamy agentów do codziennej pracy, a dowodem jest pilot: jeden moduł zmodernizowany do nowoczesnego stosu w ciągu dwóch kwartałów. Ci sami programiści, którzy znają Wasz biznes — tylko teraz dostarczają 2 do 4 razy szybciej.</p>
     <div class="hero__cta rv" style="--rv-d:.25s">
-      <a class="btn btn--accent" href="#kontakt">Umów 30-minutową rozmowę
-        <span class="btn__arr" aria-hidden="true">
-          <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-        </span>
-      </a>
+      <BtnArrow href="#kontakt">Umów 30-minutową rozmowę</BtnArrow>
       <a class="btn btn--ghost" href="#metoda">Zobacz, jak pracujemy</a>
     </div>
     <div class="hero__grid">
       <div class="hero__panel rv">
-        <img src="/img/hero-panel.webp" alt="" loading="eager" onload="this.parentElement.classList.add('has-img')" onerror="this.remove()">
+        <img src="/img/hero-panel.webp" alt="" loading="eager" fetchpriority="high" onload="this.parentElement.classList.add('has-img')" onerror="this.remove()">
         <p class="hero__panel-num" aria-hidden="true">2–4<em>×</em></p>
         <p class="hero__panel-cap">szybsze dostarczanie po dwóch kwartałach — ci sami ludzie, ten sam kod, nowy sposób pracy</p>
       </div>
@@ -45,10 +54,7 @@ import Footer from '../components/Footer.astro';
   <!-- ── 01 PROBLEM ─────────────────────────────────── -->
   <section class="sect" id="problem" aria-labelledby="problem-title">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Problem · Sytuacja zarządu</p>
-        <h2 class="sect-title sect-title--s ws" id="problem-title">Wasz zespół zna biznes lepiej niż ktokolwiek na rynku. Tylko dostarcza wolniej, niż biznes potrzebuje.</h2>
-      </div>
+      <SectHead eyebrow="01 / Problem · Sytuacja zarządu" title="Wasz zespół zna biznes lepiej niż ktokolwiek na rynku. Tylko dostarcza wolniej, niż biznes potrzebuje." id="problem-title" small />
       <div class="problems">
         <div class="problem-row rv">
           <div>
@@ -108,10 +114,7 @@ import Footer from '../components/Footer.astro';
   <!-- ── 02 DLACZEGO TERAZ ──────────────────────────── -->
   <section class="sect" id="dlaczego-teraz" aria-labelledby="teraz-title" style="padding-top: 0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Dlaczego teraz · Okno przewagi</p>
-        <h2 class="sect-title ws" id="teraz-title">Rynek już to liczy. Pytanie, kto w Waszej branży policzy to pierwszy.</h2>
-      </div>
+      <SectHead eyebrow="02 / Dlaczego teraz · Okno przewagi" title="Rynek już to liczy. Pytanie, kto w Waszej branży policzy to pierwszy." id="teraz-title" />
       <div>
         <figure class="quote-card rv">
           <blockquote>„W produkcji oprogramowania rozwiązania agentowe przyspieszają pracę o 30 do 60 proc., a przy modernizacji systemów ERP pod kątem AI i chmury liczymy na kolejne 30–50 proc. wzrostu produktywności."</blockquote>
@@ -135,11 +138,9 @@ import Footer from '../components/Footer.astro';
   <!-- ── 03 METODA (ciemna) ─────────────────────────── -->
   <section class="sect sect--dark" id="metoda" aria-labelledby="metoda-title">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Metoda · Jak to robimy</p>
-        <h2 class="sect-title sect-title--s ws" id="metoda-title">Trening AI, programowanie agentowe i pilot modernizacji. W dwa kwartały.</h2>
+      <SectHead eyebrow="03 / Metoda · Jak to robimy" title="Trening AI, programowanie agentowe i pilot modernizacji. W dwa kwartały." id="metoda-title" small>
         <p class="sect-lead rv">Trzy ścieżki idą równolegle. Najpierw szkolimy Wasz zespół z AI — żeby każdy programista umiał prowadzić agenta w codziennej pracy. Potem wprowadzamy programowanie agentowe na Waszej obecnej aplikacji, bez ryzyka, na kodzie, który ludzie znają. Dowodem jest pilot: zespół modernizuje jeden moduł do stosu, w którym AI najmocniej obniża koszt rozwoju — i wypuszcza go też natywnie na iOS i Androida. Po dwóch kwartałach zespół ma nowy sposób pracy, zmierzony wynik i wzorzec, którym sam obejmuje resztę systemu.</p>
-      </div>
+      </SectHead>
       <div class="paths">
         <article class="path rv">
           <figure class="ph ph--dark" style="--ph-ar: 16/9">
@@ -211,10 +212,7 @@ import Footer from '../components/Footer.astro';
   <!-- ── 04 CO ROBIMY INACZEJ ───────────────────────── -->
   <section class="sect" id="inaczej" aria-labelledby="inaczej-title">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Co robimy inaczej · Szkolenie a wdrożenie</p>
-        <h2 class="sect-title sect-title--s ws" id="inaczej-title">Samo szkolenie to za mało. Bez wdrożenia w codzienną pracę zostajecie z certyfikatami i starym tempem.</h2>
-      </div>
+      <SectHead eyebrow="04 / Co robimy inaczej · Szkolenie a wdrożenie" title="Samo szkolenie to za mało. Bez wdrożenia w codzienną pracę zostajecie z certyfikatami i starym tempem." id="inaczej-title" small />
       <div class="twocol">
         <p class="rv">Trzy ścieżki idą równolegle, nie po kolei. Zespół uczy się AI na własnej aplikacji — w stosie, który zna. Kiedy startuje pilot modernizacji, programiści już wiedzą, jak prowadzić agenta. Nowy sposób pracy od pierwszego dnia jest ich sposobem, nie naszym.</p>
         <p class="rv" style="--rv-d:.1s">Cały program trwa 3 miesiące, nie rok. Stara aplikacja działa bez przerwy, pilot wchodzi obok, mobile razem z webem. Bez „big bang" i bez ryzyka, że wszystko padnie w jeden weekend.</p>
@@ -225,10 +223,7 @@ import Footer from '../components/Footer.astro';
   <!-- ── 05 KORZYŚCI ────────────────────────────────── -->
   <section class="sect" id="korzysci" aria-labelledby="korzysci-title" style="padding-top: 0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>05 / Korzyści</p>
-        <h2 class="sect-title ws" id="korzysci-title">Co zyskujecie</h2>
-      </div>
+      <SectHead eyebrow="05 / Korzyści" title="Co zyskujecie" id="korzysci-title" />
       <div class="benefits">
         <article class="benefit rv">
           <p class="eyebrow">01 / Tempo</p>
@@ -290,10 +285,7 @@ import Footer from '../components/Footer.astro';
   <!-- ── 07 WYNIKI ──────────────────────────────────── -->
   <section class="sect" id="wyniki" aria-labelledby="wyniki-title" style="padding-top: 0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>07 / Wyniki · Pozostałe projekty</p>
-        <h2 class="sect-title sect-title--s ws" id="wyniki-title">Skrócenie czasu dostarczania w trzech różnych branżach.</h2>
-      </div>
+      <SectHead eyebrow="07 / Wyniki · Pozostałe projekty" title="Skrócenie czasu dostarczania w trzech różnych branżach." id="wyniki-title" small />
       <table class="results-table rv">
         <thead>
           <tr>
@@ -326,10 +318,7 @@ import Footer from '../components/Footer.astro';
   <!-- ── 08 PROCES ──────────────────────────────────── -->
   <section class="sect" id="proces" aria-labelledby="proces-title" style="padding-top: 0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>08 / Proces · Cztery kroki, dwa kwartały</p>
-        <h2 class="sect-title ws" id="proces-title">Jak pracujemy. 3 miesiące. Stała opłata.</h2>
-      </div>
+      <SectHead eyebrow="08 / Proces · Cztery kroki, dwa kwartały" title="Jak pracujemy. 3 miesiące. Stała opłata." id="proces-title" />
       <div class="steps">
         <article class="step rv">
           <p class="eyebrow">01 · Tydzień 1</p>
@@ -362,12 +351,7 @@ import Footer from '../components/Footer.astro';
           <h3>A po dwóch kwartałach?</h3>
           <p>Dla firm, które chcą utrzymać tempo: stała współpraca — doradca technologiczny zarządu i zewnętrzny dział B+R.</p>
         </div>
-        <a class="btn btn--dark" href="/doradztwo-technologiczne">Zobacz Doradztwo
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
+        <BtnArrow class="btn btn--dark" href="/doradztwo-technologiczne">Zobacz Doradztwo</BtnArrow>
       </div>
     </div>
   </section>
@@ -375,11 +359,9 @@ import Footer from '../components/Footer.astro';
   <!-- ── 09 ZESPÓŁ ──────────────────────────────────── -->
   <section class="sect" id="zespol" aria-labelledby="zespol-title" style="padding-top: 0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>09 / Zespół · Dwa nazwiska, jeden numer telefonu</p>
-        <h2 class="sect-title sect-title--s ws" id="zespol-title">Ci sami dwaj ludzie prowadzą diagnozę, wdrożenie i przekazanie.</h2>
+      <SectHead eyebrow="09 / Zespół · Dwa nazwiska, jeden numer telefonu" title="Ci sami dwaj ludzie prowadzą diagnozę, wdrożenie i przekazanie." id="zespol-title" small>
         <p class="sect-lead rv">Bez account managerów. Bez wymiany konsultantów co kwartał. Wszystko, co robimy u Was, robi jeden z nas — i każdy wie, co robi drugi.</p>
-      </div>
+      </SectHead>
       <div class="team">
         <article class="person rv">
           <div class="person__head">
@@ -404,12 +386,7 @@ import Footer from '../components/Footer.astro';
       </div>
       <div class="team-quote rv">
         <blockquote>„Byliśmy programistami, liderami, doradcami zarządów, CTO i klientami zewnętrznych dostawców. Wiemy dokładnie, gdzie projekty się sypią — z każdej z tych stron osobno."</blockquote>
-        <a class="btn btn--dark" href="/o-nas" style="align-self: flex-start">Zobacz zespół na osobnej stronie
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
+        <BtnArrow class="btn btn--dark" href="/o-nas" style="align-self: flex-start">Zobacz zespół na osobnej stronie</BtnArrow>
       </div>
     </div>
   </section>
@@ -417,48 +394,11 @@ import Footer from '../components/Footer.astro';
   <!-- ── 10 FAQ ─────────────────────────────────────── -->
   <section class="sect" id="faq" aria-labelledby="faq-title" style="padding-top: 0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>10 / FAQ · Pytania zarządu</p>
-        <h2 class="sect-title sect-title--s ws" id="faq-title">Pytania, które zwykle padają na pierwszym spotkaniu.</h2>
-      </div>
-      <div class="faq rv">
-        <details>
-          <summary><span class="num">01</span> Co z bezpieczeństwem naszych danych? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Wasz kod nie idzie do publicznych modeli. Dla branż regulowanych — Bedrock w AWS, dane w Waszej VPC. Dla obronności i wrażliwego embedded — lokalne modele (Ollama, vLLM) na Waszych serwerach. Audit log każdej interakcji z AI. NDA podpisujemy przed pierwszą rozmową.</p>
-        </details>
-        <details>
-          <summary><span class="num">02</span> Co jeśli zespół nie kupi tej zmiany? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny". Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. Opór znika, gdy programiści widzą, że dostarczają szybciej. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.</p>
-        </details>
-        <details>
-          <summary><span class="num">03</span> Jak zmierzymy efekt? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>DORA metrics jako baseline w tygodniu 1: czas od ticketu do PR, czas merge, bug escape rate, pokrycie testami. Mierzymy ponownie w tygodniu 12. Raport ROI dla zarządu — dashboard z twardymi liczbami.</p>
-        </details>
-        <details>
-          <summary><span class="num">04</span> Ile to kosztuje? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Programy kwartalne nie są dla każdej firmy. Stała opłata kwartalna, zamknięty zakres, bez T&amp;M. Kwotę ustalamy po diagnozie i podajemy mailem w 48h.</p>
-        </details>
-        <details>
-          <summary><span class="num">05</span> Czy stara aplikacja będzie działać w trakcie pilota? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Tak. Pilot wchodzi obok: dwa systemy równolegle, moduł po module, testy regresyjne na danych z produkcji. Wasza baza danych zostaje bez zmian.</p>
-        </details>
-        <details>
-          <summary><span class="num">06</span> Czy to działa przy zespole 50+ osób? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Tak — falami. Nie szkolimy 50 osób naraz. Zaczynamy od jednego zespołu (5–10 osób) i pilota, wzorce zapisujemy w CLAUDE.md i standardach repo, a przeszkoleni programiści zostają championami kolejnych fal. Druga fala kosztuje mniej niż pierwsza, trzecia mniej niż druga.</p>
-        </details>
-        <details>
-          <summary><span class="num">07</span> Kto będzie pracował przy naszym projekcie? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Dwóch ludzi: Tomek Wojciechowski i Maciej Stopa. Te same dwie osoby od diagnozy do przekazania. Bez wymiany konsultantów, bez ekspertów-fantomów w ofercie, których potem nie widać. Tomek prowadzi AI workflow i strategię, Maciej — backend, mobile i frontend. Każdy poważny PR przechodzi przez dwie pary oczu.</p>
-        </details>
-      </div>
+      <SectHead eyebrow="10 / FAQ · Pytania zarządu" title="Pytania, które zwykle padają na pierwszym spotkaniu." id="faq-title" small />
+      <Faq items={faq} />
       <div class="faq-cta rv">
         <p>Pełne odpowiedzi — z uwzględnieniem Waszego stacku, branży i compliance — na pierwszej, 30-minutowej rozmowie diagnostycznej.</p>
-        <a class="btn btn--dark" href="#kontakt">Umów rozmowę
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
+        <BtnArrow class="btn btn--dark" href="#kontakt">Umów rozmowę</BtnArrow>
       </div>
     </div>
   </section>
@@ -483,12 +423,7 @@ import Footer from '../components/Footer.astro';
             <div><dt>Odpowiedzialność</dt><dd>Dwie osoby z imienia, od diagnozy do przekazania</dd></div>
           </dl>
           <div class="contact__cta">
-            <a class="btn btn--accent" href="/umow-rozmowe">Zarezerwuj termin
-              <span class="btn__arr" aria-hidden="true">
-                <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-              </span>
-            </a>
+            <BtnArrow href="/umow-rozmowe">Zarezerwuj termin</BtnArrow>
             <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
           </div>
         </div>

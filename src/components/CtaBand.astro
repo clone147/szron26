@@ -1,0 +1,30 @@
+---
+// Wspólny blok CTA na dole strony (sect--dark cta-band).
+// Defaulty eyebrow/text/btnLabel = copy stron Akademii („Akademia to materiały…").
+// id={null} usuwa ZARÓWNO aria-labelledby na section, JAK i id na h2 (przypadek akademia.astro).
+// padTop=false → style="padding-top:0"; ghostExternal → target="_blank" rel="noopener noreferrer".
+import BtnArrow from './BtnArrow.astro';
+const {
+  eyebrow = 'Wdrożenie u Was',
+  heading,
+  text = 'Akademia to materiały. Wdrożenie to dwa kwartały na Waszym kodzie — z pomiarem efektu w DEVLens. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.',
+  btnLabel = 'Umów rozmowę',
+  btnHref = '/umow-rozmowe',
+  ghostLabel = '+48 505 091 200',
+  ghostHref = 'tel:+48505091200',
+  ghostExternal = false,
+  padTop = true,
+  id = 'cta',
+} = Astro.props;
+---
+<section class="sect sect--dark cta-band" aria-labelledby={id} style={padTop ? undefined : 'padding-top:0'}>
+  <div class="container">
+    <p class="eyebrow rv" data-scramble>{eyebrow}</p>
+    <h2 class="ws" id={id} style="margin-top:var(--space-lg)">{heading}</h2>
+    <p class="rv">{text}</p>
+    <div class="contact__cta rv">
+      <BtnArrow href={btnHref}>{btnLabel}</BtnArrow>
+      <a class="btn btn--ghost" href={ghostHref} target={ghostExternal ? '_blank' : undefined} rel={ghostExternal ? 'noopener noreferrer' : undefined}>{ghostLabel}</a>
+    </div>
+  </div>
+</section>

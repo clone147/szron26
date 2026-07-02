@@ -54,7 +54,7 @@ import '../../../styles/strefa.css';
   </div>
 
   <script>
-    import { getClient, getSessionUser, updatePassword } from '../../../lib/supabase.js';
+    import { getClient, getSessionUser, updatePassword, waitForSession } from '../../../lib/supabase.js';
 
     const loading = document.getElementById('state-loading');
     const form = document.getElementById('reset-form');
@@ -78,16 +78,7 @@ import '../../../styles/strefa.css';
       }
 
       // Fallback: PKCE code w URL (gdy link otwarty w tej samej przeglądarce, co prośba o reset)
-      if (!user) {
-        await new Promise((resolve) => {
-          const { data } = sb.auth.onAuthStateChange((_e, session) => { if (session) resolve(); });
-          let tries = 0;
-          const iv = setInterval(async () => {
-            if (await getSessionUser() || ++tries > 15) { clearInterval(iv); data.subscription.unsubscribe(); resolve(); }
-          }, 200);
-        });
-        user = await getSessionUser();
-      }
+      if (!user) user = await waitForSession(15);
 
       loading.hidden = true;
       if (!user) { invalid.hidden = false; return; }

@@ -1,5 +1,8 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
 ---
 <Interior
   title="Claude Code — bezpieczeństwo i ochrona kodu | Akademia SZRON"
@@ -11,15 +14,11 @@ import Interior from '../layouts/Interior.astro';
   updated="2026-06-29"
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Twarde blokady</strong><span>deny rules egzekwowane runtime</span></div>
-        <div><strong>Sandbox OS-level</strong><span>izolacja obejmująca subprocesy</span></div>
-        <div><strong>Hooki PreToolUse</strong><span>skrypt przed każdą operacją</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['Twarde blokady', 'deny rules egzekwowane runtime'],
+    ['Sandbox OS-level', 'izolacja obejmująca subprocesy'],
+    ['Hooki PreToolUse', 'skrypt przed każdą operacją'],
+  ]} />
 
   <!-- 01 co działa -->
   <section class="sect" aria-labelledby="tldr">
@@ -246,10 +245,7 @@ NIE wypisuj prawdziwych wartosci sekretow — tylko wskaz ich obecnosc.</code></
   <!-- powiązane szkolenia -->
   <section class="sect" aria-labelledby="powiazane">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>Powiązane szkolenia</p>
-        <h2 class="sect-title sect-title--s ws" id="powiazane">Kolejne kroki w Akademii.</h2>
-      </div>
+      <SectHead eyebrow="Powiązane szkolenia" title="Kolejne kroki w Akademii." id="powiazane" small />
       <div class="link-cards rv">
         <a class="link-card" href="/claude-code">
           <h3>Claude Code</h3>
@@ -268,20 +264,8 @@ NIE wypisuj prawdziwych wartosci sekretow — tylko wskaz ich obecnosc.</code></
   </section>
 
   <!-- CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie, żeby cały zespół pracował z AI bezpiecznie?</h2>
-      <p class="rv">Skonfigurujemy warstwy ochrony na Waszym repozytorium i wdrożymy je w zespole. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    heading="Chcecie, żeby cały zespół pracował z AI bezpiecznie?"
+    text="Skonfigurujemy warstwy ochrony na Waszym repozytorium i wdrożymy je w zespole. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens."
+  />
 </Interior>

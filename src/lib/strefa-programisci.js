@@ -1,22 +1,16 @@
 // Aplikacja „Programiści" strefy zamkniętej SZRON — kokpit do prowadzenia programistów
 // ku autonomicznemu programowaniu intencyjnemu. Dane w schemacie `strefa` (RLS), styl jak „Szkolenia".
-import { getClient, getSessionUser, isAllowed } from './supabase.js';
+import { getClient, getTeamUser, startRealtime, pollBlocked } from './supabase.js';
+import { $, $$, esc, toast as uiToast, openModal, closeModal, setOnModalClose, confirmDialog, fmtDate, fmtDateTime, todayStr, telHref, ICONS, STAGES, stageColor, stageName, SUBS, bindSearch, bindFileImport, downloadJSON } from './strefa-ui.js';
+import { createGridNav } from './strefa-grid.js';
 import flatpickr from 'flatpickr';
 import { Polish } from 'flatpickr/dist/l10n/pl.js';
 import 'flatpickr/dist/themes/dark.css';
 
 const sb = getClient();
 
-/* ── helpery DOM ── */
-const $ = (s, r = document) => r.querySelector(s);
-const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const fmtDate = (d) => d ? new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(d)) : '';
-const fmtDateTime = (d) => d ? new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(d)) : '';
-const todayStr = () => new Date().toISOString().slice(0, 10);
+/* ── helpery lokalne ── */
 const pad2 = (n) => String(n).padStart(2, '0');
-const nowLocalDT = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
-const localDT = (v) => { const d = new Date(v); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
 
 /* ── pickery daty/czasu: flatpickr (kalendarz/zegar klikany myszką na desktopie,
    natywny picker systemowy na telefonie); wpisywanie z klawiatury dalej działa ── */
@@ -29,19 +23,12 @@ const curMonth = () => { const d = new Date(); return `${d.getFullYear()}-${pad2
 const monthRange = (ym) => { const [y, m] = ym.split('-').map(Number); return [new Date(y, m - 1, 1).toISOString(), new Date(y, m, 1).toISOString()]; };
 const hhmm = (d) => new Intl.DateTimeFormat('pl-PL', { hour: '2-digit', minute: '2-digit' }).format(new Date(d));
 const fmtMonth = (ym) => { const [y, m] = ym.split('-').map(Number); return new Intl.DateTimeFormat('pl-PL', { month: 'long', year: 'numeric' }).format(new Date(y, m - 1, 1)); };
-const telHref = (s) => String(s || '').replace(/[^\d+]/g, '');
 const daysUntil = (d) => Math.round((new Date(d).setHours(0,0,0,0) - new Date().setHours(0,0,0,0)) / 86400000);
 
-/* ── ikony ── */
+/* ── ikony (wspólne ICONS + lokalne) ── */
 const ICO = {
-  chev: '<svg class="strefa-tr__chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
-  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
-  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>',
-  pencil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
-  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
-  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>',
+  ...ICONS,
   mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
-  phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>',
   user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
   open: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M10 14 21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>',
   copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
@@ -51,29 +38,9 @@ const ICO = {
   building: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/></svg>',
 };
 
-/* ── model coachingu ── */
-const STAGES = [
-  { n: 1, name: 'Początkujący', hint: 'Pierwszy kontakt z AI — agent jako asystent, człowiek pyta.' },
-  { n: 2, name: 'Kierujący', hint: 'Formułuje intencję (co, po co, kryteria); agent pisze, dev recenzuje.' },
-  { n: 3, name: 'Operator', hint: 'Pętle /loop, MCP — agent pracuje obok, człowiek kontroluje.' },
-  { n: 4, name: 'Dostrajający', hint: 'CLAUDE.md, własne MCP, dostrajanie per zadanie.' },
-  { n: 5, name: 'Autonomiczny', hint: 'Deleguje całe moduły — agent planuje, koduje, testuje.' },
-  { n: 6, name: 'Architekt AI', hint: 'Mentoruje innych, projektuje workflow zespołu i strategię agentów.' },
-];
-// 6 wyraźnie odróżniających się kolorów etapów (różne odcienie + jasność/chroma), czytelne na ciemnym tle
-const STAGE_COLORS = [
-  'oklch(68% 0.13 250)', // 1 — niebieski
-  'oklch(75% 0.13 200)', // 2 — cyjan
-  'oklch(77% 0.16 150)', // 3 — zielony
-  'oklch(83% 0.15 90)',  // 4 — złoty
-  'oklch(72% 0.19 50)',  // 5 — pomarańczowy
-  'oklch(66% 0.21 330)', // 6 — magenta
-];
-const stageColor = (n) => STAGE_COLORS[Math.max(1, Math.min(6, n || 1)) - 1];
-const stageName = (n) => (STAGES[(n || 1) - 1] || STAGES[0]).name;
+/* ── model coachingu (STAGES/stageColor/stageName/SUBS — wspólne w ./strefa-ui.js) ── */
 const MINDSETS = ['entuzjasta', 'pragmatyk', 'sceptyk'];
 const AGENTS = ['Claude Code', 'Cursor', 'GitHub Copilot', 'Gemini CLI', 'Codex CLI', 'ChatGPT', 'LM Studio / lokalny', 'inny'];
-const SUBS = ['Claude', 'Gemini', 'ChatGPT', 'Github Copilot', 'Brak'];
 // Katalog umiejętności — dynamiczny, współdzielony (tabela strefa.dev_skill_catalog).
 // Wczytywany w init() i odświeżany po edycji. Element: { id, key, title, page_slug }.
 let SKILLS = [];
@@ -93,46 +60,13 @@ const devMap = new Map();    // did -> developer
 let query = '';
 const openIds = new Set();
 const selectedIds = new Set();   // did programistów zaznaczonych checkboxami (multi-akcje)
-let activeTd = null, editing = false;
 let polling = false, adding = false, pullInFlight = false;
 let openDevId = null, activeTab = 'overview', tabBusy = false;
 const NAV = ['first_name', 'last_name', 'position', 'main_project', 'email', 'phone'];
 const MAXC = NAV.length - 1;
 
-/* ── toasty ── */
-function toast(title, body = '', kind = '') {
-  const wrap = $('#toasts'); const t = document.createElement('div');
-  t.className = 'strefa-toast' + (kind ? ` strefa-toast--${kind}` : '');
-  t.innerHTML = `<strong>${esc(title)}</strong>${body ? `<span>${esc(body)}</span>` : ''}`;
-  wrap.appendChild(t);
-  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(() => t.remove(), 300); }, 3600);
-}
-
-/* ── modale / drawer ── */
-function openModal(html, drawer = false) {
-  const root = $('#modal-root');
-  root.innerHTML = `<div class="strefa-modal${drawer ? ' strefa-modal--drawer' : ''}"><div class="strefa-modal__scrim" data-close></div><div class="strefa-modal__box" role="dialog" aria-modal="true">${html}</div></div>`;
-  const box = $('.strefa-modal__box', root);
-  root.querySelector('[data-close]').addEventListener('click', closeModal);
-  const onKey = (e) => { if (e.key === 'Escape') closeModal(); };
-  document.addEventListener('keydown', onKey); root._onKey = onKey;
-  return box;
-}
-function closeModal() {
-  const root = $('#modal-root');
-  if (root._onKey) document.removeEventListener('keydown', root._onKey);
-  root.innerHTML = ''; openDevId = null;
-}
-function confirmDialog(message, okLabel = 'Usuń', danger = true) {
-  return new Promise((resolve) => {
-    const box = openModal(`<div class="strefa-modal__body"><p style="margin:0 0 var(--space-lg)">${esc(message)}</p>
-      <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--ghost" data-no>Anuluj</button>
-      <button class="strefa-btn ${danger ? 'strefa-btn--danger' : 'strefa-btn--accent'}" data-yes>${esc(okLabel)}</button></div></div>`);
-    box.querySelector('[data-no]').addEventListener('click', () => { closeModal(); resolve(false); });
-    box.querySelector('[data-yes]').addEventListener('click', () => { closeModal(); resolve(true); });
-    box.querySelector('[data-yes]').focus();
-  });
-}
+/* ── toasty (krótszy timeout niż wspólny domyślny) ── */
+const toast = (t, b, k) => uiToast(t, b, k, 3600);
 
 /* ── DB load ── */
 async function fetchData() {
@@ -245,12 +179,7 @@ function devRow(d, r) {
   return `<tr data-did="${d.id}"${sel ? ' class="is-selected"' : ''}>
     <td class="col-sel"><div class="dcell" style="justify-content:center;cursor:default"><input type="checkbox" data-pick="${d.id}"${sel ? ' checked' : ''} aria-label="Zaznacz: ${esc(d.first_name)} ${esc(d.last_name)}"></div></td>
     <td class="col-stage"><div class="dcell" style="cursor:pointer">${stageChip(d)}</div></td>
-    <td data-col="first_name" data-r="${r}" data-c="0">${cellInner(d, 'first_name')}</td>
-    <td data-col="last_name" data-r="${r}" data-c="1">${cellInner(d, 'last_name')}</td>
-    <td data-col="position" data-r="${r}" data-c="2">${cellInner(d, 'position')}</td>
-    <td data-col="main_project" data-r="${r}" data-c="3">${cellInner(d, 'main_project')}</td>
-    <td data-col="email" data-r="${r}" data-c="4">${cellInner(d, 'email')}</td>
-    <td data-col="phone" data-r="${r}" data-c="5">${cellInner(d, 'phone')}</td>
+    ${NAV.map((col, c) => `<td data-col="${col}" data-r="${r}" data-c="${c}">${cellInner(d, col)}</td>`).join('')}
     <td class="col-skills"><div class="dcell" data-act="skills" style="cursor:pointer">${skillBar(d)}</div></td>
     <td class="col-actions"><div class="dcell">
       ${d.phone ? `<a class="strefa-iconbtn strefa-iconbtn--call" href="tel:${esc(telHref(d.phone))}" title="Zadzwoń: ${esc(d.phone)}">${ICO.phone}</a>` : ''}
@@ -310,7 +239,7 @@ function renderAll() {
   $('#empty').hidden = companies.length !== 0;
   bindGrids();
   updateBulkBar();
-  activeTd = null;
+  gridNav.reset();
 }
 
 /* ── pasek akcji zbiorczych (widoczny, gdy ktoś zaznaczony) ── */
@@ -322,66 +251,13 @@ function updateBulkBar() {
   const cnt = $('#bulk-count'); if (cnt) cnt.textContent = n === 1 ? '1 zaznaczony' : `${n} zaznaczonych`;
 }
 
-/* ── nawigacja klawiaturą po siatce (jak w Szkoleniach) ── */
-function setActive(td) {
-  if (activeTd) activeTd.classList.remove('is-active');
-  activeTd = td;
-  if (td) { td.classList.add('is-active'); td.closest('.dgrid-wrap')?.focus({ preventScroll: true }); td.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
-}
-const cellAt = (grid, r, c) => grid.querySelector(`td[data-r="${r}"][data-c="${c}"]`);
-function caretIndexFromPoint(td, x, y) {
-  try {
-    if (document.caretRangeFromPoint) { const r = document.caretRangeFromPoint(x, y); if (r && td.contains(r.startContainer)) return r.startOffset; }
-    else if (document.caretPositionFromPoint) { const pp = document.caretPositionFromPoint(x, y); if (pp && td.contains(pp.offsetNode)) return pp.offset; }
-  } catch (e) { /* ignore */ }
-  return null;
-}
-function beginEdit(td, opts = {}) {
-  if (editing) return;
-  const col = td.dataset.col; if (!col) return;
-  const { caret = null, appendChar = null } = opts;
-  const did = td.closest('tr').dataset.did; const d = devMap.get(did);
-  const orig = d[col] ?? '';
-  editing = true;
-  if (activeTd && activeTd !== td) activeTd.classList.remove('is-active');
-  activeTd = td; td.classList.add('is-editing');
-  td.innerHTML = `<input class="dgrid-edit" type="text">`;
-  const inp = td.querySelector('input');
-  inp.value = appendChar != null ? orig + appendChar : orig;
-  inp.focus();
-  try {
-    const pos = (appendChar == null && caret != null) ? Math.min(caret, inp.value.length) : inp.value.length;
-    inp.setSelectionRange(pos, pos);
-  } catch (e) { /* ignore */ }
-  let done = false;
-  const finish = async (dir) => {
-    if (done) return; done = true;
-    const val = inp.value.trim(); editing = false; td.classList.remove('is-editing');
-    td.innerHTML = cellInner(d, col); setActive(td);
-    if (val !== (orig ?? '')) {
-      d[col] = val; td.innerHTML = cellInner(d, col);
-      if (!(await dbUpdateDev(did, { [col]: val || null }))) { d[col] = orig; td.innerHTML = cellInner(d, col); }
-    }
-    if (dir) moveActive(td.closest('.dgrid'), td, dir);
-  };
-  const cancel = () => { if (done) return; done = true; editing = false; td.classList.remove('is-editing'); td.innerHTML = cellInner(d, col); setActive(td); };
-  inp.addEventListener('keydown', (e) => {
-    e.stopPropagation();
-    if (e.key === 'Enter') { e.preventDefault(); finish('down'); }
-    else if (e.key === 'Escape') { e.preventDefault(); cancel(); }
-    else if (e.key === 'Tab') { e.preventDefault(); finish(e.shiftKey ? 'prev' : 'next'); }
-    else if (e.key === 'ArrowDown') { e.preventDefault(); finish('down'); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); finish('up'); }
-  });
-  inp.addEventListener('blur', () => finish(null));
-}
-function moveActive(grid, td, dir) {
-  let r = +td.dataset.r, c = +td.dataset.c;
-  if (dir === 'down') r++; else if (dir === 'up') r = Math.max(0, r - 1);
-  else if (dir === 'next') { c++; if (c > MAXC) { c = 0; r++; } }
-  else if (dir === 'prev') { c--; if (c < 0) { c = MAXC; r = Math.max(0, r - 1); } }
-  const nt = cellAt(grid, r, c); if (nt) setActive(nt);
-}
+/* ── nawigacja klawiaturą po siatce (wspólny silnik ./strefa-grid.js, jak w Szkoleniach) ── */
+const gridNav = createGridNav({
+  getRecord: (tr) => ({ id: tr.dataset.did, rec: devMap.get(tr.dataset.did) }),
+  dbUpdate: dbUpdateDev,
+  cellInner,
+  maxCol: MAXC,
+});
 function bindGrids() {
   $$('.strefa-tr').forEach((sec) => {
     const cid = sec.dataset.cid;
@@ -399,7 +275,7 @@ function bindGrids() {
       const tr = e.target.closest('tr');
       if (a) { devRowAction(a.dataset.act, tr?.dataset.did, a, e); return; }
       const td = e.target.closest('td[data-col]');
-      if (td) { const caret = caretIndexFromPoint(td, e.clientX, e.clientY); beginEdit(td, { caret }); }
+      if (td) { const caret = gridNav.caretIndexFromPoint(td, e.clientX, e.clientY); gridNav.beginEdit(td, { caret }); }
     });
     // zaznaczanie programistów (checkboxy → multi-akcje)
     const selAll = $('input[data-pickall]', grid);
@@ -433,23 +309,7 @@ function bindGrids() {
     const doAdd = () => addDeveloper(cid, addInputs, addGo);
     addGo?.addEventListener('click', doAdd);
     addInputs.forEach((inp) => inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); doAdd(); } }));
-    wrap.addEventListener('keydown', (e) => {
-      if (editing) return;
-      if (!activeTd || !grid.contains(activeTd)) return;
-      const td = activeTd; let r = +td.dataset.r, c = +td.dataset.c; let handled = true;
-      switch (e.key) {
-        case 'ArrowRight': c = Math.min(MAXC, c + 1); break;
-        case 'ArrowLeft': c = Math.max(0, c - 1); break;
-        case 'ArrowDown': r++; break;
-        case 'ArrowUp': r = Math.max(0, r - 1); break;
-        case 'Tab': e.preventDefault(); moveActive(grid, td, e.shiftKey ? 'prev' : 'next'); return;
-        case 'Enter': case 'F2': e.preventDefault(); beginEdit(td); return;
-        default:
-          if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); beginEdit(td, { appendChar: e.key }); }
-          handled = false;
-      }
-      if (handled) { const nt = cellAt(grid, r, c); if (nt) { e.preventDefault(); setActive(nt); } }
-    });
+    gridNav.bindKeydown(wrap, grid);
   });
 }
 
@@ -546,8 +406,7 @@ function stagePopover(did, anchor) {
 const TABS = [['overview', 'Przegląd'], ['notes', 'Notatki'], ['meetings', 'Spotkania'], ['tasks', 'Zadania'], ['prompts', 'Prompty'], ['emails', 'Maile']];
 async function openProfile(did, tab = 'overview') {
   openDevId = did; activeTab = tab;
-  const box = openModal('<div class="strefa-prof"></div>', true);
-  box._cid = box; // marker
+  openModal('<div class="strefa-prof"></div>', true);
   renderProfile();
 }
 function profileHost() { return $('#modal-root .strefa-prof'); }
@@ -877,7 +736,6 @@ async function loadList(d, kind) {
     }).join('') : '<p class="note-empty">Brak zadań.</p>';
     host.querySelectorAll('[data-status]').forEach((sel) => sel.addEventListener('change', async () => {
       await sb.from('dev_tasks').update({ status: sel.value }).eq('id', sel.dataset.status); await loadList(d, 'tasks'); renderStats();
-      const dd = devMap.get(d.id); // odśwież licznik openTasks w pamięci
     }));
   } else if (kind === 'prompts') {
     const { data } = await sb.from('dev_prompts').select('*').eq('developer_id', d.id).order('used_on', { ascending: false });
@@ -966,7 +824,7 @@ async function loadMails(d, panel) {
   host.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => {
     const m = data.find((x) => x.id === b.dataset.edit);
     mailDraftId = m.id; $('#m-subject', panel).value = m.subject === '(bez tematu)' ? '' : m.subject; $('#m-body', panel).value = m.body;
-    $('#m-head', panel).textContent = 'Edytujesz szkic'; $('#m-subject', panel).focus();
+    $('#mail-head', panel).textContent = 'Edytujesz szkic'; $('#m-subject', panel).focus();
   }));
   host.querySelectorAll('[data-delmail]').forEach((b) => b.addEventListener('click', async () => {
     const { error } = await sb.from('dev_emails').delete().eq('id', b.dataset.delmail);
@@ -1184,32 +1042,14 @@ function openScheduleMeetingModal() {
   });
 }
 
-/* ── realtime + ciche auto-odświeżanie listy ── */
+/* ── ciche auto-odświeżanie listy (realtime — wspólny startRealtime w ./supabase.js) ── */
 async function pollRefresh() {
-  if (polling || document.hidden || editing) return;
-  if (document.getElementById('modal-root')?.children.length) return; // dialog/drawer otwarty
-  const root = document.getElementById('companies');
-  if (root && root.contains(document.activeElement)) return;
+  if (polling || gridNav.editing || pollBlocked('companies')) return; // m.in. dialog/drawer otwarty
   polling = true;
   try {
     const list = await fetchData();
     if (sigOf(list) !== sigOf(companies)) { const y = window.scrollY; commit(list); renderAll(); window.scrollTo({ top: y }); }
   } catch (e) { /* cicho */ } finally { polling = false; }
-}
-async function startRealtime() {
-  try { const { data } = await sb.auth.getSession(); if (data?.session) sb.realtime.setAuth(data.session.access_token); } catch (e) { /* ignore */ }
-  let deb;
-  const trigger = () => { clearTimeout(deb); deb = setTimeout(pollRefresh, 400); };
-  const triggerCatalog = () => { clearTimeout(deb); deb = setTimeout(async () => { await loadSkillCatalog(); await pollRefresh(); if (openDevId) renderProfile(); }, 400); };
-  sb.channel('strefa-programisci-list')
-    .on('postgres_changes', { event: '*', schema: 'strefa', table: 'developers' }, trigger)
-    .on('postgres_changes', { event: '*', schema: 'strefa', table: 'dev_companies' }, trigger)
-    .on('postgres_changes', { event: '*', schema: 'strefa', table: 'dev_skills' }, trigger)
-    .on('postgres_changes', { event: '*', schema: 'strefa', table: 'dev_skill_catalog' }, triggerCatalog)
-    .on('postgres_changes', { event: '*', schema: 'strefa', table: 'dev_meetings' }, trigger)
-    .subscribe((s) => { if (s === 'SUBSCRIBED') pollRefresh(); });
-  setInterval(pollRefresh, 60000);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) pollRefresh(); });
 }
 
 /* ── import / eksport JSON ── */
@@ -1217,8 +1057,7 @@ async function exportJSON() {
   const out = [];
   for (const c of companies.filter((x) => !x._none)) out.push({ id: c.id, name: c.name });
   const { data: devs } = await sb.from('developers').select('*');
-  const blob = new Blob([JSON.stringify({ companies: out, developers: devs || [] }, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `szron-programisci-${todayStr()}.json`; a.click(); URL.revokeObjectURL(a.href);
+  downloadJSON({ companies: out, developers: devs || [] }, `szron-programisci-${todayStr()}.json`);
   toast('Wyeksportowano', 'Pobrano JSON', 'ok');
 }
 async function importFile(file) {
@@ -1240,8 +1079,8 @@ async function importLegacy() {
 
 /* ── start ── */
 async function init() {
-  const user = await getSessionUser();
-  if (!user || !isAllowed(user.email)) return;
+  if (!(await getTeamUser())) return; // layout przekieruje na login
+  setOnModalClose(() => { openDevId = null; }); // każde zamknięcie modala/drawera (przycisk, scrim, Escape) zamyka profil
   $('#btn-add-company').addEventListener('click', () => companyModal(null));
   $('#btn-add-dev').addEventListener('click', () => {
     // dodaj do pierwszej firmy / rozwiń ją, lub do „bez firmy"
@@ -1257,15 +1096,16 @@ async function init() {
     if (devs.length) composeEmailModal(devs);
   });
   $('#btn-export').addEventListener('click', exportJSON);
-  $('#btn-import-file').addEventListener('click', () => $('#file-input').click());
+  bindFileImport('#btn-import-file', '#file-input', importFile);
   $('#btn-import-legacy')?.addEventListener('click', importLegacy);
-  $('#file-input').addEventListener('change', (e) => { if (e.target.files[0]) importFile(e.target.files[0]); e.target.value = ''; });
-  let timer;
-  $('#search').addEventListener('input', (e) => { clearTimeout(timer); timer = setTimeout(() => { query = e.target.value.trim(); renderAll(); }, 150); });
+  bindSearch('#search', (q) => { query = q; renderAll(); });
   await loadSkillCatalog();
   await loadData();
   if (companies.length) openIds.add(companies[0].id);
   renderAll();
-  startRealtime();
+  startRealtime(sb, 'strefa-programisci-list', ['developers', 'dev_companies', 'dev_skills', 'dev_skill_catalog', 'dev_meetings'], pollRefresh, {
+    // katalog umiejętności: przeładuj SKILLS + odśwież listę i otwarty profil
+    dev_skill_catalog: async () => { await loadSkillCatalog(); await pollRefresh(); if (openDevId) renderProfile(); },
+  });
 }
 init();

@@ -1,5 +1,7 @@
 ---
 import Interior from '../../layouts/Interior.astro';
+import SectHead from '../../components/SectHead.astro';
+import ProofStrip from '../../components/ProofStrip.astro';
 ---
 <Interior
   title="Case study: firmware STM32 dla przemysłu | SZRON"
@@ -11,23 +13,16 @@ import Interior from '../../layouts/Interior.astro';
   heroAlt="Makro oszronionej płytki STM32 ze świecącymi pomarańczowo ścieżkami"
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>2 mc → 2 tyg</strong><span>czas dostarczenia</span></div>
-        <div><strong>3 inż. z AI</strong><span>zespół po wdrożeniu</span></div>
-        <div><strong>unit + HIL</strong><span>pokrycie testami</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['2 mc → 2 tyg', 'czas dostarczenia'],
+    ['3 inż. z AI', 'zespół po wdrożeniu'],
+    ['unit + HIL', 'pokrycie testami'],
+  ]} />
 
   <!-- 01 kontekst -->
   <section class="sect" aria-labelledby="kontekst">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Kontekst klienta</p>
-        <h2 class="sect-title sect-title--s ws" id="kontekst">Sterownik w produkcji od 2019. Nowy moduł komunikacji na termin.</h2>
-      </div>
+      <SectHead eyebrow="01 / Kontekst klienta" title="Sterownik w produkcji od 2019. Nowy moduł komunikacji na termin." id="kontekst" small />
       <div class="prose rv">
         <p>Polski producent automatyki przemysłowej projektujący sterowniki dla maszyn pakujących i linii produkcyjnych. Trzon zespołu R&amp;D to trzech inżynierów embedded — dwóch seniorów z ponad 15-letnim stażem w C/C++ na ARM-y, jeden mid z 4 latami. Sam sterownik jest w produkcji od 2019 roku — sprawdzony, certyfikowany, w setkach instalacji.</p>
         <p>Wymaganie od klienta końcowego (producent linii butelkowania): moduł komunikacji Modbus RTU + CANopen z mostkiem do nowszego protokołu OPC UA, kompatybilny z istniejącym sterownikiem, bez zmiany pinout-u. Termin: 8 tygodni. Wycena wewnętrzna w firmie: 6–8 tygodni inżyniera plus 2 tygodnie testów HIL.</p>
@@ -38,10 +33,7 @@ import Interior from '../../layouts/Interior.astro';
   <!-- 02 kto prowadził (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="kto">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Kto to prowadził</p>
-        <h2 class="sect-title ws" id="kto">Dwie osoby, dwa tygodnie, jeden odbiór.</h2>
-      </div>
+      <SectHead eyebrow="02 / Kto to prowadził" title="Dwie osoby, dwa tygodnie, jeden odbiór." id="kto" />
       <dl class="def-rows rv">
         <div><dt>Tomek Wojciechowski<small>Lead operacyjny</small></dt><dd>Bare-metal C/C++17 od 18 lat, embedded STM32 / AVR od pierwszej połowy lat 2000. Setup CI dla firmware-u, pisanie CLAUDE.md dla bare-metal (180 linii reguł — zakazy w ISR, lista funkcji thread-safe, konwencje memory-mapped IO).</dd></div>
         <div><dt>Maciej Stopa<small>CI / DevOps dla firmware</small></dt><dd>GitHub Actions z arm-none-eabi, symulatory Modbus RTU i CANopen w Pythonie, integracja host-tests. Wcześniej prowadził pipeline-y dla embedded w jednym z fintech-ów.</dd></div>
@@ -52,10 +44,7 @@ import Interior from '../../layouts/Interior.astro';
   <!-- 03 co bolało -->
   <section class="sect" aria-labelledby="bol">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Problem · Co naprawdę bolało</p>
-        <h2 class="sect-title sect-title--s ws" id="bol">Problem nie był techniczny — był pojemnościowy.</h2>
-      </div>
+      <SectHead eyebrow="03 / Problem · Co naprawdę bolało" title="Problem nie był techniczny — był pojemnościowy." id="bol" small />
       <div class="prose rv">
         <p>Zespół znał stos. Znał sterownik. Znał protokoły. Problem nie był techniczny — problem był pojemnościowy.</p>
         <ul>
@@ -71,10 +60,7 @@ import Interior from '../../layouts/Interior.astro';
   <!-- 04 podejście (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="podejscie">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Podejście SZRON</p>
-        <h2 class="sect-title ws" id="podejscie">Najpierw cykl iteracji, dopiero potem kod modułu.</h2>
-      </div>
+      <SectHead eyebrow="04 / Podejście SZRON" title="Najpierw cykl iteracji, dopiero potem kod modułu." id="podejscie" />
       <div class="prose rv">
         <p>Diagnoza pokazała, że projekt da się zrobić w 2 tygodnie pod warunkiem, że zespół najpierw rozwiąże problem cyklu iteracji, a dopiero potem siądzie do kodu modułu. Większość zespołów próbuje od razu pisać feature — i traci tygodnie na test/build/flash.</p>
         <ul>
@@ -94,10 +80,7 @@ import Interior from '../../layouts/Interior.astro';
   <!-- 05 przebieg -->
   <section class="sect" aria-labelledby="przebieg">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>05 / Przebieg projektu · 2 tygodnie do odbioru</p>
-        <h2 class="sect-title ws" id="przebieg">Od CI po HIL — dwa tygodnie do podpisu.</h2>
-      </div>
+      <SectHead eyebrow="05 / Przebieg projektu · 2 tygodnie do odbioru" title="Od CI po HIL — dwa tygodnie do podpisu." id="przebieg" />
       <div class="steps">
         <article class="step rv"><p class="eyebrow">Tydzień 1</p><h3>CI + symulatory + Modbus</h3><p>GitHub Actions, host testy z mockami, kompletny stos Modbus RTU slave napisany pod testami unit. Pierwsza wersja na sprzęcie pod koniec tygodnia.</p></article>
         <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">Tydzień 2</p><h3>CANopen + integracja + HIL</h3><p>Warstwa CANopen z obsługą NMT, PDO i SDO. Integracja z istniejącym kodem sterownika. Pełen cykl testów HIL przeprowadzony przez senior + middle. Odbiór wewnętrzny w piątek.</p></article>
@@ -109,15 +92,12 @@ import Interior from '../../layouts/Interior.astro';
   <!-- 06 wynik (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="wynik">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>06 / Wynik · Mierzony w iteracjach</p>
-        <h2 class="sect-title ws" id="wynik">Mierzony w iteracjach, nie w deklaracjach.</h2>
-      </div>
-      <div class="proof-strip rv">
-        <div><strong>3–4× szybciej</strong><span>2 tygodnie zamiast 6–8 tygodni inżyniera</span></div>
-        <div><strong>30 → 4 min</strong><span>pętla feedback na CI host (20 → 12 min na HIL)</span></div>
-        <div><strong>3 z 3 inżynierów</strong><span>używa Claude Code w dzień 14 — sprawdzone w commitach</span></div>
-      </div>
+      <SectHead eyebrow="06 / Wynik · Mierzony w iteracjach" title="Mierzony w iteracjach, nie w deklaracjach." id="wynik" />
+      <ProofStrip wrap={false} items={[
+        ['3–4× szybciej', '2 tygodnie zamiast 6–8 tygodni inżyniera'],
+        ['30 → 4 min', 'pętla feedback na CI host (20 → 12 min na HIL)'],
+        ['3 z 3 inżynierów', 'używa Claude Code w dzień 14 — sprawdzone w commitach'],
+      ]} />
       <dl class="def-rows rv">
         <div><dt>Czas dostarczenia<small>2 tygodnie zamiast 6–8</small></dt><dd>Moduł zamknięty w dwa tygodnie zamiast 6–8 tygodni inżyniera (3–4× szybciej).</dd></div>
         <div><dt>Czas pętli feedback<small>CI host i HIL</small></dt><dd>30 min → 4 min na CI host. 20 min → 12 min na HIL.</dd></div>
@@ -134,10 +114,7 @@ import Interior from '../../layouts/Interior.astro';
   <!-- 07 stack -->
   <section class="sect" aria-labelledby="stack">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>07 / Stack technologiczny</p>
-        <h2 class="sect-title sect-title--s ws" id="stack">Bare-metal C/C++17 i FreeRTOS — bez migracji na siłę.</h2>
-      </div>
+      <SectHead eyebrow="07 / Stack technologiczny" title="Bare-metal C/C++17 i FreeRTOS — bez migracji na siłę." id="stack" small />
       <dl class="def-rows rv">
         <div><dt>Mikrokontroler<small>STM32F4</small></dt><dd>ARM Cortex-M4 168 MHz, 1 MB Flash, 192 kB RAM.</dd></div>
         <div><dt>Język<small>C17 / C++17</small></dt><dd>C17 dla warstw bliżej hardware'u, C++17 (bez wyjątków, bez RTTI) dla warstwy protokołów.</dd></div>
@@ -153,10 +130,7 @@ import Interior from '../../layouts/Interior.astro';
   <!-- 08 co zostało (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="zostalo">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>08 / Co zostało po nas</p>
-        <h2 class="sect-title ws" id="zostalo">Działający moduł, żywe CI i zespół, który przekonał się sam.</h2>
-      </div>
+      <SectHead eyebrow="08 / Co zostało po nas" title="Działający moduł, żywe CI i zespół, który przekonał się sam." id="zostalo" />
       <div class="grid-cards">
         <article class="card-tile rv"><p class="eyebrow">01</p><h3>Działający moduł komunikacji</h3><p>Podpisany odbiór klienta końcowego po 3 tygodniach od startu projektu.</p></article>
         <article class="card-tile rv" style="--rv-d:.1s"><p class="eyebrow">02</p><h3>Działające CI dla firmware-u</h3><p>Pipeline, który zespół rozszerza na kolejne moduły.</p></article>

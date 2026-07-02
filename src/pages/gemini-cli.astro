@@ -1,5 +1,8 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
 import { akademia } from '../data/akademia.mjs';
 const related = akademia.filter((a) => ['codex-cli', 'claude-code', 'serwery-mcp'].includes(a.slug));
 ---
@@ -12,15 +15,11 @@ const related = akademia.filter((a) => ['codex-cli', 'claude-code', 'serwery-mcp
   lead="Open-source narzędzie wiersza poleceń, które przenosi modele Gemini wprost do terminala: do 1M tokenów kontekstu, wbudowane wyszukiwanie Google i obsługa Model Context Protocol. Poniżej instalacja, autoryzacja i komendy, których używamy na co dzień."
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>1M tokenów</strong><span>kontekstu w modelu Gemini</span></div>
-        <div><strong>Darmowy start</strong><span>onboarding indywidualny przez Antigravity CLI</span></div>
-        <div><strong>MCP i shell</strong><span>rozszerzasz o własne narzędzia</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['1M tokenów', 'kontekstu w modelu Gemini'],
+    ['Darmowy start', 'onboarding indywidualny przez Antigravity CLI'],
+    ['MCP i shell', 'rozszerzasz o własne narzędzia'],
+  ]} />
 
   <!-- aktualizacja -->
   <section class="sect" style="padding-top:0;padding-bottom:0">
@@ -34,10 +33,7 @@ const related = akademia.filter((a) => ['codex-cli', 'claude-code', 'serwery-mcp
   <!-- 01 czym jest -->
   <section class="sect" aria-labelledby="czym">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Wprowadzenie · Czym jest</p>
-        <h2 class="sect-title sect-title--s ws" id="czym">Asystent AI od Google bez wychodzenia z terminala.</h2>
-      </div>
+      <SectHead eyebrow="01 / Wprowadzenie · Czym jest" title="Asystent AI od Google bez wychodzenia z terminala." id="czym" small />
       <div class="prose rv">
         <p>Gemini CLI to open-source narzędzie wiersza poleceń, które daje dostęp do modeli Gemini bezpośrednio w terminalu. Oferuje do 1M tokenów kontekstu, wbudowane narzędzia (m.in. wyszukiwarkę Google) oraz obsługę Model Context Protocol (MCP). Sprawdza się u osób, które pracują głównie w terminalu i chcą szybkiego dostępu do AI bez przełączania się między aplikacjami.</p>
         <ul>
@@ -56,10 +52,7 @@ const related = akademia.filter((a) => ['codex-cli', 'claude-code', 'serwery-mcp
   <!-- 02 instalacja (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="instalacja">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Instalacja · Windows, Linux, macOS</p>
-        <h2 class="sect-title ws" id="instalacja">Node.js 20+, a potem jedna komenda npm.</h2>
-      </div>
+      <SectHead eyebrow="02 / Instalacja · Windows, Linux, macOS" title="Node.js 20+, a potem jedna komenda npm." id="instalacja" />
       <div class="prose rv">
         <h3>Wymagania systemowe</h3>
         <ul>
@@ -93,10 +86,7 @@ sudo apt-get install -y nodejs</code></pre>
   <!-- 03 autoryzacja -->
   <section class="sect" aria-labelledby="autoryzacja">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Autoryzacja · Pierwsze uruchomienie</p>
-        <h2 class="sect-title sect-title--s ws" id="autoryzacja">Logowanie kontem Google albo klucz API.</h2>
-      </div>
+      <SectHead eyebrow="03 / Autoryzacja · Pierwsze uruchomienie" title="Logowanie kontem Google albo klucz API." id="autoryzacja" small />
       <div class="prose rv">
         <p>Najprostsza metoda to przeglądarkowy OAuth. Po uruchomieniu <code>gemini</code> wybierz „Login with Google", zaloguj się i potwierdź uprawnienia dla Gemini CLI — gotowe.</p>
         <ol>
@@ -127,10 +117,7 @@ gemini</code></pre>
   <!-- 04 komendy (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="komendy">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Komendy · Slash, kontekst, shell</p>
-        <h2 class="sect-title ws" id="komendy">Slash, znak małpy i wykrzyknik — trzy tryby pracy.</h2>
-      </div>
+      <SectHead eyebrow="04 / Komendy · Slash, kontekst, shell" title="Slash, znak małpy i wykrzyknik — trzy tryby pracy." id="komendy" />
       <div class="prose rv">
         <h3>Komendy slash (/)</h3>
         <p>Zarządzają sesją CLI. Najważniejsze:</p>
@@ -187,10 +174,7 @@ gemini</code></pre>
   <!-- 05 MCP -->
   <section class="sect" aria-labelledby="mcp">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>05 / MCP · Kontrola przeglądarki</p>
-        <h2 class="sect-title sect-title--s ws" id="mcp">ChromeDevTools MCP — agent steruje przeglądarką.</h2>
-      </div>
+      <SectHead eyebrow="05 / MCP · Kontrola przeglądarki" title="ChromeDevTools MCP — agent steruje przeglądarką." id="mcp" small />
       <div class="prose rv">
         <p>Model Context Protocol to otwarty standard stworzony przez Anthropic, który pozwala agentom AI na bezpieczną integrację z narzędziami zewnętrznymi. ChromeDevTools MCP daje Gemini pełną kontrolę przeglądarki Chrome — nawigację po stronach, wypełnianie formularzy, testowanie UI, screenshoty, debugowanie i wykonywanie JavaScript.</p>
         <h3>Instalacja dla bieżącego projektu</h3>
@@ -209,10 +193,7 @@ gemini</code></pre>
   <!-- powiazane szkolenia -->
   <section class="sect" aria-labelledby="powiazane" style="padding-top:0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>Powiązane szkolenia</p>
-        <h2 class="sect-title sect-title--s ws" id="powiazane">Czytaj dalej w Akademii.</h2>
-      </div>
+      <SectHead eyebrow="Powiązane szkolenia" title="Czytaj dalej w Akademii." id="powiazane" small />
       <div class="link-cards rv">
         {related.map((a) => (
           <a class="link-card" href={`/${a.slug}`}>
@@ -225,20 +206,5 @@ gemini</code></pre>
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie tak pracować całym zespołem?</h2>
-      <p class="rv">Akademia to materiały. Wdrożenie to dwa kwartały na Waszym kodzie — z pomiarem efektu w DEVLens. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand heading="Chcecie tak pracować całym zespołem?" />
 </Interior>

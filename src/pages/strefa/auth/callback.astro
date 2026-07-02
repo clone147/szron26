@@ -18,7 +18,7 @@ import '../../../styles/strefa.css';
   </div>
 
   <script>
-    import { getClient, getSessionUser, isAllowed, signOut } from '../../../lib/supabase.js';
+    import { getClient, getSessionUser, isAllowed, signOut, waitForSession } from '../../../lib/supabase.js';
 
     (async () => {
       const params = new URLSearchParams(window.location.search);
@@ -32,20 +32,11 @@ import '../../../styles/strefa.css';
         return;
       }
 
-      const sb = getClient(); // detectSessionInUrl: automatycznie wymienia kod PKCE na sesję
+      getClient(); // detectSessionInUrl: automatycznie wymienia kod PKCE na sesję
 
       // Poczekaj na ustanowienie sesji (zdarzenie lub polling)
       let user = await getSessionUser();
-      if (!user) {
-        await new Promise((resolve) => {
-          const { data } = sb.auth.onAuthStateChange((_e, session) => { if (session) resolve(); });
-          let tries = 0;
-          const iv = setInterval(async () => {
-            if (await getSessionUser() || ++tries > 20) { clearInterval(iv); data.subscription.unsubscribe(); resolve(); }
-          }, 200);
-        });
-        user = await getSessionUser();
-      }
+      if (!user) user = await waitForSession(20);
 
       if (!user) {
         msg.textContent = 'Nie udało się zalogować. Spróbuj ponownie.';

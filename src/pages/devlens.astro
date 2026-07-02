@@ -1,5 +1,18 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+// FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html)
+const faq = [
+  { q: 'Czym DevLens różni się od standardowego GitHub lub GitLab analytics?', a: 'GitHub i GitLab dostarczają surowe dane techniczne dla programistów. DevLens tłumaczy je na język biznesu dla zarządu: nie „commits", tylko tempo dostarczania wartości. Dochodzi Bus Factor — wskaźnik ryzyka ciągłości nieobecny w standardowych narzędziach — agregacja multi-repo i raporty wykonawcze gotowe do prezentacji. To narzędzie dla C-level, nie dla developerów.' },
+  { q: 'Co to jest Bus Factor i dlaczego jest krytyczny dla zarządu?', a: 'Bus Factor to liczba kluczowych osób, których odejście całkowicie sparaliżuje projekt. Bus Factor równy 1 oznacza, że odejście jednej osoby zatrzyma rozwój. Konsekwencje biznesowe to ryzyko ciągłości, koszt i czas rekrutacji oraz utracone przychody. DevLens identyfikuje projekty z niskim Bus Factor i sugeruje akcje: cross-team code review, dokumentację, pair programming.' },
+  { q: 'Czy moje dane z repozytoriów są bezpieczne?', a: 'Tak — bezpieczeństwo to fundament. Lokalne przetwarzanie: wszystkie tokeny dostępu i dane analityczne trzymane są tylko w Waszej przeglądarce. Zero wysyłania danych do naszych serwerów, weryfikowalne audytem kodu. Przy włączonej integracji AI do zewnętrznego API trafiają wyłącznie zagregowane statystyki, nie kod, i tylko za Waszą zgodą. Zgodność z RODO out-of-the-box, możliwość self-hostingu w wariancie enterprise.' },
+  { q: 'Jak długo trwa wdrożenie?', a: 'Platformę można uruchomić w 1–2 dni. Dnia pierwszego generujecie token dostępu read-only z GitHub lub GitLab i konfigurujecie repozytoria. Dnia drugiego DevLens agreguje dane i generuje pierwsze raporty. W pierwszym tygodniu dostrajamy dashboardy do Waszych KPI. Brak infrastruktury — działa w przeglądarce, zero instalacji serwerów.' },
+  { q: 'Jakie repozytoria i platformy są wspierane?', a: 'DevLens obsługuje dwie platformy do wyboru: GitHub (github.com oraz GitHub Enterprise) i GitLab (gitlab.com oraz self-hosted GitLab). W danym wdrożeniu integrujemy się z jedną z nich i łączymy dowolną liczbę repozytoriów w jej obrębie. Wymagany jest read-only access token — bez uprawnień do zapisu.' },
+];
 ---
 <Interior
   title="DevLens — analityka zespołów dev dla zarządu | SZRON"
@@ -11,23 +24,16 @@ import Interior from '../layouts/Interior.astro';
   heroAlt="Dashboard wykresów wyrzeźbiony z lodu z pomarańczowymi liniami danych"
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Multi-Repo</strong><span>agregacja GitHub lub GitLab</span></div>
-        <div><strong>Bus Factor</strong><span>wskaźnik ryzyka ciągłości</span></div>
-        <div><strong>100% lokalnie</strong><span>dane nie opuszczają przeglądarki</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['Multi-Repo', 'agregacja GitHub lub GitLab'],
+    ['Bus Factor', 'wskaźnik ryzyka ciągłości'],
+    ['100% lokalnie', 'dane nie opuszczają przeglądarki'],
+  ]} />
 
   <!-- 01 funkcjonalności (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="funkcje">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Funkcjonalności · Dla zarządu, nie dla programistów</p>
-        <h2 class="sect-title ws" id="funkcje">Surowe dane z kodu przetłumaczone na KPI i decyzje.</h2>
-      </div>
+      <SectHead eyebrow="01 / Funkcjonalności · Dla zarządu, nie dla programistów" title="Surowe dane z kodu przetłumaczone na KPI i decyzje." id="funkcje" />
       <dl class="def-rows rv">
         <div><dt>Strategiczne wskaźniki biznesowe<small>Dane z GitHuba w języku zarządu</small></dt><dd>Liczba zmian i tempo prac zespołu, wzorce wydajności poszczególnych programistów, analiza rotacji kodu (code churn) oraz trendy historyczne z identyfikacją sezonowości.</dd></div>
         <div><dt>Identyfikacja ryzyk operacyjnych<small>Bus Factor — większość firm nie zna tej liczby</small></dt><dd>Bus Factor pokazuje, ile kluczowych osób musi odejść, by projekt stanął. Do tego wskaźniki stagnacji projektów, dywersyfikacja wiedzy w zespole i analiza zależności między projektami.</dd></div>
@@ -40,10 +46,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 korzyści biznesowe -->
   <section class="sect" aria-labelledby="korzysci">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Korzyści biznesowe · Konkretne decyzje</p>
-        <h2 class="sect-title sect-title--s ws" id="korzysci">Konkretne liczby dla konkretnych decyzji.</h2>
-      </div>
+      <SectHead eyebrow="02 / Korzyści biznesowe · Konkretne decyzje" title="Konkretne liczby dla konkretnych decyzji." id="korzysci" small />
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">01 / Transparentność procesów</p>
@@ -82,11 +85,9 @@ import Interior from '../layouts/Interior.astro';
   <!-- 03 integracja AI (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="ai">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Integracja z AI · Opcjonalnie</p>
-        <h2 class="sect-title ws" id="ai">AI generuje podsumowania wykonawcze i rekomendacje.</h2>
+      <SectHead eyebrow="03 / Integracja z AI · Opcjonalnie" title="AI generuje podsumowania wykonawcze i rekomendacje." id="ai">
         <p class="sect-lead rv">Opcjonalna integracja z AI generuje automatyczne podsumowania wykonawcze i rekomendacje strategiczne.</p>
-      </div>
+      </SectHead>
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">01 / Podsumowania</p>
@@ -114,10 +115,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 04 dla kogo -->
   <section class="sect" aria-labelledby="dlakogo">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Dla kogo · Role w zarządzie</p>
-        <h2 class="sect-title sect-title--s ws" id="dlakogo">CEO, CTO, CFO, PM — każdy dostaje odpowiedź na swoje pytanie.</h2>
-      </div>
+      <SectHead eyebrow="04 / Dla kogo · Role w zarządzie" title="CEO, CTO, CFO, PM — każdy dostaje odpowiedź na swoje pytanie." id="dlakogo" small />
       <dl class="def-rows rv">
         <div><dt>CEO / Zarząd<small>Czy inwestycja w zespół się zwraca?</small></dt><dd>DevLens pokazuje tempo dostarczania funkcji, trendy wydajności i zwrot z inwestycji w programistów.</dd></div>
         <div><dt>CTO / Dyrektor IT<small>Gdzie są wąskie gardła i ryzyka?</small></dt><dd>Bus Factor, analiza zależności między projektami, wskaźniki stagnacji — wszystko w jednym miejscu.</dd></div>
@@ -130,11 +128,9 @@ import Interior from '../layouts/Interior.astro';
   <!-- 05 bezpieczeństwo (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="bezp">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>05 / Bezpieczeństwo · Korporacyjne</p>
-        <h2 class="sect-title ws" id="bezp">Dane wrażliwe zostają wyłącznie w przeglądarce.</h2>
+      <SectHead eyebrow="05 / Bezpieczeństwo · Korporacyjne" title="Dane wrażliwe zostają wyłącznie w przeglądarce." id="bezp">
         <p class="sect-lead rv">Wszystkie dane wrażliwe — tokeny dostępu i dane analityczne — przechowywane są wyłącznie lokalnie, w przeglądarce użytkownika.</p>
-      </div>
+      </SectHead>
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">01 / Lokalne przetwarzanie</p>
@@ -158,50 +154,16 @@ import Interior from '../layouts/Interior.astro';
   <!-- 06 FAQ -->
   <section class="sect" aria-labelledby="faq-title">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>06 / FAQ · Pytania o DevLens Pro</p>
-        <h2 class="sect-title sect-title--s ws" id="faq-title">Najczęstsze pytania o platformę analityczną dla zarządu.</h2>
-      </div>
-      <div class="faq rv">
-        <details>
-          <summary><span class="num">01</span> Czym DevLens różni się od standardowego GitHub lub GitLab analytics? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>GitHub i GitLab dostarczają surowe dane techniczne dla programistów. DevLens tłumaczy je na język biznesu dla zarządu: nie „commits", tylko tempo dostarczania wartości. Dochodzi Bus Factor — wskaźnik ryzyka ciągłości nieobecny w standardowych narzędziach — agregacja multi-repo i raporty wykonawcze gotowe do prezentacji. To narzędzie dla C-level, nie dla developerów.</p>
-        </details>
-        <details>
-          <summary><span class="num">02</span> Co to jest Bus Factor i dlaczego jest krytyczny dla zarządu? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Bus Factor to liczba kluczowych osób, których odejście całkowicie sparaliżuje projekt. Bus Factor równy 1 oznacza, że odejście jednej osoby zatrzyma rozwój. Konsekwencje biznesowe to ryzyko ciągłości, koszt i czas rekrutacji oraz utracone przychody. DevLens identyfikuje projekty z niskim Bus Factor i sugeruje akcje: cross-team code review, dokumentację, pair programming.</p>
-        </details>
-        <details>
-          <summary><span class="num">03</span> Czy moje dane z repozytoriów są bezpieczne? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Tak — bezpieczeństwo to fundament. Lokalne przetwarzanie: wszystkie tokeny dostępu i dane analityczne trzymane są tylko w Waszej przeglądarce. Zero wysyłania danych do naszych serwerów, weryfikowalne audytem kodu. Przy włączonej integracji AI do zewnętrznego API trafiają wyłącznie zagregowane statystyki, nie kod, i tylko za Waszą zgodą. Zgodność z RODO out-of-the-box, możliwość self-hostingu w wariancie enterprise.</p>
-        </details>
-        <details>
-          <summary><span class="num">04</span> Jak długo trwa wdrożenie? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Platformę można uruchomić w 1–2 dni. Dnia pierwszego generujecie token dostępu read-only z GitHub lub GitLab i konfigurujecie repozytoria. Dnia drugiego DevLens agreguje dane i generuje pierwsze raporty. W pierwszym tygodniu dostrajamy dashboardy do Waszych KPI. Brak infrastruktury — działa w przeglądarce, zero instalacji serwerów.</p>
-        </details>
-        <details>
-          <summary><span class="num">05</span> Jakie repozytoria i platformy są wspierane? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>DevLens obsługuje dwie platformy do wyboru: GitHub (github.com oraz GitHub Enterprise) i GitLab (gitlab.com oraz self-hosted GitLab). W danym wdrożeniu integrujemy się z jedną z nich i łączymy dowolną liczbę repozytoriów w jej obrębie. Wymagany jest read-only access token — bez uprawnień do zapisu.</p>
-        </details>
-      </div>
+      <SectHead eyebrow="06 / FAQ · Pytania o DevLens Pro" title="Najczęstsze pytania o platformę analityczną dla zarządu." id="faq-title" small />
+      <Faq items={faq} />
     </div>
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Przekształć dane w decyzje.</h2>
-      <p class="rv">Co robi zespół? Czy inwestycja się zwraca? Kto jest niezastąpiony? Umówmy demo platformy dostosowane do Waszej organizacji — dane zostają u Was.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Zarezerwuj demo platformy
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="Przekształć dane w decyzje."
+    text="Co robi zespół? Czy inwestycja się zwraca? Kto jest niezastąpiony? Umówmy demo platformy dostosowane do Waszej organizacji — dane zostają u Was."
+    btnLabel="Zarezerwuj demo platformy"
+  />
 </Interior>

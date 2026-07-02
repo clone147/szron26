@@ -1,5 +1,17 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+// FAQ — numeracja 01…NN generowana w <Faq />
+const faq = [
+  { q: 'Kiedy lepszy jest SZRON niż ekspert in-house?', a: 'Gdy potrzebujecie szybkiego startu, nie chcecie ryzyka związanego z rekrutacją i zależy wam na dostępie do wielobranżowej ekspertyzy. Idealny dla firm rozpoczynających transformację AI.' },
+  { q: 'Kiedy lepszy jest ekspert in-house?', a: 'Gdy macie bardzo specyficzne, ciągłe potrzeby wymagające zaangażowania na pełny etat i pełnej znajomości wewnętrznych systemów. Zwykle dla dużych organizacji (100+ pracowników).' },
+  { q: 'Czy mogę połączyć oba podejścia?', a: 'Tak. Wiele firm zaczyna ze SZRON, uczy się podstaw, a potem zatrudnia eksperta in-house, którego my szkolimy. Zmniejsza to ryzyko złej rekrutacji.' },
+  { q: 'Co jeśli mój ekspert odejdzie?', a: 'To główne ryzyko modelu in-house. Ze SZRON macie ciągłość — jeśli ktoś z naszego zespołu jest niedostępny, zastępuje go inny ekspert. Wiedza jest w organizacji, nie w jednej osobie.' },
+];
 ---
 <Interior
   title="Outsourcing AI vs in-house — koszty | SZRON"
@@ -11,23 +23,16 @@ import Interior from '../layouts/Interior.astro';
   heroAlt="Dwa bloki lodu na zamrożonej wadze, jeden świeci pomarańczowo"
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Koszt miesięczny</strong><span>8–20 tys. PLN u nas vs 25–40 tys. PLN in-house</span></div>
-        <div><strong>Czas do startu</strong><span>1–2 tygodnie vs 3–6 miesięcy rekrutacji i onboardingu</span></div>
-        <div><strong>Bez ryzyka odejścia</strong><span>wiedza w organizacji, nie w jednej osobie</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['Koszt miesięczny', '8–20 tys. PLN u nas vs 25–40 tys. PLN in-house'],
+    ['Czas do startu', '1–2 tygodnie vs 3–6 miesięcy rekrutacji i onboardingu'],
+    ['Bez ryzyka odejścia', 'wiedza w organizacji, nie w jednej osobie'],
+  ]} />
 
   <!-- 01 TCO -->
   <section class="sect" aria-labelledby="tco">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Koszty · Całkowity koszt posiadania (miesięcznie)</p>
-        <h2 class="sect-title ws" id="tco">Co realnie kosztuje ekspert in-house, a co abonament.</h2>
-      </div>
+      <SectHead eyebrow="01 / Koszty · Całkowity koszt posiadania (miesięcznie)" title="Co realnie kosztuje ekspert in-house, a co abonament." id="tco" />
       <table class="results-table rv">
         <thead><tr><th scope="col">Składnik</th><th scope="col">Ekspert in-house</th><th scope="col">SZRON Foundation</th><th scope="col">SZRON Transform</th></tr></thead>
         <tbody>
@@ -46,10 +51,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 pełne porównanie (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="porownanie">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Porównanie · Pełne zestawienie</p>
-        <h2 class="sect-title ws" id="porownanie">Osiem kryteriów. Gdzie wygrywa który model.</h2>
-      </div>
+      <SectHead eyebrow="02 / Porównanie · Pełne zestawienie" title="Osiem kryteriów. Gdzie wygrywa który model." id="porownanie" />
       <table class="results-table rv">
         <thead><tr><th scope="col">Kryterium</th><th scope="col">SZRON</th><th scope="col">In-house</th></tr></thead>
         <tbody>
@@ -69,10 +71,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 03 podsumowanie -->
   <section class="sect" aria-labelledby="podsumowanie">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Podsumowanie · Kiedy co wybrać</p>
-        <h2 class="sect-title sect-title--s ws" id="podsumowanie">Nie ma jednej odpowiedzi — jest dopasowanie do sytuacji.</h2>
-      </div>
+      <SectHead eyebrow="03 / Podsumowanie · Kiedy co wybrać" title="Nie ma jednej odpowiedzi — jest dopasowanie do sytuacji." id="podsumowanie" small />
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">SZRON</p>
@@ -91,46 +90,16 @@ import Interior from '../layouts/Interior.astro';
   <!-- 04 FAQ -->
   <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / FAQ · Najczęstsze pytania</p>
-        <h2 class="sect-title sect-title--s ws" id="faq-title">Pytania o wybór modelu.</h2>
-      </div>
-      <div class="faq rv">
-        <details>
-          <summary><span class="num">01</span> Kiedy lepszy jest SZRON niż ekspert in-house? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Gdy potrzebujecie szybkiego startu, nie chcecie ryzyka związanego z rekrutacją i zależy wam na dostępie do wielobranżowej ekspertyzy. Idealny dla firm rozpoczynających transformację AI.</p>
-        </details>
-        <details>
-          <summary><span class="num">02</span> Kiedy lepszy jest ekspert in-house? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Gdy macie bardzo specyficzne, ciągłe potrzeby wymagające zaangażowania na pełny etat i pełnej znajomości wewnętrznych systemów. Zwykle dla dużych organizacji (100+ pracowników).</p>
-        </details>
-        <details>
-          <summary><span class="num">03</span> Czy mogę połączyć oba podejścia? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Tak. Wiele firm zaczyna ze SZRON, uczy się podstaw, a potem zatrudnia eksperta in-house, którego my szkolimy. Zmniejsza to ryzyko złej rekrutacji.</p>
-        </details>
-        <details>
-          <summary><span class="num">04</span> Co jeśli mój ekspert odejdzie? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>To główne ryzyko modelu in-house. Ze SZRON macie ciągłość — jeśli ktoś z naszego zespołu jest niedostępny, zastępuje go inny ekspert. Wiedza jest w organizacji, nie w jednej osobie.</p>
-        </details>
-      </div>
+      <SectHead eyebrow="04 / FAQ · Najczęstsze pytania" title="Pytania o wybór modelu." id="faq-title" small />
+      <Faq items={faq} />
     </div>
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie porozmawiać o opcjach?</h2>
-      <p class="rv">Pomożemy wybrać model najlepszy dla Waszej sytuacji. Bez presji — pierwsza rozmowa to konkretne pytania, nie sprzedaż.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Zarezerwuj termin
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="Chcecie porozmawiać o opcjach?"
+    text="Pomożemy wybrać model najlepszy dla Waszej sytuacji. Bez presji — pierwsza rozmowa to konkretne pytania, nie sprzedaż."
+    btnLabel="Zarezerwuj termin"
+  />
 </Interior>

@@ -1,5 +1,8 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import BtnArrow from '../components/BtnArrow.astro';
 ---
 <Interior
   title="Darmowy audyt AI dla zespołu | SZRON"
@@ -9,24 +12,18 @@ import Interior from '../layouts/Interior.astro';
   lead="Patrzę na Wasze narzędzia, procesy i stack — i mówię wprost, gdzie widzę potencjał, a gdzie nie. Dostajesz konkretne rekomendacje, które możecie wdrożyć od razu. Nawet jeśli nie ze mną."
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Rozmowa + notatka</strong><span>w 1–2 dni od spotkania</span></div>
-        <div><strong>Konkretne rekomendacje</strong><span>na piśmie, gotowe do wdrożenia</span></div>
-        <div><strong>Szczera ocena</strong><span>nie pitch sprzedażowy</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['Rozmowa + notatka', 'w 1–2 dni od spotkania'],
+    ['Konkretne rekomendacje', 'na piśmie, gotowe do wdrożenia'],
+    ['Szczera ocena', 'nie pitch sprzedażowy'],
+  ]} />
 
   <!-- 01 o czym porozmawiamy (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="zakres">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Zakres · O czym porozmawiamy</p>
-        <h2 class="sect-title ws" id="zakres">Cztery tematy. Na koniec notatka z krokami.</h2>
+      <SectHead eyebrow="01 / Zakres · O czym porozmawiamy" title="Cztery tematy. Na koniec notatka z krokami." id="zakres">
         <p class="sect-lead rv">Przejdziemy przez cztery tematy. Na koniec dostaniesz notatkę z konkretnymi krokami do wdrożenia.</p>
-      </div>
+      </SectHead>
       <dl class="def-rows rv">
         <div><dt>Jak pracujecie i co Was spowalnia<small>Narzędzia, procesy, typowy dzień</small></dt><dd>Pytam o Wasze narzędzia, procesy i typowy dzień pracy. Szukam miejsc, gdzie tracicie czas na rzeczy, które AI zrobi szybciej.</dd></div>
         <div><dt>Gdzie AI da widoczny efekt<small>Nie wszędzie</small></dt><dd>Wskazuję dwa, trzy miejsca, gdzie naprawdę warto zacząć — i mówię dlaczego.</dd></div>
@@ -39,10 +36,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 dlaczego ja -->
   <section class="sect" aria-labelledby="dlaczego">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Dlaczego ja · Z czym przychodzę</p>
-        <h2 class="sect-title sect-title--s ws" id="dlaczego">Praktyka na Waszym repo.</h2>
-      </div>
+      <SectHead eyebrow="02 / Dlaczego ja · Z czym przychodzę" title="Praktyka na Waszym repo." id="dlaczego" small />
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">a</p>
@@ -66,11 +60,9 @@ import Interior from '../layouts/Interior.astro';
   <!-- 03 formularz (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="formularz">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Zgłoszenie · Umów się na rozmowę</p>
-        <h2 class="sect-title ws" id="formularz">Zostaw kontakt — odezwę się w ciągu 24h.</h2>
+      <SectHead eyebrow="03 / Zgłoszenie · Umów się na rozmowę" title="Zostaw kontakt — odezwę się w ciągu 24h." id="formularz">
         <p class="sect-lead rv">Na nic się nie zapisujesz. Po prostu pogadamy i ustalimy termin.</p>
-      </div>
+      </SectHead>
       <form name="darmowy-audyt" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="prose rv">
         <input type="hidden" name="form-name" value="darmowy-audyt" />
         <p class="hidden-field"><label>Nie wypełniaj tego pola: <input name="bot-field" /></label></p>
@@ -98,12 +90,7 @@ import Interior from '../layouts/Interior.astro';
           </select>
         </p>
         <p>
-          <button class="btn btn--accent" type="submit">Umów rozmowę
-            <span class="btn__arr" aria-hidden="true">
-              <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-              <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            </span>
-          </button>
+          <BtnArrow type="submit">Umów rozmowę</BtnArrow>
         </p>
       </form>
     </div>

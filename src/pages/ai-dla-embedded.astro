@@ -1,5 +1,8 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import BtnArrow from '../components/BtnArrow.astro';
 ---
 <Interior
   title="AI dla embedded i firmware — realizm bare-metal | SZRON"
@@ -13,10 +16,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 01 dlaczego embedded to inna gra (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="inna-gra">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Kontekst · Ograniczenia, nie życzenia</p>
-        <h2 class="sect-title ws" id="inna-gra">Dlaczego embedded to inna gra.</h2>
-      </div>
+      <SectHead eyebrow="01 / Kontekst · Ograniczenia, nie życzenia" title="Dlaczego embedded to inna gra." id="inna-gra" />
       <div class="prose rv">
         <p>Większość narzędzi AI projektowano pod web i backend — repozytorium, internet pod ręką, szybki cykl build-run. W embedded żadne z tych założeń nie obowiązuje na ślepo. Zanim zaczniemy mówić, „co AI robi", trzeba uczciwie nazwać, w czym pracujemy.</p>
       </div>
@@ -32,10 +32,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 co AI realnie robi -->
   <section class="sect" aria-labelledby="realnie">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Realizm · Co AI faktycznie zmienia</p>
-        <h2 class="sect-title sect-title--s ws" id="realnie">Co AI realnie robi w embedded.</h2>
-      </div>
+      <SectHead eyebrow="02 / Realizm · Co AI faktycznie zmienia" title="Co AI realnie robi w embedded." id="realnie" small />
       <div class="prose rv">
         <p>Zacznijmy od tego, czego AI <strong>nie</strong> robi. Nie generuje firmware'u od zera. Nie zastąpi inżyniera, który czyta datasheet, rozumie timing przerwań i wie, dlaczego ten konkretny rejestr trzeba zapisać dwa razy. Kod w ISR, dobór peryferiów, walka z erratą układu — to dalej praca człowieka przy sprzęcie.</p>
         <p>To, co AI realnie przyspiesza, to cała warstwa <em>dookoła</em> tego twardego rdzenia. Testy unit na hoście z mockami HAL. Parsery protokołów — Modbus, CANopen, ramki CAN bus, telemetria OBD-II. Dokumentacja rejestrów i mapy pamięci. Kod CRUD-owy na strukturach konfiguracyjnych, serializacja, walidacja danych z magistrali. Skrypty symulujące master/slave, żeby nie blokować ławki na każdą zmianę.</p>
@@ -50,10 +47,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 03 case STM32 -->
   <section class="sect" aria-labelledby="case" style="padding-top:0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Dowód · Sterownik STM32 w produkcji</p>
-        <h2 class="sect-title sect-title--s ws" id="case">Jak to wyglądało na realnym module STM32.</h2>
-      </div>
+      <SectHead eyebrow="03 / Dowód · Sterownik STM32 w produkcji" title="Jak to wyglądało na realnym module STM32." id="case" small />
       <div class="prose rv">
         <p>Producent automatyki przemysłowej potrzebował nowego modułu komunikacji Modbus RTU + CANopen do sterownika STM32, który jest w produkcji od 2019 roku. Wycena wewnętrzna: 6–8 tygodni inżyniera plus 2 tygodnie testów HIL. Problem nie był techniczny — zespół znał stos i protokoły. Problem był pojemnościowy: cykl build/flash/test trwał 20–40 minut, jedna ławka HIL na trzech ludzi, a senior od warstwy CAN szedł na urlop w środku terminu.</p>
         <p>Najpierw rozwiązaliśmy cykl iteracji — CI z arm-none-eabi, host-testy z mockami HAL, symulatory Modbus i CANopen w Pythonie. Dopiero potem zespół siadł do kodu modułu. Trzej inżynierowie klienta zamknęli go w dwa tygodnie, z testami HIL. My prowadziliśmy, kod pisali oni.</p>
@@ -62,18 +56,13 @@ import Interior from '../layouts/Interior.astro';
         <blockquote>Myślałem, że AI to nie dla nas — siedzimy bliżej krzemu niż chmury. Po dwóch tygodniach mam jednoznaczne zdanie: nie generuje za nas firmware'u, ale ratuje cały kontekst dookoła. Testy, dokumentacja rejestrów, sklejanie parserów. Tam, gdzie zwykle ginęliśmy.</blockquote>
         <figcaption><strong>Inżynier R&amp;D embedded</strong> — producent automatyki przemysłowej (NDA)</figcaption>
       </figure>
-      <div class="proof-strip rv">
-        <div><strong>2 mc → 2 tyg</strong><span>czas dostarczenia modułu (3–4× szybciej)</span></div>
-        <div><strong>30 → 4 min</strong><span>pętla feedback na CI host (20 → 12 min na HIL)</span></div>
-        <div><strong>3 z 3 inż.</strong><span>używa AI workflow w dzień 14 — sprawdzone w commitach</span></div>
-      </div>
+      <ProofStrip wrap={false} items={[
+        ['2 mc → 2 tyg', 'czas dostarczenia modułu (3–4× szybciej)'],
+        ['30 → 4 min', 'pętla feedback na CI host (20 → 12 min na HIL)'],
+        ['3 z 3 inż.', 'używa AI workflow w dzień 14 — sprawdzone w commitach'],
+      ]} />
       <p class="rv" style="margin-top:var(--space-lg)">
-        <a class="btn btn--dark" href="/case-studies/stm32">Zobacz cały case
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
+        <BtnArrow class="btn btn--dark" href="/case-studies/stm32">Zobacz cały case</BtnArrow>
       </p>
     </div>
   </section>
@@ -81,10 +70,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 04 stack / toolchain (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="stack">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Stack · Z czym pracujemy</p>
-        <h2 class="sect-title ws" id="stack">Toolchain i obszary, w których siedzimy.</h2>
-      </div>
+      <SectHead eyebrow="04 / Stack · Z czym pracujemy" title="Toolchain i obszary, w których siedzimy." id="stack" />
       <dl class="def-rows rv">
         <div><dt>C / C++ / STM32<small>bare-metal i RTOS</small></dt><dd>C17 bliżej hardware'u, C++17 (bez wyjątków, bez RTTI) na warstwę protokołów. STM32 na ARM Cortex-M, HAL/LL, FreeRTOS bez migracji na siłę.</dd></div>
         <div><dt>Build i testy<small>CMake, arm-none-eabi, Unity</small></dt><dd>CMake + arm-none-eabi-gcc, ninja, statyczna analiza cppcheck i clang-tidy. Unity + CMock do mockowania HAL, własne fixtury HIL w Pythonie.</dd></div>

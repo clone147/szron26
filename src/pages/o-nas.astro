@@ -1,5 +1,8 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
 ---
 <Interior
   title="Zespół SZRON — dwóch seniorów, 40+ lat w IT | SZRON"
@@ -13,23 +16,16 @@ import Interior from '../layouts/Interior.astro';
   ogImage="/img/og-tomek-orchestrator.webp"
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>40+ lat</strong><span>łącznie w produkcji</span></div>
-        <div><strong>2 osoby</strong><span>na każdym projekcie</span></div>
-        <div><strong>2 spojrzenia</strong><span>na każdy poważny PR</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['40+ lat', 'łącznie w produkcji'],
+    ['2 osoby', 'na każdym projekcie'],
+    ['2 spojrzenia', 'na każdy poważny PR'],
+  ]} />
 
   <!-- 01 manifest -->
   <section class="sect" aria-labelledby="manifest">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Manifest · Trzy zasady, na których pracujemy</p>
-        <h2 class="sect-title sect-title--s ws" id="manifest">Jeśli czegoś z tych trzech nie da się dotrzymać, nie bierzemy projektu.</h2>
-      </div>
+      <SectHead eyebrow="01 / Manifest · Trzy zasady, na których pracujemy" title="Jeśli czegoś z tych trzech nie da się dotrzymać, nie bierzemy projektu." id="manifest" small />
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">i</p>
@@ -53,10 +49,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 profile (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="profile">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Profile · Kto, co i dlaczego</p>
-        <h2 class="sect-title ws" id="profile">Dwie nakładające się specjalizacje. Każdy z nas potrafi sam doprowadzić projekt do końca.</h2>
-      </div>
+      <SectHead eyebrow="02 / Profile · Kto, co i dlaczego" title="Dwie nakładające się specjalizacje. Każdy z nas potrafi sam doprowadzić projekt do końca." id="profile" />
       <div class="team">
         <article class="person rv">
           <div class="person__head">
@@ -119,10 +112,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 03 razem -->
   <section class="sect" aria-labelledby="razem">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Razem · Co nas trzyma w jednym zespole</p>
-        <h2 class="sect-title sect-title--s ws" id="razem">Dwie specjalizacje, jedna kultura pracy.</h2>
-      </div>
+      <SectHead eyebrow="03 / Razem · Co nas trzyma w jednym zespole" title="Dwie specjalizacje, jedna kultura pracy." id="razem" small />
       <p class="rv" style="max-width:60ch">Pracujemy w tej dwójce świadomie. To nie zbiór freelancerów pod jedną domeną. Trzy zasady, które trzymają nas razem:</p>
       <dl class="def-rows rv">
         <div><dt>Każdy projekt ma dwóch właścicieli<small>Strategia + kod, zawsze razem</small></dt><dd>Tomek — strategia i AI workflow. Maciej — backend, frontend i mobile. Oba obszary muszą się spotkać na każdym projekcie. Brak jednego oznacza, że projektu nie bierzemy.</dd></div>
@@ -135,10 +125,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- cytaty -->
   <section class="sect" aria-labelledby="cytaty" style="padding-top:0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>Słowem · Jak myślimy o pracy</p>
-        <h2 class="sect-title sect-title--s ws" id="cytaty">Krótko, jak mówimy to klientom.</h2>
-      </div>
+      <SectHead eyebrow="Słowem · Jak myślimy o pracy" title="Krótko, jak mówimy to klientom." id="cytaty" small />
       <div class="grid-cards">
         <figure class="quote-card rv">
           <blockquote>„Wiem, gdzie projekty się sypią — z każdej z tych stron osobno: programisty, lidera, doradcy zarządu, CTO i klienta zewnętrznych dostawców."</blockquote>
@@ -155,10 +142,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 04 warsztat (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="warsztat">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Warsztat · Czym pracujemy dziś</p>
-        <h2 class="sect-title ws" id="warsztat">Stos, który naprawdę używamy codziennie.</h2>
-      </div>
+      <SectHead eyebrow="04 / Warsztat · Czym pracujemy dziś" title="Stos, który naprawdę używamy codziennie." id="warsztat" />
       <dl class="def-rows rv">
         <div><dt>AI workflow<small>obaj</small></dt><dd>Claude Code jako daily driver · dedykowane MCP servery per projekt · CLAUDE.md jako żywy kontrakt · agenci do testów i review · prompt-jako-kod w repo.</dd></div>
         <div><dt>Backend / frontend / mobile<small>Maciej</small></dt><dd>Java 21, Kotlin, Swift · Spring Boot 3, Spring Data JPA · React + TypeScript, React Native, natywne iOS/Android · Qt 6 / QML, C++17 (HMI i panele operatorskie) · PostgreSQL 16, MS SQL, MySQL, Oracle, DB2 · AWS ECS, terraform.</dd></div>
@@ -169,20 +153,10 @@ import Interior from '../layouts/Interior.astro';
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Najlepszy sposób, żeby sprawdzić, czy się dogadamy — to 30 minut rozmowy.</h2>
-      <p class="rv">Rozmowę prowadzi Tomek. Bez sales-talku. Konkretne pytania o Waszą aplikację i o to, czego oczekujecie. Jeśli jest sens współpracy — stała wycena kwartału w 48h, zatwierdzona przez nas obu. Jeśli nie — rozstajemy się i każdy idzie swoją drogą.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Zarezerwuj termin
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="Najlepszy sposób, żeby sprawdzić, czy się dogadamy — to 30 minut rozmowy."
+    text="Rozmowę prowadzi Tomek. Bez sales-talku. Konkretne pytania o Waszą aplikację i o to, czego oczekujecie. Jeśli jest sens współpracy — stała wycena kwartału w 48h, zatwierdzona przez nas obu. Jeśli nie — rozstajemy się i każdy idzie swoją drogą."
+    btnLabel="Zarezerwuj termin"
+  />
 </Interior>

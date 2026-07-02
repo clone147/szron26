@@ -1,0 +1,14 @@
+---
+// Przycisk z podwójną strzałką — animacja hover w main.css wymaga dokładnie 2 SVG w .btn__arr.
+// href → <a>, bez href → <button>; pozostałe atrybuty (type, style, …) przechodzą przez {...rest}.
+// {nl} po <slot /> odtwarza \n z oryginalnego markupu (kompresja builda zostawia tam newline;
+// literał '\n' bezpośrednio w wyrażeniu szablonu wywala kompilator Astro, stąd const).
+const { href, class: cls = 'btn btn--accent', ...rest } = Astro.props;
+const Tag = href ? 'a' : 'button';
+const nl = '\n';
+---
+<Tag class={cls} href={href} {...rest}><slot />{nl}<span class="btn__arr" aria-hidden="true">
+  <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+  <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+</span>
+</Tag>

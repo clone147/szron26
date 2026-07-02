@@ -1,5 +1,8 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
 ---
 <Interior
   title="MCP Supabase + Claude Code | Akademia SZRON"
@@ -10,23 +13,16 @@ import Interior from '../layouts/Interior.astro';
   lead="MCP Supabase daje Claude Code bezpośredni dostęp do bazy w naturalnym języku: listowanie tabel, zapytania, migracje, generowanie typów TypeScript. Klucz to bezpieczna konfiguracja — tryb read-only i ograniczenie do jednego projektu, nigdy na produkcji."
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Dostęp z promptu</strong><span>tabele, zapytania, migracje, typy</span></div>
-        <div><strong>Tryb read-only</strong><span>domyślnie tylko odczyt dla bezpieczeństwa</span></div>
-        <div><strong>Tylko development</strong><span>nie łącz agenta z produkcją</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['Dostęp z promptu', 'tabele, zapytania, migracje, typy'],
+    ['Tryb read-only', 'domyślnie tylko odczyt dla bezpieczeństwa'],
+    ['Tylko development', 'nie łącz agenta z produkcją'],
+  ]} />
 
   <!-- 01 treść techniczna -->
   <section class="sect" aria-labelledby="intro">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / MCP · Supabase krok po kroku</p>
-        <h2 class="sect-title sect-title--s ws" id="intro">Bezpieczny dostęp do bazy z naturalnego języka.</h2>
-      </div>
+      <SectHead eyebrow="01 / MCP · Supabase krok po kroku" title="Bezpieczny dostęp do bazy z naturalnego języka." id="intro" small />
 
       <div class="prose rv">
         <p>Supabase to otwarta platforma oparta o PostgreSQL — z autentykacją, REST i GraphQL API, storage, Row Level Security i panelem zarządzania. Serwer MCP Supabase pozwala Claude Code sięgać do tej bazy bezpośrednio z promptu.</p>
@@ -89,10 +85,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 powiązane szkolenia (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="powiazane">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Akademia · Czytaj dalej</p>
-        <h2 class="sect-title sect-title--s ws" id="powiazane">Powiązane szkolenia.</h2>
-      </div>
+      <SectHead eyebrow="02 / Akademia · Czytaj dalej" title="Powiązane szkolenia." id="powiazane" small />
       <div class="link-cards rv">
         <a class="link-card" href="/szkolenie-mysql"><h3>MySQL MCP Server</h3><p>Agent na bazie MySQL: konfiguracja, operacje zapisu, pułapki wersji.</p></a>
         <a class="link-card" href="/serwery-mcp"><h3>Serwery MCP</h3><p>Chrome DevTools MCP i ekosystem serwerów MCP w codziennej pracy.</p></a>
@@ -102,20 +95,5 @@ import Interior from '../layouts/Interior.astro';
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie, żeby tak pracował cały Wasz zespół?</h2>
-      <p class="rv">Akademia to materiały. Wdrożenie to dwa kwartały na Waszym kodzie — z pomiarem efektu w DEVLens. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand heading="Chcecie, żeby tak pracował cały Wasz zespół?" padTop={false} />
 </Interior>

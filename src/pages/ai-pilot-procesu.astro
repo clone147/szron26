@@ -1,5 +1,8 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
 ---
 <Interior
   title="Pilot AI w procesie — wdrożenie w 2–4 tygodnie | SZRON"
@@ -11,23 +14,16 @@ import Interior from '../layouts/Interior.astro';
   heroAlt="Jeden świecący pomarańczowo moduł wśród zamrożonych bloków"
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Jeden proces</strong><span>na start — zamiast całej firmy naraz</span></div>
-        <div><strong>Pomiar przed i po</strong><span>twardy dowód wartości, nie obietnica</span></div>
-        <div><strong>2–4 tygodnie</strong><span>od startu do raportu z rekomendacją</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['Jeden proces', 'na start — zamiast całej firmy naraz'],
+    ['Pomiar przed i po', 'twardy dowód wartości, nie obietnica'],
+    ['2–4 tygodnie', 'od startu do raportu z rekomendacją'],
+  ]} />
 
   <!-- 01 jak to działa -->
   <section class="sect" aria-labelledby="jak">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Jak to działa · Trzy kroki pilotażu</p>
-        <h2 class="sect-title ws" id="jak">Wybór procesu → pilotaż z pomiarem → raport.</h2>
-      </div>
+      <SectHead eyebrow="01 / Jak to działa · Trzy kroki pilotażu" title="Wybór procesu → pilotaż z pomiarem → raport." id="jak" />
       <div class="steps">
         <article class="step rv"><p class="eyebrow">01 · Wybór</p><h3>Wybieramy jeden proces</h3><p>Razem z wami identyfikujemy proces, który zjada czas i da się zautomatyzować z AI. Raportowanie, przetwarzanie dokumentów, onboarding — cokolwiek powtarzalnego.</p></article>
         <article class="step rv" style="--rv-d:.1s"><p class="eyebrow">02 · Pilotaż</p><h3>Pilotaż z pomiarem</h3><p>Wdrażamy AI w wybranym procesie na 2–4 tygodnie. Mierzymy czas przed i po. Twardy dowód wartości, zanim zdecydujecie o szerszym wdrożeniu.</p></article>
@@ -39,10 +35,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 dlaczego pilot (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="dlaczego">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Dlaczego pilot · Mniej ryzyka, więcej pewności</p>
-        <h2 class="sect-title sect-title--s ws" id="dlaczego">Najpierw mierzalny efekt na jednym procesie, dopiero potem skala.</h2>
-      </div>
+      <SectHead eyebrow="02 / Dlaczego pilot · Mniej ryzyka, więcej pewności" title="Najpierw mierzalny efekt na jednym procesie, dopiero potem skala." id="dlaczego" small />
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">a</p>
@@ -64,20 +57,10 @@ import Interior from '../layouts/Interior.astro';
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie sprawdzić AI na jednym procesie?</h2>
-      <p class="rv">Opowiedzcie nam o procesie, który was spowalnia. Powiemy, czy AI da tu mierzalny efekt — bez owijania w bawełnę.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Zarezerwuj termin
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="Chcecie sprawdzić AI na jednym procesie?"
+    text="Opowiedzcie nam o procesie, który was spowalnia. Powiemy, czy AI da tu mierzalny efekt — bez owijania w bawełnę."
+    btnLabel="Zarezerwuj termin"
+  />
 </Interior>

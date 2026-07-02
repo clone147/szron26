@@ -1,5 +1,7 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
 ---
 <Interior
   title="Claude Code — instalacja i workflow | Akademia SZRON"
@@ -10,15 +12,11 @@ import Interior from '../layouts/Interior.astro';
   updated="2026-06-29"
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Natywny instalator</strong><span>curl, brew albo Windows — bez Node.js</span></div>
-        <div><strong>Sterowanie myśleniem</strong><span>/effort na stałe, ultrathink na jeden prompt</span></div>
-        <div><strong>Pamięć projektu</strong><span>CLAUDE.md i kontekst pod kontrolą</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['Natywny instalator', 'curl, brew albo Windows — bez Node.js'],
+    ['Sterowanie myśleniem', '/effort na stałe, ultrathink na jeden prompt'],
+    ['Pamięć projektu', 'CLAUDE.md i kontekst pod kontrolą'],
+  ]} />
 
   <!-- 01 czym jest -->
   <section class="sect" aria-labelledby="czym">
@@ -159,10 +157,7 @@ claude
   <!-- powiązane szkolenia -->
   <section class="sect sect--dark" aria-labelledby="powiazane">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>Powiązane szkolenia</p>
-        <h2 class="sect-title sect-title--s ws" id="powiazane">Kolejne kroki w Akademii.</h2>
-      </div>
+      <SectHead eyebrow="Powiązane szkolenia" title="Kolejne kroki w Akademii." id="powiazane" small />
       <div class="link-cards rv">
         <a class="link-card" href="/szkolenie-git">
           <h3>Claude Code i Git</h3>

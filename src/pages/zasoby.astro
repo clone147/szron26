@@ -1,5 +1,8 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
 ---
 <Interior
   title="Zasoby — materiały o AI dla zespołów dev | SZRON"
@@ -9,23 +12,16 @@ import Interior from '../layouts/Interior.astro';
   lead="Zebraliśmy tu rzeczy, które sami dajemy zespołom na starcie współpracy: playbooki, checklisty i narzędzia do samodzielnej oceny. Frameworki, które powstały przy prawdziwych projektach. Po dostęp do materiałów zgłoś się do nas; self-assessment dojrzałości AI zrobisz od ręki."
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Z praktyki</strong><span>powstałe przy prawdziwych wdrożeniach, nie w teorii</span></div>
-        <div><strong>Gotowe do użycia</strong><span>checklisty, szablony i konkretne kroki</span></div>
-        <div><strong>Bez spamu</strong><span>materiały, nie lejek marketingowy</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['Z praktyki', 'powstałe przy prawdziwych wdrożeniach, nie w teorii'],
+    ['Gotowe do użycia', 'checklisty, szablony i konkretne kroki'],
+    ['Bez spamu', 'materiały, nie lejek marketingowy'],
+  ]} />
 
   <!-- 01 materiały -->
   <section class="sect" aria-labelledby="materialy">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Materiały · Co przygotowaliśmy</p>
-        <h2 class="sect-title sect-title--s ws" id="materialy">Trzy materiały na start z AI w zespole dev.</h2>
-      </div>
+      <SectHead eyebrow="01 / Materiały · Co przygotowaliśmy" title="Trzy materiały na start z AI w zespole dev." id="materialy" small />
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">PDF · 28 stron</p>
@@ -52,10 +48,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 jak po nie sięgnąć (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="dostep">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Dostęp · Jak po nie sięgnąć</p>
-        <h2 class="sect-title ws" id="dostep">Materiały wysyłamy bezpośrednio. Samoocenę zaczynasz od razu.</h2>
-      </div>
+      <SectHead eyebrow="02 / Dostęp · Jak po nie sięgnąć" title="Materiały wysyłamy bezpośrednio. Samoocenę zaczynasz od razu." id="dostep" />
       <dl class="def-rows rv">
         <div><dt>Playbook i checklist<small>Wysyłamy na maila</small></dt><dd>Napisz do nas, który materiał Cię interesuje — odeślemy go bezpośrednio. Bez lejka, bez spamu i bez zapisywania na listę, której nie chcesz.</dd></div>
         <div><dt>Samoocena dojrzałości AI<small>Logika w naszej metodzie</small></dt><dd>Ramę pięciu poziomów dojrzałości i to, jak czytamy wyniki, opisujemy na stronie metody. To samo podejście stosujemy w pierwszej rozmowie i audycie.</dd></div>
@@ -67,10 +60,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 03 dokąd dalej -->
   <section class="sect" aria-labelledby="dalej">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Dalej · Gdzie iść po materiały</p>
-        <h2 class="sect-title sect-title--s ws" id="dalej">Wybierz, od czego chcesz zacząć.</h2>
-      </div>
+      <SectHead eyebrow="03 / Dalej · Gdzie iść po materiały" title="Wybierz, od czego chcesz zacząć." id="dalej" small />
       <div class="link-cards rv">
         <a class="link-card" href="/metoda">
           <h3>Nasza metoda</h3>
@@ -89,20 +79,10 @@ import Interior from '../layouts/Interior.astro';
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Wolisz porozmawiać o swoim zespole niż czytać materiały?</h2>
-      <p class="rv">Materiały to dobry start, ale nic nie zastąpi rozmowy o Waszym konkretnym przypadku. Umów się — powiemy szczerze, od czego zacząć, i wskażemy, który materiał odeślemy na początek.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Zarezerwuj termin
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="Wolisz porozmawiać o swoim zespole niż czytać materiały?"
+    text="Materiały to dobry start, ale nic nie zastąpi rozmowy o Waszym konkretnym przypadku. Umów się — powiemy szczerze, od czego zacząć, i wskażemy, który materiał odeślemy na początek."
+    btnLabel="Zarezerwuj termin"
+  />
 </Interior>

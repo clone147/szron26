@@ -1,5 +1,17 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+// FAQ — numeracja 01…NN generowana w <Faq />
+const faq = [
+  { q: 'Czy AI zastąpi moich programistów?', a: 'Nie. AI to narzędzie, które wzmacnia programistów, a nie ich zastępuje. Najlepsi devowie z AI są jeszcze lepsi. Słabi nadal będą słabi — AI nie da im umiejętności, których nie mają.' },
+  { q: 'Jak długo trwa szkolenie zespołu?', a: 'Podstawowe szkolenie to 1–2 dni. Pełna augmentacja z transferem wiedzy zajmuje 1–3 miesiące, w zależności od wielkości zespołu.' },
+  { q: 'Czy dane naszego kodu są bezpieczne?', a: 'Możemy pracować z lokalnymi modelami (LM Studio, Llama), które nie wysyłają kodu na zewnątrz. Dla enterprise oferujemy rozwiązania self-hosted.' },
+  { q: 'Ile to kosztuje?', a: 'Szczegóły finansowe omawiamy indywidualnie podczas pierwszej rozmowy. Zaczynamy od 3-miesięcznego zobowiązania, w którym udowadniamy wartość na twardych danych.' },
+];
 ---
 <Interior
   title="AI dla programistów — 3x szybsze projekty IT | SZRON"
@@ -12,23 +24,16 @@ import Interior from '../layouts/Interior.astro';
   ogImage="/img/og-tomek-orchestrator.webp"
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Agenci AI</strong><span>Opus i Sonnet do kodu produkcyjnego</span></div>
-        <div><strong>Setup pod stack</strong><span>Claude Code, MCP Tools, Cursor, Copilot</span></div>
-        <div><strong>Pomiar przed i po</strong><span>konkretny ROI, nie obietnice</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['Agenci AI', 'Opus i Sonnet do kodu produkcyjnego'],
+    ['Setup pod stack', 'Claude Code, MCP Tools, Cursor, Copilot'],
+    ['Pomiar przed i po', 'konkretny ROI, nie obietnice'],
+  ]} />
 
   <!-- 01 mierzalne korzyści -->
   <section class="sect" aria-labelledby="korzysci">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Korzyści · Co realnie się zmienia</p>
-        <h2 class="sect-title ws" id="korzysci">Mierzalne korzyści dla zespołu.</h2>
-      </div>
+      <SectHead eyebrow="01 / Korzyści · Co realnie się zmienia" title="Mierzalne korzyści dla zespołu." id="korzysci" />
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">55–80%</p>
@@ -57,10 +62,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 narzędzia (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="narzedzia">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Narzędzia · Co wdrażamy</p>
-        <h2 class="sect-title ws" id="narzedzia">Narzędzia dobrane do Waszego stacku i potrzeb zespołu.</h2>
-      </div>
+      <SectHead eyebrow="02 / Narzędzia · Co wdrażamy" title="Narzędzia dobrane do Waszego stacku i potrzeb zespołu." id="narzedzia" />
       <table class="results-table rv">
         <thead><tr><th scope="col">Narzędzie</th><th scope="col">Rola</th><th scope="col">Wzrost</th></tr></thead>
         <tbody>
@@ -76,10 +78,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 03 proces wdrożenia -->
   <section class="sect" aria-labelledby="proces">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Proces · Jak wygląda wdrożenie</p>
-        <h2 class="sect-title ws" id="proces">Cztery kroki: od analizy do pomiaru.</h2>
-      </div>
+      <SectHead eyebrow="03 / Proces · Jak wygląda wdrożenie" title="Cztery kroki: od analizy do pomiaru." id="proces" />
       <div class="steps">
         <article class="step rv"><p class="eyebrow">01 · Analiza</p><h3>Sprawdzamy, jak pracujecie</h3><p>Patrzymy, jakich narzędzi używa zespół i gdzie są bottlenecki.</p></article>
         <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Dobór narzędzi</p><h3>Pod wasz stack</h3><p>Rekomendujemy narzędzia AI dopasowane do waszego stacku technologicznego.</p></article>
@@ -92,10 +91,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 04 dlaczego SZRON (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="dlaczego">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Dlaczego SZRON · Co nas wyróżnia</p>
-        <h2 class="sect-title ws" id="dlaczego">Transfer wiedzy, nie uzależnienie.</h2>
-      </div>
+      <SectHead eyebrow="04 / Dlaczego SZRON · Co nas wyróżnia" title="Transfer wiedzy, nie uzależnienie." id="dlaczego" />
       <dl class="def-rows rv">
         <div><dt>Transfer wiedzy, nie uzależnienie<small>Niezależni po 1–3 miesiącach</small></dt><dd>Po 1–3 miesiącach wasz zespół pewnie pracuje z AI. Wracamy co kwartał z aktualizacją narzędzi i strategii.</dd></div>
         <div><dt>Praktyczne doświadczenie<small>25+ lat w branży tech</small></dt><dd>Wdrażaliśmy AI, gdy inni dopiero słyszeli o ChatGPT.</dd></div>
@@ -108,46 +104,16 @@ import Interior from '../layouts/Interior.astro';
   <!-- 05 FAQ -->
   <section class="sect" aria-labelledby="faq-title">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>05 / FAQ · Najczęstsze pytania</p>
-        <h2 class="sect-title sect-title--s ws" id="faq-title">Pytania, które padają najczęściej.</h2>
-      </div>
-      <div class="faq rv">
-        <details>
-          <summary><span class="num">01</span> Czy AI zastąpi moich programistów? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Nie. AI to narzędzie, które wzmacnia programistów, a nie ich zastępuje. Najlepsi devowie z AI są jeszcze lepsi. Słabi nadal będą słabi — AI nie da im umiejętności, których nie mają.</p>
-        </details>
-        <details>
-          <summary><span class="num">02</span> Jak długo trwa szkolenie zespołu? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Podstawowe szkolenie to 1–2 dni. Pełna augmentacja z transferem wiedzy zajmuje 1–3 miesiące, w zależności od wielkości zespołu.</p>
-        </details>
-        <details>
-          <summary><span class="num">03</span> Czy dane naszego kodu są bezpieczne? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Możemy pracować z lokalnymi modelami (LM Studio, Llama), które nie wysyłają kodu na zewnątrz. Dla enterprise oferujemy rozwiązania self-hosted.</p>
-        </details>
-        <details>
-          <summary><span class="num">04</span> Ile to kosztuje? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Szczegóły finansowe omawiamy indywidualnie podczas pierwszej rozmowy. Zaczynamy od 3-miesięcznego zobowiązania, w którym udowadniamy wartość na twardych danych.</p>
-        </details>
-      </div>
+      <SectHead eyebrow="05 / FAQ · Najczęstsze pytania" title="Pytania, które padają najczęściej." id="faq-title" small />
+      <Faq items={faq} />
     </div>
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Gotowi na szybszy zespół?</h2>
-      <p class="rv">Umówcie rozmowę i pokażcie swoim devom, jak pracować z AI. NDA przed startem, szczegóły finansowe omawiamy indywidualnie.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów demo
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="Gotowi na szybszy zespół?"
+    text="Umówcie rozmowę i pokażcie swoim devom, jak pracować z AI. NDA przed startem, szczegóły finansowe omawiamy indywidualnie."
+    btnLabel="Umów demo"
+  />
 </Interior>

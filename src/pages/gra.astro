@@ -1,5 +1,6 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
 ---
 <Interior
   title="Gra Snake — przerwa od ekranu kodu | SZRON"
@@ -11,10 +12,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- gra -->
   <section class="sect" aria-labelledby="game">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>Gra · Steruj strzałkami</p>
-        <h2 class="sect-title sect-title--s ws" id="game">Zjedz jak najwięcej jabłek. Nie wpadnij w ścianę ani we własny ogon.</h2>
-      </div>
+      <SectHead eyebrow="Gra · Steruj strzałkami" title="Zjedz jak najwięcej jabłek. Nie wpadnij w ścianę ani we własny ogon." id="game" small />
 
       <div class="snake rv">
         <div class="snake__hud">
@@ -51,10 +49,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- przerwa w pracy (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="przerwa">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>Na marginesie · Po co to</p>
-        <h2 class="sect-title ws" id="przerwa">Najlepsze pomysły przychodzą między commitami.</h2>
-      </div>
+      <SectHead eyebrow="Na marginesie · Po co to" title="Najlepsze pomysły przychodzą między commitami." id="przerwa" />
       <p class="sect-lead rv">Krótka przerwa czyści głowę lepiej niż kolejna kawa. Pograj chwilę, a gdy wrócisz do realnych problemów z AI i kodem — pogadajmy.</p>
     </div>
   </section>

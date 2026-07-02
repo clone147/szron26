@@ -1,46 +1,24 @@
 // Aplikacja „Szkolenia" strefy zamkniętej SZRON.
 // Dane w schemacie `strefa` (RLS). Siatka uczestników edytowalna w pełni z klawiatury (jak arkusz).
-import { getClient, getSessionUser, isAllowed, LEGACY_OWNER_ID } from './supabase.js';
+import { getClient, getTeamUser, startRealtime, pollBlocked, LEGACY_OWNER_ID } from './supabase.js';
+import { $, $$, esc, toast, openModal, closeModal, confirmDialog, fmtDate as fmtDateBase, fmtDateTime, todayStr, telHref, ICONS, STAGES, stageColor, stageName, SUBS, bindSearch, bindFileImport, downloadJSON } from './strefa-ui.js';
+import { createGridNav } from './strefa-grid.js';
 import qrcode from 'qrcode-generator';
 
 const sb = getClient();
 
-/* ── helpery DOM ── */
-const $ = (s, r = document) => r.querySelector(s);
-const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const fmtDate = (d) => d ? new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(d)) : 'bez daty';
-const fmtDateTime = (d) => d ? new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(d)) : '';
-const todayStr = () => new Date().toISOString().slice(0, 10);
-const telHref = (s) => String(s || '').replace(/[^\d+]/g, ''); // tylko cyfry i + do linku tel:
+// fmtDate: pusta data w Szkoleniach pokazuje „bez daty" (wspólny helper ma fallback '')
+const fmtDate = (d) => fmtDateBase(d, 'bez daty');
 
-/* ── ikony ── */
+/* ── ikony (wspólne ICONS + lokalne) ── */
 const ICO = {
-  chev: '<svg class="strefa-tr__chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
-  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  ...ICONS,
   shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>',
-  pencil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
-  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>',
   file: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>',
-  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>',
-  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
   qr: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h2v2M18 14h.01M21 17v.01M14 18v.01M17 21h.01M21 21v-2"/></svg>',
-  phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>',
   play: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>',
 };
 
-/* ── model etapów programisty (spójne z /strefa/programisci) ── */
-const STAGES = [
-  { n: 1, name: 'Początkujący' },
-  { n: 2, name: 'Kierujący' },
-  { n: 3, name: 'Operator' },
-  { n: 4, name: 'Dostrajający' },
-  { n: 5, name: 'Autonomiczny' },
-  { n: 6, name: 'Architekt AI' },
-];
-const STAGE_COLORS = ['oklch(68% 0.13 250)', 'oklch(75% 0.13 200)', 'oklch(77% 0.16 150)', 'oklch(83% 0.15 90)', 'oklch(72% 0.19 50)', 'oklch(66% 0.21 330)'];
-const stageColor = (n) => STAGE_COLORS[Math.max(1, Math.min(6, n || 1)) - 1];
-const stageName = (n) => (STAGES[(n || 1) - 1] || STAGES[0]).name;
 // dopasowanie uczestnik ↔ programista: normalizacja imienia+nazwiska (bez wielkości liter, diakrytyków, „ł")
 const foldName = (s) => String(s || '').trim().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/ł/g, 'l').replace(/\s+/g, ' ');
 const nameKey = (first, last) => (foldName(first) + ' ' + foldName(last)).trim();
@@ -52,57 +30,12 @@ const trMap = new Map();       // tid -> training
 const openIds = new Set();
 const selected = new Map();     // tid -> Set(pid)
 let query = '';
-let activeTd = null;
-let editing = false;
 let developers = [];            // [{id, first_name, last_name, company_id, stage}] — z /strefa/programisci
 const devByName = new Map();    // nameKey -> developer (dopasowanie uczestnika do programisty)
 
-const SUBS = ['Claude', 'Gemini', 'ChatGPT', 'Github Copilot', 'Brak'];
 // kolumny nawigowane klawiaturą (kolejność = lewo/prawo)
 const NAV = ['attendance', 'first_name', 'last_name', 'position', 'main_project', 'main_technology', 'email', 'phone'];
 const MAXC = NAV.length - 1; // ostatni indeks kolumny edytowalnej
-
-/* ── toasty ── */
-function toast(title, body = '', kind = '') {
-  const wrap = $('#toasts');
-  const t = document.createElement('div');
-  t.className = 'strefa-toast' + (kind ? ` strefa-toast--${kind}` : '');
-  t.innerHTML = `<strong>${esc(title)}</strong>${body ? `<span>${esc(body)}</span>` : ''}`;
-  wrap.appendChild(t);
-  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(() => t.remove(), 300); }, 3800);
-}
-
-/* ── modale ── */
-function openModal(html) {
-  const root = $('#modal-root');
-  root.innerHTML = `<div class="strefa-modal"><div class="strefa-modal__scrim" data-close></div><div class="strefa-modal__box" role="dialog" aria-modal="true">${html}</div></div>`;
-  const box = $('.strefa-modal__box', root);
-  root.querySelector('[data-close]').addEventListener('click', closeModal);
-  const onKey = (e) => { if (e.key === 'Escape') closeModal(); };
-  document.addEventListener('keydown', onKey);
-  root._onKey = onKey;
-  return box;
-}
-function closeModal() {
-  const root = $('#modal-root');
-  if (root._onKey) document.removeEventListener('keydown', root._onKey);
-  root.innerHTML = '';
-}
-function confirmDialog(message, okLabel = 'Usuń', danger = true) {
-  return new Promise((resolve) => {
-    const box = openModal(`
-      <div class="strefa-modal__body">
-        <p style="margin:0 0 var(--space-lg)">${esc(message)}</p>
-        <div class="strefa-actions-row">
-          <button class="strefa-btn strefa-btn--ghost" data-no>Anuluj</button>
-          <button class="strefa-btn ${danger ? 'strefa-btn--danger' : 'strefa-btn--accent'}" data-yes>${esc(okLabel)}</button>
-        </div>
-      </div>`);
-    box.querySelector('[data-no]').addEventListener('click', () => { closeModal(); resolve(false); });
-    box.querySelector('[data-yes]').addEventListener('click', () => { closeModal(); resolve(true); });
-    box.querySelector('[data-yes]').focus();
-  });
-}
 
 /* ── DB helpery ── */
 let polling = false;
@@ -145,10 +78,7 @@ async function loadData() {
 // Ciche auto-odświeżanie: renderuje WYŁĄCZNIE gdy dane serwera różnią się od lokalnych.
 // Pomija, gdy: zakładka w tle, trwa edycja komórki, otwarty jest dialog, albo user jest aktywny w siatce.
 async function pollRefresh() {
-  if (polling || document.hidden || editing) return;
-  if (document.getElementById('modal-root')?.children.length) return;
-  const root = document.getElementById('trainings');
-  if (root && root.contains(document.activeElement)) return;
+  if (polling || gridNav.editing || pollBlocked('trainings')) return;
   polling = true;
   try {
     const [arr, devs] = await Promise.all([fetchTrainings(), fetchDevelopers()]);
@@ -162,22 +92,6 @@ async function pollRefresh() {
   finally { polling = false; }
 }
 
-// Realtime: zmiany w strefa.participants/trainings doklejają się na żywo (ciche jak pollRefresh).
-async function startRealtime() {
-  const sb = getClient();
-  // Przekaż token sesji do Realtime (RLS) — pewność, że jest ustawiony przed subskrypcją.
-  try { const { data } = await sb.auth.getSession(); if (data?.session) sb.realtime.setAuth(data.session.access_token); } catch (e) { /* ignore */ }
-  let debounce;
-  const trigger = () => { clearTimeout(debounce); debounce = setTimeout(pollRefresh, 400); };
-  sb.channel('strefa-szkolenia-list')
-    .on('postgres_changes', { event: '*', schema: 'strefa', table: 'participants' }, trigger)
-    .on('postgres_changes', { event: '*', schema: 'strefa', table: 'trainings' }, trigger)
-    .on('postgres_changes', { event: '*', schema: 'strefa', table: 'developers' }, trigger)
-    .subscribe((status) => { if (status === 'SUBSCRIBED') pollRefresh(); });
-  // Bezpiecznik na wypadek zerwania socketu (rzadki fallback) + sync po powrocie do zakładki.
-  setInterval(pollRefresh, 60000);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) pollRefresh(); });
-}
 async function dbUpdatePart(pid, patch) {
   const { error } = await sb.from('participants').update(patch).eq('id', pid);
   if (error) { toast('Błąd zapisu', error.message, 'err'); return false; }
@@ -224,14 +138,7 @@ function rowHTML(p, r) {
   const sel = selected.get(p.training_id)?.has(p.id);
   return `<tr data-pid="${p.id}" class="${sel ? 'is-selected' : ''}">
     <td class="col-sel"><input type="checkbox" data-sel ${sel ? 'checked' : ''} aria-label="Zaznacz"></td>
-    <td class="col-check" data-col="attendance" data-r="${r}" data-c="0">${cellInner(p, 'attendance')}</td>
-    <td data-col="first_name" data-r="${r}" data-c="1">${cellInner(p, 'first_name')}</td>
-    <td data-col="last_name" data-r="${r}" data-c="2">${cellInner(p, 'last_name')}</td>
-    <td data-col="position" data-r="${r}" data-c="3">${cellInner(p, 'position')}</td>
-    <td data-col="main_project" data-r="${r}" data-c="4">${cellInner(p, 'main_project')}</td>
-    <td data-col="main_technology" data-r="${r}" data-c="5">${cellInner(p, 'main_technology')}</td>
-    <td data-col="email" data-r="${r}" data-c="6">${cellInner(p, 'email')}</td>
-    <td data-col="phone" data-r="${r}" data-c="7">${cellInner(p, 'phone')}</td>
+    ${NAV.map((col, c) => `<td${col === 'attendance' ? ' class="col-check"' : ''} data-col="${col}" data-r="${r}" data-c="${c}">${cellInner(p, col)}</td>`).join('')}
     <td class="col-devstage">${devStageCell(p)}</td>
     <td class="col-sub"><div class="dcell" data-act="sub" title="Edytuj abonament / notatki" style="cursor:pointer">${subBadge(p)}</div></td>
     <td class="col-actions"><div class="dcell">
@@ -339,20 +246,16 @@ function renderAll() {
   host.innerHTML = list.map(trainingHTML).join('');
   $('#empty').hidden = trainings.length !== 0;
   bindGrids();
-  activeTd = null;
+  gridNav.reset();
 }
 
-/* ── nawigacja klawiaturą po siatce ── */
-function setActive(td) {
-  if (activeTd) activeTd.classList.remove('is-active');
-  activeTd = td;
-  if (td) {
-    td.classList.add('is-active');
-    td.closest('.dgrid-wrap')?.focus({ preventScroll: true });
-    td.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-  }
-}
-const cellAt = (grid, r, c) => grid.querySelector(`td[data-r="${r}"][data-c="${c}"]`);
+/* ── nawigacja klawiaturą po siatce (wspólny silnik ./strefa-grid.js) ── */
+const gridNav = createGridNav({
+  getRecord: (tr) => ({ id: tr.dataset.pid, rec: partMap.get(tr.dataset.pid) }),
+  dbUpdate: dbUpdatePart,
+  cellInner,
+  maxCol: MAXC,
+});
 
 async function toggleAttendance(td) {
   const pid = td.closest('tr').dataset.pid;
@@ -362,85 +265,6 @@ async function toggleAttendance(td) {
   td.innerHTML = cellInner(p, 'attendance');
   renderStats(); updateCounts(p.training_id);
   if (!(await dbUpdatePart(pid, { attendance_confirmed: nv }))) { p.attendance_confirmed = !nv; td.innerHTML = cellInner(p, 'attendance'); renderStats(); updateCounts(p.training_id); }
-}
-
-// Indeks znaku pod kursorem myszy — by postawić karetkę dokładnie tam, gdzie user kliknął.
-function caretIndexFromPoint(td, x, y) {
-  try {
-    if (document.caretRangeFromPoint) {
-      const r = document.caretRangeFromPoint(x, y);
-      if (r && td.contains(r.startContainer)) return r.startOffset;
-    } else if (document.caretPositionFromPoint) {
-      const pp = document.caretPositionFromPoint(x, y);
-      if (pp && td.contains(pp.offsetNode)) return pp.offset;
-    }
-  } catch (e) { /* ignore */ }
-  return null;
-}
-
-function beginEdit(td, opts = {}) {
-  if (editing) return;
-  const col = td.dataset.col;
-  if (col === 'attendance') return;
-  const { caret = null, appendChar = null, selectAll = false } = opts;
-  const pid = td.closest('tr').dataset.pid;
-  const p = partMap.get(pid);
-  const orig = p[col] ?? '';
-  editing = true;
-  if (activeTd && activeTd !== td) activeTd.classList.remove('is-active');
-  activeTd = td;
-  td.classList.add('is-editing');
-  // type="text" celowo dla wszystkich kolumn — email/tel nie wspierają setSelectionRange/select (rzucają wyjątek)
-  td.innerHTML = `<input class="dgrid-edit" type="text">`;
-  const inp = td.querySelector('input');
-  inp.value = appendChar != null ? orig + appendChar : orig;
-  inp.focus();
-  // Karetka: dopisany znak → koniec; klik → w miejscu kliknięcia; F2/Enter → koniec; dwuklik → zaznacz całość.
-  try {
-    if (selectAll) inp.select();
-    else {
-      const pos = (appendChar == null && caret != null) ? Math.min(caret, inp.value.length) : inp.value.length;
-      inp.setSelectionRange(pos, pos);
-    }
-  } catch (e) { /* ignore */ }
-  let done = false;
-  const finish = async (dir) => {
-    if (done) return; done = true;
-    const val = inp.value.trim();
-    editing = false;
-    td.classList.remove('is-editing');
-    td.innerHTML = cellInner(p, col);
-    setActive(td);
-    if (val !== (orig ?? '')) {
-      p[col] = val;
-      td.innerHTML = cellInner(p, col);
-      if (!(await dbUpdatePart(pid, { [col]: val || null }))) { p[col] = orig; td.innerHTML = cellInner(p, col); }
-    }
-    if (dir) moveActive(td.closest('.dgrid'), td, dir);
-  };
-  const cancel = () => {
-    if (done) return; done = true;
-    editing = false; td.classList.remove('is-editing'); td.innerHTML = cellInner(p, col); setActive(td);
-  };
-  inp.addEventListener('keydown', (e) => {
-    e.stopPropagation();
-    if (e.key === 'Enter') { e.preventDefault(); finish('down'); }
-    else if (e.key === 'Escape') { e.preventDefault(); cancel(); }
-    else if (e.key === 'Tab') { e.preventDefault(); finish(e.shiftKey ? 'prev' : 'next'); }
-    else if (e.key === 'ArrowDown') { e.preventDefault(); finish('down'); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); finish('up'); }
-  });
-  inp.addEventListener('blur', () => finish(null));
-}
-
-function moveActive(grid, td, dir) {
-  let r = +td.dataset.r, c = +td.dataset.c;
-  if (dir === 'down') r++;
-  else if (dir === 'up') r = Math.max(0, r - 1);
-  else if (dir === 'next') { c++; if (c > MAXC) { c = 0; r++; } }
-  else if (dir === 'prev') { c--; if (c < 0) { c = MAXC; r = Math.max(0, r - 1); } }
-  const nt = cellAt(grid, r, c);
-  if (nt) setActive(nt);
 }
 
 function bindGrids() {
@@ -468,9 +292,9 @@ function bindGrids() {
       if (e.target.closest('[data-sel-all]')) { onSelectAll(grid, tid, e.target.checked); return; }
       const td = e.target.closest('td[data-col]');
       if (td) {
-        if (td.dataset.col === 'attendance') { toggleAttendance(td); setActive(td); }
+        if (td.dataset.col === 'attendance') { toggleAttendance(td); gridNav.setActive(td); }
         // Pojedynczy klik = edycja w miejscu: karetka tam, gdzie kliknięto, bez kasowania zawartości.
-        else { const caret = caretIndexFromPoint(td, e.clientX, e.clientY); beginEdit(td, { caret }); }
+        else { const caret = gridNav.caretIndexFromPoint(td, e.clientX, e.clientY); gridNav.beginEdit(td, { caret }); }
       }
     });
 
@@ -480,28 +304,19 @@ function bindGrids() {
       if (sel) changeDevStage(sel);
     });
 
-    // nawigacja klawiaturą
+    // nawigacja klawiaturą: specyfika Szkoleń PRZED wspólnym rdzeniem — filtr pól
+    // oraz kolumna „Obecność" (Enter/Spacja = toggle, F2/znaki połknięte; Spacja nie edytuje zwykłych kolumn)
     wrap.addEventListener('keydown', (e) => {
-      if (editing) return;
-      if (e.target.closest('select, input, textarea')) return; // strzałki w polach (np. select etapu) nie sterują siatką
-      if (!activeTd || !grid.contains(activeTd)) return;
-      const td = activeTd; const col = td.dataset.col;
-      let r = +td.dataset.r, c = +td.dataset.c; let handled = true;
-      switch (e.key) {
-        case 'ArrowRight': c = Math.min(MAXC, c + 1); break;
-        case 'ArrowLeft': c = Math.max(0, c - 1); break;
-        case 'ArrowDown': r++; break;
-        case 'ArrowUp': r = Math.max(0, r - 1); break;
-        case 'Tab': e.preventDefault(); moveActive(grid, td, e.shiftKey ? 'prev' : 'next'); return;
-        case 'Enter': e.preventDefault(); if (col === 'attendance') toggleAttendance(td); else beginEdit(td); return;
-        case 'F2': if (col !== 'attendance') { e.preventDefault(); beginEdit(td); } return;
-        case ' ': if (col === 'attendance') { e.preventDefault(); toggleAttendance(td); } return;
-        default:
-          if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && col !== 'attendance') { e.preventDefault(); beginEdit(td, { appendChar: e.key }); }
-          handled = false;
-      }
-      if (handled) { const nt = cellAt(grid, r, c); if (nt) { e.preventDefault(); setActive(nt); } }
+      if (gridNav.editing) return;
+      if (e.target.closest('select, input, textarea')) { e.stopImmediatePropagation(); return; } // strzałki w polach (np. select etapu) nie sterują siatką
+      const td = gridNav.active;
+      if (!td || !grid.contains(td)) return;
+      if (td.dataset.col === 'attendance') {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleAttendance(td); e.stopImmediatePropagation(); }
+        else if (e.key === 'F2' || (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey)) e.stopImmediatePropagation(); // bez edycji na obecności
+      } else if (e.key === ' ') e.stopImmediatePropagation(); // Spacja nie zaczyna edycji
     });
+    gridNav.bindKeydown(wrap, grid);
 
     // dodawanie uczestnika
     const addGo = $('[data-add-go]', sec);
@@ -567,11 +382,13 @@ async function headAction(act, tid) {
     await loadData(); renderAll(); toast('Usunięto', 'Szkolenie skasowane', 'ok');
   } else if (act === 'toggle-disabled') {
     const anyDisabled = t.participants.some((p) => (p.email || '').endsWith('DISABLED'));
+    const jobs = []; // buildery są thenable — odpalą się równolegle przy Promise.all (zamiast N szeregowych RTT)
     for (const p of t.participants) {
       if (!p.email) continue;
       const ne = anyDisabled ? p.email.replace(/DISABLED$/, '') : (p.email.endsWith('DISABLED') ? p.email : p.email + 'DISABLED');
-      if (ne !== p.email) { p.email = ne; await sb.from('participants').update({ email: ne }).eq('id', p.id); }
+      if (ne !== p.email) { p.email = ne; jobs.push(sb.from('participants').update({ email: ne }).eq('id', p.id)); }
     }
+    await Promise.all(jobs);
     renderAll(); toast('Maile', anyDisabled ? 'Usunięto sufiks DISABLED' : 'Dodano sufiks DISABLED', 'ok');
   }
 }
@@ -814,7 +631,7 @@ async function notesModal(pid) {
   $('#sub-save', box).addEventListener('click', async () => {
     let sub = selName.value;
     if (sub === '__custom') sub = custom.value.trim();
-    if (sub === '' || sub === 'Brak') sub = sub === 'Brak' ? 'Brak' : null;
+    if (sub === '') sub = null;
     const date = $('#sub-date', box).value || null;
     const { error } = await sb.from('participants').update({ subscription: sub, subscription_start_date: date }).eq('id', pid);
     if (error) return toast('Błąd', error.message, 'err');
@@ -938,36 +755,36 @@ async function importFile(file) {
 }
 
 async function exportJSON() {
+  // Notatki wszystkich uczestników jednym zapytaniem (zamiast N+1 po jednym na osobę), zgrupowane per uczestnik.
+  const pids = trainings.flatMap((t) => t.participants.map((p) => p.id));
+  const byPid = new Map();
+  if (pids.length) {
+    const { data } = await sb.from('participant_notes').select('participant_id,id,raw_note,ai_summary,created_at,updated_at').in('participant_id', pids).order('created_at');
+    for (const { participant_id, ...n } of (data || [])) {
+      if (!byPid.has(participant_id)) byPid.set(participant_id, []);
+      byPid.get(participant_id).push(n);
+    }
+  }
   const out = [];
   for (const t of trainings) {
-    const parts = [];
-    for (const p of t.participants) {
-      const { data: notes } = await sb.from('participant_notes').select('id,raw_note,ai_summary,created_at,updated_at').eq('participant_id', p.id).order('created_at');
-      parts.push({ id: p.id, first_name: p.first_name, last_name: p.last_name, position: p.position, email: p.email, phone: p.phone, attendance_confirmed: p.attendance_confirmed, subscription: p.subscription, subscription_start_date: p.subscription_start_date, notes: notes || [] });
-    }
+    const parts = t.participants.map((p) => ({ id: p.id, first_name: p.first_name, last_name: p.last_name, position: p.position, email: p.email, phone: p.phone, attendance_confirmed: p.attendance_confirmed, subscription: p.subscription, subscription_start_date: p.subscription_start_date, notes: byPid.get(p.id) || [] }));
     out.push({ id: t.id, name: t.name, training_date: t.training_date, location: t.location, description: t.description, participants: parts });
   }
-  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = `szron-szkolenia-${todayStr()}.json`; a.click();
-  URL.revokeObjectURL(a.href);
+  downloadJSON(out, `szron-szkolenia-${todayStr()}.json`);
   toast('Wyeksportowano', 'Pobrano plik JSON', 'ok');
 }
 
 /* ── start ── */
 async function init() {
-  const user = await getSessionUser();
-  if (!user || !isAllowed(user.email)) return; // layout przekieruje na login
+  if (!(await getTeamUser())) return; // layout przekieruje na login
 
   $('#btn-add-training').addEventListener('click', () => trainingModal(null));
   $('#btn-qr')?.addEventListener('click', () => trainingModal(null, { afterCreate: (tr) => qrModal(tr) }));
   $('#btn-import').addEventListener('click', importLegacy);
   $('#btn-export').addEventListener('click', exportJSON);
-  $('#btn-import-file').addEventListener('click', () => $('#file-input').click());
-  $('#file-input').addEventListener('change', (e) => { if (e.target.files[0]) importFile(e.target.files[0]); e.target.value = ''; });
+  bindFileImport('#btn-import-file', '#file-input', importFile);
 
-  let timer;
-  $('#search').addEventListener('input', (e) => { clearTimeout(timer); timer = setTimeout(() => { query = e.target.value.trim(); renderAll(); }, 150); });
+  bindSearch('#search', (q) => { query = q; renderAll(); });
 
   // delegacja bulk action (przyciski renderowane dynamicznie)
   $('#trainings').addEventListener('click', (e) => {
@@ -980,7 +797,7 @@ async function init() {
   renderAll();
 
   // Realtime: zmiany doklejają się na żywo (zamiast pollingu co 15 s).
-  startRealtime();
+  startRealtime(sb, 'strefa-szkolenia-list', ['participants', 'trainings', 'developers'], pollRefresh);
 }
 
 init();

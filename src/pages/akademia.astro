@@ -1,5 +1,7 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import CtaBand from '../components/CtaBand.astro';
 import { akademia } from '../data/akademia.mjs';
 ---
 <Interior
@@ -13,10 +15,7 @@ import { akademia } from '../data/akademia.mjs';
 >
   <section class="sect">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>Wszystkie szkolenia</p>
-        <h2 class="sect-title sect-title--s ws">{akademia.length} ścieżek — od pierwszej instalacji po model na własnym serwerze.</h2>
-      </div>
+      <SectHead eyebrow="Wszystkie szkolenia" title={`${akademia.length} ścieżek — od pierwszej instalacji po model na własnym serwerze.`} small />
       <div class="link-cards rv">
         {akademia.map((a) => (
           <a class="link-card" href={`/${a.slug}`}>

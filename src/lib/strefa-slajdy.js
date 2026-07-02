@@ -1,6 +1,7 @@
 // Edytor slajdów SZRON — v2 (model obiektowy). Faza 0: dokument sceny `content`,
 // wspólny renderer (edytor/miniatury/prezentacja), autosave całego content, undo/redo.
 import { getClient, getSessionUser, isAllowed, uploadSlideImage } from './supabase.js';
+import { $, $$, esc, toast, openModal, closeModal, confirmDialog, ICONS } from './strefa-ui.js';
 import { SLIDE_W, SLIDE_H, slideToContent, contentToPatch, newObject, sanitizeHtml, textToHtml, genId } from './slajdy/slide-model.js';
 import { mountSlide, applyScale, renderSlideInner } from './slajdy/slide-renderer.js';
 import { createHistory } from './slajdy/slide-store.js';
@@ -9,10 +10,7 @@ import { createObjectEditor } from './slajdy/slide-editor.js';
 const sb = getClient();
 const clone = (x) => (typeof structuredClone === 'function' ? structuredClone(x) : JSON.parse(JSON.stringify(x)));
 
-/* ── helpery DOM ── */
-const $ = (s, r = document) => r.querySelector(s);
-const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+/* ── helpery lokalne ── */
 const norm = (c) => String(c || '').trim().toLowerCase();
 const toHex = (c) => (/^#[0-9a-f]{6}$/i.test(String(c || '')) ? c : null);
 const plSlajdy = (n) => {
@@ -24,7 +22,7 @@ const plSlajdy = (n) => {
 const ICO = {
   text: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5h16v2M9 5v14M7 19h4"/></svg>',
   img: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>',
-  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>',
+  trash: ICONS.trash,
   up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg>',
   down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
   x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
@@ -33,46 +31,6 @@ const ICO = {
   undo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>',
   redo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h1"/></svg>',
 };
-
-/* ── toasty / modale ── */
-function toast(title, body = '', kind = '') {
-  const wrap = $('#toasts');
-  const t = document.createElement('div');
-  t.className = 'strefa-toast' + (kind ? ` strefa-toast--${kind}` : '');
-  t.innerHTML = `<strong>${esc(title)}</strong>${body ? `<span>${esc(body)}</span>` : ''}`;
-  wrap.appendChild(t);
-  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(() => t.remove(), 300); }, 3800);
-}
-function openModal(html) {
-  const root = $('#modal-root');
-  root.innerHTML = `<div class="strefa-modal"><div class="strefa-modal__scrim" data-close></div><div class="strefa-modal__box" role="dialog" aria-modal="true">${html}</div></div>`;
-  const box = $('.strefa-modal__box', root);
-  root.querySelector('[data-close]').addEventListener('click', closeModal);
-  const onKey = (e) => { if (e.key === 'Escape') closeModal(); };
-  document.addEventListener('keydown', onKey);
-  root._onKey = onKey;
-  return box;
-}
-function closeModal() {
-  const root = $('#modal-root');
-  if (root._onKey) document.removeEventListener('keydown', root._onKey);
-  root.innerHTML = '';
-}
-function confirmDialog(message, okLabel = 'Usuń', danger = true) {
-  return new Promise((resolve) => {
-    const box = openModal(`
-      <div class="strefa-modal__body">
-        <p style="margin:0 0 var(--space-lg)">${esc(message)}</p>
-        <div class="strefa-actions-row">
-          <button class="strefa-btn strefa-btn--ghost" data-no>Anuluj</button>
-          <button class="strefa-btn ${danger ? 'strefa-btn--danger' : 'strefa-btn--accent'}" data-yes>${esc(okLabel)}</button>
-        </div>
-      </div>`);
-    box.querySelector('[data-no]').addEventListener('click', () => { closeModal(); resolve(false); });
-    box.querySelector('[data-yes]').addEventListener('click', () => { closeModal(); resolve(true); });
-    box.querySelector('[data-yes]').focus();
-  });
-}
 
 /* ── stan ── */
 const trainingId = new URLSearchParams(location.search).get('t');

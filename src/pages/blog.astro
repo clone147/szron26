@@ -1,5 +1,8 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
 ---
 <Interior
   title="Blog — AI dla programistów | SZRON"
@@ -9,23 +12,16 @@ import Interior from '../layouts/Interior.astro';
   lead="Szykujemy miejsce na praktyczne wpisy o narzędziach AI do kodowania — porównania, wdrożenia i wnioski z prawdziwych projektów. Pierwsze teksty są w drodze. Zanim ruszą, najwięcej konkretu znajdziesz w Akademii i w naszych case studies."
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Z okopów</strong><span>narzędzia, które realnie testujemy</span></div>
-        <div><strong>Konkret, nie ogólniki</strong><span>techniki, które działają u nas i u klientów</span></div>
-        <div><strong>Bez marketingu</strong><span>piszemy to, co sami chcielibyśmy czytać</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['Z okopów', 'narzędzia, które realnie testujemy'],
+    ['Konkret, nie ogólniki', 'techniki, które działają u nas i u klientów'],
+    ['Bez marketingu', 'piszemy to, co sami chcielibyśmy czytać'],
+  ]} />
 
   <!-- 01 empty state -->
   <section class="sect" aria-labelledby="wkrotce">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Status · Wpisy w drodze</p>
-        <h2 class="sect-title sect-title--s ws" id="wkrotce">Pierwsze wpisy publikujemy wkrótce.</h2>
-      </div>
+      <SectHead eyebrow="01 / Status · Wpisy w drodze" title="Pierwsze wpisy publikujemy wkrótce." id="wkrotce" small />
       <div class="prose rv">
         <p>Blog dopiero startuje — nie chcemy zapełniać go treścią dla samej treści. Zamiast tego przygotowujemy wpisy o tym, czym faktycznie zajmujemy się na co dzień: narzędziach AI do kodowania, sposobach pracy z agentami i wnioskach z konkretnych wdrożeń.</p>
         <div class="callout"><p><strong>O czym będziemy pisać:</strong> porównania narzędzi (Cursor, Claude Code, Copilot, Codex, Gemini CLI), Context Engineering i MCP, wdrożenia AI w zespołach dev oraz wnioski z prawdziwych projektów.</p></div>
@@ -37,10 +33,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 w międzyczasie (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="tymczasem">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / W międzyczasie · Gdzie szukać konkretu</p>
-        <h2 class="sect-title ws" id="tymczasem">Zanim ruszy blog, zajrzyj tutaj.</h2>
-      </div>
+      <SectHead eyebrow="02 / W międzyczasie · Gdzie szukać konkretu" title="Zanim ruszy blog, zajrzyj tutaj." id="tymczasem" />
       <div class="link-cards rv">
         <a class="link-card" href="/akademia">
           <h3>Akademia SZRON</h3>
@@ -59,20 +52,10 @@ import Interior from '../layouts/Interior.astro';
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Masz temat, o którym chciałbyś przeczytać? Powiedz nam.</h2>
-      <p class="rv">Nie czekaj na pierwszy wpis — jeśli mierzysz się z konkretnym problemem przy AI w zespole, umów rozmowę. Odpowiemy wprost, a przy okazji podpowiemy, gdzie zacząć w Akademii.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Zarezerwuj termin
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="Masz temat, o którym chciałbyś przeczytać? Powiedz nam."
+    text="Nie czekaj na pierwszy wpis — jeśli mierzysz się z konkretnym problemem przy AI w zespole, umów rozmowę. Odpowiemy wprost, a przy okazji podpowiemy, gdzie zacząć w Akademii."
+    btnLabel="Zarezerwuj termin"
+  />
 </Interior>

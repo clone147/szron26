@@ -1,0 +1,9 @@
+---
+// Nagłówek sekcji: eyebrow + h2, opcjonalny lead przez <slot /> (np. <p class="sect-lead rv">).
+// small → wariant sect-title--s; id opcjonalne (bez id znika też atrybut).
+// Ternary po </h2>: bez slotu ' ' (spacja jak w oryginale), ze slotem sam slot (niesie własne spacje).
+const { eyebrow, title, id, small = false } = Astro.props;
+---
+<div class="sect-head">
+  <p class="eyebrow rv" data-scramble>{eyebrow}</p>
+  <h2 class={small ? 'sect-title sect-title--s ws' : 'sect-title ws'} id={id}>{title}</h2>{Astro.slots.has('default') ? <slot /> : ' '}</div>

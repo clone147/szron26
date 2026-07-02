@@ -1,5 +1,8 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
 ---
 <Interior
   title="Coaching AI — trening zespołu na waszym kodzie | SZRON"
@@ -11,23 +14,16 @@ import Interior from '../layouts/Interior.astro';
   heroAlt="Sylwetka z nici pomarańczowego światła na rdzeniu z kryształów"
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Na waszym kodzie</strong><span>trening na prawdziwych taskach z Jiry</span></div>
-        <div><strong>Po miesiącu samodzielnie</strong><span>zostają championi, dokumentacja i szablony</span></div>
-        <div><strong>Builder, nie trener</strong><span>20 lat w produkcji, ponad 3 lata z modelami LLM</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['Na waszym kodzie', 'trening na prawdziwych taskach z Jiry'],
+    ['Po miesiącu samodzielnie', 'zostają championi, dokumentacja i szablony'],
+    ['Builder, nie trener', '20 lat w produkcji, ponad 3 lata z modelami LLM'],
+  ]} />
 
   <!-- 01 idea -->
   <section class="sect" aria-labelledby="idea">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Idea · Agent jako drugi mózg programisty</p>
-        <h2 class="sect-title sect-title--s ws" id="idea">Programista myśli — agent pisze.</h2>
-      </div>
+      <SectHead eyebrow="01 / Idea · Agent jako drugi mózg programisty" title="Programista myśli — agent pisze." id="idea" small />
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">a</p>
@@ -51,31 +47,25 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 proces (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="proces">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Proces · Jak wygląda sprint</p>
-        <h2 class="sect-title ws" id="proces">Cztery kroki: analiza → narzędzia → coaching → kompetencje.</h2>
-      </div>
+      <SectHead eyebrow="02 / Proces · Jak wygląda sprint" title="Cztery kroki: analiza → narzędzia → coaching → kompetencje." id="proces" />
       <div class="steps">
         <article class="step rv"><p class="eyebrow">01 · Analiza workflow</p><h3>Patrzymy, jak pracujecie</h3><p>Każdy zespół ma swoje nawyki — jedni tracą godziny na review, inni na konfigurację. Mapujemy codzienne zadania, szukamy największych blokerów, oceniamy stack i to, co da się zautomatyzować.</p></article>
         <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Dobór narzędzi</p><h3>Testujemy na waszym kodzie</h3><p>Wdrażamy agentów AI — Opusa i Sonnet — przez Claude Code i MCP Tools. Do tego Cursor czy Copilot tam, gdzie pasują. Testujemy na waszym kodzie i wybieramy to, co realnie robi różnicę. Setup lokalnych modeli opcjonalnie.</p></article>
         <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Coaching na kodzie</p><h3>Robimy taski razem</h3><p>Bierzemy wasze prawdziwe taski z Jiry i robimy je razem. Nie ma lepszego sposobu niż zobaczyć na żywo, jak AI zmienia tempo pracy. Po kilku dniach ludzie sami zaczynają eksperymentować — warsztaty na repo, Context Engineering w praktyce, integracja MCP Tools.</p></article>
         <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Budujemy kompetencje</p><h3>Zostają u was</h3><p>Zostawiamy dokumentację, szablony i wewnętrznych championów. Po miesiącu zespół pewnie korzysta z AI, a my wracamy regularnie z nowymi narzędziami i strategiami. 30 dni wsparcia na wszelki wypadek.</p></article>
       </div>
-      <div class="proof-strip rv">
-        <div><strong>2 dni szkolenia</strong><span>w pierwszym miesiącu, potem ok. 2h follow-up tygodniowo</span></div>
-        <div><strong>Cykl 2–8 tygodni</strong><span>zależnie od rozmiaru zespołu</span></div>
-        <div><strong>NDA przed startem</strong><span>szczegóły finansowe ustalamy indywidualnie</span></div>
-      </div>
+      <ProofStrip wrap={false} items={[
+        ['2 dni szkolenia', 'w pierwszym miesiącu, potem ok. 2h follow-up tygodniowo'],
+        ['Cykl 2–8 tygodni', 'zależnie od rozmiaru zespołu'],
+        ['NDA przed startem', 'szczegóły finansowe ustalamy indywidualnie'],
+      ]} />
     </div>
   </section>
 
   <!-- 03 dla kogo -->
   <section class="sect" aria-labelledby="role">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Dla kogo · Dobieramy podejście do roli</p>
-        <h2 class="sect-title sect-title--s ws" id="role">Dev potrzebuje czegoś innego niż tech lead.</h2>
-      </div>
+      <SectHead eyebrow="03 / Dla kogo · Dobieramy podejście do roli" title="Dev potrzebuje czegoś innego niż tech lead." id="role" small />
       <dl class="def-rows rv">
         <div><dt>Programiści<small>Opus, Sonnet, Claude Code, MCP Tools, Cursor, Copilot, Codex, Gemini CLI</small></dt><dd>Taski, które zajmowały dzień, idą w godziny. AI pisze testy i dokumentację, łapie bugi zanim trafią na review, pozwala robić refactoring bez strachu. Junior po dwóch tygodniach dowozi jak mid, a senior może w końcu skupić się na architekturze zamiast klepać boilerplate.</dd></div>
         <div><dt>Tech leadzi<small>Context Engineering, quality gates AI, asystenci architektury, integracje MCP</small></dt><dd>Tech lead nie musi być wąskim gardłem. AI pilnuje standardów, łapie regresje i sprawdza architekturę — zespół dowozi szybciej, a jakość rośnie sama. Szybszy onboarding nowych devów i automatyzacja powtarzalnych decyzji.</dd></div>
@@ -86,10 +76,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 04 FAQ -->
   <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / FAQ · Pytania o Coaching Sprinty</p>
-        <h2 class="sect-title sect-title--s ws" id="faq-title">Jak przygotować zespół i czego oczekiwać.</h2>
-      </div>
+      <SectHead eyebrow="04 / FAQ · Pytania o Coaching Sprinty" title="Jak przygotować zespół i czego oczekiwać." id="faq-title" small />
       <div class="faq rv">
         <details>
           <summary><span class="num">01</span> Co to znaczy „augmentacja pracownika" w praktyce? <span class="ico" aria-hidden="true">+</span></summary>
@@ -116,20 +103,10 @@ import Interior from '../layouts/Interior.astro';
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">30 minut. Sprawdzimy, czy coaching ma sens u was.</h2>
-      <p class="rv">Pogadajmy szczerze — powiemy, czy sprint treningowy ma u was sens, czy nie. Trenujemy na waszym prawdziwym kodzie, mierzymy przed i po, a po miesiącu jedziecie dalej sami. Różnicę widać już w pierwszym sprincie.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Zarezerwuj termin
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="30 minut. Sprawdzimy, czy coaching ma sens u was."
+    text="Pogadajmy szczerze — powiemy, czy sprint treningowy ma u was sens, czy nie. Trenujemy na waszym prawdziwym kodzie, mierzymy przed i po, a po miesiącu jedziecie dalej sami. Różnicę widać już w pierwszym sprincie."
+    btnLabel="Zarezerwuj termin"
+  />
 </Interior>

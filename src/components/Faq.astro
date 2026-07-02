@@ -1,0 +1,14 @@
+---
+// Lista FAQ (details/summary) z automatyczną numeracją 01…NN.
+// Pytanie zostaje gołym text-nodem między .num a .ico — 3-kolumnowy grid w main.css tego wymaga.
+// [i > 0 && ' ', …] wstawia spację między <details> — .map() nie daje separatora.
+// Odpowiedź przez set:html: item.a trzyma DOKŁADNE bajty źródła (encje typu &amp;, cudzysłowy ASCII),
+// bo escapowana interpolacja zmieniłaby " na &quot; itd. Pytanie {item.q} zostaje escapowane (czysty tekst).
+const { items } = Astro.props;
+---
+<div class="faq rv">
+  {items.map((item, i) => [i > 0 && ' ', <details>
+    <summary><span class="num">{String(i + 1).padStart(2, '0')}</span> {item.q} <span class="ico" aria-hidden="true">+</span></summary>
+    <p set:html={item.a} />
+  </details>])}
+</div>

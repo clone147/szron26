@@ -1,5 +1,9 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import BtnArrow from '../components/BtnArrow.astro';
+import CtaBand from '../components/CtaBand.astro';
 ---
 <Interior
   title="Metoda — trzy ścieżki, dwa kwartały | SZRON"
@@ -11,23 +15,16 @@ import Interior from '../layouts/Interior.astro';
   heroAlt="Trzy strumienie światła zbiegające się w jeden punkt w oszronionym kanale"
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Trzy ścieżki równolegle</strong><span>trening, agenty i pilot — nie po kolei</span></div>
-        <div><strong>Na Waszym kodzie</strong><span>bez wymiany ludzi i wiedzy o biznesie</span></div>
-        <div><strong>3 miesiące</strong><span>stała opłata, zamknięty zakres</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['Trzy ścieżki równolegle', 'trening, agenty i pilot — nie po kolei'],
+    ['Na Waszym kodzie', 'bez wymiany ludzi i wiedzy o biznesie'],
+    ['3 miesiące', 'stała opłata, zamknięty zakres'],
+  ]} />
 
   <!-- 01 dlaczego równolegle -->
   <section class="sect" aria-labelledby="dlaczego">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Logika · Dlaczego równolegle</p>
-        <h2 class="sect-title sect-title--s ws" id="dlaczego">Samo szkolenie to za mało. Bez wdrożenia w codzienną pracę zostajecie z certyfikatami i starym tempem.</h2>
-      </div>
+      <SectHead eyebrow="01 / Logika · Dlaczego równolegle" title="Samo szkolenie to za mało. Bez wdrożenia w codzienną pracę zostajecie z certyfikatami i starym tempem." id="dlaczego" small />
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">a</p>
@@ -51,10 +48,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 trzy ścieżki (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="sciezki">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Ścieżki · Trzy razem, nie po kolei</p>
-        <h2 class="sect-title ws" id="sciezki">Trzy ścieżki, które idą jednocześnie.</h2>
-      </div>
+      <SectHead eyebrow="02 / Ścieżki · Trzy razem, nie po kolei" title="Trzy ścieżki, które idą jednocześnie." id="sciezki" />
 
       <article class="card-tile rv">
         <p class="eyebrow">Ścieżka 01 · Trening z AI</p>
@@ -99,10 +93,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 03 czego nie obiecujemy -->
   <section class="sect" aria-labelledby="granice">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Granice · Czego nie obiecujemy</p>
-        <h2 class="sect-title sect-title--s ws" id="granice">Mówimy wprost, gdzie kończą się obietnice.</h2>
-      </div>
+      <SectHead eyebrow="03 / Granice · Czego nie obiecujemy" title="Mówimy wprost, gdzie kończą się obietnice." id="granice" small />
       <dl class="def-rows rv">
         <div><dt>Nie „identyczna kopia"<small>Pilot to okazja, nie przepisanie 1:1</small></dt><dd>Pilot to okazja, żeby naprawić to, co od lat irytowało użytkowników.</dd></div>
         <div><dt>Nie zaczynamy bez analizy<small>Najpierw diagnoza</small></dt><dd>Diagnoza mówi uczciwie, czy pilot ma sens i od którego modułu zacząć.</dd></div>
@@ -114,10 +105,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 04 proces -->
   <section class="sect" aria-labelledby="proces-title" style="padding-top:0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Proces · Cztery kroki, dwa kwartały</p>
-        <h2 class="sect-title ws" id="proces-title">Jak pracujemy. 3 miesiące. Stała opłata.</h2>
-      </div>
+      <SectHead eyebrow="04 / Proces · Cztery kroki, dwa kwartały" title="Jak pracujemy. 3 miesiące. Stała opłata." id="proces-title" />
       <div class="steps">
         <article class="step rv">
           <p class="eyebrow">01 · Tydzień 1</p>
@@ -140,21 +128,18 @@ import Interior from '../layouts/Interior.astro';
           <p>Dokumentacja, wskaźniki, samodzielny zespół zdolny do dalszego rozwoju aplikacji.</p>
         </article>
       </div>
-      <div class="proof-strip rv">
-        <div><strong>3 miesiące</strong><span>razem</span></div>
-        <div><strong>Stała opłata</strong><span>bez ukrytych kosztów</span></div>
-        <div><strong>Bez przedłużania</strong><span>zamknięty zakres</span></div>
-      </div>
+      <ProofStrip wrap={false} items={[
+        ['3 miesiące', 'razem'],
+        ['Stała opłata', 'bez ukrytych kosztów'],
+        ['Bez przedłużania', 'zamknięty zakres'],
+      ]} />
     </div>
   </section>
 
   <!-- 05 co zyskujecie (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="korzysci">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>05 / Korzyści · Co zyskujecie</p>
-        <h2 class="sect-title ws" id="korzysci">Zespół, który znacie. Tempo, którego nie znacie.</h2>
-      </div>
+      <SectHead eyebrow="05 / Korzyści · Co zyskujecie" title="Zespół, który znacie. Tempo, którego nie znacie." id="korzysci" />
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">01 / Tempo</p>
@@ -177,31 +162,16 @@ import Interior from '../layouts/Interior.astro';
           <h3>A po dwóch kwartałach?</h3>
           <p>Dla firm, które chcą utrzymać tempo: stała współpraca — doradca technologiczny zarządu i zewnętrzny dział B+R.</p>
         </div>
-        <a class="btn btn--dark" href="/doradztwo-technologiczne">Zobacz doradztwo
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
+        <BtnArrow class="btn btn--dark" href="/doradztwo-technologiczne">Zobacz doradztwo</BtnArrow>
       </div>
     </div>
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">30 minut. Sprawdzimy, czy nasza metoda ma u Was sens.</h2>
-      <p class="rv">Zaczynamy od diagnozy: konkretne pytania, zero sprzedaży. Powiemy wprost, czy widzimy potencjał i od którego modułu warto zacząć pilot — albo że na razie nie ma sensu.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Zarezerwuj termin
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="30 minut. Sprawdzimy, czy nasza metoda ma u Was sens."
+    text="Zaczynamy od diagnozy: konkretne pytania, zero sprzedaży. Powiemy wprost, czy widzimy potencjał i od którego modułu warto zacząć pilot — albo że na razie nie ma sensu."
+    btnLabel="Zarezerwuj termin"
+  />
 </Interior>

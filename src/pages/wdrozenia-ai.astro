@@ -1,5 +1,16 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+// FAQ — numeracja 01…NN generowana w <Faq />
+const faq = [
+  { q: 'Na czyim kodzie pracujemy podczas warsztatu?', a: 'Na waszym — bierzemy realne taski z Jiry i robimy je razem z AI, nie na sztucznych przykładach. Dzięki temu efekty widać od pierwszego tygodnia, a zespół od razu uczy się pracy na własnym projekcie.' },
+  { q: 'Co zostaje u nas po zakończeniu programu?', a: 'Skonfigurowane narzędzia, dokumentacja procesów i 30 dni wsparcia. Celem jest autonomia — żebyście jechali dalej beze mnie. Agent AI działa wtedy jak drugi mózg programisty.' },
+  { q: 'Czy kod musi wychodzić na zewnątrz?', a: 'Nie musi. Tam, gdzie to ważne, stawiamy lokalne modele AI w waszej serwerowni — pełna kontrola nad danymi, zgodność z NIS2 i wymaganiami branżowymi, a skuteczność porównywalna z modelami w chmurze.' },
+];
 ---
 <Interior
   title="Wdrożenia AI — mierzalne efekty treningu | SZRON"
@@ -11,23 +22,16 @@ import Interior from '../layouts/Interior.astro';
   heroAlt="Zazębiające się oszronione koła zębate z pomarańczową energią"
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>Na waszym kodzie</strong><span>nie na przykładach — efekty od pierwszego tygodnia</span></div>
-        <div><strong>25+ lat doświadczenia</strong><span>3+ lata z LLM: RAG, fine-tuning</span></div>
-        <div><strong>30 dni wsparcia</strong><span>i autonomia zespołu po programie</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['Na waszym kodzie', 'nie na przykładach — efekty od pierwszego tygodnia'],
+    ['25+ lat doświadczenia', '3+ lata z LLM: RAG, fine-tuning'],
+    ['30 dni wsparcia', 'i autonomia zespołu po programie'],
+  ]} />
 
   <!-- 01 co mówią -->
   <section class="sect" aria-labelledby="opinie">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Dowód · Co to zmienia w pracy zespołu</p>
-        <h2 class="sect-title sect-title--s ws" id="opinie">Jeden dev z AI bierze na siebie pracę, która kiedyś wymagała całego zespołu.</h2>
-      </div>
+      <SectHead eyebrow="01 / Dowód · Co to zmienia w pracy zespołu" title="Jeden dev z AI bierze na siebie pracę, która kiedyś wymagała całego zespołu." id="opinie" small />
       <div class="grid-cards">
         <figure class="quote-card rv">
           <blockquote>„Jeden zaawansowany we współpracy z AI pracownik jest w stanie wykonać zadania, które wcześniej wymagały pracy kilkudziesięcioosobowego zespołu."</blockquote>
@@ -45,10 +49,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 case studies (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="rezultaty">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Rezultaty · Prawdziwe projekty z AI</p>
-        <h2 class="sect-title ws" id="rezultaty">Jakie rezultaty daje trening AI. Konkretne liczby, nie obietnice.</h2>
-      </div>
+      <SectHead eyebrow="02 / Rezultaty · Prawdziwe projekty z AI" title="Jakie rezultaty daje trening AI. Konkretne liczby, nie obietnice." id="rezultaty" />
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">01 / System raportowania</p>
@@ -77,10 +78,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 03 jak pracujemy -->
   <section class="sect" aria-labelledby="proces">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Proces · Jak pracujemy z Waszym zespołem</p>
-        <h2 class="sect-title ws" id="proces">Jak to wygląda z perspektywy Waszego zespołu.</h2>
-      </div>
+      <SectHead eyebrow="03 / Proces · Jak pracujemy z Waszym zespołem" title="Jak to wygląda z perspektywy Waszego zespołu." id="proces" />
       <div class="steps">
         <article class="step rv"><p class="eyebrow">01 · Diagnoza</p><h3>Sprawdzam, co Was spowalnia</h3><p>Patrzę na wasze daily, review i pipeline. Pytam devów, co ich wkurza. Zwykle po jednym dniu wiem, gdzie jest problem.</p></article>
         <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Dobór narzędzi</p><h3>Szukam najlepszego narzędzia</h3><p>Testuję na waszym kodzie i wybieram to, co realnie pomaga: GitHub Copilot, agenci AI, ChatGPT / GPT-4, Cursor IDE.</p></article>
@@ -93,10 +91,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 04 dlaczego SZRON (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="dlaczego">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Dlaczego SZRON · Co robi różnicę</p>
-        <h2 class="sect-title ws" id="dlaczego">Różnicę robi podejście. Dlatego zespoły wybierają nas.</h2>
-      </div>
+      <SectHead eyebrow="04 / Dlaczego SZRON · Co robi różnicę" title="Różnicę robi podejście. Dlatego zespoły wybierają nas." id="dlaczego" />
       <dl class="def-rows rv">
         <div><dt>Budujemy wasze kompetencje<small>Autonomia po 30 dniach</small></dt><dd>Długoterminowe partnerstwo: wasz zespół rośnie, a my wracamy regularnie z nowymi narzędziami i strategiami. Agent AI jako drugi mózg programisty, pełna dokumentacja procesów.</dd></div>
         <div><dt>Doświadczenie z wielu branż<small>Wzorce, które działają</small></dt><dd>Fintech, IoT, embedded, mobile, e-commerce — od embedded po web. Dzięki temu widzimy wzorce, które działają niezależnie od branży, i te, które inni przegapiają.</dd></div>
@@ -109,42 +104,16 @@ import Interior from '../layouts/Interior.astro';
   <!-- 05 FAQ -->
   <section class="sect" aria-labelledby="faq-title">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>05 / FAQ · Zanim zaczniemy</p>
-        <h2 class="sect-title sect-title--s ws" id="faq-title">Pytania, które padają przed treningiem.</h2>
-      </div>
-      <div class="faq rv">
-        <details>
-          <summary><span class="num">01</span> Na czyim kodzie pracujemy podczas warsztatu? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Na waszym — bierzemy realne taski z Jiry i robimy je razem z AI, nie na sztucznych przykładach. Dzięki temu efekty widać od pierwszego tygodnia, a zespół od razu uczy się pracy na własnym projekcie.</p>
-        </details>
-        <details>
-          <summary><span class="num">02</span> Co zostaje u nas po zakończeniu programu? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Skonfigurowane narzędzia, dokumentacja procesów i 30 dni wsparcia. Celem jest autonomia — żebyście jechali dalej beze mnie. Agent AI działa wtedy jak drugi mózg programisty.</p>
-        </details>
-        <details>
-          <summary><span class="num">03</span> Czy kod musi wychodzić na zewnątrz? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Nie musi. Tam, gdzie to ważne, stawiamy lokalne modele AI w waszej serwerowni — pełna kontrola nad danymi, zgodność z NIS2 i wymaganiami branżowymi, a skuteczność porównywalna z modelami w chmurze.</p>
-        </details>
-      </div>
+      <SectHead eyebrow="05 / FAQ · Zanim zaczniemy" title="Pytania, które padają przed treningiem." id="faq-title" small />
+      <Faq items={faq} />
     </div>
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Chcecie zobaczyć różnicę? 30 minut, zero sprzedaży.</h2>
-      <p class="rv">Porozmawiajmy o waszym zespole — powiem wprost, co ma sens, a co nie. Praktyka na waszym kodzie, budowanie kompetencji AI w zespole, widoczna zmiana w pierwszych tygodniach.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów Coaching Sprint
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="Chcecie zobaczyć różnicę? 30 minut, zero sprzedaży."
+    text="Porozmawiajmy o waszym zespole — powiem wprost, co ma sens, a co nie. Praktyka na waszym kodzie, budowanie kompetencji AI w zespole, widoczna zmiana w pierwszych tygodniach."
+    btnLabel="Umów Coaching Sprint"
+  />
 </Interior>

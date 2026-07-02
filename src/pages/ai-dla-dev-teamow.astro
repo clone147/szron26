@@ -1,5 +1,17 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+// FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html)
+const faq = [
+  { q: 'Jak zmierzymy efekt?', a: 'DORA metrics jako baseline w tygodniu 1: czas od ticketu do PR, czas merge, bug escape rate, pokrycie testami. Mierzymy ponownie w tygodniu 12. Raport ROI dla zarządu — dashboard z twardymi liczbami.' },
+  { q: 'Co z bezpieczeństwem naszych danych?', a: 'Wasz kod nie idzie do publicznych modeli. Dla branż regulowanych — Bedrock w AWS, dane w Waszej VPC. Dla obronności i wrażliwego embedded — lokalne modele (Ollama, vLLM) na Waszych serwerach. Audit log każdej interakcji z AI. NDA podpisujemy przed pierwszą rozmową.' },
+  { q: 'Co jeśli zespół nie kupi tej zmiany?', a: 'Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny". Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.' },
+  { q: 'Czy stara aplikacja będzie działać w trakcie?', a: 'Tak. Pilot wchodzi obok: dwa systemy równolegle, moduł po module, testy regresyjne na danych z produkcji. Wasza baza danych zostaje bez zmian.' },
+];
 ---
 <Interior
   title="AI dla zespołów software — workflow agentowy | SZRON"
@@ -13,10 +25,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 01 wczoraj → dziś -->
   <section class="sect" aria-labelledby="wczoraj-dzis">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Codzienna praca · Wczoraj a dziś</p>
-        <h2 class="sect-title sect-title--s ws" id="wczoraj-dzis">Co zmienia się w pracy dewa, gdy dochodzi agent.</h2>
-      </div>
+      <SectHead eyebrow="01 / Codzienna praca · Wczoraj a dziś" title="Co zmienia się w pracy dewa, gdy dochodzi agent." id="wczoraj-dzis" small />
       <table class="results-table rv">
         <thead><tr><th scope="col">Czynność</th><th scope="col">Wczoraj — wspomaganie</th><th scope="col">Dziś — programowanie intencyjne</th></tr></thead>
         <tbody>
@@ -53,10 +62,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 02 pełny workflow agentowy (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="workflow">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Workflow · Jak prowadzi się agenta</p>
-        <h2 class="sect-title ws" id="workflow">Pełny workflow agentowy, nie czat z promptami.</h2>
-      </div>
+      <SectHead eyebrow="02 / Workflow · Jak prowadzi się agenta" title="Pełny workflow agentowy, nie czat z promptami." id="workflow" />
       <dl class="def-rows rv">
         <div>
           <dt>Plan mode<small>najpierw plan, potem kod</small></dt>
@@ -85,15 +91,12 @@ import Interior from '../layouts/Interior.astro';
   <!-- 03 pomiar -->
   <section class="sect" aria-labelledby="pomiar">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>03 / Pomiar · DORA i DEVLens</p>
-        <h2 class="sect-title sect-title--s ws" id="pomiar">Efekt w danych, nie w deklaracjach.</h2>
-      </div>
-      <div class="proof-strip rv">
-        <div><strong>Tydzień 1</strong><span>baseline DORA: czas od ticketu do PR, czas merge, bug escape rate, pokrycie testami</span></div>
-        <div><strong>DEVLens</strong><span>wskaźniki produktywności wprost z repozytoriów Git i SVN, od pierwszego tygodnia</span></div>
-        <div><strong>Tydzień 12</strong><span>pomiar ponowny i raport ROI dla zarządu — dashboard z liczbami</span></div>
-      </div>
+      <SectHead eyebrow="03 / Pomiar · DORA i DEVLens" title="Efekt w danych, nie w deklaracjach." id="pomiar" small />
+      <ProofStrip wrap={false} items={[
+        ['Tydzień 1', 'baseline DORA: czas od ticketu do PR, czas merge, bug escape rate, pokrycie testami'],
+        ['DEVLens', 'wskaźniki produktywności wprost z repozytoriów Git i SVN, od pierwszego tygodnia'],
+        ['Tydzień 12', 'pomiar ponowny i raport ROI dla zarządu — dashboard z liczbami'],
+      ]} />
       <p class="rv" style="--rv-d:.1s; margin-top:var(--space-lg); max-width:60ch">
         Baseline zakładamy w tygodniu 1, mierzymy ponownie w tygodniu 12 — porównujemy te same wskaźniki, a nie wrażenia. To, co zajmowało 6 miesięcy, zespół dostarcza w 4 tygodnie; tempo rośnie 2–4 razy. Średnia po naszych projektach to 3–4 mergowane PR-y dziennie na programistę, każdy z testami.
       </p>
@@ -103,10 +106,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- 04 dokąd dalej -->
   <section class="sect" aria-labelledby="dalej" style="padding-top:0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>04 / Dokąd dalej · Powiązane</p>
-        <h2 class="sect-title sect-title--s ws" id="dalej">Gdzie zajrzeć po szczegóły.</h2>
-      </div>
+      <SectHead eyebrow="04 / Dokąd dalej · Powiązane" title="Gdzie zajrzeć po szczegóły." id="dalej" small />
       <div class="link-cards rv">
         <a class="link-card" href="/metoda">
           <h3>Metoda</h3>
@@ -127,46 +127,16 @@ import Interior from '../layouts/Interior.astro';
   <!-- 05 FAQ -->
   <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>05 / FAQ · Pytania o pracę z agentem</p>
-        <h2 class="sect-title sect-title--s ws" id="faq-title">Pytania, które padają przed startem.</h2>
-      </div>
-      <div class="faq rv">
-        <details>
-          <summary><span class="num">01</span> Jak zmierzymy efekt? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>DORA metrics jako baseline w tygodniu 1: czas od ticketu do PR, czas merge, bug escape rate, pokrycie testami. Mierzymy ponownie w tygodniu 12. Raport ROI dla zarządu — dashboard z twardymi liczbami.</p>
-        </details>
-        <details>
-          <summary><span class="num">02</span> Co z bezpieczeństwem naszych danych? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Wasz kod nie idzie do publicznych modeli. Dla branż regulowanych — Bedrock w AWS, dane w Waszej VPC. Dla obronności i wrażliwego embedded — lokalne modele (Ollama, vLLM) na Waszych serwerach. Audit log każdej interakcji z AI. NDA podpisujemy przed pierwszą rozmową.</p>
-        </details>
-        <details>
-          <summary><span class="num">03</span> Co jeśli zespół nie kupi tej zmiany? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny". Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.</p>
-        </details>
-        <details>
-          <summary><span class="num">04</span> Czy stara aplikacja będzie działać w trakcie? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Tak. Pilot wchodzi obok: dwa systemy równolegle, moduł po module, testy regresyjne na danych z produkcji. Wasza baza danych zostaje bez zmian.</p>
-        </details>
-      </div>
+      <SectHead eyebrow="05 / FAQ · Pytania o pracę z agentem" title="Pytania, które padają przed startem." id="faq-title" small />
+      <Faq items={faq} />
     </div>
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Zobaczcie ten workflow na własnym kodzie.</h2>
-      <p class="rv">30 minut rozmowy. Powiemy, czy i gdzie agent da Waszemu zespołowi realny zwrot — i jak go zmierzymy od pierwszego tygodnia.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="Zobaczcie ten workflow na własnym kodzie."
+    text="30 minut rozmowy. Powiemy, czy i gdzie agent da Waszemu zespołowi realny zwrot — i jak go zmierzymy od pierwszego tygodnia."
+    btnLabel="Umów diagnozę"
+  />
 </Interior>

@@ -1,5 +1,8 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
 
 // Narzędzia open source SZRON — treść wg starej strony (OpenSource.tsx)
 const tools = [
@@ -63,23 +66,16 @@ const tools = [
   heroAlt="Kryształy szronu splecione w otwartą kratę z pomarańczowymi spoinami"
 >
   <!-- proof -->
-  <section class="sect" style="padding-bottom:0">
-    <div class="container">
-      <div class="proof-strip rv">
-        <div><strong>4 narzędzia</strong><span>serwer MCP + skille Claude Code</span></div>
-        <div><strong>37 wzorców</strong><span>w humanizerze polskiego tekstu</span></div>
-        <div><strong>MIT License</strong><span>za darmo, bez haczyków</span></div>
-      </div>
-    </div>
-  </section>
+  <ProofStrip items={[
+    ['4 narzędzia', 'serwer MCP + skille Claude Code'],
+    ['37 wzorców', 'w humanizerze polskiego tekstu'],
+    ['MIT License', 'za darmo, bez haczyków'],
+  ]} />
 
   <!-- narzędzia -->
   <section class="sect" aria-labelledby="narzedzia">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>01 / Narzędzia · Sprawdzone w boju</p>
-        <h2 class="sect-title sect-title--s ws" id="narzedzia">Każde powstało przy realnym projekcie wdrożeniowym.</h2>
-      </div>
+      <SectHead eyebrow="01 / Narzędzia · Sprawdzone w boju" title="Każde powstało przy realnym projekcie wdrożeniowym." id="narzedzia" small />
       <div class="grid-cards">
         {tools.map((t, i) => (
           <article class="card-tile tool-card rv" style={`--rv-d:${(i * 0.08).toFixed(2)}s`}>
@@ -105,10 +101,7 @@ const tools = [
   <!-- dlaczego open source -->
   <section class="sect sect--dark" aria-labelledby="dlaczego">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>02 / Dlaczego · Po co to robimy</p>
-        <h2 class="sect-title ws" id="dlaczego">Dlaczego open source?</h2>
-      </div>
+      <SectHead eyebrow="02 / Dlaczego · Po co to robimy" title="Dlaczego open source?" id="dlaczego" />
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">Powstaje przy pracy</p>
@@ -130,22 +123,17 @@ const tools = [
   </section>
 
   <!-- CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Masz pomysł?</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Masz pomysł na narzędzie?</h2>
-      <p class="rv">Budujemy narzędzia, które pomagają polskim zespołom pracować z AI. Jeśli masz pomysł albo chcesz kontrybuować — napisz.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/kontakt">Napisz do nas
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="https://github.com/clone147" target="_blank" rel="noopener noreferrer">Zobacz GitHub</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Masz pomysł?"
+    heading="Masz pomysł na narzędzie?"
+    text="Budujemy narzędzia, które pomagają polskim zespołom pracować z AI. Jeśli masz pomysł albo chcesz kontrybuować — napisz."
+    btnLabel="Napisz do nas"
+    btnHref="/kontakt"
+    ghostLabel="Zobacz GitHub"
+    ghostHref="https://github.com/clone147"
+    ghostExternal={true}
+    padTop={false}
+  />
 
   <script is:inline>
     document.querySelectorAll('.install__btn').forEach((btn) => {
