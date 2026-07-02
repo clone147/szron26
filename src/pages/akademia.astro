@@ -27,20 +27,11 @@ import { akademia } from '../data/akademia.mjs';
     </div>
   </section>
 
-  <section class="sect sect--dark cta-band" style="padding-top:0">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Wdrożenie u Was</p>
-      <h2 class="ws" style="margin-top:var(--space-lg)">Chcecie, żeby tak pracował cały Wasz zespół?</h2>
-      <p class="rv">Akademia to materiały. Wdrożenie to dwa kwartały na Waszym kodzie — z pomiarem efektu w DEVLens. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="/metoda">Zobacz metodę</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    id={null}
+    padTop={false}
+    heading="Chcecie, żeby tak pracował cały Wasz zespół?"
+    ghostLabel="Zobacz metodę"
+    ghostHref="/metoda"
+  />
 </Interior>

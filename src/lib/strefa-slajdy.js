@@ -1,9 +1,9 @@
 // Edytor slajdów SZRON — v2 (model obiektowy). Faza 0: dokument sceny `content`,
 // wspólny renderer (edytor/miniatury/prezentacja), autosave całego content, undo/redo.
-import { getClient, getSessionUser, isAllowed, uploadSlideImage } from './supabase.js';
+import { getClient, getTeamUser, uploadSlideImage } from './supabase.js';
 import { $, $$, esc, toast, openModal, closeModal, confirmDialog, ICONS } from './strefa-ui.js';
-import { SLIDE_W, SLIDE_H, slideToContent, contentToPatch, newObject, sanitizeHtml, textToHtml, genId } from './slajdy/slide-model.js';
-import { mountSlide, applyScale, renderSlideInner } from './slajdy/slide-renderer.js';
+import { SLIDE_W, SLIDE_H, slideToContent, contentToPatch, newObject, sanitizeHtml, textToHtml, genId, emptyContent } from './slajdy/slide-model.js';
+import { mountSlide, applyScale, renderSlideInner, FONT_STACKS, ALIGN_JUSTIFY } from './slajdy/slide-renderer.js';
 import { createHistory } from './slajdy/slide-store.js';
 import { createObjectEditor } from './slajdy/slide-editor.js';
 
@@ -28,8 +28,6 @@ const ICO = {
   x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
   grip: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/></svg>',
   empty: '<svg class="deck-empty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M12 9v4M10 11h4"/></svg>',
-  undo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>',
-  redo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h1"/></svg>',
 };
 
 /* ── stan ── */
@@ -90,10 +88,12 @@ function setStatus(state) {
 }
 
 /* ── zapis content + notatek ── */
-function saveContentNow(s) {
-  sb.from('training_slides').update(contentToPatch(s.content)).eq('id', s.id)
+// jeden punkt prawdy dla patcha slajdu do DB (toast błędu + status)
+function dbUpdate(id, patch) {
+  sb.from('training_slides').update(patch).eq('id', id)
     .then(({ error }) => { if (error) { toast('Błąd zapisu', error.message, 'err'); setStatus('error'); } else setStatus('saved'); });
 }
+function saveContentNow(s) { dbUpdate(s.id, contentToPatch(s.content)); }
 function scheduleSaveContent(s) {
   setStatus('saving');
   const key = s.id + '|content';
@@ -110,15 +110,12 @@ function scheduleSave(id, patch) {
   setStatus('saving');
   const key = id + '|' + Object.keys(patch).join(',');
   clearTimeout(saveTimers.get(key));
-  saveTimers.set(key, setTimeout(() => {
-    saveTimers.delete(key);
-    sb.from('training_slides').update(patch).eq('id', id).then(({ error }) => { if (error) { toast('Błąd zapisu', error.message, 'err'); setStatus('error'); } else setStatus('saved'); });
-  }, 600));
+  saveTimers.set(key, setTimeout(() => { saveTimers.delete(key); dbUpdate(id, patch); }, 600));
 }
 function flushSave(id, patch) {
   const key = id + '|' + Object.keys(patch).join(',');
   clearTimeout(saveTimers.get(key)); saveTimers.delete(key);
-  sb.from('training_slides').update(patch).eq('id', id).then(({ error }) => { if (error) { toast('Błąd zapisu', error.message, 'err'); setStatus('error'); } else setStatus('saved'); });
+  dbUpdate(id, patch);
 }
 
 // Wczytaj zawartość edytowalnych obiektów tekstowych z DOM do modelu. Zwraca true, gdy zmiana.
@@ -218,13 +215,13 @@ function renderEditor() {
       <textarea class="deck-notes__field" id="slide-notes" placeholder="Notatki dla prezentera — widoczne tylko tu, nie na slajdzie…">${esc(s.notes || '')}</textarea>
     </div>`;
   const host = $('#canvas');
-  mountSlide(host, s.content, { deckBg: deckBgCss(), editable: false, observe: false });
+  mountSlide(host, s.content, { deckBg: deckBgCss(), observe: false });
   if (editorRO) { editorRO.disconnect(); editorRO = null; }
   const st = host.querySelector('.slide-stage');
   if (st && 'ResizeObserver' in window) { editorRO = new ResizeObserver(() => { applyScale(host, st); objEditor?.updateRect(); }); editorRO.observe(host); }
   const keepIds = objEditor ? objEditor.selectedIds() : [];
   if (objEditor) objEditor.destroy();
-  stopBarTracking(); { const b = $('#obj-bar'); if (b) b.hidden = true; }
+  { const b = $('#obj-bar'); if (b) b.hidden = true; }
   objEditor = createObjectEditor({ host, getSlide: () => slides[current], commit: editorCommit, onSelect: renderRightPanel, onEmptyDblClick: insertTextAt, onEditStart: showFmtBar, onEditEnd: hideFmtBar, onDrawShape });
   bindEditorChrome();
   bindCanvasDrop(host);
@@ -261,7 +258,6 @@ function renderObjBar(model) {
   }));
   positionObjBar();
 }
-function stopBarTracking() { const b = $('#obj-bar'); if (b) b.hidden = true; }
 function positionObjBar() {
   const bar = $('#obj-bar'); if (!bar) return;
   const ids = objEditor?.selectedIds() || [];
@@ -373,8 +369,7 @@ function alignSelected(mode) {
     else if (mode === 'bottom') o.y = Math.round(maxY - o.h);
     else if (mode === 'vcenter') o.y = Math.round(cy - o.h / 2);
   });
-  scheduleSaveContent(s); pushHistory(); renderEditor();
-  setTimeout(() => objEditor.selectMany(ids), 20);
+  commitAndRerender(s, ids);
 }
 function distributeSelected(axis) {
   const s = slides[current]; const ids = objEditor?.selectedIds() || []; if (ids.length < 3) return;
@@ -383,8 +378,7 @@ function distributeSelected(axis) {
   objs.sort((a, b) => a[k] - b[k]);
   const min = objs[0][k], max = objs[objs.length - 1][k], step = (max - min) / (objs.length - 1);
   objs.forEach((o, i) => { o[k] = Math.round(min + step * i); });
-  scheduleSaveContent(s); pushHistory(); renderEditor();
-  setTimeout(() => objEditor.selectMany(ids), 20);
+  commitAndRerender(s, ids);
 }
 function groupSelected() {
   const s = slides[current]; const ids = objEditor?.selectedIds() || []; if (ids.length < 2) return;
@@ -401,18 +395,23 @@ function ungroupSelected() {
 let clipboard = null;
 function copySelected() {
   const s = slides[current]; const ids = objEditor?.selectedIds() || []; if (!ids.length) return;
-  clipboard = ids.map((id) => s.content.objects.find((o) => o.id === id)).filter(Boolean).map((o) => JSON.parse(JSON.stringify(o)));
+  clipboard = ids.map((id) => s.content.objects.find((o) => o.id === id)).filter(Boolean).map((o) => clone(o));
+}
+// klonowanie obiektów do bieżącego slajdu (paste / duplicate) — remap grup tylko przy wklejaniu,
+// duplikaty celowo zostają w grupie źródła; z liczone w pętli (rośnie z każdym push)
+function cloneObjectsInto(s, srcObjs, offset, remapGroups) {
+  if (!srcObjs.length) return;
+  const groupMap = {}; const newIds = [];
+  srcObjs.forEach((src) => {
+    const copy = { ...clone(src), id: genId(), x: src.x + offset, y: src.y + offset, z: s.content.objects.length };
+    if (remapGroups && copy.group) { groupMap[src.group] = groupMap[src.group] || genId(); copy.group = groupMap[src.group]; }
+    s.content.objects.push(copy); newIds.push(copy.id);
+  });
+  commitAndRerender(s, newIds);
 }
 function pasteClipboard() {
   const s = slides[current]; if (!clipboard || !clipboard.length || !s) return;
-  const groupMap = {}; const newIds = [];
-  clipboard.forEach((src) => {
-    const copy = { ...JSON.parse(JSON.stringify(src)), id: genId(), x: src.x + 28, y: src.y + 28, z: s.content.objects.length };
-    if (copy.group) { groupMap[src.group] = groupMap[src.group] || genId(); copy.group = groupMap[src.group]; }
-    s.content.objects.push(copy); newIds.push(copy.id);
-  });
-  scheduleSaveContent(s); pushHistory(); renderEditor();
-  setTimeout(() => objEditor.selectMany(newIds), 20);
+  cloneObjectsInto(s, clipboard, 28, true);
 }
 function selectAllObjects() {
   const s = slides[current]; if (!s || !s.content.objects.length) return;
@@ -436,25 +435,28 @@ function bindEditorChrome() {
 }
 
 /* ── obiekty: wstawianie / operacje ── */
+// wspólny finał mutacji: zapis + historia + re-render + przywrócenie selekcji po remoncie (20 ms)
+function commitAndRerender(s, ids, { edit = false } = {}) {
+  scheduleSaveContent(s); pushHistory(); renderEditor();
+  setTimeout(() => {
+    if (edit) objEditor?.enterTextEdit(ids[0]);
+    else if (ids.length === 1) objEditor?.select(ids[0]);
+    else objEditor?.selectMany(ids);
+  }, 20);
+}
 function addObject(s, obj, { edit = false } = {}) {
   obj.z = s.content.objects.length;
   s.content.objects.push(obj);
-  scheduleSaveContent(s); pushHistory();
-  renderEditor();
-  setTimeout(() => { if (edit) objEditor?.enterTextEdit(obj.id); else objEditor?.select(obj.id); }, 20);
+  commitAndRerender(s, [obj.id], { edit });
 }
-function insertText() {
-  const s = slides[current]; if (!s) return;
-  const obj = newObject('text', { x: 560, y: 460, w: 800, h: 160, size: 64, align: 'center', valign: 'middle', richText: '', color: theme().textColor, font: theme().font });
-  addObject(s, obj, { edit: true });
-}
+function insertText() { insertTextAt(SLIDE_W / 2, SLIDE_H / 2); }
 function onDrawShape(kind, rect) {
   const s = slides[current]; if (!s) return;
   const isLine = kind === 'line' || kind === 'arrow';
   const obj = newObject('shape', { kind, x: rect.x, y: rect.y, w: rect.w, h: rect.h, fill: isLine ? theme().textColor : theme().accent, stroke: null, radius: kind === 'rect' ? 12 : 0 });
   addObject(s, obj);
 }
-function refreshObject(id) { const s = slides[current]; if (!s) return; scheduleSaveContent(s); pushHistory(); renderEditor(); setTimeout(() => objEditor?.select(id), 20); }
+function refreshObject(id) { const s = slides[current]; if (!s) return; commitAndRerender(s, [id]); }
 
 /* ── layouty slajdów (wstawiane jako gotowy slajd) ── */
 function ltxt(text, props) { return newObject('text', { ...props, richText: textToHtml(text) }); }
@@ -470,12 +472,7 @@ async function applyLayout(name) {
   const make = LAYOUTS[name]; if (!make) return;
   flushCurrent();
   const objs = make(); objs.forEach((o, i) => { o.z = i; });
-  const content = { version: 1, background: { type: 'none' }, objects: objs };
-  const { data, error } = await sb.from('training_slides').insert({ training_id: trainingId, position: slides.length, ...contentToPatch(content) }).select().single();
-  if (error) return toast('Błąd', error.message, 'err');
-  data.content = content; slides.push(data); current = slides.length - 1;
-  history.reset(data.id, clone(content));
-  redraw();
+  if (!(await insertSlideRow({ ...emptyContent(), objects: objs }))) return;
   toast('Dodano slajd', name, 'ok');
 }
 function openLayoutPicker() {
@@ -525,11 +522,13 @@ function openCommandPalette(initialQuery = '') {
 }
 
 /* ── eksport ── */
-const EXPORT_SLIDE_CSS = `.slide-stage{position:absolute;top:0;left:0;transform-origin:top left}
+// wspólna baza CSS renderera poza aplikacją (eksport PDF/PNG + okno prezentera)
+const SLIDE_BASE_CSS = `.slide-stage{position:absolute;top:0;left:0;transform-origin:top left}
 .slide-bg{position:absolute;inset:0}.slide-bg__img{position:absolute;inset:0;width:100%;height:100%}
 .slide-obj{position:absolute;box-sizing:border-box}.slide-obj--text{display:flex}
-.slide-obj__text{max-width:100%;max-height:100%;overflow:hidden;white-space:pre-wrap;word-break:break-word;letter-spacing:-.01em}
-.slide-obj__text ul,.slide-obj__text ol{margin:0;padding-left:1.3em;text-align:left}.slide-obj__text a{color:inherit}`;
+.slide-obj__text{max-width:100%;max-height:100%;overflow:hidden;white-space:pre-wrap;word-break:break-word}
+.slide-obj__text ul,.slide-obj__text ol{margin:0;padding-left:1.3em;text-align:left}`;
+const EXPORT_SLIDE_CSS = SLIDE_BASE_CSS + '.slide-obj__text{letter-spacing:-.01em}.slide-obj__text a{color:inherit}';
 function exportPDF() {
   const w = window.open('', 'szron-export', 'width=1280,height=760');
   if (!w) return toast('Popup zablokowany', 'Zezwól na okno wydruku', 'err');
@@ -607,11 +606,8 @@ async function insertAiSlide(content) {
     return obj;
   });
   objs.forEach((o, i) => { o.z = i; });
-  const full = { version: 1, background: content.background && content.background.type ? content.background : { type: 'none' }, objects: objs, transition: 'none' };
-  const { data, error } = await sb.from('training_slides').insert({ training_id: trainingId, position: slides.length, ...contentToPatch(full) }).select().single();
-  if (error) return toast('Błąd', error.message, 'err');
-  data.content = full; slides.push(data); current = slides.length - 1;
-  history.reset(data.id, clone(full)); redraw();
+  const full = { ...emptyContent(), background: content.background && content.background.type ? content.background : { type: 'none' }, objects: objs, transition: 'none' };
+  if (!(await insertSlideRow(full))) return;
   toast('Gotowe', 'AI utworzyło slajd', 'ok');
 }
 function imageDims(url) {
@@ -626,15 +622,7 @@ function deleteSelectedObject() {
 }
 function duplicateSelectedObject() {
   const s = slides[current]; const ids = objEditor?.selectedIds() || []; if (!s || !ids.length) return;
-  const newIds = [];
-  ids.forEach((id) => {
-    const src = s.content.objects.find((o) => o.id === id); if (!src) return;
-    const copy = { ...JSON.parse(JSON.stringify(src)), id: genId(), x: src.x + 24, y: src.y + 24, z: s.content.objects.length };
-    s.content.objects.push(copy); newIds.push(copy.id);
-  });
-  if (!newIds.length) return;
-  scheduleSaveContent(s); pushHistory(); renderEditor();
-  setTimeout(() => objEditor.selectMany(newIds), 20);
+  cloneObjectsInto(s, ids.map((id) => s.content.objects.find((o) => o.id === id)).filter(Boolean), 24, false);
 }
 function nudgeSelected(dx, dy) {
   const s = slides[current]; const ids = objEditor?.selectedIds() || []; if (!s || !ids.length) return;
@@ -661,8 +649,7 @@ function zorder(dir) {
   let j = dir === 'front' ? objs.length : dir === 'back' ? 0 : dir === 'forward' ? Math.min(objs.length, i + 1) : Math.max(0, i - 1);
   objs.splice(j, 0, m);
   objs.forEach((o, k) => { o.z = k; });
-  scheduleSaveContent(s); pushHistory(); renderEditor();
-  setTimeout(() => objEditor?.select(id), 20);
+  commitAndRerender(s, [id]);
 }
 function bindCanvasDrop(host) {
   host.addEventListener('dragover', (e) => { if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) { e.preventDefault(); host.classList.add('is-drop'); } });
@@ -676,7 +663,6 @@ function bindCanvasDrop(host) {
 
 /* prawy inspektor: właściwości zaznaczonego obiektu */
 const FONTS = [['helvetica', 'Helvetica'], ['display', 'Nagłówkowy'], ['body', 'Tekstowy']];
-const FONT_CSS = { helvetica: "'Helvetica Neue', Helvetica, Arial, sans-serif", display: 'var(--font-display)', body: 'var(--font-body)' };
 // presety stylów tekstu (spięte z wyglądem decku)
 const TEXT_STYLES = {
   'Tytuł': { size: 128, weight: 700, align: 'center', font: 'display' },
@@ -775,7 +761,7 @@ function bindObjectInspector(o) {
   $('#oi-front')?.addEventListener('click', () => zorder('front'));
   $('#oi-back')?.addEventListener('click', () => zorder('back'));
 
-  $('#oi-font')?.addEventListener('change', (e) => { o.font = e.target.value; const t = txt(); if (t) t.style.fontFamily = FONT_CSS[o.font]; live(); commit(); });
+  $('#oi-font')?.addEventListener('change', (e) => { o.font = e.target.value; const t = txt(); if (t) t.style.fontFamily = FONT_STACKS[o.font]; live(); commit(); });
   $('#oi-size')?.addEventListener('input', (e) => { o.size = +e.target.value || 64; const t = txt(); if (t) t.style.fontSize = o.size + 'px'; live(); });
   $('#oi-size')?.addEventListener('change', commit);
   $('#oi-color')?.addEventListener('input', (e) => { o.color = e.target.value; const t = txt(); if (t) t.style.color = o.color; live(); });
@@ -786,8 +772,8 @@ function bindObjectInspector(o) {
     const preset = TEXT_STYLES[e.target.value]; if (!preset) return;
     Object.assign(o, preset);
     const t = txt(), box = el();
-    if (t) { t.style.fontFamily = FONT_CSS[o.font]; t.style.fontSize = o.size + 'px'; t.style.fontWeight = o.weight; t.style.textAlign = o.align; }
-    if (box) box.style.justifyContent = { left: 'flex-start', center: 'center', right: 'flex-end' }[o.align];
+    if (t) { t.style.fontFamily = FONT_STACKS[o.font]; t.style.fontSize = o.size + 'px'; t.style.fontWeight = o.weight; t.style.textAlign = o.align; }
+    if (box) box.style.justifyContent = ALIGN_JUSTIFY[o.align];
     live(); commit(); renderObjectInspector(o);
   });
   $('#oi-pal')?.querySelectorAll('.oi-pal__chip').forEach((c) => c.addEventListener('click', () => {
@@ -798,7 +784,7 @@ function bindObjectInspector(o) {
   $('#oi-align')?.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
     o.align = b.dataset.al; $('#oi-align').querySelectorAll('button').forEach((x) => x.classList.toggle('is-active', x === b));
     const box = el(); const t = txt();
-    if (box) box.style.justifyContent = { left: 'flex-start', center: 'center', right: 'flex-end' }[o.align];
+    if (box) box.style.justifyContent = ALIGN_JUSTIFY[o.align];
     if (t) t.style.textAlign = o.align;
     live(); commit();
   }));
@@ -904,7 +890,7 @@ function renderStrip() {
   const dbg = deckBgCss();
   slides.forEach((s, i) => {
     const h = strip.querySelector(`[data-thumb="${i}"]`);
-    if (h) mountSlide(h, s.content, { deckBg: dbg, editable: false, observe: false });
+    if (h) mountSlide(h, s.content, { deckBg: dbg, observe: false });
   });
   bindStrip();
 }
@@ -944,18 +930,22 @@ function selectSlide(idx) {
 }
 
 /* ── CRUD / reorder ── */
+// wspólny przepływ wstawienia slajdu: DB insert → stan lokalny → historia → redraw (toasty sukcesu w callerach)
+async function insertSlideRow(content) {
+  const { data, error } = await sb.from('training_slides')
+    .insert({ training_id: trainingId, position: slides.length, ...contentToPatch(content) }).select().single();
+  if (error) { toast('Błąd', error.message, 'err'); return null; }
+  data.content = content;
+  slides.push(data);
+  current = slides.length - 1;
+  history.reset(data.id, clone(content));
+  redraw();
+  return data;
+}
 async function addSlide() {
   flushCurrent();
   // Nowy slajd = pusty canvas (obiekty dodaje się świadomie: + Tekst / + Obrazek / dwuklik).
-  const starter = { version: 1, background: { type: 'none' }, objects: [] };
-  const { data, error } = await sb.from('training_slides')
-    .insert({ training_id: trainingId, position: slides.length, ...contentToPatch(starter) }).select().single();
-  if (error) return toast('Błąd', error.message, 'err');
-  data.content = starter;
-  slides.push(data);
-  current = slides.length - 1;
-  history.reset(data.id, clone(starter));
-  redraw();
+  await insertSlideRow(emptyContent());
 }
 async function deleteSlide(idx) {
   const s = slides[idx]; if (!s) return;
@@ -1010,7 +1000,7 @@ async function handleSlideImage(file) {
   const aspect = (dim.w && dim.h) ? dim.w / dim.h : 16 / 9;
   let w = 1000, h = Math.round(w / aspect);
   if (h > 760) { h = 760; w = Math.round(h * aspect); }
-  const obj = newObject('image', { src: res.url, w, h, x: Math.round((SLIDE_W - w) / 2), y: Math.round((SLIDE_H - h) / 2), fit: 'contain', naturalW: dim.w, naturalH: dim.h });
+  const obj = newObject('image', { src: res.url, w, h, x: Math.round((SLIDE_W - w) / 2), y: Math.round((SLIDE_H - h) / 2), fit: 'contain' });
   addObject(s, obj);
   toast('Gotowe', 'Obrazek dodany', 'ok');
 }
@@ -1074,8 +1064,7 @@ function renderStage(animate) {
     <button class="stage-presenter" aria-label="Widok prezentera (P)" title="Widok prezentera (P)">▣</button>
     <div class="stage-progress">${dots}<span class="stage-count-txt">${presentIdx + 1} / ${total}</span></div>`;
   const host = $('#stage-vp');
-  mountSlide(host, s.content, { deckBg: deckBgCss(), editable: false, observe: false });
-  applyScale(host, host.querySelector('.slide-stage'));
+  mountSlide(host, s.content, { deckBg: deckBgCss(), observe: false });   // mountSlide sam woła applyScale
   applyBuilds(host, s.content, buildStep);
   if (animate && s.content.transition && s.content.transition !== 'none') { void host.offsetWidth; host.classList.add('stage-trans-' + s.content.transition); }
   stage.querySelector('.stage-prev').addEventListener('click', prevStep);
@@ -1133,11 +1122,7 @@ body{background:#0b0d12;color:#e8eaed;font-family:-apple-system,'Helvetica Neue'
 .pv-bottom{display:flex;align-items:center;justify-content:center;gap:12px}
 .pv-btn{background:#1c2230;border:1px solid #2a2f3a;color:#e8eaed;font-size:16px;padding:10px 24px;border-radius:8px;cursor:pointer}
 .pv-btn:hover{background:#262d3d}
-.slide-stage{position:absolute;top:0;left:0;transform-origin:top left}
-.slide-bg{position:absolute;inset:0}.slide-bg__img{position:absolute;inset:0;width:100%;height:100%}
-.slide-obj{position:absolute;box-sizing:border-box}.slide-obj--text{display:flex}
-.slide-obj__text{max-width:100%;max-height:100%;overflow:hidden;white-space:pre-wrap;word-break:break-word}
-.slide-obj__text ul,.slide-obj__text ol{margin:0;padding-left:1.3em;text-align:left}`;
+${SLIDE_BASE_CSS}`;
 function openPresenter() {
   if (presenterWin && !presenterWin.closed) { presenterWin.focus(); return; }
   presenterWin = window.open('', 'szron-presenter', 'width=1200,height=820');
@@ -1234,8 +1219,7 @@ function onKeyGlobal(e) {
 
 /* ── init ── */
 async function init() {
-  const user = await getSessionUser();
-  if (!user || !isAllowed(user.email)) return;
+  if (!(await getTeamUser())) return; // layout przekieruje na login
   if (!trainingId) { location.replace('/strefa/szkolenia'); return; }
   bindFileInputs();
   document.addEventListener('paste', onPaste);

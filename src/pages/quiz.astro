@@ -1,5 +1,8 @@
 ---
 import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import BtnArrow from '../components/BtnArrow.astro';
+import CtaBand from '../components/CtaBand.astro';
 ---
 <Interior
   title="Quiz: gotowość firmy na AI | SZRON"
@@ -11,10 +14,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- quiz -->
   <section class="sect" aria-labelledby="quiz">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>Quiz · Procesy · Narzędzia · Zespół</p>
-        <h2 class="sect-title sect-title--s ws" id="quiz">Wybierz odpowiedź najbliższą rzeczywistości.</h2>
-      </div>
+      <SectHead eyebrow="Quiz · Procesy · Narzędzia · Zespół" title="Wybierz odpowiedź najbliższą rzeczywistości." id="quiz" small />
 
       <div class="quiz rv" id="quiz">
         <!-- ekran pytań -->
@@ -43,12 +43,7 @@ import Interior from '../layouts/Interior.astro';
           <table class="results-table" id="quiz-breakdown"></table>
           <div class="quiz__nav" style="margin-top:var(--space-2xl)">
             <button type="button" class="btn btn--ghost btn--dark-on-light" id="quiz-restart">Wypełnij ponownie</button>
-            <a class="btn btn--accent" href="/umow-rozmowe">Omów wynik z nami
-              <span class="btn__arr" aria-hidden="true">
-                <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-                <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-              </span>
-            </a>
+            <BtnArrow href="/umow-rozmowe">Omów wynik z nami</BtnArrow>
           </div>
         </div>
       </div>
@@ -58,10 +53,7 @@ import Interior from '../layouts/Interior.astro';
   <!-- co dalej (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="codalej">
     <div class="container">
-      <div class="sect-head">
-        <p class="eyebrow rv" data-scramble>Po wyniku · Co dalej</p>
-        <h2 class="sect-title ws" id="codalej">Quiz to początek rozmowy, nie audyt.</h2>
-      </div>
+      <SectHead eyebrow="Po wyniku · Co dalej" title="Quiz to początek rozmowy, nie audyt." id="codalej" />
       <dl class="def-rows rv">
         <div><dt>Procesy<small>Pytania 1–3</small></dt><dd>Jak identyfikujecie zadania do automatyzacji, ile czasu zżerają powtarzalne zadania i jak szybko dostarczacie projekty IT.</dd></div>
         <div><dt>Narzędzia<small>Pytania 4–6</small></dt><dd>Z jakich narzędzi AI korzysta zespół, jak są zintegrowane z systemami i jak podchodzicie do compliance (AI Act, NIS2).</dd></div>
@@ -71,22 +63,11 @@ import Interior from '../layouts/Interior.astro';
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Kontakt</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Przeanalizujemy Wasze odpowiedzi razem.</h2>
-      <p class="rv">Pokaż nam wynik i kontekst — odpowiemy, od czego konkretnie zacząć w Waszej firmie. Bez sprzedaży, z konkretnymi rekomendacjami.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów rozmowę
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="Przeanalizujemy Wasze odpowiedzi razem."
+    text="Pokaż nam wynik i kontekst — odpowiemy, od czego konkretnie zacząć w Waszej firmie. Bez sprzedaży, z konkretnymi rekomendacjami."
+  />
 
   <style>
     .quiz {

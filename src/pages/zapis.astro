@@ -1,18 +1,10 @@
 ---
-import '../styles/main.css';
-import '../styles/strefa.css';
+import Bare from '../layouts/Bare.astro';
+// Lekka strona mobilna (skan QR) — tylko tokeny + rdzeń stylów strefy, bez CSS całej aplikacji.
+import '../styles/tokens.css';
+import '../styles/strefa-core.css';
 ---
-<!doctype html>
-<html lang="pl">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Zapis na szkolenie — SZRON</title>
-  <meta name="robots" content="noindex, nofollow" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+<Bare title="Zapis na szkolenie — SZRON">
   <style>
     /* Formularz zapisu — komfort na telefonach i iPadach */
     .zapis-form .strefa-input { font-size: 16px; padding: .65rem .85rem; border-radius: 12px; min-height: 44px; }
@@ -25,8 +17,6 @@ import '../styles/strefa.css';
       .strefa-grid2 { grid-template-columns: 1fr; }
     }
   </style>
-</head>
-<body class="strefa-body">
   <div class="strefa-login">
     <div class="strefa-login__box">
       <div class="strefa-login__brand">
@@ -144,5 +134,4 @@ import '../styles/strefa.css';
       });
     })();
   </script>
-</body>
-</html>
+</Bare>

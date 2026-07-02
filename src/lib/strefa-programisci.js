@@ -3,9 +3,6 @@
 import { getClient, getTeamUser, startRealtime, pollBlocked } from './supabase.js';
 import { $, $$, esc, toast as uiToast, openModal, closeModal, setOnModalClose, confirmDialog, fmtDate, fmtDateTime, todayStr, telHref, ICONS, STAGES, stageColor, stageName, SUBS, bindSearch, bindFileImport, downloadJSON } from './strefa-ui.js';
 import { createGridNav } from './strefa-grid.js';
-import flatpickr from 'flatpickr';
-import { Polish } from 'flatpickr/dist/l10n/pl.js';
-import 'flatpickr/dist/themes/dark.css';
 
 const sb = getClient();
 
@@ -13,11 +10,19 @@ const sb = getClient();
 const pad2 = (n) => String(n).padStart(2, '0');
 
 /* ── pickery daty/czasu: flatpickr (kalendarz/zegar klikany myszką na desktopie,
-   natywny picker systemowy na telefonie); wpisywanie z klawiatury dalej działa ── */
-const FP_BASE = { locale: Polish, time_24hr: true, minuteIncrement: 5, allowInput: true, disableMobile: false };
-const fpDate = (el, defaultDate) => el && flatpickr(el, { ...FP_BASE, dateFormat: 'Y-m-d', defaultDate });
-const fpTime = (el, defaultDate) => el && flatpickr(el, { ...FP_BASE, enableTime: true, noCalendar: true, dateFormat: 'H:i', defaultDate });
-const fpDateTime = (el, defaultDate) => el && flatpickr(el, { ...FP_BASE, enableTime: true, dateFormat: 'Y-m-d\\TH:i', altInput: true, altFormat: 'd.m.Y, H:i', defaultDate });
+   natywny picker systemowy na telefonie); wpisywanie z klawiatury dalej działa.
+   Ładowany leniwie (dynamiczny, zmemoizowany import wraz z locale pl i dark.css)
+   dopiero przy pierwszym otwarciu formularza — bundle widoku jest lżejszy o ~50 kB. ── */
+let fpP;
+const loadFp = () => fpP ??= Promise.all([
+  import('flatpickr'),
+  import('flatpickr/dist/l10n/pl.js'),
+  import('flatpickr/dist/themes/dark.css'),
+]).then(([m, l]) => ({ fp: m.default, Polish: l.Polish }));
+const FP_BASE = { time_24hr: true, minuteIncrement: 5, allowInput: true, disableMobile: false };
+const fpDate = async (el, defaultDate) => { if (!el) return; const { fp, Polish } = await loadFp(); return fp(el, { ...FP_BASE, locale: Polish, dateFormat: 'Y-m-d', defaultDate }); };
+const fpTime = async (el, defaultDate) => { if (!el) return; const { fp, Polish } = await loadFp(); return fp(el, { ...FP_BASE, locale: Polish, enableTime: true, noCalendar: true, dateFormat: 'H:i', defaultDate }); };
+const fpDateTime = async (el, defaultDate) => { if (!el) return; const { fp, Polish } = await loadFp(); return fp(el, { ...FP_BASE, locale: Polish, enableTime: true, dateFormat: 'Y-m-d\\TH:i', altInput: true, altFormat: 'd.m.Y, H:i', defaultDate }); };
 const todayLocal = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
 const curMonth = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`; };
 const monthRange = (ym) => { const [y, m] = ym.split('-').map(Number); return [new Date(y, m - 1, 1).toISOString(), new Date(y, m, 1).toISOString()]; };

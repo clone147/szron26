@@ -3,6 +3,7 @@ import Interior from '../layouts/Interior.astro';
 import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import BtnArrow from '../components/BtnArrow.astro';
+import CtaBand from '../components/CtaBand.astro';
 ---
 <Interior
   title="AI dla embedded i firmware — realizm bare-metal | SZRON"
@@ -96,20 +97,12 @@ import BtnArrow from '../components/BtnArrow.astro';
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Chcesz to zobaczyć na kodzie ze swojej branży?</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">30 minut live demo. Bez NDA.</h2>
-      <p class="rv">Agent na żywo, na kodzie open-source z Waszej domeny — Modbus, CANopen, SCPI, OCPP, co u Was gra. Zobaczysz, co AI naprawdę przyspiesza w bare-metal, a czego nie tknie. Termin pod Was.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/warsztat-embedded#zgloszenie">Umów live demo
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    eyebrow="Chcesz to zobaczyć na kodzie ze swojej branży?"
+    heading="30 minut live demo. Bez NDA."
+    text="Agent na żywo, na kodzie open-source z Waszej domeny — Modbus, CANopen, SCPI, OCPP, co u Was gra. Zobaczysz, co AI naprawdę przyspiesza w bare-metal, a czego nie tknie. Termin pod Was."
+    btnLabel="Umów live demo"
+    btnHref="/warsztat-embedded#zgloszenie"
+    padTop={false}
+  />
 </Interior>

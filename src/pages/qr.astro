@@ -1,18 +1,10 @@
 ---
-import '../styles/main.css';
-import '../styles/strefa.css';
+import Bare from '../layouts/Bare.astro';
+// Lekka strona pełnoekranowa (kod QR na rzutnik) — tylko tokeny + rdzeń stylów strefy.
+import '../styles/tokens.css';
+import '../styles/strefa-core.css';
 ---
-<!doctype html>
-<html lang="pl">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Kod QR — zapis na szkolenie · SZRON</title>
-  <meta name="robots" content="noindex, nofollow" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+<Bare title="Kod QR — zapis na szkolenie · SZRON" viewport="width=device-width, initial-scale=1, viewport-fit=cover">
   <style>
     [hidden]{display:none!important}
     .qr-screen{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(.8rem,2.2vmin,1.6rem);padding:clamp(1rem,4vmin,3rem);text-align:center}
@@ -29,8 +21,6 @@ import '../styles/strefa.css';
     .qr-screen__url{font-size:clamp(.78rem,1.8vmin,1rem);color:var(--color-text-inv-3);margin:0;word-break:break-all}
     .qr-screen__bad{max-width:38ch}
   </style>
-</head>
-<body class="strefa-body">
   <main class="qr-screen">
     <div class="qr-screen__brand"><img src="/img/logo-dark.svg" alt="SZRON" /><span>SZRON</span></div>
 
@@ -92,5 +82,4 @@ import '../styles/strefa.css';
         .catch(() => {});
     }
   </script>
-</body>
-</html>
+</Bare>

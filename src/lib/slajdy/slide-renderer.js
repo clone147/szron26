@@ -1,16 +1,14 @@
 // Wspólny renderer slajdu (edytor / miniatury / prezentacja).
 // Renderuje wnętrze `.slide-stage` (warstwa tła + obiekty) w przestrzeni 1920×1080.
 // Skalowanie do viewportu = jeden transform: scale na `.slide-stage`.
-import { SLIDE_W, SLIDE_H } from './slide-model.js';
+import { SLIDE_W, SLIDE_H, esc } from './slide-model.js';
 
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-const FONT_STACKS = {
+export const FONT_STACKS = {
   helvetica: "'Helvetica Neue', Helvetica, Arial, sans-serif",
   display: 'var(--font-display)',
   body: 'var(--font-body)',
 };
-const ALIGN_JUSTIFY = { left: 'flex-start', center: 'center', right: 'flex-end' };
+export const ALIGN_JUSTIFY = { left: 'flex-start', center: 'center', right: 'flex-end' };
 const VALIGN_ITEMS = { top: 'flex-start', middle: 'center', bottom: 'flex-end' };
 
 // HTML warstwy tła slajdu. deckBg = gotowa wartość CSS `background` (kolor lub url decku).
@@ -37,13 +35,12 @@ function textStyle(o) {
   ].filter(Boolean).join(';');
 }
 
-export function renderObject(o, { editable = false } = {}) {
+function renderObject(o) {
   const box = `position:absolute;left:0;top:0;width:${o.w}px;height:${o.h}px;`
     + `transform:translate(${o.x}px,${o.y}px) rotate(${o.rotation || 0}deg);opacity:${o.opacity ?? 1};z-index:${o.z || 0};`;
   if (o.type === 'text') {
-    const ce = editable ? ' contenteditable="true" data-edit="text"' : '';
     return `<div class="slide-obj slide-obj--text" data-id="${o.id}" style="${box}align-items:${VALIGN_ITEMS[o.valign] || 'center'};justify-content:${ALIGN_JUSTIFY[o.align] || 'center'}">`
-      + `<div class="slide-obj__text" style="${textStyle(o)}"${ce} data-ph="Tekst…">${o.richText || ''}</div></div>`;
+      + `<div class="slide-obj__text" style="${textStyle(o)}" data-ph="Tekst…">${o.richText || ''}</div></div>`;
   }
   if (o.type === 'image') {
     return `<div class="slide-obj slide-obj--image" data-id="${o.id}" style="${box}">`
@@ -70,9 +67,9 @@ export function renderObject(o, { editable = false } = {}) {
 }
 
 // Wnętrze `.slide-stage` (string): warstwa tła + obiekty wg z.
-export function renderSlideInner(content, { deckBg, editable = false } = {}) {
+export function renderSlideInner(content, { deckBg } = {}) {
   const objs = (content.objects || []).slice().sort((a, b) => (a.z || 0) - (b.z || 0))
-    .map((o) => renderObject(o, { editable })).join('');
+    .map((o) => renderObject(o)).join('');
   return bgHtml(content, deckBg) + objs;
 }
 

@@ -4,14 +4,14 @@
 
 export const SLIDE_W = 1920;
 export const SLIDE_H = 1080;
-export const CONTENT_VERSION = 1;
+const CONTENT_VERSION = 1;
 
 let _idc = 0;
 export function genId() {
   return 'o_' + (Date.now().toString(36) + (_idc++).toString(36) + Math.floor(Math.random() * 1296).toString(36)).slice(-9);
 }
 
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 // tekst → bezpieczny HTML (akapity przez <br>)
 export function textToHtml(t) {
@@ -20,7 +20,7 @@ export function textToHtml(t) {
   return esc(v).replace(/\n/g, '<br>');
 }
 // HTML → czysty tekst (do cache `text` / miniatur poza edytorem)
-export function htmlToText(html) {
+function htmlToText(html) {
   return String(html ?? '')
     .replace(/<br\s*\/?>(?!$)/gi, '\n')
     .replace(/<\/p>/gi, '\n')
@@ -72,9 +72,9 @@ export function newObject(type, props = {}) {
   };
   if (type === 'text') Object.assign(base, {
     richText: '', font: 'helvetica', size: 72, color: '#ffffff',
-    align: 'center', valign: 'middle', weight: 500, lineHeight: 1.18, bg: null, autoHeight: false,
+    align: 'center', valign: 'middle', weight: 500, lineHeight: 1.18, bg: null,
   });
-  if (type === 'image') Object.assign(base, { src: '', fit: 'cover', radius: 0, naturalW: 0, naturalH: 0, alt: '' });
+  if (type === 'image') Object.assign(base, { src: '', fit: 'cover', radius: 0, alt: '' });
   if (type === 'shape') Object.assign(base, { kind: 'rect', fill: '#f97316', stroke: null, radius: 12 });
   return Object.assign(base, props);
 }
@@ -84,7 +84,7 @@ export function emptyContent() {
 }
 
 // Normalizacja + wersjonowanie istniejącego dokumentu.
-export function migrateContent(content) {
+function migrateContent(content) {
   if (!content || typeof content !== 'object' || !Array.isArray(content.objects)) return emptyContent();
   const bg = content.background && typeof content.background === 'object' ? content.background : { type: 'none' };
   const objects = content.objects.map((o, i) => ({ ...o, z: Number.isFinite(o.z) ? o.z : i }))
@@ -115,12 +115,12 @@ export function slideToContent(row) {
 }
 
 // Pochodne do zapisu w DB (cache): pierwszy tekst + pierwszy obraz/tło.
-export function deriveText(content) {
+function deriveText(content) {
   return (content.objects || [])
     .filter((o) => o.type === 'text')
     .map((o) => htmlToText(o.richText)).filter(Boolean).join('\n').slice(0, 500);
 }
-export function deriveImage(content) {
+function deriveImage(content) {
   if (content.background && content.background.type === 'image') return content.background.value || null;
   const img = (content.objects || []).find((o) => o.type === 'image' && o.src);
   return img ? img.src : null;

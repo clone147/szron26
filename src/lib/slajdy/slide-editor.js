@@ -2,8 +2,12 @@
 // Selekcja: pojedyncza, Shift+klik (multi), marquee (gumka na pustym).
 // Drag ciała (też grupy) = własny handler pointer (kontrola skali + snapping). Skala/rotacja pojedynczego = Moveable.
 // Edycja tekstu: dwuklik.
-import Moveable from 'moveable';
 import { SLIDE_W, SLIDE_H, sanitizeHtml } from './slide-model.js';
+
+// Moveable (~250 kB) ładowany leniwie osobnym chunkiem; memoizowany promise
+// eliminuje wyścig podwójnego `new Moveable` przy dwóch szybkich zaznaczeniach.
+let moveablePromise = null;
+const loadMoveable = () => (moveablePromise ||= import('moveable'));
 
 const parseTransform = (t) => {
   const tx = /translate\(\s*([-\d.]+)px\s*,\s*([-\d.]+)px\s*\)/.exec(t || '');
@@ -17,13 +21,14 @@ export function createObjectEditor(opts) {
   const { host, getSlide, commit, onSelect } = opts;
   const container = host.parentElement;
   let moveable = null;
+  let destroyed = false;
   let selected = [];          // ids zaznaczonych obiektów
   let editingId = null;
   let drag = null;
-  let marquee = null;
   let drawMode = null;
-  let draw = null;
-  let drawEl = null;
+  let activeTrack = null;     // cancel aktywnego gestu rubber-band (marquee / rysowanie)
+
+  loadMoveable();             // prefetch w tle — pierwsze zaznaczenie nie czeka na sieć
 
   const stage = () => host.querySelector('.slide-stage');
   const elOf = (id) => stage()?.querySelector(`.slide-obj[data-id="${id}"]`);
@@ -31,7 +36,9 @@ export function createObjectEditor(opts) {
   const scaleNow = () => (host.clientWidth / SLIDE_W) || 1;
   const selectedEls = () => selected.map(elOf).filter(Boolean);
 
-  function initMoveable() {
+  async function initMoveable() {
+    const { default: Moveable } = await loadMoveable();
+    if (moveable || destroyed) return;  // guard po await: równoległa inicjalizacja / destroy w trakcie ładowania
     moveable = new Moveable(container, {
       target: null, origin: false, draggable: false, resizable: true, rotatable: true,
       throttleResize: 0, throttleRotate: 0, keepRatio: false,
@@ -69,9 +76,10 @@ export function createObjectEditor(opts) {
   }
 
   // zastosuj `selected` → klasy, cele Moveable, callback
-  function applyTargets() {
+  // (async tylko przy pierwszym zaznaczeniu — z załadowanym modułem wykonuje się synchronicznie)
+  async function applyTargets() {
     if (editingId) return;
-    if (!moveable) initMoveable();
+    if (!moveable) { await initMoveable(); if (!moveable) return; }
     stage()?.querySelectorAll('.slide-obj.is-selected').forEach((n) => n.classList.remove('is-selected'));
     const els = selectedEls();
     els.forEach((e) => e.classList.add('is-selected'));
@@ -108,33 +116,47 @@ export function createObjectEditor(opts) {
     return { x: (e.clientX - r.left) / sc, y: (e.clientY - r.top) / sc };
   }
 
+  // wspólna maszyna „rubber band" (drag-to-draw i marquee): overlay na stage,
+  // pointermove/up na window; callbacki dostają znormalizowany rect {x,y,w,h}
+  // ORAZ surowe punkty {x0,y0,x1,y1} (fallback rysowania centruje na punkcie startu).
+  function trackRect(e, className, { onMove, onUp }) {
+    const el = document.createElement('div');
+    el.className = className;
+    stage().appendChild(el);
+    const p0 = stagePoint(e);
+    const pts = { x0: p0.x, y0: p0.y, x1: p0.x, y1: p0.y };
+    const rect = () => ({ x: Math.min(pts.x0, pts.x1), y: Math.min(pts.y0, pts.y1), w: Math.abs(pts.x1 - pts.x0), h: Math.abs(pts.y1 - pts.y0) });
+    const move = (ev) => {
+      const p = stagePoint(ev); pts.x1 = p.x; pts.y1 = p.y;
+      const r = rect();
+      el.style.cssText = `position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;`;
+      onMove && onMove(r, pts);
+    };
+    const cancel = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      el.remove();
+      activeTrack = null;
+    };
+    const up = () => { cancel(); onUp && onUp(rect(), pts); };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    activeTrack = cancel;
+  }
+
   // tryb rysowania kształtu (drag-to-draw)
-  function ensureDrawEl() { if (!drawEl) { drawEl = document.createElement('div'); drawEl.className = 'slide-draw'; } stage().appendChild(drawEl); }
   function startDraw(e) {
-    const p = stagePoint(e); draw = { x0: p.x, y0: p.y, x1: p.x, y1: p.y };
-    ensureDrawEl();
-    window.addEventListener('pointermove', onDrawMove);
-    window.addEventListener('pointerup', onDrawUp);
-  }
-  function onDrawMove(e) {
-    if (!draw) return;
-    const p = stagePoint(e); draw.x1 = p.x; draw.y1 = p.y;
-    const x = Math.min(draw.x0, draw.x1), y = Math.min(draw.y0, draw.y1);
-    const w = Math.abs(draw.x1 - draw.x0), h = Math.abs(draw.y1 - draw.y0);
-    if (drawEl) drawEl.style.cssText = `position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px;`;
-  }
-  function onDrawUp() {
-    window.removeEventListener('pointermove', onDrawMove);
-    window.removeEventListener('pointerup', onDrawUp);
-    if (drawEl) drawEl.remove();
-    const kind = drawMode;
-    if (draw && kind) {
-      let x = Math.min(draw.x0, draw.x1), y = Math.min(draw.y0, draw.y1);
-      let w = Math.abs(draw.x1 - draw.x0), h = Math.abs(draw.y1 - draw.y0);
-      if (w < 16 || h < 16) { w = 360; h = (kind === 'line' || kind === 'arrow') ? 8 : 240; x = draw.x0 - w / 2; y = draw.y0 - h / 2; }
-      opts.onDrawShape && opts.onDrawShape(kind, { x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(Math.max(h, kind === 'line' || kind === 'arrow' ? 8 : h)) });
-    }
-    draw = null; drawMode = null; host.classList.remove('is-drawing');
+    trackRect(e, 'slide-draw', {
+      onUp(r, pts) {
+        const kind = drawMode;
+        if (kind) {
+          let { x, y, w, h } = r;
+          if (w < 16 || h < 16) { w = 360; h = (kind === 'line' || kind === 'arrow') ? 8 : 240; x = pts.x0 - w / 2; y = pts.y0 - h / 2; }
+          opts.onDrawShape && opts.onDrawShape(kind, { x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(Math.max(h, kind === 'line' || kind === 'arrow' ? 8 : h)) });
+        }
+        drawMode = null; host.classList.remove('is-drawing');
+      },
+    });
   }
 
   function onPointerDown(e) {
@@ -142,13 +164,18 @@ export function createObjectEditor(opts) {
     if (drawMode) { e.preventDefault(); startDraw(e); return; }
     if (e.target.closest('.moveable-control, .moveable-line, .moveable-rotation, .moveable-control-box')) return;
     const objEl = e.target.closest('.slide-obj');
-    if (!objEl) {                                    // pusty → marquee
+    if (!objEl) {                                    // pusty → marquee (gumka)
       if (!e.shiftKey) setSingle(null);
-      const p = stagePoint(e);
-      marquee = { x0: p.x, y0: p.y, x1: p.x, y1: p.y, add: e.shiftKey, base: [...selected] };
-      ensureMarqueeEl();
-      window.addEventListener('pointermove', onMarqueeMove);
-      window.addEventListener('pointerup', onMarqueeUp);
+      const add = e.shiftKey, base = [...selected];
+      trackRect(e, 'slide-marquee', {
+        onMove(r) {
+          const hit = (getSlide().content.objects || []).filter((o) => o.x < r.x + r.w && o.x + o.w > r.x && o.y < r.y + r.h && o.y + o.h > r.y).map((o) => o.id);
+          selected = add ? Array.from(new Set([...base, ...hit])) : hit;
+          stage()?.querySelectorAll('.slide-obj.is-selected').forEach((n) => n.classList.remove('is-selected'));
+          selectedEls().forEach((el) => el.classList.add('is-selected'));
+        },
+        onUp() { applyTargets(); },
+      });
       return;
     }
     const id = objEl.dataset.id;
@@ -185,28 +212,6 @@ export function createObjectEditor(opts) {
       commit();
     }
     drag = null;
-  }
-
-  // marquee (gumka)
-  let marqueeEl = null;
-  function ensureMarqueeEl() { if (!marqueeEl) { marqueeEl = document.createElement('div'); marqueeEl.className = 'slide-marquee'; } stage().appendChild(marqueeEl); }
-  function onMarqueeMove(e) {
-    if (!marquee) return;
-    const p = stagePoint(e); marquee.x1 = p.x; marquee.y1 = p.y;
-    const x = Math.min(marquee.x0, marquee.x1), y = Math.min(marquee.y0, marquee.y1);
-    const w = Math.abs(marquee.x1 - marquee.x0), h = Math.abs(marquee.y1 - marquee.y0);
-    if (marqueeEl) { marqueeEl.style.cssText = `position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px;`; }
-    const hit = (getSlide().content.objects || []).filter((o) => o.x < x + w && o.x + o.w > x && o.y < y + h && o.y + o.h > y).map((o) => o.id);
-    selected = marquee.add ? Array.from(new Set([...marquee.base, ...hit])) : hit;
-    stage()?.querySelectorAll('.slide-obj.is-selected').forEach((n) => n.classList.remove('is-selected'));
-    selectedEls().forEach((el) => el.classList.add('is-selected'));
-  }
-  function onMarqueeUp() {
-    window.removeEventListener('pointermove', onMarqueeMove);
-    window.removeEventListener('pointerup', onMarqueeUp);
-    if (marqueeEl) { marqueeEl.remove(); }
-    marquee = null;
-    applyTargets();
   }
 
   function enterTextEdit(id) {
@@ -253,13 +258,11 @@ export function createObjectEditor(opts) {
     setDrawMode(kind) { drawMode = kind || null; host.classList.toggle('is-drawing', !!kind); },
     updateRect() { if (moveable && moveable.target) moveable.updateRect(); },
     destroy() {
+      destroyed = true;
       window.removeEventListener('pointermove', onPointerMove); window.removeEventListener('pointerup', onPointerUp);
-      window.removeEventListener('pointermove', onMarqueeMove); window.removeEventListener('pointerup', onMarqueeUp);
-      window.removeEventListener('pointermove', onDrawMove); window.removeEventListener('pointerup', onDrawUp);
-      if (marqueeEl) marqueeEl.remove();
-      if (drawEl) drawEl.remove();
+      activeTrack?.();
       if (moveable) { moveable.destroy(); moveable = null; }
-      selected = []; editingId = null; drag = null; marquee = null; drawMode = null;
+      selected = []; editingId = null; drag = null; drawMode = null;
     },
   };
 }

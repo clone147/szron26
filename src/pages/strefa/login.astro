@@ -1,20 +1,9 @@
 ---
+import Bare from '../../layouts/Bare.astro';
 import '../../styles/main.css';
 import '../../styles/strefa.css';
 ---
-<!doctype html>
-<html lang="pl">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Logowanie — Strefa SZRON</title>
-  <meta name="robots" content="noindex, nofollow" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
-</head>
-<body class="strefa-body">
+<Bare title="Logowanie — Strefa SZRON">
   <div class="strefa-login">
     <div class="strefa-login__box">
       <div class="strefa-login__brand">
@@ -83,5 +72,4 @@ import '../../styles/strefa.css';
       window.location.replace(safeNext);
     });
   </script>
-</body>
-</html>
+</Bare>

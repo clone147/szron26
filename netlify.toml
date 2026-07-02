@@ -65,3 +65,15 @@
   for = "/js/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# bundle Astro/Vite — nazwy z hashem treści, bezpieczne do cache'owania na rok
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# fonty self-hosted — pliki wersjonowane w nazwie (v4/v22), efektywnie niezmienne
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

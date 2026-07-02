@@ -1,19 +1,11 @@
 /* ───────────────────────────────────────────────────────────────────────────
    Strefa zamknięta SZRON — motyw aplikacyjny (ciemny, na tokenach Hallmark).
    Gęsty, klawiaturowy interfejs CRM: powłoka, login, siatka edytowalna, dialogi.
+   Rdzeń (powłoka, login, formularze, przyciski) mieszka w strefa-core.css —
+   współdzielony z lekkimi stronami /zapis i /qr.
    ─────────────────────────────────────────────────────────────────────────── */
 
-.strefa-body {
-  margin: 0;
-  background: var(--color-ink);
-  color: var(--color-text-inv);
-  font-family: var(--font-body);
-  font-size: 15px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
-}
-.strefa-body * { box-sizing: border-box; }
+@import url("strefa-core.css");
 
 /* ── motyw jasny strefy: remap tokenów pod data-theme="light" na <body> ──
    Cały interfejs strefy stoi na tokenach „ciemnych" (ink, text-inv, line-dark),
@@ -30,18 +22,6 @@
   --color-glass:      oklch(98.5% 0.001 240 / 0.85);
   --color-paper:      oklch(22.5% 0.012 240);    /* powierzchnia kontrastowa (np. hover przycisku accent) */
 }
-
-/* ── ekran ładowania / sprawdzania dostępu ── */
-.strefa-boot {
-  position: fixed; inset: 0; display: grid; place-content: center; gap: var(--space-md);
-  justify-items: center; color: var(--color-text-inv-2); font-size: var(--text-s);
-}
-.strefa-boot__spinner {
-  width: 34px; height: 34px; border-radius: 50%;
-  border: 3px solid var(--color-line-dark); border-top-color: var(--color-accent);
-  animation: strefa-spin .8s linear infinite;
-}
-@keyframes strefa-spin { to { transform: rotate(360deg); } }
 
 /* mały, widoczny wskaźnik synchronizacji z Google Calendar (pill ze spinnerem) */
 .sync-ind { display: inline-flex; align-items: center; gap: .4rem; font-size: var(--text-caption); font-weight: 600; color: var(--color-accent); background: var(--color-accent-soft); border-radius: 999px; padding: .25rem .6rem; margin-bottom: .6rem; }
@@ -85,19 +65,8 @@ body:has(.strefa-main[data-page="programisci"]) .strefa-top__inner { max-width: 
 .strefa-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-lg); flex-wrap: wrap; margin-bottom: var(--space-xl); }
 .strefa-head h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.6rem, 3vw, 2.4rem); margin: 0 0 .25rem; letter-spacing: -.01em; }
 .strefa-head p { color: var(--color-text-inv-2); margin: 0; font-size: var(--text-s); max-width: 52ch; }
-.strefa-eyebrow { font-family: var(--font-display); text-transform: uppercase; letter-spacing: .14em; font-size: .72rem; color: var(--color-accent); margin: 0 0 .5rem; }
 
-/* ── przyciski ── */
-.strefa-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
-  font-family: var(--font-body); font-weight: 600; font-size: var(--text-s);
-  padding: .5rem .85rem; border-radius: var(--radius-btn); border: 1px solid transparent;
-  cursor: pointer; line-height: 1; text-decoration: none; white-space: nowrap;
-  transition: background var(--dur-1), border-color var(--dur-1), color var(--dur-1), opacity var(--dur-1);
-}
-.strefa-btn:disabled { opacity: .45; cursor: not-allowed; }
-.strefa-btn--accent { background: var(--color-accent); color: var(--color-ink); }
-.strefa-btn--accent:hover:not(:disabled) { background: var(--color-paper); }
+/* ── przyciski (bazowy .strefa-btn + --accent w strefa-core.css) ── */
 .strefa-btn--ghost { background: transparent; border-color: var(--color-line-dark); color: var(--color-text-inv); }
 .strefa-btn--ghost:hover:not(:disabled) { background: var(--color-ink-3); border-color: var(--color-text-inv-3); }
 .strefa-btn--danger { background: transparent; border-color: color-mix(in oklch, oklch(60% 0.2 25) 60%, transparent); color: oklch(72% 0.17 25); }
@@ -133,10 +102,7 @@ body:has(.strefa-main[data-page="programisci"]) .strefa-top__inner { max-width: 
 .strefa-search input { width: 100%; padding-left: 2.1rem; }
 .strefa-search svg { position: absolute; left: .65rem; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--color-text-inv-3); pointer-events: none; }
 
-/* ── pola formularzy ── */
-.strefa-field { display: flex; flex-direction: column; gap: .3rem; }
-.strefa-field label { font-size: var(--text-caption); color: var(--color-text-inv-2); font-weight: 500; }
-.strefa-input,
+/* ── pola formularzy (.strefa-field/.strefa-input w strefa-core.css) ── */
 .strefa-select,
 .strefa-textarea,
 .strefa-search input {
@@ -146,11 +112,11 @@ body:has(.strefa-main[data-page="programisci"]) .strefa-top__inner { max-width: 
   transition: border-color var(--dur-1), box-shadow var(--dur-1);
 }
 .strefa-textarea { resize: vertical; min-height: 5rem; line-height: 1.45; }
-.strefa-input:focus, .strefa-select:focus, .strefa-textarea:focus, .strefa-search input:focus {
+.strefa-select:focus, .strefa-textarea:focus, .strefa-search input:focus {
   outline: none; border-color: var(--color-accent);
   box-shadow: 0 0 0 3px var(--color-accent-soft);
 }
-.strefa-input::placeholder, .strefa-textarea::placeholder { color: var(--color-text-inv-3); }
+.strefa-textarea::placeholder { color: var(--color-text-inv-3); }
 /* select: bez natywnego (niższego) chromu macOS — własny chevron, równa wysokość z inputami */
 .strefa-select { appearance: none; -webkit-appearance: none; -moz-appearance: none; padding-right: 2rem; cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23a9a9b5'%20stroke-width='2.4'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='m6%209%206%206%206-6'/%3E%3C/svg%3E");
@@ -243,7 +209,6 @@ body:has(.strefa-main[data-page="programisci"]) .strefa-top__inner { max-width: 
 .strefa-modal__body { padding: var(--space-lg); }
 .strefa-modal__section + .strefa-modal__section { margin-top: var(--space-lg); padding-top: var(--space-lg); border-top: 1px solid var(--color-line-dark); }
 .strefa-modal__section h3 { font-family: var(--font-display); font-weight: 600; font-size: .95rem; margin: 0 0 var(--space-sm); display: flex; align-items: center; gap: .4rem; }
-.strefa-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-sm); }
 .strefa-actions-row { display: flex; gap: var(--space-sm); justify-content: flex-end; margin-top: var(--space-md); flex-wrap: wrap; }
 
 /* notatki */
@@ -257,23 +222,12 @@ body:has(.strefa-main[data-page="programisci"]) .strefa-top__inner { max-width: 
 .note__raw pre { white-space: pre-wrap; font-family: var(--font-body); font-size: var(--text-caption); color: var(--color-text-inv-2); margin: .5rem 0 0; }
 .note-empty { text-align: center; color: var(--color-text-inv-3); padding: var(--space-lg); }
 
-/* ── login ── */
-.strefa-login { min-height: 100vh; display: grid; place-items: center; padding: var(--space-lg); }
-.strefa-login__box { width: min(26rem, 100%); }
-.strefa-login__brand { text-align: center; margin-bottom: var(--space-xl); }
-.strefa-login__brand img { height: 30px; }
-.strefa-login__brand p { color: var(--color-text-inv-3); font-size: var(--text-caption); margin: var(--space-sm) 0 0; text-transform: uppercase; letter-spacing: .14em; }
-.strefa-login__card { background: var(--color-ink-2); border: 1px solid var(--color-line-dark); border-radius: var(--radius-card); padding: var(--space-xl); }
-.strefa-login__card h1 { font-family: var(--font-display); font-weight: 600; font-size: 1.4rem; margin: 0 0 var(--space-lg); }
-.strefa-login form { display: flex; flex-direction: column; gap: var(--space-md); }
+/* ── login (rdzeń .strefa-login… i .strefa-msg… w strefa-core.css) ── */
 .strefa-google { display: flex; align-items: center; justify-content: center; gap: .6rem; width: 100%; background: var(--color-paper); color: var(--color-ink); border: 0; border-radius: var(--radius-btn); padding: .65rem; font: inherit; font-weight: 600; cursor: pointer; transition: opacity var(--dur-1); }
 .strefa-google:hover:not(:disabled) { opacity: .9; }
 .strefa-google svg { width: 18px; height: 18px; }
 .strefa-divider { display: flex; align-items: center; gap: var(--space-sm); color: var(--color-text-inv-3); font-size: var(--text-caption); margin: var(--space-md) 0; }
 .strefa-divider::before, .strefa-divider::after { content: ""; flex: 1; height: 1px; background: var(--color-line-dark); }
-.strefa-msg { font-size: var(--text-s); padding: .6rem .75rem; border-radius: var(--radius-btn); }
-.strefa-msg--err { background: color-mix(in oklch, oklch(60% 0.2 25) 18%, transparent); color: oklch(80% 0.14 25); border: 1px solid color-mix(in oklch, oklch(60% 0.2 25) 35%, transparent); }
-.strefa-login__back { display: block; text-align: center; margin-top: var(--space-lg); color: var(--color-text-inv-3); font-size: var(--text-caption); }
 
 /* ── pulpit ── */
 .strefa-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: var(--space-md); }
@@ -422,7 +376,7 @@ body:has(.strefa-main[data-page="programisci"]) .strefa-top__inner { max-width: 
 .flatpickr-current-month, .flatpickr-current-month .numInputWrapper, .flatpickr-current-month input.cur-year { color: var(--color-text-inv) !important; }
 span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(--color-text-inv-3) !important; }
 /* dropdown miesiąca — wtopiony w tło, bez ramki, akcent na hover */
-.flatpickr-current-month .flatpickr-monthDropdown-months { background: transparent !important; color: var(--color-text-inv) !important; border: 0 !important; font-weight: 700; border-radius: var(--radius-sm); }
+.flatpickr-current-month .flatpickr-monthDropdown-months { background: transparent !important; color: var(--color-text-inv) !important; border: 0 !important; font-weight: 700 !important; border-radius: var(--radius-sm) !important; }
 .flatpickr-current-month .flatpickr-monthDropdown-months:hover { background: var(--color-ink-3) !important; }
 .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month { background: var(--color-ink-2) !important; color: var(--color-text-inv) !important; }
 .flatpickr-day { color: var(--color-text-inv) !important; }
@@ -485,7 +439,6 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 @media (max-width: 700px) {
   .strefa-top__nav { margin-left: 0; }
   .strefa-top__email { display: none; }
-  .strefa-grid2 { grid-template-columns: 1fr; }
   .strefa-head { align-items: flex-start; }
   .skill-check { grid-template-columns: 1fr; }
   .strefa-modal--drawer .strefa-modal__box { width: 100%; }

@@ -1,0 +1,119 @@
+/* ───────────────────────────────────────────────────────────────────────────
+   Rdzeń stylów stron samodzielnych (/zapis, /qr) — wycięty ze strefa.css,
+   żeby lekkie strony mobilne nie ciągnęły całego CSS aplikacji.
+   strefa.css importuje ten plik na początku (kolejność kaskady bez zmian).
+   Reguły są kopiami 1:1 (globalne z main.css + klasy strefa-* ze strefa.css).
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── globalne z main.css (reset, media, focus, selekcja, nagłówki) ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  overflow-x: clip;
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + 1rem);
+}
+
+body {
+  overflow-x: clip;
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.55;
+  color: var(--color-text);
+  background: var(--color-ink); /* prześwituje przy bounce-scrollu nad hero */
+  -webkit-font-smoothing: antialiased;
+}
+
+img, svg, video { display: block; max-width: 100%; }
+a { color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection { background: var(--color-accent); color: var(--color-ink); }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 440;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+/* ── powłoka strefy ── */
+.strefa-body {
+  margin: 0;
+  background: var(--color-ink);
+  color: var(--color-text-inv);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+.strefa-body * { box-sizing: border-box; }
+
+/* ── ekran ładowania / sprawdzania dostępu ── */
+.strefa-boot {
+  position: fixed; inset: 0; display: grid; place-content: center; gap: var(--space-md);
+  justify-items: center; color: var(--color-text-inv-2); font-size: var(--text-s);
+}
+.strefa-boot__spinner {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 3px solid var(--color-line-dark); border-top-color: var(--color-accent);
+  animation: strefa-spin .8s linear infinite;
+}
+@keyframes strefa-spin { to { transform: rotate(360deg); } }
+
+.strefa-eyebrow { font-family: var(--font-display); text-transform: uppercase; letter-spacing: .14em; font-size: .72rem; color: var(--color-accent); margin: 0 0 .5rem; }
+
+/* ── przyciski ── */
+.strefa-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+  font-family: var(--font-body); font-weight: 600; font-size: var(--text-s);
+  padding: .5rem .85rem; border-radius: var(--radius-btn); border: 1px solid transparent;
+  cursor: pointer; line-height: 1; text-decoration: none; white-space: nowrap;
+  transition: background var(--dur-1), border-color var(--dur-1), color var(--dur-1), opacity var(--dur-1);
+}
+.strefa-btn:disabled { opacity: .45; cursor: not-allowed; }
+.strefa-btn--accent { background: var(--color-accent); color: var(--color-ink); }
+.strefa-btn--accent:hover:not(:disabled) { background: var(--color-paper); }
+
+/* ── pola formularzy ── */
+.strefa-field { display: flex; flex-direction: column; gap: .3rem; }
+.strefa-field label { font-size: var(--text-caption); color: var(--color-text-inv-2); font-weight: 500; }
+.strefa-input {
+  background: var(--color-ink); color: var(--color-text-inv);
+  border: 1px solid var(--color-line-dark); border-radius: var(--radius-btn);
+  padding: .5rem .7rem; font: inherit; width: 100%;
+  transition: border-color var(--dur-1), box-shadow var(--dur-1);
+}
+.strefa-input:focus {
+  outline: none; border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+.strefa-input::placeholder { color: var(--color-text-inv-3); }
+
+.strefa-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-sm); }
+
+/* ── login ── */
+.strefa-login { min-height: 100vh; display: grid; place-items: center; padding: var(--space-lg); }
+.strefa-login__box { width: min(26rem, 100%); }
+.strefa-login__brand { text-align: center; margin-bottom: var(--space-xl); }
+.strefa-login__brand img { height: 30px; }
+.strefa-login__brand p { color: var(--color-text-inv-3); font-size: var(--text-caption); margin: var(--space-sm) 0 0; text-transform: uppercase; letter-spacing: .14em; }
+.strefa-login__card { background: var(--color-ink-2); border: 1px solid var(--color-line-dark); border-radius: var(--radius-card); padding: var(--space-xl); }
+.strefa-login__card h1 { font-family: var(--font-display); font-weight: 600; font-size: 1.4rem; margin: 0 0 var(--space-lg); }
+.strefa-login form { display: flex; flex-direction: column; gap: var(--space-md); }
+.strefa-msg { font-size: var(--text-s); padding: .6rem .75rem; border-radius: var(--radius-btn); }
+.strefa-msg--err { background: color-mix(in oklch, oklch(60% 0.2 25) 18%, transparent); color: oklch(80% 0.14 25); border: 1px solid color-mix(in oklch, oklch(60% 0.2 25) 35%, transparent); }
+.strefa-login__back { display: block; text-align: center; margin-top: var(--space-lg); color: var(--color-text-inv-3); font-size: var(--text-caption); }
+
+@media (max-width: 700px) {
+  .strefa-grid2 { grid-template-columns: 1fr; }
+}

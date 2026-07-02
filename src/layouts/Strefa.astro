@@ -2,6 +2,7 @@
 // Layout strefy zamkniętej SZRON — samodzielna powłoka aplikacji (bez marketingowego nav/stopki).
 // Każda strona używająca tego layoutu jest chroniona: skrypt sprawdza sesję i allowlistę,
 // niezalogowanych przekierowuje na /strefa/login.
+import '../styles/fonts.css';
 import '../styles/main.css';
 import '../styles/strefa.css';
 const { title = 'Strefa SZRON', active = '' } = Astro.props;
@@ -13,9 +14,10 @@ const { title = 'Strefa SZRON', active = '' } = Astro.props;
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{title} — Strefa SZRON</title>
   <meta name="robots" content="noindex, nofollow" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/albert-sans-v4-latin.woff2" crossorigin />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/albert-sans-v4-latin-ext.woff2" crossorigin />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-v22-latin.woff2" crossorigin />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-v22-latin-ext.woff2" crossorigin />
   <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
 </head>
 <body class="strefa-body">
