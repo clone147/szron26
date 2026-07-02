@@ -19,7 +19,7 @@ let editingId = null;       // rect z otwartym edytorem tekstu
 let saveTimer = null;
 let dirty = false;
 
-const FONT = 30, LINE_H = 36; // tekst w prostokątach (Caveat)
+const FONT = 36, LINE_H = 43; // tekst w prostokątach (Caveat)
 
 const canvas = $('#diag-canvas');
 const ctx = canvas.getContext('2d');
@@ -311,9 +311,21 @@ function startTextEdit(s) {
   });
   textEl.value = s.text || '';
   textEl.hidden = false;
+  centerTextarea(s);
   textEl.focus();
   render();
 }
+// Pionowe centrowanie tekstu w textarea (jak na canvasie): padding-top wg liczby linii.
+function centerTextarea(s) {
+  ctx.font = `500 ${FONT}px Caveat, cursive`;
+  const lines = wrapText(ctx, textEl.value, Math.max(20, s.w - 16)).length;
+  const pad = Math.max(0, (s.h - 8 / camera.z - lines * LINE_H) * camera.z / 2);
+  textEl.style.paddingTop = pad + 'px';
+}
+textEl.addEventListener('input', () => {
+  const s = shapes.find((x) => x.id === editingId);
+  if (s) centerTextarea(s);
+});
 function commitText() {
   const s = shapes.find((x) => x.id === editingId);
   if (s && s.text !== textEl.value) { s.text = textEl.value; scheduleSave(); }
@@ -328,8 +340,25 @@ textEl.addEventListener('keydown', (e) => {
 });
 
 /* ── klawiatura ── */
+let clipboard = null; // skopiowany kształt (⌘C/⌘V)
 document.addEventListener('keydown', (e) => {
   if (!current || editingId || e.target.matches('input, textarea, select')) return;
+  if ((e.metaKey || e.ctrlKey) && (e.key === 'c' || e.key === 'C')) {
+    const s = shapes.find((x) => x.id === selectedId);
+    if (s) { clipboard = { ...s }; e.preventDefault(); }
+    return;
+  }
+  if ((e.metaKey || e.ctrlKey) && (e.key === 'v' || e.key === 'V')) {
+    if (!clipboard) return;
+    e.preventDefault();
+    const s = { ...clipboard, id: uid(), x: clipboard.x + 16, y: clipboard.y + 16 };
+    clipboard = { ...s }; // kolejne wklejenia kaskadowo
+    shapes.push(s);
+    selectedId = s.id;
+    scheduleSave();
+    render();
+    return;
+  }
   if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
     shapes = shapes.filter((s) => s.id !== selectedId);
     selectedId = null;
