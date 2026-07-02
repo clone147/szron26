@@ -1,7 +1,8 @@
 // Strefa / Diagramy — prosty edytor diagramów w stylu Excalidraw (rysowanie „ołówkiem").
 // Galeria diagramów z miniaturami (renderowane z jsonb) → klik otwiera edytor pełnoekranowy.
-// Kształt: { id, type: 'rect'|'arrow', x, y, w, h, text?, seed }
-// (strzałka: x,y = początek, w,h = wektor do końca; rect trzymany znormalizowany w>0,h>0).
+// Kształt: { id, type: 'rect'|'arrow', x, y, w, h, text?, seed, startBind?, endBind? }
+// (strzałka: x,y = początek, w,h = wektor do końca; rect trzymany znormalizowany w>0,h>0;
+//  startBind/endBind = id obiektu, do którego przyklejona jest końcówka strzałki).
 import { getClient, getTeamUser } from './supabase.js';
 import { $, esc, fmtDateTime, toast, confirmDialog, openModal, closeModal } from './strefa-ui.js';
 
@@ -117,6 +118,7 @@ function resize() {
 }
 
 function render() {
+  updateBoundArrows();
   const dpr = window.devicePixelRatio || 1;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -151,6 +153,18 @@ function render() {
       ctx.restore();
     }
     if (sel) drawHandles(s);
+  }
+  // podświetlenie obiektu, do którego przyklei się końcówka strzałki
+  const bindPt = drag?.mode === 'draw' && drag.tool === 'arrow' ? { x: drag.x + drag.w, y: drag.y + drag.h }
+    : drag?.mode === 'handle' && drag.s.type === 'arrow' ? drag.p : null;
+  const bt = bindPt && bindTargetAt(bindPt);
+  if (bt) {
+    ctx.save();
+    ctx.setLineDash([5 / camera.z, 4 / camera.z]);
+    ctx.lineWidth = 1.2 / camera.z;
+    ctx.strokeStyle = pal().selSoft;
+    ctx.strokeRect(bt.x - 6, bt.y - 6, bt.w + 12, bt.h + 12);
+    ctx.restore();
   }
   // podgląd rysowanego kształtu
   if (drag?.mode === 'draw') {
@@ -224,6 +238,50 @@ function hitShape(p) {
   }
   return null;
 }
+/* ── przyklejanie strzałek ── */
+const BIND_PAD = 12; // margines łapania obiektu wokół jego ramki
+const BIND_GAP = 5;  // odstęp grotu od ramki
+const byId = (id) => shapes.find((s) => s.id === id);
+// obiekt (nie-strzałka) pod punktem, do którego można przykleić końcówkę
+function bindTargetAt(p) {
+  for (let i = shapes.length - 1; i >= 0; i--) {
+    const s = shapes[i];
+    if (s.type !== 'arrow' && p.x >= s.x - BIND_PAD && p.x <= s.x + s.w + BIND_PAD &&
+        p.y >= s.y - BIND_PAD && p.y <= s.y + s.h + BIND_PAD) return s;
+  }
+  return null;
+}
+// punkt na ramce obiektu s (z odstępem) na linii środek→toward
+function borderPoint(s, toward) {
+  const cx = s.x + s.w / 2, cy = s.y + s.h / 2;
+  const dx = toward.x - cx, dy = toward.y - cy;
+  if (!dx && !dy) return { x: cx, y: s.y - BIND_GAP };
+  const k = 1 / Math.max(Math.abs(dx) / (s.w / 2 + BIND_GAP), Math.abs(dy) / (s.h / 2 + BIND_GAP));
+  return { x: cx + dx * k, y: cy + dy * k };
+}
+// przelicza końcówki przyklejonych strzałek (obiekty mogły się przesunąć/rozciągnąć)
+function updateBoundArrows() {
+  for (const a of shapes) {
+    if (a.type !== 'arrow' || (!a.startBind && !a.endBind)) continue;
+    const s1 = a.startBind && byId(a.startBind);
+    const s2 = a.endBind && byId(a.endBind);
+    if (a.startBind && !s1) delete a.startBind;
+    if (a.endBind && !s2) delete a.endBind;
+    let p1 = { x: a.x, y: a.y }, p2 = { x: a.x + a.w, y: a.y + a.h };
+    const c = (s) => ({ x: s.x + s.w / 2, y: s.y + s.h / 2 });
+    if (s1) p1 = borderPoint(s1, s2 && s2 !== s1 ? c(s2) : p2);
+    if (s2) p2 = borderPoint(s2, s1 && s1 !== s2 ? c(s1) : p1);
+    a.x = p1.x; a.y = p1.y; a.w = p2.x - p1.x; a.h = p2.y - p1.y;
+  }
+}
+// próba przyklejenia jednej końcówki strzałki po puszczeniu myszy
+function tryBind(a, which, p) {
+  const t = bindTargetAt(p);
+  if (t) a[which] = t.id; else delete a[which];
+  if (a.startBind && a.startBind === a.endBind) delete a[which]; // obie końcówki w tym samym obiekcie — bez sensu
+  updateBoundArrows();
+}
+
 function hitHandle(p) {
   const s = shapes.find((x) => x.id === selectedId);
   if (!s) return null;
@@ -259,14 +317,19 @@ canvas.addEventListener('pointermove', (e) => {
   if (drag.mode === 'draw') {
     drag.w = p.x - drag.x; drag.h = p.y - drag.y;
   } else if (drag.mode === 'move') {
+    // przeciągnięcie całej strzałki odkleja ją od obiektów
+    if (drag.s.type === 'arrow') { delete drag.s.startBind; delete drag.s.endBind; }
     drag.s.x += p.x - drag.p.x; drag.s.y += p.y - drag.p.y;
     drag.p = p; dirty = true;
   } else if (drag.mode === 'handle') {
     const s = drag.s;
+    // na czas przeciągania końcówki odklejamy ją (ponowne przyklejenie przy puszczeniu)
+    if (drag.k === 'a1') delete s.startBind;
+    else if (drag.k === 'a2') delete s.endBind;
     if (drag.k === 'se') { s.w = Math.max(20, p.x - s.x); s.h = Math.max(20, p.y - s.y); }
     else if (drag.k === 'a1') { s.w += s.x - p.x; s.h += s.y - p.y; s.x = p.x; s.y = p.y; }
     else { s.w = p.x - s.x; s.h = p.y - s.y; }
-    dirty = true;
+    drag.p = p; dirty = true;
   } else if (drag.mode === 'pan') {
     camera.x = drag.cx - (e.clientX - drag.sx) / camera.z;
     camera.y = drag.cy - (e.clientY - drag.sy) / camera.z;
@@ -279,7 +342,11 @@ canvas.addEventListener('pointerup', () => {
     const d = drag;
     if (Math.abs(d.w) > 8 || Math.abs(d.h) > 8) {
       const s = { id: uid(), type: d.tool, seed: d.seed };
-      if (d.tool === 'arrow') { s.x = d.x; s.y = d.y; s.w = d.w; s.h = d.h; }
+      if (d.tool === 'arrow') {
+        s.x = d.x; s.y = d.y; s.w = d.w; s.h = d.h;
+        tryBind(s, 'startBind', { x: s.x, y: s.y });
+        tryBind(s, 'endBind', { x: s.x + s.w, y: s.y + s.h });
+      }
       else {
         s.x = Math.min(d.x, d.x + d.w); s.y = Math.min(d.y, d.y + d.h);
         s.w = Math.max(24, Math.abs(d.w)); s.h = Math.max(24, Math.abs(d.h));
@@ -291,7 +358,14 @@ canvas.addEventListener('pointerup', () => {
       if (d.tool === 'text') { setTool('select'); drag = null; startTextEdit(s); return; } // od razu wpisywanie
     }
     setTool('select');
-  } else if (dirty) scheduleSave();
+  } else if (dirty) {
+    // puszczenie końcówki strzałki nad obiektem → przyklejenie
+    if (drag?.mode === 'handle' && drag.s.type === 'arrow' && drag.p) {
+      if (drag.k === 'a1') tryBind(drag.s, 'startBind', { x: drag.s.x, y: drag.s.y });
+      else tryBind(drag.s, 'endBind', { x: drag.s.x + drag.s.w, y: drag.s.y + drag.s.h });
+    }
+    scheduleSave();
+  }
   drag = null;
   render();
 });
@@ -371,6 +445,7 @@ document.addEventListener('keydown', (e) => {
     if (!clipboard) return;
     e.preventDefault();
     const s = { ...clipboard, id: uid(), x: clipboard.x + 16, y: clipboard.y + 16 };
+    delete s.startBind; delete s.endBind; // kopia strzałki nie dziedziczy przyklejenia
     clipboard = { ...s }; // kolejne wklejenia kaskadowo
     shapes.push(s);
     selectedId = s.id;
