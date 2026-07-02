@@ -937,6 +937,8 @@ h1, h2, h3, h4 {
 /* paper-cover wsuwa się pod ciemny baner (jak na homepage) */
 .page-body--interior { margin-top: calc(-1 * var(--radius-sect)); }
 .page-body--interior > .sect:first-child { padding-top: var(--space-4xl); }
+/* gdy pierwsza sekcja kartki jest ciemna: prostokątne górne rogi, żeby nie prześwitywał biały łuk kartki na tle ciemnego hero */
+.page-body--interior > .sect--dark:first-child { border-top-left-radius: 0; border-top-right-radius: 0; }
 
 /* ── uniwersalne helpery dla stron wewnętrznych ──────── */
 /* responsywna siatka kart (auto-fit) — działa na jasnym i ciemnym tle */
