@@ -19,7 +19,7 @@ let editingId = null;       // rect z otwartym edytorem tekstu
 let saveTimer = null;
 let dirty = false;
 
-const FONT = 24, LINE_H = 28; // tekst w prostokątach (Caveat)
+const FONT = 30, LINE_H = 36; // tekst w prostokątach (Caveat)
 
 const canvas = $('#diag-canvas');
 const ctx = canvas.getContext('2d');
