@@ -24,6 +24,18 @@ import ProofStrip from '../components/ProofStrip.astro';
         ['61', 'firm — od MŚP po korporacje'],
         ['5', 'miast: Wrocław, Katowice, Kraków, Warszawa, Poznań'],
       ]} />
+      <div class="zjazd-gallery rv" style="margin-top:var(--space-4xl)">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <img src={`/img/zjazd/warsztaty-${n}.webp`} width="1600" height="1200" loading="lazy" decoding="async"
+               alt={`Warsztaty ARM 2023 — sala pełna inżynierów z laptopami i płytkami deweloperskimi (zdjęcie ${n} z 5)`} />
+        ))}
+      </div>
+      <style>
+        .zjazd-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(.75rem, 1.5vw, 1.25rem); }
+        .zjazd-gallery img { width: 100%; height: 100%; object-fit: cover; border-radius: calc(var(--radius-sect) / 2); display: block; }
+        .zjazd-gallery img:first-child { grid-column: 1 / -1; }
+        @media (max-width: 560px) { .zjazd-gallery { grid-template-columns: 1fr; } }
+      </style>
     </div>
   </section>
 
