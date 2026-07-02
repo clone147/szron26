@@ -1,15 +1,15 @@
 // Strefa / Diagramy — prosty edytor diagramów w stylu Excalidraw (rysowanie „ołówkiem").
-// Prostokąty z tekstem + strzałki na <canvas>; wiele diagramów w strefa.diagrams (jsonb).
+// Galeria diagramów z miniaturami (renderowane z jsonb) → klik otwiera edytor pełnoekranowy.
 // Kształt: { id, type: 'rect'|'arrow', x, y, w, h, text?, seed }
 // (strzałka: x,y = początek, w,h = wektor do końca; rect trzymany znormalizowany w>0,h>0).
 import { getClient, getTeamUser } from './supabase.js';
-import { $, toast, confirmDialog, openModal, closeModal } from './strefa-ui.js';
+import { $, esc, fmtDateTime, toast, confirmDialog, openModal, closeModal } from './strefa-ui.js';
 
 const sb = getClient();
 
 /* ── stan ── */
-let diagrams = [];          // [{id,title,updated_at}]
-let current = null;         // {id,title,data:{shapes:[]}}
+let diagrams = [];          // [{id,title,updated_at,data}]
+let current = null;         // otwarty diagram
 let shapes = [];
 let tool = 'select';
 let selectedId = null;
@@ -19,6 +19,8 @@ let editingId = null;       // rect z otwartym edytorem tekstu
 let saveTimer = null;
 let dirty = false;
 
+const FONT = 24, LINE_H = 28; // tekst w prostokątach (Caveat)
+
 const canvas = $('#diag-canvas');
 const ctx = canvas.getContext('2d');
 const wrap = $('#canvas-wrap');
@@ -26,7 +28,7 @@ const textEl = $('#diag-text');
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-/* ── „ołówkowe" rysowanie: seedowany PRNG + jitter, dwa przebiegi ── */
+/* ── „ołówkowe" rysowanie: seedowany PRNG, JEDNA falująca kreska ── */
 function mulberry32(a) {
   return () => {
     a |= 0; a = (a + 0x6D2B79F5) | 0;
@@ -35,36 +37,54 @@ function mulberry32(a) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
-// Odcinek jako lekko wygięta krzywa z szumem — rnd steruje powtarzalnym „drżeniem".
-function sketchLine(x1, y1, x2, y2, rnd) {
+// Pojedyncza kreska ołówka: łamana z błądzeniem losowym w poprzek + lekkie wygięcie
+// całości (bow) i drobny przestrzał na końcach — bez drugiego przebiegu.
+function sketchLine(g, x1, y1, x2, y2, rnd, overshoot = 0) {
   const len = Math.hypot(x2 - x1, y2 - y1) || 1;
-  const off = Math.min(3, Math.max(1.2, len / 90));
-  const j = () => (rnd() - 0.5) * 2 * off;
-  for (let pass = 0; pass < 2; pass++) {
-    const mx = (x1 + x2) / 2 + j() * 1.6;
-    const my = (y1 + y2) / 2 + j() * 1.6;
-    ctx.beginPath();
-    ctx.moveTo(x1 + j(), y1 + j());
-    ctx.quadraticCurveTo(mx, my, x2 + j(), y2 + j());
-    ctx.stroke();
+  const ux = (x2 - x1) / len, uy = (y2 - y1) / len;   // wzdłuż
+  const nx = -uy, ny = ux;                            // w poprzek
+  if (overshoot) {
+    const o1 = rnd() * overshoot, o2 = rnd() * overshoot;
+    x1 -= ux * o1; y1 -= uy * o1; x2 += ux * o2; y2 += uy * o2;
   }
+  const segs = Math.max(4, Math.min(26, Math.round(len / 18)));
+  const amp = Math.min(1.6, 0.5 + len / 400);         // amplituda drżenia
+  const bow = (rnd() - 0.5) * Math.min(6, len / 22);  // wygięcie łuku całej kreski
+  let off = (rnd() - 0.5) * amp;
+  g.beginPath();
+  g.moveTo(x1 + nx * off, y1 + ny * off);
+  for (let i = 1; i <= segs; i++) {
+    const t = i / segs;
+    off += (rnd() - 0.5) * amp;
+    off = Math.max(-2.2, Math.min(2.2, off));
+    const o = off + Math.sin(Math.PI * t) * bow;
+    g.lineTo(x1 + (x2 - x1) * t + nx * o, y1 + (y2 - y1) * t + ny * o);
+  }
+  g.stroke();
 }
-function sketchRect(x, y, w, h, rnd) {
-  sketchLine(x, y, x + w, y, rnd);
-  sketchLine(x + w, y, x + w, y + h, rnd);
-  sketchLine(x + w, y + h, x, y + h, rnd);
-  sketchLine(x, y + h, x, y, rnd);
+function sketchRect(g, x, y, w, h, rnd) {
+  const ov = Math.min(5, Math.max(2, (w + h) / 90)); // rogi lekko „przerysowane"
+  sketchLine(g, x, y, x + w, y, rnd, ov);
+  sketchLine(g, x + w, y, x + w, y + h, rnd, ov);
+  sketchLine(g, x + w, y + h, x, y + h, rnd, ov);
+  sketchLine(g, x, y + h, x, y, rnd, ov);
 }
-function sketchArrow(x1, y1, x2, y2, rnd) {
-  sketchLine(x1, y1, x2, y2, rnd);
+function sketchArrow(g, x1, y1, x2, y2, rnd) {
+  sketchLine(g, x1, y1, x2, y2, rnd);
   const ang = Math.atan2(y2 - y1, x2 - x1);
-  const hl = Math.min(16, Math.max(9, Math.hypot(x2 - x1, y2 - y1) * 0.18));
-  for (const da of [Math.PI * 0.85, -Math.PI * 0.85]) {
-    sketchLine(x2, y2, x2 + Math.cos(ang + da) * hl, y2 + Math.sin(ang + da) * hl, rnd);
+  const hl = Math.min(18, Math.max(10, Math.hypot(x2 - x1, y2 - y1) * 0.16));
+  for (const da of [Math.PI * 0.86, -Math.PI * 0.86]) {
+    sketchLine(g, x2, y2, x2 + Math.cos(ang + da) * hl, y2 + Math.sin(ang + da) * hl, rnd);
   }
+}
+function drawShape(g, s, color) {
+  g.strokeStyle = color;
+  const rnd = mulberry32(s.seed);
+  if (s.type === 'rect') sketchRect(g, s.x, s.y, s.w, s.h, rnd);
+  else sketchArrow(g, s.x, s.y, s.x + s.w, s.y + s.h, rnd);
 }
 
-/* ── render ── */
+/* ── render edytora ── */
 function resize() {
   const r = wrap.getBoundingClientRect();
   if (!r.width || !r.height) return; // shell strefy może być jeszcze ukryty (guard auth)
@@ -96,18 +116,12 @@ function render() {
   ctx.scale(camera.z, camera.z);
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
+  ctx.lineWidth = 1.8;
 
   for (const s of shapes) {
     const sel = s.id === selectedId;
-    ctx.strokeStyle = sel ? 'oklch(83% 0.15 90)' : 'rgba(235,235,240,.92)';
-    ctx.lineWidth = 1.6;
-    const rnd = mulberry32(s.seed);
-    if (s.type === 'rect') {
-      sketchRect(s.x, s.y, s.w, s.h, rnd);
-      if (s.text && s.id !== editingId) drawText(s);
-    } else {
-      sketchArrow(s.x, s.y, s.x + s.w, s.y + s.h, rnd);
-    }
+    drawShape(ctx, s, sel ? 'oklch(83% 0.15 90)' : 'rgba(235,235,240,.92)');
+    if (s.type === 'rect' && s.text && s.id !== editingId) drawText(ctx, s);
     if (sel) drawHandles(s);
   }
   // podgląd rysowanego kształtu
@@ -115,28 +129,27 @@ function render() {
     ctx.strokeStyle = 'rgba(235,235,240,.5)';
     const rnd = mulberry32(drag.seed);
     const { x, y, w, h } = drag;
-    if (drag.tool === 'rect') sketchRect(Math.min(x, x + w), Math.min(y, y + h), Math.abs(w), Math.abs(h), rnd);
-    else sketchArrow(x, y, x + w, y + h, rnd);
+    if (drag.tool === 'rect') sketchRect(ctx, Math.min(x, x + w), Math.min(y, y + h), Math.abs(w), Math.abs(h), rnd);
+    else sketchArrow(ctx, x, y, x + w, y + h, rnd);
   }
 }
 
-function drawText(s) {
-  ctx.fillStyle = 'rgba(235,235,240,.95)';
-  ctx.font = '500 17px Caveat, cursive';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  const lines = wrapText(s.text, Math.max(20, s.w - 16));
-  const lh = 20;
-  const y0 = s.y + s.h / 2 - ((lines.length - 1) * lh) / 2;
-  lines.forEach((ln, i) => ctx.fillText(ln, s.x + s.w / 2, y0 + i * lh));
+function drawText(g, s) {
+  g.fillStyle = 'rgba(235,235,240,.95)';
+  g.font = `500 ${FONT}px Caveat, cursive`;
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  const lines = wrapText(g, s.text, Math.max(20, s.w - 16));
+  const y0 = s.y + s.h / 2 - ((lines.length - 1) * LINE_H) / 2;
+  lines.forEach((ln, i) => g.fillText(ln, s.x + s.w / 2, y0 + i * LINE_H));
 }
-function wrapText(text, maxW) {
+function wrapText(g, text, maxW) {
   const out = [];
   for (const raw of String(text).split('\n')) {
     let line = '';
     for (const word of raw.split(' ')) {
       const t = line ? line + ' ' + word : word;
-      if (ctx.measureText(t).width > maxW && line) { out.push(line); line = word; }
+      if (g.measureText(t).width > maxW && line) { out.push(line); line = word; }
       else line = t;
     }
     out.push(line);
@@ -276,7 +289,7 @@ function startTextEdit(s) {
   Object.assign(textEl.style, {
     left: sx + 4 + 'px', top: sy + 4 + 'px',
     width: s.w * camera.z - 8 + 'px', height: s.h * camera.z - 8 + 'px',
-    fontSize: 17 * camera.z + 'px',
+    fontSize: FONT * camera.z + 'px', lineHeight: LINE_H * camera.z + 'px',
   });
   textEl.value = s.text || '';
   textEl.hidden = false;
@@ -298,7 +311,7 @@ textEl.addEventListener('keydown', (e) => {
 
 /* ── klawiatura ── */
 document.addEventListener('keydown', (e) => {
-  if (editingId || e.target.matches('input, textarea, select')) return;
+  if (!current || editingId || e.target.matches('input, textarea, select')) return;
   if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
     shapes = shapes.filter((s) => s.id !== selectedId);
     selectedId = null;
@@ -326,27 +339,85 @@ function scheduleSave() {
 async function saveNow() {
   if (!current || !dirty) return;
   dirty = false;
+  current.data = { shapes };
   const { error } = await sb.from('diagrams')
-    .update({ data: { shapes }, updated_at: new Date().toISOString() })
+    .update({ data: current.data, updated_at: new Date().toISOString() })
     .eq('id', current.id);
   if (error) { toast('Błąd zapisu', error.message, 'err'); dirty = true; }
   else setStatus('Zapisano');
 }
 window.addEventListener('beforeunload', () => { if (dirty) saveNow(); });
 
-async function loadList(selectId = null) {
-  const { data, error } = await sb.from('diagrams').select('id, title, updated_at').order('updated_at', { ascending: false });
+/* ── galeria z miniaturami ── */
+async function loadList() {
+  const { data, error } = await sb.from('diagrams').select('id, title, updated_at, data').order('updated_at', { ascending: false });
   if (error) { toast('Błąd', error.message, 'err'); return; }
   diagrams = data || [];
-  const sel = $('#diag-select');
-  sel.innerHTML = diagrams.map((d) => `<option value="${d.id}">${d.title.replace(/</g, '&lt;')}</option>`).join('') || '<option value="">— brak —</option>';
-  const id = selectId || current?.id || diagrams[0]?.id;
-  if (id && diagrams.some((d) => d.id === id)) { sel.value = id; if (current?.id !== id) await openDiagram(id); }
-  else if (!diagrams.length) { current = null; shapes = []; render(); }
 }
 
-async function openDiagram(id) {
+// Miniatura: kształty diagramu wpasowane w mały canvas (ta sama „ołówkowa" kreska).
+function drawThumb(cv, shs) {
+  const g = cv.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const W = cv.width = cv.clientWidth * dpr, H = cv.height = cv.clientHeight * dpr;
+  g.scale(dpr, dpr);
+  const w = W / dpr, h = H / dpr;
+  if (!shs.length) {
+    g.fillStyle = 'rgba(255,255,255,.25)';
+    g.font = '500 15px Caveat, cursive';
+    g.textAlign = 'center';
+    g.fillText('pusty diagram', w / 2, h / 2 + 5);
+    return;
+  }
+  let x1 = 1e9, y1 = 1e9, x2 = -1e9, y2 = -1e9;
+  for (const s of shs) {
+    x1 = Math.min(x1, s.x, s.x + s.w); x2 = Math.max(x2, s.x, s.x + s.w);
+    y1 = Math.min(y1, s.y, s.y + s.h); y2 = Math.max(y2, s.y, s.y + s.h);
+  }
+  const pad = 14;
+  const sc = Math.min((w - pad * 2) / Math.max(40, x2 - x1), (h - pad * 2) / Math.max(40, y2 - y1), 0.9);
+  g.translate(w / 2 - ((x1 + x2) / 2) * sc, h / 2 - ((y1 + y2) / 2) * sc);
+  g.scale(sc, sc);
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  g.lineWidth = 1.6 / sc;
+  for (const s of shs) {
+    drawShape(g, s, 'rgba(235,235,240,.85)');
+    if (s.type === 'rect' && s.text) drawText(g, s);
+  }
+}
+
+function renderGallery() {
+  const grid = $('#diag-grid');
+  grid.innerHTML = `
+    <button class="diag-card diag-card--new" id="card-new" type="button">
+      <span class="diag-card__thumb diag-card__thumb--new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+      <span class="diag-card__title">Nowy diagram</span>
+    </button>` +
+    diagrams.map((d) => `
+    <button class="diag-card" type="button" data-id="${d.id}">
+      <span class="diag-card__thumb"><canvas></canvas></span>
+      <span class="diag-card__title">${esc(d.title)}</span>
+      <span class="diag-card__date">${fmtDateTime(d.updated_at)}</span>
+    </button>`).join('');
+  $('#card-new').addEventListener('click', () => createDiagram());
+  for (const card of grid.querySelectorAll('.diag-card[data-id]')) {
+    const d = diagrams.find((x) => x.id === card.dataset.id);
+    card.addEventListener('click', () => openEditor(d.id));
+    requestAnimationFrame(() => drawThumb(card.querySelector('canvas'), Array.isArray(d.data?.shapes) ? d.data.shapes : []));
+  }
+}
+
+async function showGallery() {
   if (dirty) await saveNow();
+  current = null;
+  $('#diag-editor').hidden = true;
+  $('#diag-gallery').hidden = false;
+  await loadList();
+  renderGallery();
+}
+
+/* ── otwieranie / tworzenie / edytor ── */
+async function openEditor(id) {
   const { data, error } = await sb.from('diagrams').select('*').eq('id', id).single();
   if (error) { toast('Błąd', error.message, 'err'); return; }
   current = data;
@@ -354,26 +425,29 @@ async function openDiagram(id) {
   selectedId = null;
   camera = { x: 0, y: 0, z: 1 };
   setStatus('');
-  render();
+  $('#diag-title').textContent = data.title;
+  $('#diag-gallery').hidden = true;
+  $('#diag-editor').hidden = false;
+  setTool('select');
+  resize();
 }
 
-async function createDiagram() {
-  const title = await promptTitle('Nowy diagram', 'Nowy diagram');
-  if (title === null) return;
+async function createDiagram(title = null) {
+  if (title === null) {
+    title = await promptTitle('Nowy diagram', 'Nowy diagram');
+    if (title === null) return;
+  }
   const { data, error } = await sb.from('diagrams').insert({ title: title || 'Nowy diagram' }).select().single();
   if (error) { toast('Błąd', error.message, 'err'); return; }
-  current = data;
-  shapes = [];
-  await loadList(data.id);
-  render();
+  openEditor(data.id);
 }
 
 function promptTitle(heading, initial) {
   return new Promise((resolve) => {
     const box = openModal(`
       <div class="strefa-modal__body">
-        <h3 style="margin:0 0 var(--space-md)">${heading}</h3>
-        <input class="strefa-input" id="dg-title" type="text" value="${String(initial).replace(/"/g, '&quot;')}" />
+        <h3 style="margin:0 0 var(--space-md)">${esc(heading)}</h3>
+        <input class="strefa-input" id="dg-title" type="text" value="${esc(initial)}" />
         <div class="strefa-actions-row" style="margin-top:var(--space-lg)">
           <button class="strefa-btn strefa-btn--ghost" data-no>Anuluj</button>
           <button class="strefa-btn strefa-btn--accent" data-yes>Zapisz</button>
@@ -388,9 +462,8 @@ function promptTitle(heading, initial) {
   });
 }
 
-/* ── toolbar ── */
-$('#diag-select').addEventListener('change', (e) => openDiagram(e.target.value));
-$('#btn-new').addEventListener('click', createDiagram);
+/* ── toolbar edytora ── */
+$('#btn-back').addEventListener('click', showGallery);
 $('#btn-rename').addEventListener('click', async () => {
   if (!current) return;
   const title = await promptTitle('Zmień nazwę', current.title);
@@ -398,29 +471,24 @@ $('#btn-rename').addEventListener('click', async () => {
   const { error } = await sb.from('diagrams').update({ title }).eq('id', current.id);
   if (error) { toast('Błąd', error.message, 'err'); return; }
   current.title = title;
-  loadList(current.id);
+  $('#diag-title').textContent = title;
 });
 $('#btn-delete').addEventListener('click', async () => {
   if (!current) return;
   if (!(await confirmDialog(`Usunąć diagram „${current.title}"?`))) return;
   const { error } = await sb.from('diagrams').delete().eq('id', current.id);
   if (error) { toast('Błąd', error.message, 'err'); return; }
-  current = null;
-  shapes = [];
-  await loadList();
+  dirty = false;
+  showGallery();
 });
 document.querySelectorAll('.diag-tool').forEach((b) => b.addEventListener('click', () => setTool(b.dataset.tool)));
 
 /* ── start ── */
 (async () => {
   if (!(await getTeamUser())) return; // layout przekieruje
-  setTool('select');
   window.addEventListener('resize', resize);
   new ResizeObserver(resize).observe(wrap); // łapie też moment odsłonięcia shell'a przez guard auth
-  resize();
   await loadList();
-  if (!diagrams.length) {
-    const { data } = await sb.from('diagrams').insert({ title: 'Mój pierwszy diagram' }).select().single();
-    if (data) await loadList(data.id);
-  }
+  if (!diagrams.length) createDiagram('Nowy diagram'); // brak diagramów → od razu do edytora
+  else renderGallery();
 })();
