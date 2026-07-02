@@ -5,6 +5,11 @@
 [build.environment]
   NODE_VERSION = "22"
 
+[[redirects]]
+  from = "/szkolenie-context7"
+  to = "/akademia"
+  status = 301
+
 # ── 301: stare aliasy URL ze szron.tech (zgodność z dotychczasowym routingiem) ──
 [[redirects]]
   from = "/about"
