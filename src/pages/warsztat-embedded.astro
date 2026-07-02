@@ -1,0 +1,154 @@
+---
+import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import Faq from '../components/Faq.astro';
+import BtnArrow from '../components/BtnArrow.astro';
+
+const faq = [
+  { q: 'Czy musimy udostępnić nasz kod?', a: 'Nie. Cały warsztat pracuje na kodzie pisanym od zera na Waszym sprzęcie — bez dotykania firmowego repozytorium, bez NDA na start. Wasz kod zostaje u Was.' },
+  { q: 'Co jeśli kod nie może wychodzić poza firmę?', a: 'Pokazujemy workflow również na modelach lokalnych (Ollama, vLLM) na Waszych serwerach. Dla większości zespołów wystarczy jednak sam fakt, że na warsztacie nie używamy Waszego kodu.' },
+  { q: 'Jak działa dofinansowanie KFS/BUR?', a: 'Dla MŚP realne dofinansowanie sięga 80% ceny. Papiery załatwiamy my — dostajecie komplet dokumentów do podpisu, resztą zajmuje się SZRON. To standardowa ścieżka, robiliśmy ją wielokrotnie.' },
+  { q: 'Co dokładnie dostajemy po warsztacie?', a: 'Embedded AI Starter Pack: gotowe pliki CLAUDE.md pod STM32/Zephyr/Qt, serwer MCP do pracy z datasheetami PDF oraz skill sprawdzający zgodność z MISRA C. Do tego działający kod na Waszym sprzęcie, napisany w trakcie dnia.' },
+  { q: 'A jeśli po warsztacie nic się nie zmieni?', a: 'Gwarancja: jeśli zespół nie zamknie pierwszego realnego zadania z AI w ciągu 2 tygodni od warsztatu, druga sesja jest gratis.' },
+];
+---
+<Interior
+  title="Warsztat: Claude Code dla embedded/C++ — na Waszym sprzęcie | SZRON"
+  description="1-dniowy zamknięty warsztat dla zespołów embedded. Przynosicie własny devboard, wychodzicie z działającym kodem. Starter Pack: CLAUDE.md, MCP do datasheetów, MISRA-check. KFS do -80% dla MŚP."
+  eyebrow="Warsztat zamknięty · 1 dzień · do 10 osób"
+  heading="Claude Code dla embedded/C++. Na Waszym sprzęcie."
+  lead="Przynosicie własny devboard albo urządzenie. Kod piszemy od zera, na Waszym targecie — bez dotykania firmowego repo, bez NDA. Wychodzicie z działającym kodem na swoim sprzęcie i kompletem narzędzi do pracy z agentami od poniedziałku."
+  headingSmall
+>
+  <!-- 01 twist -->
+  <section class="sect sect--dark" aria-labelledby="twist">
+    <div class="container">
+      <SectHead eyebrow="01 / Format · Wasz sprzęt, świeży kod" title="Nie slajdy. Działający kod na Waszym targecie." id="twist" />
+      <dl class="def-rows rv">
+        <div><dt>Wasz sprzęt<small>devboard lub urządzenie z produkcji</small></dt><dd>Każdy uczestnik pracuje na swoim targecie — STM32, Zephyr, ARM Linux, co macie na biurku. Agent pisze kod pod Wasz konkretny układ, nie pod przykład z tutoriala.</dd></div>
+        <div><dt>Kod od zera<small>zero ryzyka dla firmowego repo</small></dt><dd>Nie prosimy o dostęp do Waszego kodu ani przed, ani w trakcie. Wszystko, co powstaje na warsztacie, piszemy od zera — i zostaje u Was.</dd></div>
+        <div><dt>Demo-sygnatura<small>datasheet → driver</small></dt><dd>Gwóźdź programu: agent dostaje kilkusetstronicowy datasheet w PDF i pisze działający driver I2C/SPI. Każdy embedded dev zna ten ból — zobaczycie, jak znika.</dd></div>
+        <div><dt>MISRA-check<small>AI pilnuje zgodności</small></dt><dd>Pokazujemy workflow, w którym agent sprawdza kod pod MISRA C — dla przemysłu, kolei i systemów safety to argument bezpieczeństwa, nie gadżet. W Polsce nikt inny tego nie uczy.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 02 starter pack -->
+  <section class="sect" aria-labelledby="pack">
+    <div class="container">
+      <SectHead eyebrow="02 / Deliverable · Zostaje u Was" title="Embedded AI Starter Pack." id="pack" small />
+      <div class="prose rv">
+        <p>Warsztat to jeden dzień, ale narzędzia zostają na zawsze. Każdy zespół wychodzi z gotowym pakietem, który od następnego dnia działa w Waszych projektach:</p>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>CLAUDE.md<small>STM32 · Zephyr · Qt</small></dt><dd>Reguły pracy agenta pisane pod sprzęt: nigdy kod HAL bez referencji do datasheet, oznaczone ISR-y, lista funkcji thread-safe, PR z memory map diff.</dd></div>
+        <div><dt>MCP do datasheetów<small>PDF → kontekst agenta</small></dt><dd>Serwer MCP, przez który agent czyta datasheety i noty aplikacyjne — podstawa workflow „datasheet → driver".</dd></div>
+        <div><dt>Skill MISRA-check<small>zgodność jako element pracy</small></dt><dd>Skill sprawdzający wygenerowany i ludzki kod pod kątem reguł MISRA C — do wpięcia w codzienny przepływ pracy i CI.</dd></div>
+      </dl>
+      <ProofStrip wrap={false} items={[
+        ['1 dzień', 'zamknięty warsztat, tylko Wasz zespół'],
+        ['do 10 os.', 'każdy przy własnym sprzęcie'],
+        ['2 tyg.', 'gwarancja: pierwsze zadanie z AI albo druga sesja gratis'],
+      ]} />
+    </div>
+  </section>
+
+  <!-- 03 cena / KFS -->
+  <section class="sect sect--dark" aria-labelledby="cena">
+    <div class="container">
+      <SectHead eyebrow="03 / Cena · Z dofinansowaniem KFS/BUR" title="7 500 zł netto za grupę. Dla MŚP realnie od ~1 500 zł." id="cena" />
+      <dl class="def-rows rv">
+        <div><dt>Cena<small>zamknięta grupa lub per osoba</small></dt><dd>7 500 zł netto za grupę do 10 osób (widełki 6 000–9 000 w zależności od zakresu) albo 1 900 zł netto od osoby przy grupach mieszanych.</dd></div>
+        <div><dt>KFS/BUR done-for-you<small>dla MŚP do -80%</small></dt><dd>Załatwiamy papiery za Was — wniosek, dokumentacja, rozliczenie. Dla małych i średnich firm dofinansowanie realnie zdejmuje do 80% ceny.</dd></div>
+        <div><dt>Gwarancja<small>wynik, nie obecność</small></dt><dd>Jeśli zespół nie zamknie pierwszego realnego zadania z AI w 2 tygodnie od warsztatu — druga sesja gratis.</dd></div>
+        <div><dt>Pilotaż<small>-30–40% za case study</small></dt><dd>Pierwsze firmy w danej branży dostają rabat 30–40% w zamian za case study i referencję wideo po warsztacie.</dd></div>
+        <div><dt>Retainer<small>warsztat się zwraca</small></dt><dd>Jeśli po warsztacie wchodzicie w program „AI enablement" (3–6 miesięcy), 100% ceny warsztatu zaliczamy na poczet pierwszego miesiąca.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 04 zgłoszenie -->
+  <section class="sect" aria-labelledby="zgloszenie">
+    <div class="container">
+      <SectHead eyebrow="04 / Zgłoszenie · Wracamy w 24h" title="Zapytaj o termin dla swojego zespołu." id="zgloszenie" small />
+      <div class="prose rv">
+        <p>Zanim cokolwiek kupisz, proponujemy <strong>30-minutowe live demo</strong> — online, bez NDA, na kodzie open-source z Waszej domeny. Zobaczysz agenta w akcji na protokole, który znasz, i ocenisz sam.</p>
+      </div>
+      <div id="lead-msg" role="alert" hidden></div>
+      <form id="lead-form" class="rv">
+        <p>
+          <label for="w-name">Imię i nazwisko</label>
+          <input type="text" id="w-name" autocomplete="name" required />
+        </p>
+        <p>
+          <label for="w-email">E-mail firmowy</label>
+          <input type="email" id="w-email" autocomplete="email" required />
+        </p>
+        <p>
+          <label for="w-company">Firma</label>
+          <input type="text" id="w-company" autocomplete="organization" required />
+        </p>
+        <p>
+          <label for="w-phone">Telefon (opcjonalnie)</label>
+          <input type="tel" id="w-phone" autocomplete="tel" />
+        </p>
+        <p>
+          <label for="w-msg">Czym się zajmujecie i na czym pracujecie?</label>
+          <textarea id="w-msg" rows="4" placeholder="np. sterowniki STM32 + Modbus, zespół 6 osób, interesuje nas demo / warsztat / KFS"></textarea>
+        </p>
+        <button type="submit" class="btn btn--accent" id="w-submit">Wyślij zgłoszenie</button>
+      </form>
+      <div id="lead-done" hidden class="callout">
+        <p><strong>Zgłoszenie wysłane.</strong> Wracamy mailem w 24h z propozycją terminu demo albo warsztatu.</p>
+      </div>
+      <p class="rv"><small>Wysyłając formularz akceptujesz przetwarzanie danych zgodnie z <a href="/privacy-policy">polityką prywatności</a>. Masz szefa, który musi to klepnąć? Wyślij mu <a href="/dla-szefa">jedną stronę streszczenia</a>.</small></p>
+    </div>
+  </section>
+
+  <!-- 05 FAQ -->
+  <section class="sect sect--dark" aria-labelledby="faq" style="padding-top:0">
+    <div class="container">
+      <SectHead eyebrow="05 / FAQ · Pytania przed zgłoszeniem" title="Najczęstsze pytania." id="faq" />
+      <Faq items={faq} />
+      <p class="rv" style="margin-top:var(--space-lg)">
+        <BtnArrow class="btn btn--dark" href="/ai-dla-embedded">Zobacz, jak podchodzimy do AI w embedded</BtnArrow>
+      </p>
+    </div>
+  </section>
+
+  <script is:inline>
+    (function () {
+      var URL_ = 'https://sttluvcbucpxzbcsuigw.supabase.co/rest/v1/landing_leads';
+      var ANON = 'sb_publishable_X5xi2HxbmVnbxmCNd8us4Q_Dr6eXvo0';
+      var form = document.getElementById('lead-form');
+      var msg = document.getElementById('lead-msg');
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        msg.hidden = true;
+        var btn = document.getElementById('w-submit');
+        btn.disabled = true; btn.textContent = 'Wysyłam…';
+        try {
+          var r = await fetch(URL_, {
+            method: 'POST',
+            headers: { apikey: ANON, Authorization: 'Bearer ' + ANON, 'Content-Type': 'application/json', 'Content-Profile': 'strefa', Prefer: 'return=minimal' },
+            body: JSON.stringify({
+              source: 'warsztat-embedded',
+              name: document.getElementById('w-name').value.trim(),
+              email: document.getElementById('w-email').value.trim(),
+              company: document.getElementById('w-company').value.trim(),
+              phone: document.getElementById('w-phone').value.trim() || null,
+              message: document.getElementById('w-msg').value.trim() || null,
+            }),
+          });
+          if (!r.ok) throw new Error('http ' + r.status);
+          form.hidden = true;
+          document.getElementById('lead-done').hidden = false;
+        } catch (err) {
+          msg.hidden = false; msg.className = 'callout'; msg.innerHTML = '<p><strong>Nie udało się wysłać.</strong> Spróbuj ponownie albo napisz na tw@szron.tech.</p>';
+          btn.disabled = false; btn.textContent = 'Wyślij zgłoszenie';
+        }
+      });
+    })();
+  </script>
+</Interior>

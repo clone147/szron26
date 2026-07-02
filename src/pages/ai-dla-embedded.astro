@@ -81,14 +81,28 @@ import BtnArrow from '../components/BtnArrow.astro';
     </div>
   </section>
 
+  <!-- 05 MISRA / warsztat -->
+  <section class="sect" aria-labelledby="misra">
+    <div class="container">
+      <SectHead eyebrow="05 / Safety · MISRA i zgodność" title="AI, które pilnuje MISRA C — nie omija jej." id="misra" small />
+      <div class="prose rv">
+        <p>Dla przemysłu, energetyki, kolei i systemów sygnalizacji zgodność z MISRA C to nie formalność, tylko warunek wejścia. Zbudowaliśmy workflow, w którym agent sprawdza kod — wygenerowany i ludzki — pod kątem reguł MISRA jeszcze przed review. To zamienia AI z ryzyka certyfikacyjnego w dodatkową linię obrony.</p>
+        <p>Ten workflow, razem z regułami CLAUDE.md pod STM32/Zephyr/Qt i serwerem MCP do datasheetów, przekazujemy zespołom na jednodniowym warsztacie — na Waszym sprzęcie, bez dotykania Waszego repo.</p>
+      </div>
+      <p class="rv" style="margin-top:var(--space-lg)">
+        <BtnArrow class="btn btn--dark" href="/warsztat-embedded">Warsztat: Claude Code dla embedded/C++</BtnArrow>
+      </p>
+    </div>
+  </section>
+
   <!-- kontakt CTA -->
   <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
     <div class="container">
-      <p class="eyebrow rv" data-scramble>Wasze firmware'y leżą tygodniami?</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Embedded też się da. Tylko inaczej.</h2>
-      <p class="rv">30-minutowa rozmowa — pokażemy, gdzie konkretnie zespół embedded traci tempo i co AI naprawdę przyspiesza w bare-metal, a czego nie tknie.</p>
+      <p class="eyebrow rv" data-scramble>Chcesz to zobaczyć na kodzie ze swojej branży?</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">30 minut live demo. Bez NDA.</h2>
+      <p class="rv">Agent na żywo, na kodzie open-source z Waszej domeny — Modbus, CANopen, SCPI, OCPP, co u Was gra. Zobaczysz, co AI naprawdę przyspiesza w bare-metal, a czego nie tknie. Termin pod Was.</p>
       <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę
+        <a class="btn btn--accent" href="/warsztat-embedded#zgloszenie">Umów live demo
           <span class="btn__arr" aria-hidden="true">
             <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
             <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>

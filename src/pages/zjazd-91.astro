@@ -1,0 +1,117 @@
+---
+import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+---
+<Interior
+  title="Zjazd 91 — reunion warsztatów ARM 2023 | SZRON"
+  description="Darmowe spotkanie online dla uczestników warsztatów ARM z 2023 roku. 91 inżynierów, 61 firm, 5 miast. Od ChatGPT podpowiadającego GUI do agentów piszących firmware."
+  eyebrow="Zjazd absolwentów · online · darmowy"
+  heading="Zjazd 91. Od ChatGPT na warsztatach do agentów piszących firmware."
+  lead="W 2023 trzymaliście w rękach płytkę ARM z dotykowym ekranem 10&quot; i pisaliście GUI w trybie KIOSK z pomocą AI. To była zapowiedź. Trzy lata później agent czyta datasheet i sam pisze driver. Spotkajmy się — 90 minut online, zero sprzedaży, sama technika."
+  headingSmall
+>
+  <!-- 01 pamiętasz -->
+  <section class="sect sect--dark" aria-labelledby="pamietasz">
+    <div class="container">
+      <SectHead eyebrow="01 / 2023 · Pamiętasz?" title="91 inżynierów, 61 firm, 5 miast." id="pamietasz" />
+      <div class="prose rv">
+        <p>Wrocław, Katowice, Kraków, Warszawa, Poznań. Każdy uczestnik dostał do ręki płytkę ARM z ekranem dotykowym 10 cali. Migaliście LED-ami przez GPIO, gadaliście po RS232, pisaliście GUI dotykowe w przeglądarce — w trybie KIOSK, z pomocą ówczesnego AI. Były projekty grupowe i nagrody.</p>
+        <p>Wtedy AI podpowiadało nam kod GUI. Dziś agent sam pisze firmware — czyta 400-stronicowy datasheet i oddaje działający driver I2C. Chcemy Wam pokazać na żywo, co się zmieniło przez te trzy lata i co to znaczy dla pracy inżyniera embedded.</p>
+      </div>
+      <ProofStrip wrap={false} items={[
+        ['91', 'inżynierów na warsztatach w 2023'],
+        ['61', 'firm — od MŚP po korporacje'],
+        ['5', 'miast: Wrocław, Katowice, Kraków, Warszawa, Poznań'],
+      ]} />
+    </div>
+  </section>
+
+  <!-- 02 agenda -->
+  <section class="sect" aria-labelledby="agenda">
+    <div class="container">
+      <SectHead eyebrow="02 / Agenda · 90 minut, online" title="Co zobaczysz na zjeździe." id="agenda" small />
+      <dl class="def-rows rv">
+        <div><dt>2023 → 2026<small>co się realnie zmieniło</small></dt><dd>Od autouzupełniania do agentów: jak wygląda dziś praca z AI w embedded — bez marketingu, na przykładach z produkcji.</dd></div>
+        <div><dt>Demo na żywo<small>datasheet → driver</small></dt><dd>Agent dostaje 400-stronicowy datasheet w PDF i pisze działający driver I2C/SPI. Zobaczysz cały proces, z błędami i poprawkami — nie wyreżyserowany klip.</dd></div>
+        <div><dt>Q&amp;A<small>Wasze projekty, Wasze pytania</small></dt><dd>Toolchainy Keil/STM32, kod który nie może wyjść z firmy, MISRA, testy HIL — pytajcie o swoje realia, odpowiadamy wprost.</dd></div>
+      </dl>
+      <div class="callout rv">
+        <p><strong>Zero sprzedaży na spotkaniu.</strong> To reunion i pokaz techniki. Termin i link do spotkania wyślemy mailem po zapisie.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 zapis -->
+  <section class="sect sect--dark" aria-labelledby="zapis">
+    <div class="container">
+      <SectHead eyebrow="03 / Zapis · Darmowy, 90 minut, online" title="Zapisz się — wyślemy termin i link." id="zapis" />
+      <div id="lead-msg" role="alert" hidden></div>
+      <form id="lead-form" class="rv">
+        <p>
+          <label for="z-name">Imię i nazwisko</label>
+          <input type="text" id="z-name" autocomplete="name" required />
+        </p>
+        <p>
+          <label for="z-email">E-mail</label>
+          <input type="email" id="z-email" autocomplete="email" required />
+        </p>
+        <p>
+          <label for="z-company">Firma</label>
+          <input type="text" id="z-company" autocomplete="organization" />
+        </p>
+        <p>
+          <label for="z-city">Miasto warsztatów w 2023</label>
+          <select id="z-city">
+            <option value="">Wybierz (jeśli pamiętasz)</option>
+            <option>Wrocław</option>
+            <option>Katowice</option>
+            <option>Kraków</option>
+            <option>Warszawa</option>
+            <option>Poznań</option>
+            <option>Nie pamiętam / nie byłem</option>
+          </select>
+        </p>
+        <button type="submit" class="btn btn--accent" id="z-submit">Zapisz mnie na zjazd</button>
+      </form>
+      <div id="lead-done" hidden class="callout">
+        <p><strong>Jesteś na liście!</strong> Termin i link do spotkania dostaniesz mailem. Do zobaczenia.</p>
+      </div>
+      <p class="rv"><small>Wysyłając formularz akceptujesz przetwarzanie danych zgodnie z <a href="/privacy-policy">polityką prywatności</a>. Użyjemy maila tylko do organizacji zjazdu — bez newslettera.</small></p>
+    </div>
+  </section>
+
+  <script is:inline>
+    (function () {
+      var URL_ = 'https://sttluvcbucpxzbcsuigw.supabase.co/rest/v1/landing_leads';
+      var ANON = 'sb_publishable_X5xi2HxbmVnbxmCNd8us4Q_Dr6eXvo0';
+      var form = document.getElementById('lead-form');
+      var msg = document.getElementById('lead-msg');
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        msg.hidden = true;
+        var btn = document.getElementById('z-submit');
+        btn.disabled = true; btn.textContent = 'Zapisuję…';
+        try {
+          var r = await fetch(URL_, {
+            method: 'POST',
+            headers: { apikey: ANON, Authorization: 'Bearer ' + ANON, 'Content-Type': 'application/json', 'Content-Profile': 'strefa', Prefer: 'return=minimal' },
+            body: JSON.stringify({
+              source: 'zjazd-91',
+              name: document.getElementById('z-name').value.trim(),
+              email: document.getElementById('z-email').value.trim(),
+              company: document.getElementById('z-company').value.trim() || null,
+              city: document.getElementById('z-city').value || null,
+            }),
+          });
+          if (!r.ok) throw new Error('http ' + r.status);
+          form.hidden = true;
+          document.getElementById('lead-done').hidden = false;
+        } catch (err) {
+          msg.hidden = false; msg.className = 'callout'; msg.innerHTML = '<p><strong>Nie udało się zapisać.</strong> Spróbuj ponownie albo napisz na tw@szron.tech.</p>';
+          btn.disabled = false; btn.textContent = 'Zapisz mnie na zjazd';
+        }
+      });
+    })();
+  </script>
+</Interior>

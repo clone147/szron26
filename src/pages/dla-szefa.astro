@@ -1,0 +1,73 @@
+---
+import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import BtnArrow from '../components/BtnArrow.astro';
+---
+<Interior
+  title="AI w zespole embedded — jedna strona dla decydenta | SZRON"
+  description="Streszczenie dla szefa: co daje warsztat Claude Code dla embedded/C++, ile kosztuje, jak działa dofinansowanie KFS do -80% i od czego zacząć bez ryzyka."
+  eyebrow="Jedna strona · dla decydenta"
+  heading="Ktoś z Twojego zespołu przesłał Ci tę stronę. Oto konkret."
+  lead="Twój inżynier widział, jak agent AI czyta datasheet i pisze działający driver. Uznał, że warto, żebyś to zobaczył. Poniżej wszystko, czego potrzebujesz do decyzji: co to daje, ile kosztuje, jakie jest ryzyko. Czas czytania: 2 minuty."
+  headingSmall
+>
+  <!-- 01 co z tego macie -->
+  <section class="sect sect--dark" aria-labelledby="roi">
+    <div class="container">
+      <SectHead eyebrow="01 / Efekt · Liczby, nie obietnice" title="Co z tego ma firma." id="roi" />
+      <div class="prose rv">
+        <p>W typowym projekcie embedded około <strong>70% czasu</strong> nie idzie na „magiczny" kod hardware'owy, tylko na warstwę dookoła: testy, parsery protokołów, dokumentację rejestrów, kod CRUD na strukturach. To właśnie tę warstwę agenty AI zdejmują z inżynierów. Na realnym module STM32 (Modbus RTU + CANopen) zespół klienta zamknął w 2 tygodnie pracę wycenioną wewnętrznie na 2 miesiące.</p>
+      </div>
+      <ProofStrip wrap={false} items={[
+        ['2 mc → 2 tyg', 'realny moduł STM32 w produkcji — nie benchmark'],
+        ['70%', 'czasu projektu embedded to praca, którą przyspiesza AI'],
+        ['0', 'dostępu do Waszego kodu — warsztat na kodzie pisanym od zera'],
+      ]} />
+      <p class="rv" style="margin-top:var(--space-lg)">
+        <BtnArrow class="btn btn--dark" href="/case-studies/stm32">Pełny case STM32 z liczbami</BtnArrow>
+      </p>
+    </div>
+  </section>
+
+  <!-- 02 koszt -->
+  <section class="sect" aria-labelledby="koszt">
+    <div class="container">
+      <SectHead eyebrow="02 / Koszt · Z dofinansowaniem" title="Ile to kosztuje i skąd dofinansowanie." id="koszt" small />
+      <dl class="def-rows rv">
+        <div><dt>Warsztat<small>1 dzień, do 10 osób, u Was</small></dt><dd>7 500 zł netto za grupę. Zespół pracuje na własnym sprzęcie i wychodzi z działającym kodem oraz gotowym pakietem narzędzi (CLAUDE.md, MCP do datasheetów, MISRA-check).</dd></div>
+        <div><dt>KFS/BUR<small>dla MŚP realnie do -80%</small></dt><dd>Dofinansowanie z Krajowego Funduszu Szkoleniowego. Papierologię prowadzimy my — Wasza księgowość dostaje komplet do podpisu. Efektywny koszt dla MŚP: od ~1 500 zł za cały zespół.</dd></div>
+        <div><dt>Gwarancja<small>wynik albo druga sesja</small></dt><dd>Jeśli zespół nie zamknie pierwszego realnego zadania z AI w 2 tygodnie po warsztacie — druga sesja gratis.</dd></div>
+        <div><dt>Zero ryzyka na start<small>demo za darmo</small></dt><dd>Pierwszy krok nic nie kosztuje: 30-minutowe live demo online, bez NDA, na kodzie open-source z Waszej branży. Na życzenie przyjedziemy pokazać to zarządowi osobiście — też za darmo.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 03 kto -->
+  <section class="sect sect--dark" aria-labelledby="kto">
+    <div class="container">
+      <SectHead eyebrow="03 / Kto · Praktyk, nie trener" title="Kto to prowadzi." id="kto" />
+      <div class="prose rv">
+        <p><strong>Tomek Wojciechowski</strong> — 25 lat w embedded (STM32, C++, Qt), od trzech lat z LLM-ami w produkcji. W 2023 przeszkolił 91 inżynierów z 61 firm na warsztatach ARM w pięciu miastach — być może Twój pracownik był jednym z nich. Nie sprzedaje slajdów: na warsztacie kod powstaje na żywo, na sprzęcie uczestników.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Decyzja w 30 minut, nie w kwartał</p>
+      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Zacznij od darmowego demo.</h2>
+      <p class="rv">30 minut online, bez NDA, na kodzie z Waszej branży. Zobaczysz dokładnie to, co Twój inżynier — i zdecydujesz na faktach.</p>
+      <div class="contact__cta rv">
+        <a class="btn btn--accent" href="/warsztat-embedded#zgloszenie">Umów demo lub zapytaj o termin
+          <span class="btn__arr" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+        </a>
+        <a class="btn btn--ghost" href="tel:+48505091200">+48 505 091 200</a>
+      </div>
+    </div>
+  </section>
+</Interior>
