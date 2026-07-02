@@ -81,7 +81,8 @@ function drawShape(g, s, color) {
   g.strokeStyle = color;
   const rnd = mulberry32(s.seed);
   if (s.type === 'rect') sketchRect(g, s.x, s.y, s.w, s.h, rnd);
-  else sketchArrow(g, s.x, s.y, s.x + s.w, s.y + s.h, rnd);
+  else if (s.type === 'arrow') sketchArrow(g, s.x, s.y, s.x + s.w, s.y + s.h, rnd);
+  // 'text' — bez ramki (samą ramkę zaznaczenia rysuje render())
 }
 
 /* ── render edytora ── */
@@ -121,7 +122,15 @@ function render() {
   for (const s of shapes) {
     const sel = s.id === selectedId;
     drawShape(ctx, s, sel ? 'oklch(83% 0.15 90)' : 'rgba(235,235,240,.92)');
-    if (s.type === 'rect' && s.text && s.id !== editingId) drawText(ctx, s);
+    if (s.type !== 'arrow' && s.text && s.id !== editingId) drawText(ctx, s);
+    if (s.type === 'text' && sel) { // pole tekstowe: delikatna ramka tylko przy zaznaczeniu
+      ctx.save();
+      ctx.setLineDash([4 / camera.z, 4 / camera.z]);
+      ctx.lineWidth = 1 / camera.z;
+      ctx.strokeStyle = 'oklch(83% 0.15 90 / .6)';
+      ctx.strokeRect(s.x, s.y, s.w, s.h);
+      ctx.restore();
+    }
     if (sel) drawHandles(s);
   }
   // podgląd rysowanego kształtu
@@ -130,7 +139,14 @@ function render() {
     const rnd = mulberry32(drag.seed);
     const { x, y, w, h } = drag;
     if (drag.tool === 'rect') sketchRect(ctx, Math.min(x, x + w), Math.min(y, y + h), Math.abs(w), Math.abs(h), rnd);
-    else sketchArrow(ctx, x, y, x + w, y + h, rnd);
+    else if (drag.tool === 'arrow') sketchArrow(ctx, x, y, x + w, y + h, rnd);
+    else {
+      ctx.save();
+      ctx.setLineDash([4 / camera.z, 4 / camera.z]);
+      ctx.lineWidth = 1 / camera.z;
+      ctx.strokeRect(Math.min(x, x + w), Math.min(y, y + h), Math.abs(w), Math.abs(h));
+      ctx.restore();
+    }
   }
 }
 
@@ -158,8 +174,8 @@ function wrapText(g, text, maxW) {
 }
 
 function handlesFor(s) {
-  if (s.type === 'rect') return [{ k: 'se', x: s.x + s.w, y: s.y + s.h }];
-  return [{ k: 'a1', x: s.x, y: s.y }, { k: 'a2', x: s.x + s.w, y: s.y + s.h }];
+  if (s.type === 'arrow') return [{ k: 'a1', x: s.x, y: s.y }, { k: 'a2', x: s.x + s.w, y: s.y + s.h }];
+  return [{ k: 'se', x: s.x + s.w, y: s.y + s.h }];
 }
 function drawHandles(s) {
   ctx.fillStyle = 'oklch(83% 0.15 90)';
@@ -183,9 +199,9 @@ function distSeg(p, x1, y1, x2, y2) {
 function hitShape(p) {
   for (let i = shapes.length - 1; i >= 0; i--) {
     const s = shapes[i];
-    if (s.type === 'rect') {
-      if (p.x >= s.x - 4 && p.x <= s.x + s.w + 4 && p.y >= s.y - 4 && p.y <= s.y + s.h + 4) return s;
-    } else if (distSeg(p, s.x, s.y, s.x + s.w, s.y + s.h) < 7 / camera.z) return s;
+    if (s.type === 'arrow') {
+      if (distSeg(p, s.x, s.y, s.x + s.w, s.y + s.h) < 7 / camera.z) return s;
+    } else if (p.x >= s.x - 4 && p.x <= s.x + s.w + 4 && p.y >= s.y - 4 && p.y <= s.y + s.h + 4) return s;
   }
   return null;
 }
@@ -201,7 +217,7 @@ canvas.addEventListener('pointerdown', (e) => {
   if (editingId) commitText();
   canvas.setPointerCapture(e.pointerId);
   const p = toWorld(e);
-  if (tool === 'rect' || tool === 'arrow') {
+  if (tool === 'rect' || tool === 'arrow' || tool === 'text') {
     drag = { mode: 'draw', tool, x: p.x, y: p.y, w: 0, h: 0, seed: (Math.random() * 1e9) | 0 };
     return;
   }
@@ -244,14 +260,16 @@ canvas.addEventListener('pointerup', () => {
     const d = drag;
     if (Math.abs(d.w) > 8 || Math.abs(d.h) > 8) {
       const s = { id: uid(), type: d.tool, seed: d.seed };
-      if (d.tool === 'rect') {
+      if (d.tool === 'arrow') { s.x = d.x; s.y = d.y; s.w = d.w; s.h = d.h; }
+      else {
         s.x = Math.min(d.x, d.x + d.w); s.y = Math.min(d.y, d.y + d.h);
         s.w = Math.max(24, Math.abs(d.w)); s.h = Math.max(24, Math.abs(d.h));
         s.text = '';
-      } else { s.x = d.x; s.y = d.y; s.w = d.w; s.h = d.h; }
+      }
       shapes.push(s);
       selectedId = s.id;
       scheduleSave();
+      if (d.tool === 'text') { setTool('select'); drag = null; startTextEdit(s); return; } // od razu wpisywanie
     }
     setTool('select');
   } else if (dirty) scheduleSave();
@@ -261,7 +279,7 @@ canvas.addEventListener('pointerup', () => {
 
 canvas.addEventListener('dblclick', (e) => {
   const s = hitShape(toWorld(e));
-  if (s?.type === 'rect') startTextEdit(s);
+  if (s && s.type !== 'arrow') startTextEdit(s);
 });
 
 // scroll = przesuwanie, Ctrl/⌘+scroll = zoom
@@ -320,6 +338,7 @@ document.addEventListener('keydown', (e) => {
   } else if (e.key === 'v' || e.key === 'V') setTool('select');
   else if (e.key === 'r' || e.key === 'R') setTool('rect');
   else if (e.key === 'a' || e.key === 'A') setTool('arrow');
+  else if (e.key === 't' || e.key === 'T') setTool('text');
 });
 
 function setTool(t) {
@@ -329,7 +348,7 @@ function setTool(t) {
 }
 
 /* ── zapis / Supabase ── */
-function setStatus(txt) { $('#save-status').textContent = txt; }
+function setStatus(txt) { const el = $('#save-status'); if (el) el.textContent = txt; }
 function scheduleSave() {
   dirty = true;
   setStatus('Zapisywanie…');
@@ -382,7 +401,7 @@ function drawThumb(cv, shs) {
   g.lineWidth = 1.6 / sc;
   for (const s of shs) {
     drawShape(g, s, 'rgba(235,235,240,.85)');
-    if (s.type === 'rect' && s.text) drawText(g, s);
+    if (s.type !== 'arrow' && s.text) drawText(g, s);
   }
 }
 
