@@ -42,7 +42,7 @@ import ProofStrip from '../components/ProofStrip.astro';
         .zjazd-thumb img { width: 100%; aspect-ratio: 4 / 3; height: auto; object-fit: cover; display: block; transition: transform .25s ease, opacity .25s ease; }
         .zjazd-thumb:hover img, .zjazd-thumb:focus-visible img { transform: scale(1.04); opacity: .9; }
         @media (max-width: 700px) { .zjazd-gallery { grid-template-columns: repeat(3, 1fr); } }
-        .zjazd-lightbox { border: 0; padding: 0; background: transparent; max-width: min(92vw, 1400px); max-height: 90vh; }
+        .zjazd-lightbox { position: fixed; inset: 0; margin: auto; border: 0; padding: 0; background: transparent; max-width: min(92vw, 1400px); max-height: 90vh; }
         .zjazd-lightbox::backdrop { background: rgba(0, 0, 0, .82); }
         .zjazd-lightbox img { max-width: min(92vw, 1400px); max-height: 90vh; width: auto; height: auto; display: block; border-radius: 12px; }
         .zjazd-lb-close { position: absolute; top: .5rem; right: .5rem; width: 2.4rem; height: 2.4rem; border: 0; border-radius: 50%; background: rgba(0, 0, 0, .55); color: #fff; font-size: 1.1rem; cursor: pointer; }
