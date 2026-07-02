@@ -15,6 +15,22 @@
 }
 .strefa-body * { box-sizing: border-box; }
 
+/* ── motyw jasny strefy: remap tokenów pod data-theme="light" na <body> ──
+   Cały interfejs strefy stoi na tokenach „ciemnych" (ink, text-inv, line-dark),
+   a --color-paper pełni rolę powierzchni kontrastowej — dlatego jasny motyw
+   to wyłącznie podmiana wartości tych tokenów (paper → ciemny, ink → jasny). */
+.strefa-body[data-theme="light"] {
+  --color-ink:        oklch(98.5% 0.001 240);   /* tło strony */
+  --color-ink-2:      oklch(100% 0 0);           /* karty */
+  --color-ink-3:      oklch(93.5% 0.002 240);    /* hover kart */
+  --color-line-dark:  oklch(17% 0.01 240 / 0.13);
+  --color-text-inv:   oklch(17% 0.01 240);
+  --color-text-inv-2: oklch(32% 0.009 240);
+  --color-text-inv-3: oklch(48% 0.008 240);
+  --color-glass:      oklch(98.5% 0.001 240 / 0.85);
+  --color-paper:      oklch(22.5% 0.012 240);    /* powierzchnia kontrastowa (np. hover przycisku accent) */
+}
+
 /* ── ekran ładowania / sprawdzania dostępu ── */
 .strefa-boot {
   position: fixed; inset: 0; display: grid; place-content: center; gap: var(--space-md);
