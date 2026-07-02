@@ -1,0 +1,37 @@
+---
+import Strefa from '../../layouts/Strefa.astro';
+---
+<Strefa title="Diagramy" active="diagramy">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap" rel="stylesheet" />
+
+  <div class="diag-wrap">
+    <div class="diag-bar">
+      <div class="diag-bar__group">
+        <select id="diag-select" class="diag-select" aria-label="Wybierz diagram"></select>
+        <button class="strefa-iconbtn" id="btn-new" type="button" title="Nowy diagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button class="strefa-iconbtn" id="btn-rename" type="button" title="Zmień nazwę"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+        <button class="strefa-iconbtn" id="btn-delete" type="button" title="Usuń diagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+      </div>
+      <div class="diag-bar__group diag-tools" role="toolbar" aria-label="Narzędzia">
+        <button class="diag-tool" id="tool-select" data-tool="select" type="button" title="Zaznaczanie (V)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 3 7.5 18 2.6-7.9L22 10.5Z"/></svg></button>
+        <button class="diag-tool" id="tool-rect" data-tool="rect" type="button" title="Prostokąt (R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="1"/></svg></button>
+        <button class="diag-tool" id="tool-arrow" data-tool="arrow" type="button" title="Strzałka (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 19 5"/><path d="M10 5h9v9"/></svg></button>
+      </div>
+      <div class="diag-bar__group diag-bar__right">
+        <span class="slides-status" id="save-status" aria-live="polite"></span>
+        <span class="diag-hint">2× klik na prostokąt = tekst · Del = usuń · przeciągnij tło = przesuwanie</span>
+      </div>
+    </div>
+    <div class="diag-canvas-wrap" id="canvas-wrap">
+      <canvas id="diag-canvas"></canvas>
+      <textarea id="diag-text" class="diag-textedit" hidden spellcheck="false"></textarea>
+    </div>
+  </div>
+
+  <div id="modal-root"></div>
+  <div class="strefa-toasts" id="toasts" aria-live="polite"></div>
+
+  <script>
+    import '../../lib/strefa-diagramy.js';
+  </script>
+</Strefa>

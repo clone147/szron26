@@ -765,3 +765,41 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 @media (prefers-reduced-motion: reduce) {
   .deck-thumb, .bg-chip, .deck-thumb__tools { animation: none !important; transition: none !important; }
 }
+
+/* ── Diagramy: edytor „ołówkowy" na pełnym ekranie pod górnym paskiem ── */
+.diag-wrap {
+  position: fixed; top: 3.75rem; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column; background: var(--color-ink);
+}
+.diag-bar {
+  display: flex; align-items: center; gap: var(--space-lg); flex-wrap: wrap;
+  padding: .5rem var(--container-pad);
+  border-bottom: 1px solid var(--color-line-dark);
+  background: var(--color-ink-2, color-mix(in oklch, var(--color-ink) 88%, white));
+}
+.diag-bar__group { display: flex; align-items: center; gap: var(--space-xs); }
+.diag-bar__right { margin-left: auto; gap: var(--space-md); }
+.diag-select {
+  background: var(--color-ink-3); color: var(--color-text-inv);
+  border: 1px solid var(--color-line-dark); border-radius: var(--radius-btn);
+  font: inherit; font-size: var(--text-s); padding: .35rem .6rem; max-width: 16rem;
+}
+.diag-tools { border: 1px solid var(--color-line-dark); border-radius: var(--radius-btn); padding: 2px; }
+.diag-tool {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 28px; border: 0; border-radius: calc(var(--radius-btn) - 2px);
+  background: transparent; color: var(--color-text-inv-2); cursor: pointer;
+}
+.diag-tool:hover { background: var(--color-ink-3); color: var(--color-text-inv); }
+.diag-tool.is-active { background: var(--color-accent); color: var(--color-ink); }
+.diag-tool svg { width: 16px; height: 16px; }
+.diag-hint { font-size: var(--text-caption); color: var(--color-text-inv-3); }
+.diag-canvas-wrap { position: relative; flex: 1; overflow: hidden; touch-action: none; }
+.diag-canvas-wrap canvas { display: block; }
+.diag-textedit {
+  position: absolute; z-index: 5; resize: none; overflow: hidden;
+  background: transparent; border: 1px dashed color-mix(in oklch, var(--color-accent) 60%, transparent);
+  border-radius: 4px; outline: none; color: var(--color-text-inv);
+  font-family: 'Caveat', cursive; line-height: 1.2; text-align: center; padding: 2px 4px;
+}
+@media (max-width: 720px) { .diag-hint { display: none; } }
