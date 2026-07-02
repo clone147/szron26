@@ -28,6 +28,25 @@ const textEl = $('#diag-text');
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
+/* ── paleta kresek zależna od motywu strefy (body[data-theme]) ── */
+const PAL_DARK = {
+  grid: 'rgba(255,255,255,.07)', ink: 'rgba(235,235,240,.92)', inkSoft: 'rgba(235,235,240,.5)',
+  inkThumb: 'rgba(235,235,240,.85)', text: 'rgba(235,235,240,.95)', muted: 'rgba(255,255,255,.25)',
+  sel: 'oklch(83% 0.15 90)', selSoft: 'oklch(83% 0.15 90 / .6)',
+};
+const PAL_LIGHT = {
+  grid: 'rgba(0,0,0,.09)', ink: 'rgba(32,36,46,.92)', inkSoft: 'rgba(32,36,46,.5)',
+  inkThumb: 'rgba(32,36,46,.85)', text: 'rgba(32,36,46,.95)', muted: 'rgba(0,0,0,.3)',
+  sel: 'oklch(55% 0.14 90)', selSoft: 'oklch(55% 0.14 90 / .6)',
+};
+const pal = () => (document.body.dataset.theme === 'light' ? PAL_LIGHT : PAL_DARK);
+
+// przełączenie motywu → przerysowanie edytora i miniatur galerii
+new MutationObserver(() => {
+  if (!$('#diag-editor').hidden) render();
+  if (!$('#diag-gallery').hidden) renderGallery();
+}).observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+
 /* ── „ołówkowe" rysowanie: seedowany PRNG, JEDNA falująca kreska ── */
 function mulberry32(a) {
   return () => {
@@ -104,7 +123,7 @@ function render() {
   const W = canvas.width / dpr, H = canvas.height / dpr;
 
   // kropkowana siatka tła
-  ctx.fillStyle = 'rgba(255,255,255,.07)';
+  ctx.fillStyle = pal().grid;
   const step = 24 * camera.z;
   if (step > 8) {
     const ox = ((-camera.x * camera.z) % step + step) % step;
@@ -121,13 +140,13 @@ function render() {
 
   for (const s of shapes) {
     const sel = s.id === selectedId;
-    drawShape(ctx, s, sel ? 'oklch(83% 0.15 90)' : 'rgba(235,235,240,.92)');
+    drawShape(ctx, s, sel ? pal().sel : pal().ink);
     if (s.type !== 'arrow' && s.text && s.id !== editingId) drawText(ctx, s);
     if (s.type === 'text' && sel) { // pole tekstowe: delikatna ramka tylko przy zaznaczeniu
       ctx.save();
       ctx.setLineDash([4 / camera.z, 4 / camera.z]);
       ctx.lineWidth = 1 / camera.z;
-      ctx.strokeStyle = 'oklch(83% 0.15 90 / .6)';
+      ctx.strokeStyle = pal().selSoft;
       ctx.strokeRect(s.x, s.y, s.w, s.h);
       ctx.restore();
     }
@@ -135,7 +154,7 @@ function render() {
   }
   // podgląd rysowanego kształtu
   if (drag?.mode === 'draw') {
-    ctx.strokeStyle = 'rgba(235,235,240,.5)';
+    ctx.strokeStyle = pal().inkSoft;
     const rnd = mulberry32(drag.seed);
     const { x, y, w, h } = drag;
     if (drag.tool === 'rect') sketchRect(ctx, Math.min(x, x + w), Math.min(y, y + h), Math.abs(w), Math.abs(h), rnd);
@@ -151,7 +170,7 @@ function render() {
 }
 
 function drawText(g, s) {
-  g.fillStyle = 'rgba(235,235,240,.95)';
+  g.fillStyle = pal().text;
   g.font = `500 ${FONT}px Caveat, cursive`;
   g.textAlign = 'center';
   g.textBaseline = 'middle';
@@ -178,7 +197,7 @@ function handlesFor(s) {
   return [{ k: 'se', x: s.x + s.w, y: s.y + s.h }];
 }
 function drawHandles(s) {
-  ctx.fillStyle = 'oklch(83% 0.15 90)';
+  ctx.fillStyle = pal().sel;
   for (const h of handlesFor(s)) {
     ctx.beginPath();
     ctx.arc(h.x, h.y, 4.5 / camera.z, 0, Math.PI * 2);
@@ -411,7 +430,7 @@ function drawThumb(cv, shs) {
   g.scale(dpr, dpr);
   const w = W / dpr, h = H / dpr;
   if (!shs.length) {
-    g.fillStyle = 'rgba(255,255,255,.25)';
+    g.fillStyle = pal().muted;
     g.font = '500 15px Caveat, cursive';
     g.textAlign = 'center';
     g.fillText('pusty diagram', w / 2, h / 2 + 5);
@@ -429,7 +448,7 @@ function drawThumb(cv, shs) {
   g.lineCap = 'round'; g.lineJoin = 'round';
   g.lineWidth = 1.6 / sc;
   for (const s of shs) {
-    drawShape(g, s, 'rgba(235,235,240,.85)');
+    drawShape(g, s, pal().inkThumb);
     if (s.type !== 'arrow' && s.text) drawText(g, s);
   }
 }
