@@ -584,6 +584,70 @@ async function createDiagram(title = null) {
   openEditor(data.id);
 }
 
+/* ── import diagramu z JSON ── */
+// Akceptuje: {title?, shapes:[...]}, {title?, data:{shapes:[...]}} albo gołą tablicę kształtów.
+function sanitizeShapes(raw) {
+  const num = (v) => (Number.isFinite(+v) ? +v : null);
+  const out = [];
+  const ids = new Set();
+  for (const r of Array.isArray(raw) ? raw : []) {
+    if (!r || !['rect', 'arrow', 'text'].includes(r.type)) continue;
+    let x = num(r.x), y = num(r.y), w = num(r.w), h = num(r.h);
+    if (x === null || y === null || w === null || h === null) continue;
+    if (r.type !== 'arrow') { // rect/text trzymamy znormalizowane: w,h > 0
+      if (w < 0) { x += w; w = -w; }
+      if (h < 0) { y += h; h = -h; }
+      w = Math.max(24, w); h = Math.max(24, h);
+    }
+    const s = {
+      id: typeof r.id === 'string' && r.id ? r.id : uid(),
+      type: r.type, x, y, w, h,
+      seed: Number.isInteger(r.seed) ? r.seed : (Math.random() * 1e9) | 0,
+    };
+    if (ids.has(s.id)) s.id = uid();
+    ids.add(s.id);
+    if (s.type !== 'arrow') s.text = typeof r.text === 'string' ? r.text : '';
+    else {
+      if (typeof r.startBind === 'string') s.startBind = r.startBind;
+      if (typeof r.endBind === 'string') s.endBind = r.endBind;
+    }
+    out.push(s);
+  }
+  for (const s of out) { // bindy do nieistniejących obiektów precz
+    if (s.startBind && !out.some((o) => o.id === s.startBind && o.type !== 'arrow')) delete s.startBind;
+    if (s.endBind && !out.some((o) => o.id === s.endBind && o.type !== 'arrow')) delete s.endBind;
+  }
+  return out;
+}
+
+function importDiagram() {
+  const box = openModal(`
+    <div class="strefa-modal__body">
+      <h3 style="margin:0 0 var(--space-md)">Import diagramu z JSON</h3>
+      <textarea class="strefa-input" id="dg-json" rows="12" spellcheck="false" style="font-family:monospace;font-size:.8rem;resize:vertical"
+        placeholder='{"title":"Mój diagram","shapes":[{"type":"rect","x":0,"y":0,"w":300,"h":140,"text":"Hello"},{"type":"arrow","x":150,"y":150,"w":0,"h":120}]}'></textarea>
+      <div class="strefa-actions-row" style="margin-top:var(--space-lg)">
+        <button class="strefa-btn strefa-btn--ghost" data-no>Anuluj</button>
+        <button class="strefa-btn strefa-btn--accent" data-yes>Importuj</button>
+      </div>
+    </div>`);
+  box.querySelector('[data-no]').addEventListener('click', closeModal);
+  box.querySelector('[data-yes]').addEventListener('click', async () => {
+    let parsed;
+    try { parsed = JSON.parse(box.querySelector('#dg-json').value); }
+    catch (e) { toast('Niepoprawny JSON', e.message, 'err'); return; }
+    const rawShapes = Array.isArray(parsed) ? parsed : parsed?.shapes ?? parsed?.data?.shapes;
+    const shs = sanitizeShapes(rawShapes);
+    if (!shs.length) { toast('Pusty import', 'Nie znaleziono żadnego poprawnego kształtu (rect/arrow/text).', 'err'); return; }
+    const title = (typeof parsed?.title === 'string' && parsed.title.trim()) || 'Import JSON';
+    const { data, error } = await sb.from('diagrams').insert({ title, data: { shapes: shs } }).select().single();
+    if (error) { toast('Błąd importu', error.message, 'err'); return; }
+    closeModal();
+    toast('Zaimportowano', `„${title}" — ${shs.length} kształtów`);
+    openEditor(data.id);
+  });
+}
+
 function promptTitle(heading, initial) {
   return new Promise((resolve) => {
     const box = openModal(`
@@ -624,6 +688,7 @@ $('#btn-delete').addEventListener('click', async () => {
   showGallery();
 });
 document.querySelectorAll('.diag-tool').forEach((b) => b.addEventListener('click', () => setTool(b.dataset.tool)));
+$('#btn-import')?.addEventListener('click', importDiagram);
 
 /* ── start ── */
 (async () => {
