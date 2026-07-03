@@ -11,6 +11,7 @@ const faq = [
   { q: 'Co z bezpieczeństwem naszych danych?', a: 'Wasz kod nie idzie do publicznych modeli. Dla branż regulowanych — Bedrock w AWS, dane w Waszej VPC. Dla obronności i wrażliwego embedded — lokalne modele (Ollama, vLLM) na Waszych serwerach. Audit log każdej interakcji z AI. NDA podpisujemy przed pierwszą rozmową.' },
   { q: 'Co jeśli zespół nie kupi tej zmiany?', a: 'Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny". Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. Opór znika, gdy programiści widzą, że dostarczają szybciej. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.' },
   { q: 'Jak zmierzymy efekt?', a: 'DORA metrics jako baseline w tygodniu 1: czas od ticketu do PR, czas merge, bug escape rate, pokrycie testami. Mierzymy ponownie w tygodniu 12. Raport ROI dla zarządu — dashboard z twardymi liczbami.' },
+  { q: 'Rynek AI zmienia się co kwartał. Skąd pewność, że wybierzecie narzędzia, które się utrzymają?', a: 'Dobór technologii to nasz zawód od 25 lat — przeszliśmy zmiany platform od Delphi, przez C++ i mobile, po agentów, i widzieliśmy, które wybory firmy spłacały latami. Z agentami pracujemy w produkcji od premiery Claude Code, więc koszt prób i błędów ponieśliśmy u siebie, nie u klientów. A program kończymy tak, żeby zespół sam umiał ocenić i przyjąć kolejne narzędzie — przewaga zostaje u Was, nie w naszym cenniku.' },
   { q: 'Ile to kosztuje?', a: 'Programy kwartalne nie są dla każdej firmy. Stała opłata kwartalna, zamknięty zakres, bez T&amp;M. Kwotę ustalamy po diagnozie i podajemy mailem w 48h.' },
   { q: 'Czy stara aplikacja będzie działać w trakcie pilota?', a: 'Tak. Pilot wchodzi obok: dwa systemy równolegle, moduł po module, testy regresyjne na danych z produkcji. Wasza baza danych zostaje bez zmian.' },
   { q: 'Czy to działa przy zespole 50+ osób?', a: 'Tak — falami. Nie szkolimy 50 osób naraz. Zaczynamy od jednego zespołu (5–10 osób) i pilota, wzorce zapisujemy w CLAUDE.md i standardach repo, a przeszkoleni programiści zostają championami kolejnych fal. Druga fala kosztuje mniej niż pierwsza, trzecia mniej niż druga.' },
@@ -131,6 +132,27 @@ const faq = [
           </article>
         </div>
         <p class="now-note rv">Większość rynku zatrzymała się na autouzupełnianiu i czacie z AI. My uczymy zespoły programowania intencyjnego: programista zleca agentowi zadanie — intencję, kontekst, kryteria odbioru — i ocenia wynik. Pełną autonomię, którą zapowiadają producenci modeli, wykorzystają te zespoły, które już dziś są w tym biegłe. Kwartał treningu teraz jest wart więcej niż rok doganiania później.</p>
+        <div class="industries rv">
+          <p class="eyebrow">Przewaga, która zostaje u Was</p>
+          <div class="industries__grid">
+            <article>
+              <h3>Dobór technologii bez prób i błędów</h3>
+              <p>Przeszliśmy kilka zmian platform — od Delphi, przez C++ i mobile, po agentów. Wiemy, które narzędzia przetrwają, a które są modą na kwartał. Wasza konkurencja będzie to sprawdzać na własnych budżetach.</p>
+            </article>
+            <article>
+              <h3>Trzy lata z agentami w produkcji</h3>
+              <p>Pracujemy z LLM-ami od premiery Claude Code. Ślepe uliczki mamy za sobą — Wasz zespół startuje z workflow, do którego rynek dopiero będzie dochodził.</p>
+            </article>
+            <article>
+              <h3>Narzędzia, których nie kupicie z półki</h3>
+              <p>DEVLens do pomiaru zespołów, własne serwery MCP (m.in. open-source do IBM DB2), szablony CLAUDE.md sprawdzone we wdrożeniach. Zostają u Was po programie.</p>
+            </article>
+            <article>
+              <h3>Wzorce z Waszej branży, nie z prezentacji</h3>
+              <p>Legacy rozwijane 20–30 lat, embedded, płatności, energetyka — znamy je od środka. Zespół dostaje wzorce z realnych wdrożeń, nie ogólne szkolenie z AI.</p>
+            </article>
+          </div>
+        </div>
       </div>
     </div>
   </section>
