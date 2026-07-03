@@ -458,7 +458,9 @@ document.addEventListener('keydown', (e) => {
     selectedId = null;
     scheduleSave();
     render();
-  } else if (e.key === 'v' || e.key === 'V') setTool('select');
+  } else if (e.key === 'ArrowLeft') navDiagram(-1);
+  else if (e.key === 'ArrowRight') navDiagram(1);
+  else if (e.key === 'v' || e.key === 'V') setTool('select');
   else if (e.key === 'r' || e.key === 'R') setTool('rect');
   else if (e.key === 'a' || e.key === 'A') setTool('arrow');
   else if (e.key === 't' || e.key === 'T') setTool('text');
@@ -572,6 +574,16 @@ async function openEditor(id) {
   $('#diag-editor').hidden = false;
   setTool('select');
   resize();
+}
+
+// przejście na sąsiedni diagram (kolejność jak w galerii); dir = -1 (←) / +1 (→), z zawinięciem
+async function navDiagram(dir) {
+  if (!current || diagrams.length < 2) return;
+  const i = diagrams.findIndex((d) => d.id === current.id);
+  const next = diagrams[((i < 0 ? 0 : i) + dir + diagrams.length) % diagrams.length];
+  if (!next || next.id === current.id) return;
+  if (dirty) await saveNow();
+  openEditor(next.id);
 }
 
 async function createDiagram(title = null) {
@@ -689,6 +701,8 @@ $('#btn-delete').addEventListener('click', async () => {
 });
 document.querySelectorAll('.diag-tool').forEach((b) => b.addEventListener('click', () => setTool(b.dataset.tool)));
 $('#btn-import')?.addEventListener('click', importDiagram);
+$('#btn-prev').addEventListener('click', () => navDiagram(-1));
+$('#btn-next').addEventListener('click', () => navDiagram(1));
 
 /* ── start ── */
 (async () => {
