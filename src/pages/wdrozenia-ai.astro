@@ -8,7 +8,7 @@ import CtaBand from '../components/CtaBand.astro';
 // FAQ — numeracja 01…NN generowana w <Faq />
 const faq = [
   { q: 'Na czyim kodzie pracujemy podczas warsztatu?', a: 'Na waszym — bierzemy realne taski z Jiry i robimy je razem z AI, nie na sztucznych przykładach. Dzięki temu efekty widać od pierwszego tygodnia, a zespół od razu uczy się pracy na własnym projekcie.' },
-  { q: 'Co zostaje u nas po zakończeniu programu?', a: 'Skonfigurowane narzędzia, dokumentacja procesów i 30 dni wsparcia. Celem jest autonomia — żebyście jechali dalej beze mnie. Agent AI działa wtedy jak drugi mózg programisty.' },
+  { q: 'Co zostaje u nas po zakończeniu programu?', a: 'Skonfigurowane narzędzia, dokumentacja procesów i 30 dni wsparcia. Celem jest autonomia — żebyście jechali dalej bez nas. Agent AI działa wtedy jak drugi mózg programisty.' },
   { q: 'Czy kod musi wychodzić na zewnątrz?', a: 'Nie musi. Tam, gdzie to ważne, stawiamy lokalne modele AI w waszej serwerowni — pełna kontrola nad danymi, zgodność z NIS2 i wymaganiami branżowymi, a skuteczność porównywalna z modelami w chmurze.' },
 ];
 ---
@@ -17,7 +17,7 @@ const faq = [
   description="Co dostajecie z treningu AI: szybsze kodowanie na waszym kodzie i taskach, mierzalne efekty od pierwszego tygodnia, narzędzia i dokumentacja, które zostają."
   eyebrow="Coaching Sprint · efekty od pierwszego tygodnia"
   heading="Co konkretnie dostaniecie z treningu AI."
-  lead="Wasi programiści uczą się pracować z AI na waszym kodzie, na waszych taskach — z mierzalnymi efektami od pierwszego tygodnia. Pokazuję, co realnie pomaga, zostawiam skonfigurowane narzędzia i dokumentację, a celem jest, żebyście jechali dalej beze mnie."
+  lead="Wasi programiści uczą się pracować z AI na waszym kodzie, na waszych taskach — z mierzalnymi efektami od pierwszego tygodnia. Pokazujemy, co realnie pomaga, zostawiamy skonfigurowane narzędzia i dokumentację, a celem jest, żebyście jechali dalej bez nas."
   heroImage="/img/sub/wdrozenia-ai.webp"
   heroAlt="Zazębiające się oszronione koła zębate z pomarańczową energią"
 >
@@ -38,9 +38,9 @@ const faq = [
           <figcaption><strong>The New York Times</strong> — maj 2025</figcaption>
         </figure>
         <article class="card-tile rv" style="--rv-d:.1s">
-          <p class="eyebrow">Skąd to wiem</p>
+          <p class="eyebrow">Skąd to wiemy</p>
           <h3>Z realnych projektów, nie z obietnic.</h3>
-          <p>Pracowałem z AI na produkcyjnym kodzie w różnych branżach: fintech, IoT, embedded, mobile, e-commerce. Poniżej konkretne projekty i konkretne liczby.</p>
+          <p>Pracowaliśmy z AI na produkcyjnym kodzie w różnych branżach: fintech, IoT, embedded, mobile, e-commerce. Poniżej konkretne projekty i konkretne liczby.</p>
         </article>
       </div>
     </div>
@@ -80,10 +80,10 @@ const faq = [
     <div class="container">
       <SectHead eyebrow="03 / Proces · Jak pracujemy z Waszym zespołem" title="Jak to wygląda z perspektywy Waszego zespołu." id="proces" />
       <div class="steps">
-        <article class="step rv"><p class="eyebrow">01 · Diagnoza</p><h3>Sprawdzam, co Was spowalnia</h3><p>Patrzę na wasze daily, review i pipeline. Pytam devów, co ich wkurza. Zwykle po jednym dniu wiem, gdzie jest problem.</p></article>
-        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Dobór narzędzi</p><h3>Szukam najlepszego narzędzia</h3><p>Testuję na waszym kodzie i wybieram to, co realnie pomaga: GitHub Copilot, agenci AI, ChatGPT / GPT-4, Cursor IDE.</p></article>
+        <article class="step rv"><p class="eyebrow">01 · Diagnoza</p><h3>Sprawdzamy, co Was spowalnia</h3><p>Patrzymy na wasze daily, review i pipeline. Pytamy devów, co ich wkurza. Zwykle po jednym dniu wiemy, gdzie jest problem.</p></article>
+        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Dobór narzędzi</p><h3>Szukamy najlepszego narzędzia</h3><p>Testujemy na waszym kodzie i wybieramy to, co realnie pomaga: GitHub Copilot, agenci AI, ChatGPT / GPT-4, Cursor IDE.</p></article>
         <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Warsztat</p><h3>Na waszym kodzie</h3><p>Bierzemy wasze taski z Jiry i robimy je razem z AI: Context Engineering, Self-Improving Loops, integracja MCP Tools, konfiguracja AGENTS.md.</p></article>
-        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Oddaję klucze</p><h3>Jedziecie dalej beze mnie</h3><p>Zostawiam skonfigurowane narzędzia, dokumentację i 30 dni wsparcia. Cel jest prosty — żebyście jechali dalej beze mnie.</p></article>
+        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Oddajemy klucze</p><h3>Jedziecie dalej bez nas</h3><p>Zostawiamy skonfigurowane narzędzia, dokumentację i 30 dni wsparcia. Cel jest prosty — żebyście jechali dalej bez nas.</p></article>
       </div>
     </div>
   </section>
@@ -113,7 +113,7 @@ const faq = [
   <CtaBand
     eyebrow="Kontakt"
     heading="Chcecie zobaczyć różnicę? 30 minut, zero sprzedaży."
-    text="Porozmawiajmy o waszym zespole — powiem wprost, co ma sens, a co nie. Praktyka na waszym kodzie, budowanie kompetencji AI w zespole, widoczna zmiana w pierwszych tygodniach."
+    text="Porozmawiajmy o waszym zespole — powiemy wprost, co ma sens, a co nie. Praktyka na waszym kodzie, budowanie kompetencji AI w zespole, widoczna zmiana w pierwszych tygodniach."
     btnLabel="Umów Coaching Sprint"
   />
 </Interior>
