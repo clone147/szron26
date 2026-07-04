@@ -128,3 +128,23 @@
   }, { rootMargin: "0px 0px -8% 0px", threshold: 0.1 });
   targets.forEach(function (el) { io.observe(el); });
 })();
+
+/* SZRON — powiadomienia email z formularzy (Resend przez Supabase Edge Function).
+   Nie przerywa natywnego POST do Netlify Forms (archiwum zgłoszeń) — fetch keepalive leci równolegle. */
+(function () {
+  "use strict";
+  document.querySelectorAll("form[data-netlify]").forEach(function (form) {
+    form.addEventListener("submit", function () {
+      var data = {};
+      new FormData(form).forEach(function (v, k) { data[k] = v; });
+      try {
+        fetch("https://sttluvcbucpxzbcsuigw.supabase.co/functions/v1/szron-site-form", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ form: form.getAttribute("name"), data: data }),
+          keepalive: true,
+        });
+      } catch (e) { /* email jest best-effort; zgłoszenie i tak zapisuje Netlify */ }
+    });
+  });
+})();
