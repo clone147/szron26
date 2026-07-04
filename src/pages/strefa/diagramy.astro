@@ -24,6 +24,12 @@ import Strefa from '../../layouts/Strefa.astro';
         <button class="strefa-iconbtn" id="btn-delete" type="button" title="Usuń diagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
         <button class="strefa-iconbtn" id="btn-prev" type="button" title="Poprzedni diagram (←)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
         <button class="strefa-iconbtn" id="btn-next" type="button" title="Następny diagram (→)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        <button class="strefa-iconbtn" id="btn-lock" type="button" title="Zablokuj edycję" aria-pressed="false"></button>
+      </div>
+      <div class="diag-bar__group diag-tools diag-zoom" role="toolbar" aria-label="Zoom">
+        <button class="diag-tool" id="btn-zoom-out" type="button" title="Oddal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+        <button class="diag-tool diag-zoom__pct" id="btn-zoom-100" type="button" title="Resetuj zoom (100%)">100%</button>
+        <button class="diag-tool" id="btn-zoom-in" type="button" title="Przybliż"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
       </div>
       <div class="diag-bar__group diag-tools" role="toolbar" aria-label="Narzędzia">
         <button class="diag-tool" data-tool="select" type="button" title="Zaznaczanie (V)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 3 7.5 18 2.6-7.9L22 10.5Z"/></svg></button>

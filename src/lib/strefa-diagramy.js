@@ -19,6 +19,7 @@ let drag = null;            // operacja myszy w toku
 let editingId = null;       // rect z otwartym edytorem tekstu
 let saveTimer = null;
 let dirty = false;
+let locked = false;         // kłódka: diagram tylko do odczytu (stan trzymany w data.locked)
 
 const FONT = 36, LINE_H = 43; // tekst w prostokątach (Caveat)
 
@@ -294,6 +295,10 @@ canvas.addEventListener('pointerdown', (e) => {
   if (editingId) commitText();
   canvas.setPointerCapture(e.pointerId);
   const p = toWorld(e);
+  if (locked) { // zablokowany diagram: tylko przesuwanie widoku
+    drag = { mode: 'pan', sx: e.clientX, sy: e.clientY, cx: camera.x, cy: camera.y };
+    return;
+  }
   if (tool === 'rect' || tool === 'arrow' || tool === 'text') {
     drag = { mode: 'draw', tool, x: p.x, y: p.y, w: 0, h: 0, seed: (Math.random() * 1e9) | 0 };
     return;
@@ -371,24 +376,32 @@ canvas.addEventListener('pointerup', () => {
 });
 
 canvas.addEventListener('dblclick', (e) => {
+  if (locked) return;
   const s = hitShape(toWorld(e));
   if (s && s.type !== 'arrow') startTextEdit(s);
 });
 
-// scroll = przesuwanie, Ctrl/⌘+scroll = zoom
+/* ── zoom ── */
+function centerWorld() {
+  const r = canvas.getBoundingClientRect();
+  return { x: r.width / 2 / camera.z + camera.x, y: r.height / 2 / camera.z + camera.y };
+}
+// zmienia zoom trzymając punkt p (świat) w miejscu na ekranie; domyślnie środek widoku
+function setZoom(z, p = centerWorld()) {
+  z = Math.max(0.25, Math.min(3, z));
+  camera.x = p.x - (p.x - camera.x) * (camera.z / z);
+  camera.y = p.y - (p.y - camera.y) * (camera.z / z);
+  camera.z = z;
+  updateZoomLabel();
+  render();
+}
+function updateZoomLabel() { $('#btn-zoom-100').textContent = Math.round(camera.z * 100) + '%'; }
+
+// scroll = zoom (kursor jako punkt odniesienia)
 wrap.addEventListener('wheel', (e) => {
   e.preventDefault();
-  if (e.ctrlKey || e.metaKey) {
-    const p = toWorld(e);
-    const z = Math.max(0.25, Math.min(3, camera.z * (e.deltaY < 0 ? 1.08 : 0.92)));
-    camera.x = p.x - (p.x - camera.x) * (camera.z / z);
-    camera.y = p.y - (p.y - camera.y) * (camera.z / z);
-    camera.z = z;
-  } else {
-    camera.x += e.deltaX / camera.z;
-    camera.y += e.deltaY / camera.z;
-  }
-  render();
+  if (editingId) commitText();
+  setZoom(camera.z * (e.deltaY < 0 ? 1.08 : 0.92), toWorld(e));
 }, { passive: false });
 
 /* ── edycja tekstu w prostokącie ── */
@@ -436,6 +449,11 @@ textEl.addEventListener('keydown', (e) => {
 let clipboard = null; // skopiowany kształt (⌘C/⌘V)
 document.addEventListener('keydown', (e) => {
   if (!current || editingId || e.target.matches('input, textarea, select')) return;
+  if (locked) { // zablokowany: tylko nawigacja
+    if (e.key === 'ArrowLeft') navDiagram(-1);
+    else if (e.key === 'ArrowRight') navDiagram(1);
+    return;
+  }
   if ((e.metaKey || e.ctrlKey) && (e.key === 'c' || e.key === 'C')) {
     const s = shapes.find((x) => x.id === selectedId);
     if (s) { clipboard = { ...s }; e.preventDefault(); }
@@ -483,7 +501,7 @@ function scheduleSave() {
 async function saveNow() {
   if (!current || !dirty) return;
   dirty = false;
-  current.data = { shapes };
+  current.data = { shapes, ...(locked && { locked: true }) };
   const { error } = await sb.from('diagrams')
     .update({ data: current.data, updated_at: new Date().toISOString() })
     .eq('id', current.id);
@@ -580,6 +598,9 @@ async function openEditor(id) {
   $('#diag-title').textContent = data.title;
   $('#diag-gallery').hidden = true;
   $('#diag-editor').hidden = false;
+  locked = !!data.data?.locked;
+  applyLock();
+  updateZoomLabel();
   setTool('select');
   resize();
 }
@@ -707,7 +728,38 @@ $('#btn-delete').addEventListener('click', async () => {
   dirty = false;
   showGallery();
 });
-document.querySelectorAll('.diag-tool').forEach((b) => b.addEventListener('click', () => setTool(b.dataset.tool)));
+/* ── kłódka: blokada edycji diagramu ── */
+const ICON_LOCKED = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+const ICON_UNLOCKED = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.8-1.3"/></svg>';
+function applyLock() {
+  const btn = $('#btn-lock');
+  btn.innerHTML = locked ? ICON_LOCKED : ICON_UNLOCKED;
+  btn.title = locked ? 'Diagram zablokowany — kliknij, by odblokować' : 'Zablokuj edycję';
+  btn.setAttribute('aria-pressed', String(locked));
+  btn.classList.toggle('is-locked', locked);
+  document.querySelectorAll('.diag-tool[data-tool]').forEach((b) => { b.disabled = locked; });
+  $('#btn-rename').disabled = locked;
+  $('#btn-delete').disabled = locked;
+  if (locked) {
+    if (editingId) commitText();
+    selectedId = null;
+    setTool('select');
+    render();
+  }
+}
+$('#btn-lock').addEventListener('click', async () => {
+  if (!current) return;
+  locked = !locked;
+  applyLock();
+  current.data = { shapes, ...(locked && { locked: true }) };
+  const { error } = await sb.from('diagrams').update({ data: current.data }).eq('id', current.id);
+  if (error) { toast('Błąd', error.message, 'err'); }
+});
+
+document.querySelectorAll('.diag-tool[data-tool]').forEach((b) => b.addEventListener('click', () => setTool(b.dataset.tool)));
+$('#btn-zoom-in').addEventListener('click', () => setZoom(camera.z * 1.2));
+$('#btn-zoom-out').addEventListener('click', () => setZoom(camera.z / 1.2));
+$('#btn-zoom-100').addEventListener('click', () => setZoom(1));
 $('#btn-import')?.addEventListener('click', importDiagram);
 $('#btn-prev').addEventListener('click', () => navDiagram(-1));
 $('#btn-next').addEventListener('click', () => navDiagram(1));

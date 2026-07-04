@@ -804,6 +804,13 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 .diag-tool:hover { background: var(--color-ink-3); color: var(--color-text-inv); }
 .diag-tool.is-active { background: var(--color-accent); color: var(--color-ink); }
 .diag-tool svg { width: 16px; height: 16px; }
+.diag-tool:disabled { opacity: .35; cursor: default; pointer-events: none; }
+.diag-zoom__pct {
+  width: auto; min-width: 44px; padding: 0 6px;
+  font-size: var(--text-caption); font-variant-numeric: tabular-nums;
+}
+.strefa-iconbtn:disabled { opacity: .35; cursor: default; pointer-events: none; }
+#btn-lock.is-locked { background: var(--color-accent-soft); color: var(--color-accent); }
 .diag-hint { font-size: var(--text-caption); color: var(--color-text-inv-3); }
 .diag-canvas-wrap { position: relative; flex: 1; overflow: hidden; touch-action: none; }
 .diag-canvas-wrap canvas { display: block; }
