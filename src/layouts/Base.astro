@@ -1,6 +1,16 @@
 ---
 import '../styles/fonts.css';
 import '../styles/main.css';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+
+// Cache-busting: /js/* ma na Netlify roczny immutable cache, a main.js nie ma
+// hasha w nazwie — wersjonujemy query paramem liczonym z treści przy buildzie.
+const mainJsHash = createHash('md5')
+  .update(readFileSync(new URL('../../public/js/main.js', import.meta.url)))
+  .digest('hex')
+  .slice(0, 10);
+
 const {
   title = 'Wdrożenie AI w zespole programistów — 2–4× szybciej | SZRON',
   description = 'Wdrażamy AI i programowanie agentowe (Claude Code, agenci, MCP) w zespołach IT dużych firm — na Waszym kodzie. Szkolenie, agenci w codziennej pracy i pilot modernizacji w dwa kwartały. Efekt mierzony metrykami DORA.',
@@ -79,6 +89,6 @@ const orgSchema = {
 </head>
 <body>
   <slot />
-  <script src="/js/main.js" defer></script>
+  <script src={`/js/main.js?v=${mainJsHash}`} defer></script>
 </body>
 </html>
