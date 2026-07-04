@@ -1,6 +1,20 @@
 ---
 // Główna nawigacja SZRON — realne trasy + dropdown Akademia
 import { akademia } from '../data/akademia.mjs';
+import { execSync } from 'node:child_process';
+
+// Znacznik buildu (commit + czas buildu, Europe/Warsaw) — prawie niewidoczny
+// w toolbarze; służy tylko do sprawdzenia, że deploy na Netlify się wgrał.
+let buildSha = process.env.COMMIT_REF?.slice(0, 7);
+if (!buildSha) {
+  try { buildSha = execSync('git rev-parse --short HEAD').toString().trim(); }
+  catch { buildSha = 'dev'; }
+}
+const buildTime = new Intl.DateTimeFormat('pl-PL', {
+  timeZone: 'Europe/Warsaw', day: '2-digit', month: '2-digit',
+  hour: '2-digit', minute: '2-digit',
+}).format(new Date());
+const buildTag = `${buildSha} · ${buildTime}`;
 const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg><svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg></span>`;
 ---
 <header class="nav" id="nav">
@@ -8,6 +22,7 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
     <a class="logo" href="/" aria-label="SZRON — strona główna">
       <img src="/img/logo-dark.svg" alt="" width="105" height="26" />
     </a>
+    <span class="nav__build" aria-hidden="true">{buildTag}</span>
     <nav aria-label="Nawigacja główna">
       <ul class="nav__links">
         <li><a href="/metoda">Metoda</a></li>
@@ -80,6 +95,20 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
 </header>
 
 <style>
+  /* znacznik buildu — celowo prawie niewidoczny (deploy-check dla właściciela) */
+  .nav__build {
+    align-self: center;
+    margin-left: 0.5rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.02em;
+    color: currentColor;
+    opacity: 0.13;
+    user-select: all;
+    white-space: nowrap;
+    transition: opacity .2s ease;
+  }
+  .nav__build:hover { opacity: 0.85; }
+  @media (max-width: 64rem) { .nav__build { display: none; } }
   /* Inline login „Strefa" w nawigacji — tokeny Hallmark, ciemny panel */
   .nav-auth { position: relative; }
   .nav-auth__panel {
