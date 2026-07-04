@@ -133,7 +133,10 @@
    Nie przerywa natywnego POST do Netlify Forms (archiwum zgłoszeń) — fetch keepalive leci równolegle. */
 (function () {
   "use strict";
-  document.querySelectorAll("form[data-netlify]").forEach(function (form) {
+  /* Netlify po przetworzeniu usuwa data-netlify z serwowanego HTML — łapiemy po name. */
+  ["kontakt", "umow-rozmowe", "darmowy-audyt"].forEach(function (name) {
+    var form = document.querySelector('form[name="' + name + '"]');
+    if (!form) return;
     form.addEventListener("submit", function () {
       var data = {};
       new FormData(form).forEach(function (v, k) { data[k] = v; });
