@@ -28,15 +28,17 @@ const orgSchema = {
   '@context': 'https://schema.org',
   '@graph': [
     {
-      '@type': 'Organization',
+      '@type': ['Organization', 'ProfessionalService'],
       '@id': new URL('/#org', site).href,
       name: 'SZRON',
       legalName: 'SZRON Tomek Wojciechowski',
       url: site.href,
       logo: new URL('/img/logo.svg', site).href,
+      image: ogImageAbs,
       description: 'Transformacja zespołów IT i programowanie agentowe dla dużych firm.',
       email: 'tw@szron.tech',
       telephone: '+48505091200',
+      priceRange: '$$',
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'ul. Legionistów 12/1/B',
@@ -44,6 +46,16 @@ const orgSchema = {
         addressLocality: 'Rzeszów',
         addressCountry: 'PL',
       },
+      areaServed: { '@type': 'Country', name: 'Polska' },
+      hasMap: 'https://g.page/r/CVPGYD5OGvcNEBM',
+      openingHoursSpecification: [
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          opens: '07:00',
+          closes: '17:00',
+        },
+      ],
       founder: [
         { '@type': 'Person', name: 'Tomek Wojciechowski' },
         { '@type': 'Person', name: 'Maciej Stopa' },
