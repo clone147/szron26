@@ -871,7 +871,7 @@ h1, h2, h3, h4 {
   position: absolute; top: calc(100% + 0.85rem); left: 50%;
   transform: translateX(-50%) translateY(-6px);
   width: min(94vw, 40rem);
-  background: var(--color-glass); backdrop-filter: blur(14px);
+  background: oklch(17% 0.01 240 / 0.98); backdrop-filter: blur(14px);
   border: 1px solid var(--color-line-dark); border-radius: var(--radius-card);
   padding: var(--space-md);
   opacity: 0; visibility: hidden; pointer-events: none;
