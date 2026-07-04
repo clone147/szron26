@@ -4,6 +4,7 @@ import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import Faq from '../components/Faq.astro';
 import CtaBand from '../components/CtaBand.astro';
+import ShotGallery from '../components/ShotGallery.astro';
 
 // FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html)
 const faq = [
@@ -40,6 +41,11 @@ const faq = [
         <div><dt>Przejrzysty wgląd w efektywność<small>Wszystkie projekty w jednym miejscu</small></dt><dd>Agregacja danych z repozytoriów GitHub lub GitLab, intuicyjne dashboardy dla kadry zarządzającej, raporty wykonawcze gotowe do prezentacji i eksport danych do analizy offline.</dd></div>
         <div><dt>Bezpieczeństwo i prywatność<small>Wasze dane nigdy nie opuszczają przeglądarki</small></dt><dd>Tokeny dostępu trzymane tylko w przeglądarce użytkownika, zero wysyłania danych do zewnętrznych serwerów, pełna kontrola nad danymi analitycznymi i compliance korporacyjny out-of-the-box.</dd></div>
       </dl>
+      <ShotGallery items={[
+        { src: '/img/devlens/01-dashboard.webp', alt: 'Panel zespołu DevLens: 24,2 tys. zmian, 45 programistów, wykres produktywności zespołu z trendem +124%', caption: 'Panel zespołu — produktywność, ryzyko i aktywność 45 programistów w jednym widoku.' },
+        { src: '/img/devlens/06-aktywnosc-tygodniowa.webp', alt: 'Wykres aktywności tygodniowej top 10 programistów na przestrzeni roku', caption: 'Aktywność tygodniowa — kto pracuje regularnie, a kto zrywami. Top 5/10/20 lub cały zespół.' },
+        { src: '/img/devlens/09-projekty-breakdown.webp', alt: 'Profil programisty: kamienie milowe, rozkład zaangażowania w projekty i ostatnie zmiany w kodzie', caption: 'Profil programisty — kamienie milowe, rozkład pracy między projektami i ostatnie zmiany.' },
+      ]} />
     </div>
   </section>
 
@@ -79,6 +85,10 @@ const faq = [
           <p>Identyfikacja przeciążonych członków zespołu i obszarów wymagających wsparcia.</p>
         </article>
       </div>
+      <ShotGallery cols={2} items={[
+        { src: '/img/devlens/08-ryzyko-ciaglosci.webp', alt: 'Analiza ryzyka i ciągłości wiedzy: poziom ryzyka 3/10, koncentracja wiedzy, gotowość sukcesji, podsumowanie dla zarządu', caption: 'Analiza ryzyka i ciągłości wiedzy — Bus Factor rozbity na czynniki, z podsumowaniem dla zarządu.' },
+        { src: '/img/devlens/10-technologie-profile.webp', alt: 'Profile specjalizacji programistów: obszary pracy, kluczowe technologie i unikalna wiedza każdej osoby', caption: 'Profile specjalizacji — czym zajmuje się każdy programista i czyja wiedza jest unikalna.' },
+      ]} />
     </div>
   </section>
 
@@ -105,6 +115,9 @@ const faq = [
           <p>Automatyczna identyfikacja nietypowych wzorców wydajności i potencjalnych problemów.</p>
         </article>
       </div>
+      <ShotGallery cols={1} items={[
+        { src: '/img/devlens/07-prompty-ai.webp', alt: 'Widok Analiza AI: lista promptów wysłanych do agenta Claude Code pogrupowana w sesje i projekty', caption: 'Analiza AI — jak zespół realnie korzysta z agentów: prompty, sesje i projekty w jednym widoku.' },
+      ]} />
       <figure class="quote-card rv" style="margin-top:var(--space-2xl)">
         <blockquote>„Włączasz AI i dostajesz gotowe podsumowanie tygodnia lub kwartału. W języku, który rozumie zarząd — bez tłumaczenia z technicznego."</blockquote>
         <figcaption><strong>DevLens Pro</strong> — integracja z AI</figcaption>

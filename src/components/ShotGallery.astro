@@ -1,0 +1,140 @@
+---
+// Galeria screenshotów z lightboksem: klik w miniaturę powiększa na środek
+// ekranu (zamykanie: ×, ESC, klik w tło). items: [{src, alt, caption}]
+interface Item { src: string; alt: string; caption: string }
+const { items, cols = 3 } = Astro.props as { items: Item[]; cols?: number };
+---
+<div class="shot-grid rv" style={`--shot-cols:${cols}`}>
+  {items.map((it, i) => (
+    <figure class="shot" style={`--rv-d:${(i * 0.06).toFixed(2)}s`}>
+      <button type="button" class="shot-btn" data-shot-full={it.src} data-shot-alt={it.alt} aria-label={`Powiększ: ${it.caption}`}>
+        <img src={it.src} alt={it.alt} loading="lazy" decoding="async" />
+        <span class="shot-zoom" aria-hidden="true">⤢</span>
+      </button>
+      <figcaption>{it.caption}</figcaption>
+    </figure>
+  ))}
+</div>
+
+<style>
+  .shot-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--shot-cols, 3), 1fr);
+    gap: var(--space-lg);
+    margin-top: var(--space-2xl);
+  }
+  @media (max-width: 900px) { .shot-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .shot-grid { grid-template-columns: 1fr; } }
+
+  .shot { margin: 0; }
+  .shot-btn {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    cursor: zoom-in;
+    background: var(--color-paper-2);
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  :global(.sect--dark) .shot-btn { border-color: var(--color-line-dark); background: var(--color-ink-2); }
+  .shot-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 32px oklch(17% 0.01 240 / 0.18); }
+  .shot-btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+  .shot-btn img { display: block; width: 100%; height: auto; }
+  .shot-zoom {
+    position: absolute; right: .6rem; bottom: .6rem;
+    display: grid; place-items: center;
+    width: 2rem; height: 2rem;
+    border-radius: 50%;
+    background: var(--color-scrim);
+    color: var(--color-text-inv);
+    font-size: 1rem;
+    opacity: 0; transition: opacity .2s ease;
+  }
+  .shot-btn:hover .shot-zoom { opacity: 1; }
+  .shot figcaption {
+    margin-top: var(--space-xs);
+    font-size: var(--text-s, .875rem);
+    color: var(--color-text-2);
+  }
+  :global(.sect--dark) .shot figcaption { color: var(--color-text-inv-2); }
+</style>
+
+<style is:global>
+  .shot-lightbox {
+    position: fixed; inset: 0; z-index: 999;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: clamp(1rem, 4vw, 3rem);
+    background: oklch(17% 0.01 240 / 0.92);
+    cursor: zoom-out;
+    overflow: hidden;
+  }
+  .shot-lightbox.is-open { display: flex; animation: shot-fade .2s ease; }
+  @keyframes shot-fade { from { opacity: 0 } to { opacity: 1 } }
+  .shot-lightbox img {
+    max-width: 100%; max-height: calc(100vh - 2 * clamp(1rem, 4vw, 3rem));
+    width: auto; height: auto;
+    border-radius: var(--radius-card);
+    box-shadow: 0 24px 80px oklch(0% 0 0 / 0.5);
+    cursor: default;
+    animation: shot-pop .25s ease;
+  }
+  @keyframes shot-pop { from { transform: scale(.96); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+  .shot-lightbox-close {
+    position: absolute; top: 1rem; right: 1rem;
+    width: 2.75rem; height: 2.75rem;
+    display: grid; place-items: center;
+    border: 1px solid var(--color-line-dark);
+    border-radius: 50%;
+    background: var(--color-ink-2);
+    color: var(--color-text-inv);
+    font-size: 1.25rem; line-height: 1;
+    cursor: pointer;
+    transition: background .2s ease;
+  }
+  .shot-lightbox-close:hover { background: var(--color-ink-3); }
+  .shot-lightbox-close:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+</style>
+
+<script>
+  function setupShotLightbox() {
+    if (document.querySelector('.shot-lightbox')) return;
+    const box = document.createElement('div');
+    box.className = 'shot-lightbox';
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-modal', 'true');
+    box.setAttribute('aria-label', 'Podgląd zrzutu ekranu');
+    box.innerHTML = '<img alt=""><button type="button" class="shot-lightbox-close" aria-label="Zamknij podgląd">✕</button>';
+    document.body.appendChild(box);
+    const img = box.querySelector('img');
+    let lastFocus = null;
+
+    const open = (src, alt) => {
+      img.src = src; img.alt = alt || '';
+      box.classList.add('is-open');
+      document.documentElement.style.overflow = 'hidden';
+      lastFocus = document.activeElement;
+      box.querySelector('.shot-lightbox-close').focus();
+    };
+    const close = () => {
+      box.classList.remove('is-open');
+      img.src = '';
+      document.documentElement.style.overflow = '';
+      if (lastFocus) lastFocus.focus();
+    };
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-shot-full]');
+      if (btn) { open(btn.dataset.shotFull, btn.dataset.shotAlt); return; }
+      if (!box.classList.contains('is-open')) return;
+      if (e.target.closest('.shot-lightbox-close') || e.target === box) close();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && box.classList.contains('is-open')) close();
+    });
+  }
+  setupShotLightbox();
+</script>

@@ -4,6 +4,7 @@ import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import Faq from '../components/Faq.astro';
 import CtaBand from '../components/CtaBand.astro';
+import ShotGallery from '../components/ShotGallery.astro';
 
 // FAQ — numeracja 01…NN generowana w <Faq />
 const faq = [
@@ -85,6 +86,13 @@ const faq = [
         <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Szkolenie</p><h3>Praktyczne warsztaty</h3><p>Context Engineering i praca z agentami AI — na realnych zadaniach.</p></article>
         <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Pomiar</p><h3>Produktywność przed i po</h3><p>Mierzymy efekty i pokazujemy konkretny ROI.</p></article>
       </div>
+      <ShotGallery cols={2} items={[
+        { src: '/img/devlens/05-akceleracja.webp', alt: 'Raport wzrostu wydajności zespołu: średni wzrost tempa pracy +266,6%, analiza porównawcza przed/po dacie granicznej', caption: 'Pomiar z realnego wdrożenia — średni wzrost tempa pracy zespołu +266% po dacie wdrożenia AI.' },
+        { src: '/img/devlens/04-porownanie-przed-po.webp', alt: 'Analiza porównawcza przed/po dla programisty: tempo pracy +354,9%, produktywność netto, regularność +100,7%', caption: 'Analiza przed/po dla pojedynczego programisty — tempo pracy, regularność, produktywność netto.' },
+        { src: '/img/devlens/02-profil-velocity-wzrost.webp', alt: 'Profil programisty z wykresem efektywności rosnącym po wdrożeniu AI', caption: 'Profil programisty — wyraźny wzrost liczby zmian w kolejnych miesiącach pracy z agentami.' },
+        { src: '/img/devlens/03-profil-improving.webp', alt: 'Profil programisty z rosnącym trendem wydajności od daty wdrożenia oznaczonej na wykresie', caption: 'Data wdrożenia oznaczona na wykresie — widać moment, w którym zespół zaczął pracować z AI.' },
+      ]} />
+      <p class="rv" style="margin-top:var(--space-lg);color:var(--color-text-2);font-size:var(--text-s,.875rem)">Zrzuty z naszej platformy <a href="/devlens">DevLens Pro</a> — dane z realnego wdrożenia, zanonimizowane.</p>
     </div>
   </section>
 
