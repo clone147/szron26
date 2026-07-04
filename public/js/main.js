@@ -32,6 +32,10 @@
   }
 
   /* ── nagłówki: podział na słowa (reveal słowo po słowie) ── */
+  /* mniejsze nagłówki (karty, kroki, def-rows) też dostają ws */
+  document
+    .querySelectorAll(".card-tile h3, .step h3, .def-rows dt")
+    .forEach(function (el) { el.classList.add("ws"); });
   document.querySelectorAll(".ws").forEach(function (el) {
     if (reduceMotion) return;
     var delay = 0;
@@ -49,7 +53,7 @@
           var inner = document.createElement("span");
           inner.textContent = part;
           inner.style.transitionDelay = delay.toFixed(2) + "s";
-          delay += 0.06;
+          delay += 0.12;
           w.appendChild(inner);
           frag.appendChild(w);
         });

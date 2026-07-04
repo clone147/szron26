@@ -1151,7 +1151,7 @@ form [name="bot-field"], form label:has([name="bot-field"]), p.hidden, .hidden-f
 .ws .w > span {
   display: inline-block;
   transform: translateY(110%);
-  transition: transform 0.65s var(--ease-out);
+  transition: transform 1.2s var(--ease-out);
 }
 .ws.is-view .w > span { transform: none; }
 
