@@ -4,7 +4,7 @@
 - **Po przetestowaniu nowej funkcjonalności ZAWSZE wdrażaj na Netlify.** Nie zostawiaj zmian tylko lokalnie.
 - Komenda deployu (produkcja): `netlify deploy --prod --build`
   - CLI jest zalogowane (eveo.tomek@gmail.com), katalog podpięty do projektu **szron-new** przez `.netlify/state.json`.
-  - `--build` uruchamia `npm run build` → publikuje `dist/`. Site: https://szron-new.netlify.app
+  - `--build` uruchamia `npm run build` → publikuje `dist/`. Produkcja: **https://szron.tech** (domena podpięta do projektu szron-new; alias: https://szron-new.netlify.app)
 - Po deployu **pushuj commity** na git: remote `origin` = github.com/clone147/szron26, branch `main`.
 
 ## Architektura (skrót)
