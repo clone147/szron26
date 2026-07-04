@@ -140,13 +140,13 @@
     form.addEventListener("submit", function () {
       var data = {};
       new FormData(form).forEach(function (v, k) { data[k] = v; });
+      /* sendBeacon zamiast fetch: keepalive z JSON-em wymaga preflightu CORS,
+         który Chrome ubija przy nawigacji — beacon (text/plain) przeżywa unload. */
       try {
-        fetch("https://sttluvcbucpxzbcsuigw.supabase.co/functions/v1/szron-site-form", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ form: form.getAttribute("name"), data: data }),
-          keepalive: true,
-        });
+        navigator.sendBeacon(
+          "https://sttluvcbucpxzbcsuigw.supabase.co/functions/v1/szron-site-form",
+          new Blob([JSON.stringify({ form: name, data: data })], { type: "text/plain" })
+        );
       } catch (e) { /* email jest best-effort; zgłoszenie i tak zapisuje Netlify */ }
     });
   });
