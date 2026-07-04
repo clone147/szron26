@@ -34,7 +34,11 @@
   /* ── nagłówki: scramble jak na eyebrows ────────────── */
   /* .ws (h1/h2 hero i sekcji) + mniejsze nagłówki dostają rv + data-scramble */
   document
-    .querySelectorAll(".ws, .card-tile h3, .step h3, .def-rows dt")
+    .querySelectorAll(
+      ".ws, .card-tile h3, .step h3, .def-rows dt, " +
+      ".card-tile p, .step p, .def-rows dd, .sect-lead, " +
+      ".page-hero__lead, .quote-card blockquote"
+    )
     .forEach(function (el) {
       el.classList.add("rv");
       el.setAttribute("data-scramble", "");
@@ -76,10 +80,11 @@
       });
     })(el);
     if (!nodes.length) return;
-    // zablokuj wymiary na czas animacji — losowe litery mają inne szerokości,
-    // więc bez tego zmienia się liczba linii i trzęsie się wszystko poniżej
-    el.style.minHeight = el.offsetHeight + "px";
-    el.style.minWidth = el.offsetWidth + "px";
+    // twarda blokada wysokości + overflow na czas animacji — losowe litery mają
+    // inne szerokości, więc bez tego zmienia się liczba linii i wszystko
+    // poniżej się trzęsie (minHeight nie wystarcza, gdy tekst łamie się SZERZEJ)
+    el.style.height = el.offsetHeight + "px";
+    el.style.overflow = "hidden";
     var frame = 0;
     var total = Math.max(24, Math.min(56, Math.round(len * 0.6)));
     var tick = function () {
@@ -100,7 +105,7 @@
         item.node.textContent = frame < total ? out : original;
       });
       if (frame < total) requestAnimationFrame(tick);
-      else { el.style.minHeight = ""; el.style.minWidth = ""; }
+      else { el.style.height = ""; el.style.overflow = ""; }
     };
     requestAnimationFrame(tick);
   };
