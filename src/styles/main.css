@@ -1146,18 +1146,11 @@ form [name="bot-field"], form label:has([name="bot-field"]), p.hidden, .hidden-f
 }
 .rv.is-view { opacity: 1; transform: none; }
 
-/* reveal słowo po słowie — span-y generuje JS */
-.ws .w { display: inline-block; overflow: hidden; vertical-align: bottom; }
-.ws .w > span {
-  display: inline-block;
-  transform: translateY(110%);
-  transition: transform 1.2s var(--ease-out);
-}
-.ws.is-view .w > span { transform: none; }
+/* nagłówki .ws: rv + data-scramble dokłada JS (main.js) */
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .rv, .ws .w > span { opacity: 1; transform: none; transition: opacity 0.15s linear; }
+  .rv { opacity: 1; transform: none; transition: opacity 0.15s linear; }
   .btn__arr svg { transition: none; }
 }
 

@@ -31,61 +31,53 @@
     });
   }
 
-  /* ── nagłówki: podział na słowa (reveal słowo po słowie) ── */
-  /* mniejsze nagłówki (karty, kroki, def-rows) też dostają ws */
+  /* ── nagłówki: scramble jak na eyebrows ────────────── */
+  /* .ws (h1/h2 hero i sekcji) + mniejsze nagłówki dostają rv + data-scramble */
   document
-    .querySelectorAll(".card-tile h3, .step h3, .def-rows dt")
-    .forEach(function (el) { el.classList.add("ws"); });
-  document.querySelectorAll(".ws").forEach(function (el) {
-    if (reduceMotion) return;
-    var delay = 0;
-    var splitNode = function (node) {
-      if (node.nodeType === Node.TEXT_NODE) {
-        var frag = document.createDocumentFragment();
-        node.textContent.split(/(\s+)/).forEach(function (part) {
-          if (!part) return;
-          if (/^\s+$/.test(part)) {
-            frag.appendChild(document.createTextNode(" "));
-            return;
-          }
-          var w = document.createElement("span");
-          w.className = "w";
-          var inner = document.createElement("span");
-          inner.textContent = part;
-          inner.style.transitionDelay = delay.toFixed(2) + "s";
-          delay += 0.12;
-          w.appendChild(inner);
-          frag.appendChild(w);
-        });
-        node.parentNode.replaceChild(frag, node);
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        Array.prototype.slice.call(node.childNodes).forEach(splitNode);
-      }
-    };
-    Array.prototype.slice.call(el.childNodes).forEach(splitNode);
-  });
+    .querySelectorAll(".ws, .card-tile h3, .step h3, .def-rows dt")
+    .forEach(function (el) {
+      el.classList.add("rv");
+      el.setAttribute("data-scramble", "");
+    });
 
-  /* ── scramble na eyebrows ──────────────────────────── */
+  /* ── scramble (dekodowanie liter) ──────────────────── */
+  /* działa na text-node'ach, więc nie niszczy zagnieżdżonych elementów
+     (np. <small> w dt); czas skaluje się z długością tekstu */
   var CHARS = "abcdefghijklmnoprstuwyz0123456789";
+  var KEEP = /[\s\/·.,–—:;?!()&+%]/;
   var scramble = function (el) {
-    var original = el.textContent;
+    var nodes = [];
+    var len = 0;
+    (function walk(n) {
+      Array.prototype.slice.call(n.childNodes).forEach(function (c) {
+        if (c.nodeType === Node.TEXT_NODE && c.textContent.trim()) {
+          nodes.push({ node: c, orig: c.textContent });
+          len += c.textContent.length;
+        } else if (c.nodeType === Node.ELEMENT_NODE) {
+          walk(c);
+        }
+      });
+    })(el);
+    if (!nodes.length) return;
     var frame = 0;
-    var total = 16;
+    var total = Math.max(24, Math.min(56, Math.round(len * 0.6)));
     var tick = function () {
       frame++;
       var progress = frame / total;
-      var out = "";
-      for (var i = 0; i < original.length; i++) {
-        var ch = original[i];
-        if (ch === " " || ch === "/" || ch === "·" || i < original.length * progress) {
-          out += ch;
-        } else {
-          out += CHARS[(Math.random() * CHARS.length) | 0];
+      nodes.forEach(function (item) {
+        var original = item.orig;
+        var out = "";
+        for (var i = 0; i < original.length; i++) {
+          var ch = original[i];
+          if (KEEP.test(ch) || i < original.length * progress) {
+            out += ch;
+          } else {
+            out += CHARS[(Math.random() * CHARS.length) | 0];
+          }
         }
-      }
-      el.textContent = out;
+        item.node.textContent = frame < total ? out : original;
+      });
       if (frame < total) requestAnimationFrame(tick);
-      else el.textContent = original;
     };
     requestAnimationFrame(tick);
   };

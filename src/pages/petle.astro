@@ -76,6 +76,21 @@ tym wypisie wszystkie checkboxy są zaznaczone [x]</code></pre>
     </div>
   </section>
 
+  <!-- 04 filozofia loopów (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="filozofia">
+    <div class="container">
+      <SectHead eyebrow="04 / Filozofia · Praca to pisanie pętli" title="Nie promptujesz. Piszesz pętle." id="filozofia">
+        <p class="sect-lead rv">Boris Cherny, twórca Claude Code, ujął to wprost: „I don't prompt Claude anymore. I have loops that are running. My job is to write loops." Ewolucja wygląda tak: najpierw kod z autouzupełnianiem, potem promptowanie kilku agentów równolegle, na końcu pętle, które promptują same. Anatomia dobrej pętli to kontekst + cel + definicja sukcesu — agent iteruje i sam ocenia wyniki, aż przejdą test.</p>
+      </SectHead>
+      <dl class="def-rows rv">
+        <div><dt>Builder / tester / reviewer<small>Trzech agentów zamiast jednego</small></dt><dd>Sesja, która sama pisze, testuje i recenzuje własny kod, to student oceniający swój egzamin. Rozdziel role na osobnych agentów — weryfikacja przez odrębnego recenzenta wyraźnie podnosi jakość pierwszego podejścia.</dd></div>
+        <div><dt>Każ mu udowodnić<small>Definition of done w pętli</small></dt><dd>Plan → zmiana → testy → podsumowanie, co padło → poprawka. Agent nie raportuje „zrobione" — pokazuje zielone testy. Dokładnie dlatego warunek w /goal piszesz tak, żeby dało się go zweryfikować z transkryptu.</dd></div>
+        <div><dt>Kontekst to RAM<small>Strefa głupienia zaczyna się wcześniej, niż myślisz</small></dt><dd>Okna kontekstu mają po 1M tokenów, ale realna jakość degraduje się już około 250 tysięcy. CLAUDE.md poniżej 300 linii, /clear między zadaniami, a po dwóch nieudanych próbach — /clear zamiast trzeciej.</dd></div>
+        <div><dt>Zakładaj najgorsze<small>Bezpieczeństwo pętli</small></dt><dd>Agent zrobi wszystko, co może przeczytać lub dotknąć. Zakazy w promptach nie wystarczą — agent potrafi napisać skrypt, który je obejdzie. Uprawnienia ustawiaj na poziomie systemu: hooki, sandbox, sekrety w vaultach zamiast w plikach.</dd></div>
+      </dl>
+    </div>
+  </section>
+
   <!-- powiązane -->
   <section class="sect" aria-labelledby="powiazane" style="padding-top:0">
     <div class="container">

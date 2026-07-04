@@ -17,28 +17,34 @@ const faq = [
   title="AI Act 2026 — czy Twoja firma jest gotowa? | SZRON"
   description="Sprawdź, czy Twoja firma musi dostosować się do AI Act. Kluczowe daty, klasyfikacja ryzyka, kary i checklist zgodności dla polskich firm."
   eyebrow="Regulacje UE · AI Act"
-  heading="AI Act 2026. Czy jesteś gotowy?"
-  lead="2 sierpnia 2026 — to data, którą musisz znać. Sprawdź, czy Twoja firma jest przygotowana na nowe regulacje AI: kluczowe daty, klasyfikacja ryzyka, realne kary i konkretne kroki przygotowań."
+  updated="2026-07-04"
+  heading="AI Act 2026. Terminy właśnie się zmieniły."
+  lead="29 czerwca 2026 Rada UE zatwierdziła pakiet upraszczający AI Act i przesunęła wymogi high-risk o 16 miesięcy — na 2 grudnia 2027. W Polsce przeszło to bez echa. Ale uwaga: obowiązki transparentności wchodzą już w sierpniu 2026, a oznaczanie treści AI — 2 grudnia 2026. Poniżej aktualny terminarz, klasyfikacja ryzyka i od czego zacząć."
   heroImage="/img/sub/ai-act-compliance.webp"
   heroAlt="Oszroniony dokument z lodu z pomarańczową pieczęcią"
 >
   <!-- proof -->
   <ProofStrip items={[
-    ['2 sierpnia 2026', 'pełna zgodność dla systemów high-risk'],
+    ['+16 miesięcy', 'high-risk przesunięty na 2 grudnia 2027'],
     ['Do 35 mln EUR', 'kary za najcięższe naruszenia'],
-    ['Deployer też', 'nie tylko dostawca AI ma obowiązki'],
+    ['Sierpień 2026', 'transparentność chatbotów i agentów — już'],
   ]} />
 
   <!-- 01 kluczowe daty (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="daty">
     <div class="container">
-      <SectHead eyebrow="01 / Timeline · Kluczowe daty AI Act" title="Trzy daty, które zmieniają zasady gry." id="daty" />
+      <SectHead eyebrow="01 / Timeline · Terminarz po zmianach z 29.06.2026" title="Aktualny terminarz. Dwie daty bliżej, niż myślisz." id="daty">
+        <p class="sect-lead rv">Kancelarie piszą o tych zmianach dla zarządów. My tłumaczymy, co z tego wynika dla CTO i tech leadów: 16 miesięcy oddechu na high-risk to czas na wdrożenie z governance, nie na odkładanie. A transparentność i oznaczanie treści wchodzą praktycznie zaraz.</p>
+      </SectHead>
       <table class="results-table rv">
-        <thead><tr><th scope="col">Data</th><th scope="col">Co wchodzi w życie</th><th scope="col">Kogo dotyczy</th></tr></thead>
+        <thead><tr><th scope="col">Data</th><th scope="col">Co wchodzi w życie</th><th scope="col">Co to znaczy w praktyce</th></tr></thead>
         <tbody>
-          <tr><td>2 lutego 2025</td><td>Zakaz praktyk AI o niedopuszczalnym ryzyku</td><td><strong>Manipulacja, social scoring, rozpoznawanie emocji w pracy</strong></td></tr>
-          <tr><td>2 sierpnia 2025</td><td>Obowiązki dla modeli GPAI</td><td><strong>Dokumentacja techniczna, transparentność, prawa autorskie</strong></td></tr>
-          <tr><td>2 sierpnia 2026</td><td>Pełna zgodność dla systemów high-risk</td><td><strong>Systemy HR, kredytowe, edukacyjne, infrastruktura krytyczna</strong></td></tr>
+          <tr><td>2 lutego 2025</td><td>Zakaz praktyk AI o niedopuszczalnym ryzyku</td><td><strong>Manipulacja, social scoring, rozpoznawanie emocji w pracy — obowiązuje</strong></td></tr>
+          <tr><td>2 sierpnia 2025</td><td>Obowiązki dla modeli GPAI</td><td><strong>Dokumentacja techniczna, transparentność, prawa autorskie — obowiązuje</strong></td></tr>
+          <tr><td>Sierpień 2026</td><td>Obowiązki transparentności</td><td><strong>Chatboty i agenci muszą się ujawniać — zinwentaryzuj, kto ma AI w produkcie, teraz</strong></td></tr>
+          <tr><td>2 grudnia 2026</td><td>Oznaczanie treści generowanych przez AI</td><td><strong>Odroczone tylko o 4 miesiące — dotyczy każdego, kto publikuje content z AI</strong></td></tr>
+          <tr><td>2 grudnia 2027</td><td>High-risk, Annex III (przesunięte z 2.08.2026)</td><td><strong>Systemy HR, kredytowe, edukacyjne, infrastruktura krytyczna</strong></td></tr>
+          <tr><td>2 sierpnia 2028</td><td>Annex I — AI w produktach regulowanych</td><td><strong>Obronność, energetyka, medtech</strong></td></tr>
         </tbody>
       </table>
     </div>
@@ -93,7 +99,7 @@ const faq = [
         <article class="step rv"><p class="eyebrow">01 · Inwentaryzacja</p><h3>Spis systemów AI</h3><p>Zbierz wszystkie systemy AI, które wdrażasz lub z których korzystasz.</p></article>
         <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Klasyfikacja</p><h3>Ocena ryzyka</h3><p>Przypisz każdy system do kategorii: prohibited, high-risk, limited, minimal.</p></article>
         <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Gap analysis</p><h3>Luka do zamknięcia</h3><p>Porównaj stan obecny z wymogami i wskaż, czego brakuje.</p></article>
-        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Plan wdrożenia</p><h3>Harmonogram działań</h3><p>Ułóż kolejność prac tak, by zdążyć przed 2 sierpnia 2026.</p></article>
+        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Plan wdrożenia</p><h3>Harmonogram działań</h3><p>Najpierw transparentność (sierpień 2026) i oznaczanie treści (grudzień 2026), potem high-risk — do grudnia 2027.</p></article>
       </div>
     </div>
   </section>
