@@ -539,7 +539,7 @@ function renderGallery() {
     </button>` +
     diagrams.map((d) => `
     <button class="diag-card" type="button" data-id="${d.id}">
-      <span class="diag-card__thumb"><canvas></canvas></span>
+      <span class="diag-card__thumb"><canvas></canvas><span class="diag-card__del" role="button" aria-label="Usuń diagram" title="Usuń diagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></span></span>
       <span class="diag-card__title">${esc(d.title)}</span>
       <span class="diag-card__date">${fmtDateTime(d.updated_at)}</span>
     </button>`).join('');
@@ -547,6 +547,14 @@ function renderGallery() {
   for (const card of grid.querySelectorAll('.diag-card[data-id]')) {
     const d = diagrams.find((x) => x.id === card.dataset.id);
     card.addEventListener('click', () => openEditor(d.id));
+    card.querySelector('.diag-card__del').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!(await confirmDialog(`Usunąć diagram „${d.title}"?`, 'OK'))) return;
+      const { error } = await sb.from('diagrams').delete().eq('id', d.id);
+      if (error) { toast('Błąd', error.message, 'err'); return; }
+      diagrams = diagrams.filter((x) => x.id !== d.id);
+      renderGallery();
+    });
     requestAnimationFrame(() => drawThumb(card.querySelector('canvas'), Array.isArray(d.data?.shapes) ? d.data.shapes : []));
   }
 }

@@ -766,6 +766,7 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
   color: var(--color-text-inv); font: inherit;
 }
 .diag-card__thumb {
+  position: relative;
   display: block; aspect-ratio: 16 / 10; border-radius: var(--radius-card, 10px);
   background: var(--color-ink-3); border: 1px solid var(--color-line-dark);
   overflow: hidden; transition: border-color var(--dur-1), transform var(--dur-1), box-shadow var(--dur-1);
@@ -782,6 +783,16 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 }
 .diag-card__thumb--new svg { width: 34px; height: 34px; }
 .diag-card:hover .diag-card__thumb--new { color: var(--color-accent); }
+.diag-card__del {
+  position: absolute; top: 6px; right: 6px;
+  display: grid; place-content: center; width: 28px; height: 28px;
+  border-radius: 7px; background: color-mix(in oklch, var(--color-ink-3) 80%, black);
+  color: var(--color-text-inv-3);
+  opacity: 0; transition: opacity var(--dur-1), color var(--dur-1), background var(--dur-1);
+}
+.diag-card:hover .diag-card__del, .diag-card:focus-visible .diag-card__del { opacity: 1; }
+.diag-card__del:hover { color: #fff; background: oklch(60% 0.2 25); }
+.diag-card__del svg { width: 15px; height: 15px; }
 .diag-card__title { font-weight: 500; font-size: var(--text-s); }
 .diag-card__date { font-size: var(--text-caption); color: var(--color-text-inv-3); }
 .diag-tools { border: 1px solid var(--color-line-dark); border-radius: var(--radius-btn); padding: 2px; }
