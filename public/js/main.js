@@ -62,6 +62,7 @@
     var frame = 0;
     var total = Math.max(24, Math.min(56, Math.round(len * 0.6)));
     var tick = function () {
+      if (document.hidden) frame = total - 1; // ukryta karta: dokończ natychmiast
       frame++;
       var progress = frame / total;
       nodes.forEach(function (item) {
