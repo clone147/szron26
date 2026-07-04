@@ -1,0 +1,41 @@
+# SZRON Technologie
+
+> SZRON wdraża programowanie agentowe (Claude Code, MCP, agenci AI) w zespołach IT 30+ osób — na istniejącym kodzie i z obecnymi ludźmi klienta. Efekt: zespół dostarcza 2–4× szybciej w dwa kwartały, mierzony metrykami DORA przed i po. Polska, obsługa całego kraju; klienci z przemysłu, transportu, sektora regulowanego i software house'ów.
+
+Kluczowe fakty:
+- Metoda: trzy równoległe ścieżki w jeden kwartał — trening z AI, programowanie agentowe na kodzie klienta, pilot modernizacji jednego modułu.
+- Wyniki z wdrożeń: system biletowy 6 miesięcy → 4 tygodnie; sterownik przemysłowy 2 miesiące → 2 tygodnie; moduł panelu sterowania w energetyce → 2 tygodnie.
+- Pomiar: baseline DORA metrics w tygodniu 1, ponowny pomiar w tygodniu 12; analityka repozytoriów w DevLens Pro.
+- Bezpieczeństwo: kod nie trafia do publicznych modeli; sektor regulowany — Bedrock w VPC lub modele lokalne (Ollama, vLLM); NDA przed pierwszą rozmową.
+- Zespół: Tomek Wojciechowski (25 lat w IT, były CTO) i Maciej Stopa (18 lat, full-stack/mobile). Dwie osoby na każdym projekcie, zero podwykonawców.
+- Kontakt: tw@szron.tech, +48 505 091 200, Rzeszów.
+
+## Oferta
+
+- [Metoda — trzy ścieżki, dwa kwartały](https://szron.tech/metoda): jak wygląda wdrożenie krok po kroku, proces i stała opłata
+- [Transformacja AI dla programistów](https://szron.tech/transformacja-ai-dla-programistow): wdrożenie agentów AI w zespole dev, pomiar produktywności przed i po
+- [AI dla zespołów software](https://szron.tech/ai-dla-dev-teamow): jak zmienia się codzienna praca programisty z agentem — plan mode, subagenci, MCP
+- [AI dla embedded](https://szron.tech/ai-dla-embedded): agenci AI w C/C++, STM32, systemy przemysłowe
+- [AI dla sektora regulowanego](https://szron.tech/ai-sektor-regulowany): obronność, fintech, medycyna — modele lokalne i audit log
+- [Zgodność z AI Act](https://szron.tech/ai-act-compliance): aktualny terminarz po zmianach Rady UE z 29.06.2026, klasyfikacja ryzyka, audyt zgodności
+- [DevLens Pro](https://szron.tech/devlens): platforma analityczna dla zarządu — produktywność zespołów dev, Bus Factor, dane zostają w przeglądarce
+- [Kalkulator ROI AI](https://szron.tech/kalkulator-roi-ai): policz zwrot z wdrożenia AI w zespole
+
+## Case studies
+
+- [RegioBus: system biletowy 6 miesięcy → 4 tygodnie](https://szron.tech/case-studies/regiobus)
+- [STM32: sterownik przemysłowy 2 miesiące → 2 tygodnie](https://szron.tech/case-studies/stm32)
+- [HMI Qt/QML dla energetyki](https://szron.tech/case-studies/hmi)
+
+## Akademia (przewodniki techniczne)
+
+- [Claude Code — podstawy pracy agentowej](https://szron.tech/claude-code)
+- [Bezpieczeństwo Claude Code](https://szron.tech/claude-code-bezpieczenstwo)
+- [Serwery MCP](https://szron.tech/serwery-mcp)
+- [Pętle agentowe /goal i /loop](https://szron.tech/petle)
+- [Lokalne modele: LM Studio](https://szron.tech/lm-studio) i [llama-server](https://szron.tech/llama-server)
+
+## Kontakt
+
+- [Umów rozmowę / diagnozę 30 min](https://szron.tech/umow-rozmowe)
+- [Kontakt](https://szron.tech/kontakt)

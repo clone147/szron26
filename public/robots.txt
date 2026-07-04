@@ -2,4 +2,29 @@ User-agent: *
 Allow: /
 Disallow: /strefa
 
+# AI crawlers — jawnie mile widziane (GEO: cytowania w ChatGPT, Claude, Perplexity, Gemini)
+User-agent: GPTBot
+Allow: /
+Disallow: /strefa
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /strefa
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /strefa
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /strefa
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /strefa
+
+User-agent: Google-Extended
+Allow: /
+
 Sitemap: https://szron.tech/sitemap-index.xml
+# LLM-friendly summary: https://szron.tech/llms.txt
