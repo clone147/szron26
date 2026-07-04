@@ -65,23 +65,32 @@ function sketchLine(g, x1, y1, x2, y2, rnd, overshoot = 0) {
   const ux = (x2 - x1) / len, uy = (y2 - y1) / len;   // wzdłuż
   const nx = -uy, ny = ux;                            // w poprzek
   if (overshoot) {
-    const o1 = rnd() * overshoot, o2 = rnd() * overshoot;
+    // czasem przestrzał, czasem lekko niedociągnięta kreska — jak przy szybkim rysowaniu
+    const o1 = (rnd() - 0.3) * overshoot, o2 = (rnd() - 0.3) * overshoot;
     x1 -= ux * o1; y1 -= uy * o1; x2 += ux * o2; y2 += uy * o2;
   }
   const segs = Math.max(4, Math.min(26, Math.round(len / 18)));
-  const amp = Math.min(1.6, 0.5 + len / 400);         // amplituda drżenia
-  const bow = (rnd() - 0.5) * Math.min(6, len / 22);  // wygięcie łuku całej kreski
+  // każda kreska ma własny „charakter": inną nerwowość, wygięcie i powolną falę ręki
+  const amp = Math.min(2.2, 0.5 + len / 400) * (0.55 + rnd() * 1.1);
+  const bow = (rnd() - 0.5) * Math.min(9, len / 16);
+  const waveF = 1 + rnd() * 2.5;                      // częstotliwość fali nadgarstka
+  const waveP = rnd() * Math.PI * 2;                  // losowa faza
+  const waveA = amp * (0.3 + rnd() * 0.9);            // i jej amplituda
   let off = (rnd() - 0.5) * amp;
+  const lw = g.lineWidth;
+  g.lineWidth = lw * (0.85 + rnd() * 0.35);           // minimalnie inny docisk pióra per kreska
   g.beginPath();
   g.moveTo(x1 + nx * off, y1 + ny * off);
   for (let i = 1; i <= segs; i++) {
     const t = i / segs;
     off += (rnd() - 0.5) * amp;
-    off = Math.max(-2.2, Math.min(2.2, off));
-    const o = off + Math.sin(Math.PI * t) * bow;
+    off = Math.max(-2.8, Math.min(2.8, off));
+    const env = Math.sin(Math.PI * t);                // fala i łuk zanikają na końcach kreski
+    const o = off + env * (bow + Math.sin(Math.PI * t * waveF + waveP) * waveA);
     g.lineTo(x1 + (x2 - x1) * t + nx * o, y1 + (y2 - y1) * t + ny * o);
   }
   g.stroke();
+  g.lineWidth = lw;
 }
 function sketchRect(g, x, y, w, h, rnd) {
   const ov = Math.min(5, Math.max(2, (w + h) / 90)); // rogi lekko „przerysowane"
