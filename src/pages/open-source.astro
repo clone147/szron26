@@ -76,7 +76,7 @@ const tools = [
   <section class="sect" aria-labelledby="narzedzia">
     <div class="container">
       <SectHead eyebrow="01 / Narzędzia · Sprawdzone w boju" title="Każde powstało przy realnym projekcie wdrożeniowym." id="narzedzia" small />
-      <div class="grid-cards">
+      <div class="tools-grid">
         {tools.map((t, i) => (
           <article class="card-tile tool-card rv" style={`--rv-d:${(i * 0.08).toFixed(2)}s`}>
             <div class="badges">
@@ -102,23 +102,11 @@ const tools = [
   <section class="sect sect--dark" aria-labelledby="dlaczego">
     <div class="container">
       <SectHead eyebrow="02 / Dlaczego · Po co to robimy" title="Dlaczego open source?" id="dlaczego" />
-      <div class="grid-cards">
-        <article class="card-tile rv">
-          <p class="eyebrow">Powstaje przy pracy</p>
-          <h3>Sprawdzone w boju, nie w teorii.</h3>
-          <p>Każde narzędzie powstało przy realnym projekcie wdrożeniowym. Nie teoria — rozwiązanie problemu, na który sami trafiliśmy.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.1s">
-          <p class="eyebrow">Społeczność ponad marketing</p>
-          <h3>Feedback wart więcej niż kampania.</h3>
-          <p>Opinia developerów, którzy realnie używają narzędzia, jest cenniejsza niż reklamy. Budujemy razem z tymi, którzy z tego korzystają.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.2s">
-          <p class="eyebrow">Standard budujemy razem</p>
-          <h3>Polski AI tooling jest młody.</h3>
-          <p>Im więcej osób kontrybuuje, tym lepsze narzędzia powstają. Oddajemy społeczności to, co tworzymy przy projektach.</p>
-        </article>
-      </div>
+      <dl class="def-rows rv">
+        <div><dt>Sprawdzone w boju, nie w teorii<small>Powstaje przy pracy</small></dt><dd>Każde narzędzie powstało przy realnym projekcie wdrożeniowym. Nie teoria — rozwiązanie problemu, na który sami trafiliśmy.</dd></div>
+        <div><dt>Feedback wart więcej niż kampania<small>Społeczność ponad marketing</small></dt><dd>Opinia developerów, którzy realnie używają narzędzia, jest cenniejsza niż reklamy. Budujemy razem z tymi, którzy z tego korzystają.</dd></div>
+        <div><dt>Polski AI tooling jest młody<small>Standard budujemy razem</small></dt><dd>Im więcej osób kontrybuuje, tym lepsze narzędzia powstają. Oddajemy społeczności to, co tworzymy przy projektach.</dd></div>
+      </dl>
     </div>
   </section>
 

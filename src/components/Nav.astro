@@ -22,13 +22,27 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
     <a class="logo" href="/" aria-label="SZRON — strona główna">
       <img src="/img/logo-dark.svg" alt="" width="105" height="26" />
     </a>
-    <span class="nav__build" aria-hidden="true">{buildTag}</span>
     <nav aria-label="Nawigacja główna">
       <ul class="nav__links">
-        <li><a href="/metoda">Metoda</a></li>
-        <li><a href="/doradztwo-technologiczne">Doradztwo</a></li>
-        <li><a href="/case-studies">Case studies</a></li>
-        <li><a href="/devlens">DevLens</a></li>
+        <li class="nav__dd">
+          <button type="button" class="nav__dd-toggle" aria-expanded="false" aria-controls="dd-oferta">
+            Oferta
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="nav__dd-panel" id="dd-oferta" role="menu">
+            <a class="nav__dd-head" href="/metoda" role="menuitem">Metoda — wdrożenie AI w dwa kwartały →</a>
+            <div class="nav__dd-grid">
+              <a href="/transformacja-ai-dla-programistow" role="menuitem"><span>Transformacja AI dla programistów</span></a>
+              <a href="/ai-dla-dev-teamow" role="menuitem"><span>AI dla zespołów software</span></a>
+              <a href="/doradztwo-technologiczne" role="menuitem"><span>Doradztwo technologiczne</span></a>
+              <a href="/ai-dla-embedded" role="menuitem"><span>AI dla embedded</span></a>
+              <a href="/ai-sektor-regulowany" role="menuitem"><span>AI dla sektora regulowanego</span></a>
+              <a href="/ai-act-compliance" role="menuitem"><span>Zgodność z AI Act</span></a>
+              <a href="/devlens" role="menuitem"><span>DevLens Pro — analityka zespołów</span></a>
+              <a href="/kalkulator-roi-ai" role="menuitem"><span>Kalkulator ROI AI</span></a>
+            </div>
+          </div>
+        </li>
         <li class="nav__dd">
           <button type="button" class="nav__dd-toggle" aria-expanded="false" aria-controls="dd-akademia">
             Akademia
@@ -43,6 +57,7 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
             </div>
           </div>
         </li>
+        <li><a href="/case-studies">Case studies</a></li>
         <li><a href="/open-source">Open source</a></li>
         <li><a href="/o-nas">Zespół</a></li>
         <li><a href="/kontakt">Kontakt</a></li>
@@ -72,23 +87,33 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
       </ul>
     </nav>
     <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę<Fragment set:html={arrow} /></a>
+    <span class="nav__build" aria-hidden="true">{buildTag}</span>
     <button class="nav__burger" aria-expanded="false" aria-controls="nav-menu" aria-label="Otwórz menu">
       <span></span><span></span><span></span>
     </button>
   </div>
   <nav class="nav__menu" id="nav-menu" aria-label="Nawigacja mobilna">
-    <a href="/metoda">Metoda</a>
-    <a href="/doradztwo-technologiczne">Doradztwo</a>
-    <a href="/case-studies">Case studies</a>
-    <a href="/devlens">DevLens</a>
-    <a href="/open-source">Open source</a>
-    <a href="/o-nas">Zespół</a>
-    <a href="/kontakt">Kontakt</a>
+    <details class="nav__menu-acc">
+      <summary>Oferta</summary>
+      <a href="/metoda">Metoda — wdrożenie AI →</a>
+      <a href="/transformacja-ai-dla-programistow">Transformacja AI dla programistów</a>
+      <a href="/ai-dla-dev-teamow">AI dla zespołów software</a>
+      <a href="/doradztwo-technologiczne">Doradztwo technologiczne</a>
+      <a href="/ai-dla-embedded">AI dla embedded</a>
+      <a href="/ai-sektor-regulowany">AI dla sektora regulowanego</a>
+      <a href="/ai-act-compliance">Zgodność z AI Act</a>
+      <a href="/devlens">DevLens Pro</a>
+      <a href="/kalkulator-roi-ai">Kalkulator ROI AI</a>
+    </details>
     <details class="nav__menu-acc">
       <summary>Akademia</summary>
       <a href="/akademia">Wszystkie szkolenia →</a>
       {akademia.map((a) => <a href={`/${a.slug}`}>{a.title}</a>)}
     </details>
+    <a href="/case-studies">Case studies</a>
+    <a href="/open-source">Open source</a>
+    <a href="/o-nas">Zespół</a>
+    <a href="/kontakt">Kontakt</a>
     <a href="/strefa/login">Strefa zamknięta →</a>
     <a class="btn btn--accent" href="/umow-rozmowe" style="margin-top:var(--space-md)">Umów diagnozę</a>
   </nav>
@@ -98,7 +123,8 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
   /* znacznik buildu — celowo prawie niewidoczny (deploy-check dla właściciela) */
   .nav__build {
     align-self: center;
-    margin-left: 0.5rem;
+    order: 99;
+    margin-left: 0.6rem;
     font-size: 0.55rem;
     letter-spacing: 0.02em;
     color: currentColor;
@@ -108,7 +134,7 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
     transition: opacity .2s ease;
   }
   .nav__build:hover { opacity: 0.85; }
-  @media (max-width: 64rem) { .nav__build { display: none; } }
+  @media (max-width: 72rem) { .nav__build { display: none; } }
   /* Inline login „Strefa" w nawigacji — tokeny Hallmark, ciemny panel */
   .nav-auth { position: relative; }
   .nav-auth__panel {

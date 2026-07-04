@@ -200,6 +200,8 @@ h1, h2, h3, h4 {
   opacity: 0.8;
   transition: opacity var(--dur-1) var(--ease-out);
 }
+/* pozycje menu nigdy nie łamią się na dwie linie */
+.nav__links a, .nav__dd-toggle { white-space: nowrap; }
 .nav__links a:hover { opacity: 1; }
 
 .nav .btn { height: 2.75rem; padding-inline: 1.25rem; }
@@ -883,6 +885,11 @@ h1, h2, h3, h4 {
 .nav__dd:hover .nav__dd-panel, .nav__dd:focus-within .nav__dd-panel {
   opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(-50%) translateY(0);
 }
+/* pierwszy dropdown (Oferta) siedzi przy logo — panel dosunięty do lewej,
+   żeby nie wystawał poza ekran */
+.nav__links > li:first-child .nav__dd-panel { left: 0; transform: translateX(0) translateY(-6px); }
+.nav__links > li:first-child.nav__dd:hover .nav__dd-panel,
+.nav__links > li:first-child.nav__dd:focus-within .nav__dd-panel { transform: translateX(0) translateY(0); }
 .nav__dd-head {
   display: block; padding: 0.5rem 0.75rem 0.75rem; margin-bottom: 0.5rem;
   font-size: var(--text-caption); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
@@ -1105,7 +1112,19 @@ form [name="bot-field"], form label:has([name="bot-field"]), p.hidden, .hidden-f
 .prose table { display: block; max-width: 100%; overflow-x: auto; }
 
 /* ── open source: karty narzędzi, badge, komenda instalacji ── */
+/* narzędzia to główny content strony — dwie szerokie kolumny zamiast ścisku */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+}
+@media (max-width: 44rem) { .tools-grid { grid-template-columns: 1fr; } }
 .tool-card { gap: var(--space-md); }
+.tool-card > h3 {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+}
 .tool-card .badges { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: var(--space-xs); }
 .badge {
   font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
@@ -1120,21 +1139,34 @@ form [name="bot-field"], form label:has([name="bot-field"]), p.hidden, .hidden-f
 .tool-card .tool-foot { margin-top: auto; padding-top: var(--space-md); }
 .tool-card .tool-foot a { font-weight: 600; color: var(--color-text); text-underline-offset: 3px; }
 
-.install { display: flex; align-items: stretch; gap: 0.4rem; margin-top: var(--space-md); }
+/* komenda instalacji: pełna szerokość, zawija się (nigdy nie przycina),
+   przycisk Kopiuj jako nakładka w rogu */
+.install { position: relative; margin-top: var(--space-md); }
 .install code {
-  flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap;
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-all;
   font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.78rem;
+  line-height: 1.55;
   background: var(--color-ink); color: var(--color-text-inv);
-  padding: 0.7rem 0.85rem; border-radius: var(--radius-btn);
+  padding: 0.7rem 5.2rem 0.7rem 1.9rem; border-radius: var(--radius-btn);
+}
+.install code::before {
+  content: "$";
+  position: absolute; left: 0.8rem;
+  color: var(--color-accent);
+  font-weight: 600;
 }
 .install__btn {
-  flex: 0 0 auto; cursor: pointer; font: inherit; font-size: 0.7rem; font-weight: 600;
+  position: absolute; top: 0.42rem; right: 0.42rem;
+  cursor: pointer; font: inherit; font-size: 0.66rem; font-weight: 600;
   letter-spacing: 0.04em; text-transform: uppercase;
-  padding: 0 0.9rem; border-radius: var(--radius-btn);
-  background: var(--color-accent); color: var(--color-ink); border: 0;
-  transition: background-color var(--dur-1) var(--ease-out);
+  padding: 0.32rem 0.7rem; border-radius: calc(var(--radius-btn) - 2px);
+  background: oklch(100% 0 0 / 0.1); color: var(--color-text-inv);
+  border: 1px solid oklch(100% 0 0 / 0.18);
+  transition: background-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
 }
-.install__btn:hover { background: var(--color-paper); }
+.install__btn:hover { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-ink); }
 .install__btn.is-done { background: oklch(70% 0.15 150); color: var(--color-ink); }
 
 /* ── reveals (scroll) ────────────────────────────────── */
