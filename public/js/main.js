@@ -43,8 +43,25 @@
   /* ── scramble (dekodowanie liter) ──────────────────── */
   /* działa na text-node'ach, więc nie niszczy zagnieżdżonych elementów
      (np. <small> w dt); czas skaluje się z długością tekstu */
-  var CHARS = "abcdefghijklmnoprstuwyz0123456789";
   var KEEP = /[\s\/·.,–—:;?!()&+%]/;
+  /* losowa litera o zbliżonej szerokości i tej samej wielkości — żeby słowa
+     nie zmieniały szerokości w trakcie animacji i tekst się nie przełamywał */
+  var SETS = {
+    narrow: "ijltfr",
+    wide: "mw",
+    regular: "abcdenoshkuvyz",
+    digit: "0123456789",
+  };
+  var randLike = function (ch) {
+    var lower = ch.toLowerCase();
+    var set;
+    if (/[0-9]/.test(ch)) set = SETS.digit;
+    else if (SETS.narrow.indexOf(lower) !== -1) set = SETS.narrow;
+    else if (SETS.wide.indexOf(lower) !== -1) set = SETS.wide;
+    else set = SETS.regular;
+    var out = set[(Math.random() * set.length) | 0];
+    return ch === ch.toUpperCase() && ch !== lower ? out.toUpperCase() : out;
+  };
   var scramble = function (el) {
     var nodes = [];
     var len = 0;
@@ -59,6 +76,10 @@
       });
     })(el);
     if (!nodes.length) return;
+    // zablokuj wymiary na czas animacji — losowe litery mają inne szerokości,
+    // więc bez tego zmienia się liczba linii i trzęsie się wszystko poniżej
+    el.style.minHeight = el.offsetHeight + "px";
+    el.style.minWidth = el.offsetWidth + "px";
     var frame = 0;
     var total = Math.max(24, Math.min(56, Math.round(len * 0.6)));
     var tick = function () {
@@ -73,12 +94,13 @@
           if (KEEP.test(ch) || i < original.length * progress) {
             out += ch;
           } else {
-            out += CHARS[(Math.random() * CHARS.length) | 0];
+            out += randLike(ch);
           }
         }
         item.node.textContent = frame < total ? out : original;
       });
       if (frame < total) requestAnimationFrame(tick);
+      else { el.style.minHeight = ""; el.style.minWidth = ""; }
     };
     requestAnimationFrame(tick);
   };
