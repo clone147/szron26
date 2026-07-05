@@ -86,6 +86,10 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
         </li>
       </ul>
     </nav>
+    <a class="nav__tel" href="tel:+48505091200">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.6 2h2.2l1.1 2.8-1.4 1.1a9.5 9.5 0 0 0 4.6 4.6l1.1-1.4L14 10.2v2.2c0 .9-.7 1.6-1.6 1.6C7 14 2 9 2 3.6 2 2.7 2.7 2 3.6 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      505 091 200
+    </a>
     <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę<Fragment set:html={arrow} /></a>
     <span class="nav__build" aria-hidden="true">{buildTag}</span>
     <button class="nav__burger" aria-expanded="false" aria-controls="nav-menu" aria-label="Otwórz menu">
@@ -116,10 +120,21 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
     <a href="/kontakt">Kontakt</a>
     <a href="/strefa/login">Strefa zamknięta →</a>
     <a class="btn btn--accent" href="/umow-rozmowe" style="margin-top:var(--space-md)">Umów diagnozę</a>
+    <a class="btn" href="tel:+48505091200" style="margin-top:var(--space-sm)">Zadzwoń: 505 091 200</a>
   </nav>
 </header>
 
 <style>
+  /* CTA telefoniczne w prawym górnym rogu — obok „Umów diagnozę" */
+  .nav__tel {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    margin-right: var(--space-md);
+    font-weight: 600; font-size: 0.92rem; letter-spacing: 0.01em;
+    color: currentColor; text-decoration: none; white-space: nowrap;
+  }
+  .nav__tel svg { width: 15px; height: 15px; flex: none; }
+  .nav__tel:hover { color: var(--color-accent); }
+  @media (max-width: 76rem) { .nav__tel { display: none; } }
   /* znacznik buildu — celowo prawie niewidoczny (deploy-check dla właściciela) */
   .nav__build {
     align-self: center;
