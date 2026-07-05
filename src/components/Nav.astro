@@ -19,7 +19,7 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
 ---
 <header class="nav" id="nav">
   <div class="container nav__inner">
-    <a class="logo" href="/" aria-label="SZRON — strona główna">
+    <a class="logo" href="/" aria-label="SZRON — strona główna" title={buildTag}>
       <img src="/img/logo-dark.svg" alt="" width="105" height="26" />
     </a>
     <nav aria-label="Nawigacja główna">
@@ -86,12 +86,11 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
         </li>
       </ul>
     </nav>
+    <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę<Fragment set:html={arrow} /></a>
     <a class="nav__tel" href="tel:+48505091200">
       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.6 2h2.2l1.1 2.8-1.4 1.1a9.5 9.5 0 0 0 4.6 4.6l1.1-1.4L14 10.2v2.2c0 .9-.7 1.6-1.6 1.6C7 14 2 9 2 3.6 2 2.7 2.7 2 3.6 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
       505 091 200
     </a>
-    <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę<Fragment set:html={arrow} /></a>
-    <span class="nav__build" aria-hidden="true">{buildTag}</span>
     <button class="nav__burger" aria-expanded="false" aria-controls="nav-menu" aria-label="Otwórz menu">
       <span></span><span></span><span></span>
     </button>
@@ -125,31 +124,19 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
 </header>
 
 <style>
-  /* CTA telefoniczne w prawym górnym rogu — obok „Umów diagnozę" */
+  /* CTA telefoniczne — w miejscu dawnego znacznika buildu, za „Umów diagnozę".
+     Znacznik buildu żyje teraz w title logo (tooltip po najechaniu). */
   .nav__tel {
+    align-self: center;
+    order: 99;
     display: inline-flex; align-items: center; gap: 0.45rem;
-    margin-right: var(--space-md);
+    margin-left: var(--space-md);
     font-weight: 600; font-size: 0.92rem; letter-spacing: 0.01em;
     color: currentColor; text-decoration: none; white-space: nowrap;
   }
   .nav__tel svg { width: 15px; height: 15px; flex: none; }
   .nav__tel:hover { color: var(--color-accent); }
   @media (max-width: 76rem) { .nav__tel { display: none; } }
-  /* znacznik buildu — celowo prawie niewidoczny (deploy-check dla właściciela) */
-  .nav__build {
-    align-self: center;
-    order: 99;
-    margin-left: 0.6rem;
-    font-size: 0.55rem;
-    letter-spacing: 0.02em;
-    color: currentColor;
-    opacity: 0.13;
-    user-select: all;
-    white-space: nowrap;
-    transition: opacity .2s ease;
-  }
-  .nav__build:hover { opacity: 0.85; }
-  @media (max-width: 72rem) { .nav__build { display: none; } }
   /* Inline login „Strefa" w nawigacji — tokeny Hallmark, ciemny panel */
   .nav-auth { position: relative; }
   .nav-auth__panel {
