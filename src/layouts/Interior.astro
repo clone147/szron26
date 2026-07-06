@@ -3,6 +3,7 @@ import Base from './Base.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { pageSchema } from '../data/page-schema.mjs';
+import { akademia } from '../data/akademia.mjs';
 
 // Layout stron wewnętrznych: ciemny baner nagłówka → biała „kartka" z sekcjami → stopka.
 // Ten sam język wizualny co homepage, bez sticky-hero.
@@ -33,6 +34,10 @@ const site = Astro.site ?? new URL('https://szron.tech');
 const canonical = new URL(Astro.url.pathname, site).href;
 const image = heroImage ? new URL(heroImage, site).href : null;
 const schema = pageSchema(Astro.url.pathname, { title, description, heading, image, canonical, site, dateModified: updated });
+
+// Bramka treści: strony szkoleniowe Akademii pokazują niezalogowanym ~połowę sekcji.
+const slug = Astro.url.pathname.replace(/\/+$/, '').replace(/^\/+/, '');
+const gated = akademia.some((a) => a.slug === slug);
 ---
 <Base title={title} description={description} ogDescription={ogDescription} ogImage={ogImage} schema={schema}>
   <Nav />
@@ -58,4 +63,20 @@ const schema = pageSchema(Astro.url.pathname, { title, description, heading, ima
     <slot />
     <Footer />
   </div>
+  {gated && (
+    <style is:global>
+      .agate-hidden { display: none !important; }
+      .agate-fade { position: relative; }
+      .agate-fade::after { content: ''; position: absolute; inset: auto 0 0 0; height: min(45%, 340px); pointer-events: none; background: linear-gradient(to bottom, transparent, var(--agate-bg, #fff)); }
+      .sect--dark.agate-fade::after { --agate-bg: var(--color-ink); }
+      .agate__card { max-width: 640px; margin: 0 auto; text-align: center; display: grid; gap: var(--space-md); justify-items: center; border: 1px solid var(--color-border, rgba(128,128,128,.35)); border-radius: 12px; padding: var(--space-xl) var(--space-lg); }
+      .agate__card h2 { margin: 0; }
+      .agate__actions { display: flex; gap: var(--space-sm); flex-wrap: wrap; justify-content: center; }
+      .agate__status { font-size: .85rem; opacity: .8; min-height: 1.2em; margin: 0; }
+    </style>
+    <script>
+      import { initGate } from '../lib/akademia-gate.js';
+      initGate();
+    </script>
+  )}
 </Base>
