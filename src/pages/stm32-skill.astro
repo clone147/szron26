@@ -1,0 +1,251 @@
+---
+import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
+---
+<Interior
+  updated="2026-07-06"
+  title="Skill STM32 dla Claude Code — konfigurator | Akademia SZRON"
+  description="Open-source'owy skill Claude Code do firmware STM32: build Keil z CLI, flash ST-Link, debug SWO, weryfikacja sieciowa. Skonfiguruj wersję pod własną płytkę i pobierz."
+  eyebrow="Akademia · Skill STM32"
+  heading="Skill STM32 dla Claude Code: agent, który buduje, wgrywa i weryfikuje firmware."
+  lead="Stworzony w SZRON skill dla Claude Code zamienia agenta w pełnoprawnego inżyniera embedded: kompiluje projekt Keil z linii poleceń, flashuje przez ST-Link, dowodzi przez SWO, że nowy firmware naprawdę działa, i testuje aplikacje sieciowe. Poniżej skonfigurujesz jego wersję pod własną płytkę STM32 — albo pobierzesz oryginał."
+>
+  <ProofStrip items={[
+    ['Pełny workflow', 'build → flash → weryfikacja SWO i HTTP'],
+    ['Sprawdzone pułapki', 'każdy pitfall kosztował realny debugging'],
+    ['Twoja wersja', 'konfigurator generuje skill pod Twoją płytkę'],
+  ]} />
+
+  <!-- 01 co robi skill -->
+  <section class="sect" aria-labelledby="co-robi">
+    <div class="container">
+      <SectHead eyebrow="01 / Skill · Co dostajesz" title="Samowystarczalny workflow embedded dla agenta." id="co-robi" small />
+      <img class="hero-img rv" src="/img/stm32-skill-hero.jpg" alt="Płytka STM32 połączona z matrycą LED RGB 64x64 i kablem Ethernet, w tle terminal agenta AI" width="1380" height="768" loading="lazy" />
+      <div class="prose rv">
+        <p>Skill <code>stm32f429-disco</code> to komplet wiedzy, którego Claude Code potrzebuje, żeby samodzielnie pracować z firmware STM32 — bez pytania Cię o komendy i bez zgadywania. Powstał podczas realnej pracy nad urządzeniem sieciowym z matrycą LED 64x64 i zawiera wyłącznie zweryfikowane fakty: dokładne komendy, kody wyjścia, procedury odzyskiwania i pułapki, z których każda kosztowała godziny debugowania.</p>
+        <h2>Co jest w środku</h2>
+        <ul>
+          <li><strong>SKILL.md</strong> — workflow: napisz kod → podbij wersję buildu → build (Keil UV4 CLI) → flash (STM32CubeProgrammer) → weryfikacja co najmniej dwiema metodami (banner SWO, ping/curl, test współbieżności).</li>
+          <li><strong>references/</strong> — 5 dokumentów: toolchain (komendy, kody wyjścia, edycja XML .uvprojx), mapa projektu (pamięć, taski FreeRTOS, pipeline LCD), cookbook aplikacji sieciowych CycloneTCP, przewodnik maintainera i spec sprzętu.</li>
+          <li><strong>scripts/</strong> — 5 skryptów PowerShell: <code>build</code>, <code>flash</code>, <code>swo</code> (zawsze zwalnia ST-Link), <code>stress</code> (test zamrożenia sterty) i <code>backup</code> pełnego flasha.</li>
+        </ul>
+        <div class="callout"><p><strong>Dlaczego to działa:</strong> ST-Link jest jednokliencki, wyczerpanie sterty FreeRTOS zawiesza urządzenie po cichu, a Keil zwraca kod 1 przy samych warningach. Agent bez tej wiedzy utknie na każdym z tych progów — z nią przechodzi przez nie sam.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 konfigurator -->
+  <section class="sect sect--dark" aria-labelledby="konfigurator">
+    <div class="container">
+      <SectHead eyebrow="02 / Konfigurator · Twoja płytka" title="Wygeneruj wersję pod własny hardware." id="konfigurator" small />
+      <p class="rv">Podaj parametry swojej płytki i projektu — dostaniesz ZIP ze skillem, w którym wszystkie fakty środowiskowe (MCU, zegary, adresy pamięci, ścieżki toolchainu, IP) są już Twoje. Sekcje sieciową i wyświetlacza można wyłączyć. Konfigurowanie jest otwarte dla każdego; pobranie wymaga zalogowania na szron.tech (np. kontem Google).</p>
+
+      <form id="cfg-form" class="cfg rv" autocomplete="off"><!-- generowany z JS --></form>
+
+      <div class="cfg-preview rv">
+        <h3>Podgląd wygenerowanego SKILL.md</h3>
+        <pre><code id="cfg-preview"></code></pre>
+      </div>
+
+      <div class="cfg-actions rv">
+        <div id="auth-box" class="cfg-auth" hidden>
+          <p>Pobieranie wymaga zalogowania.</p>
+          <button type="button" class="btn" id="btn-login">Zaloguj przez Google</button>
+        </div>
+        <p id="auth-status" class="cfg-status"></p>
+        <button type="button" class="btn" id="btn-dl-custom">Pobierz skonfigurowany skill (ZIP)</button>
+        <p id="dl-msg" class="cfg-status" role="status"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 wersja oryginalna -->
+  <section class="sect" aria-labelledby="oryginal">
+    <div class="container">
+      <SectHead eyebrow="03 / Oryginał · Referencyjny hardware" title="Wersja oryginalna: dokładne wymagania." id="oryginal" small />
+      <div class="prose rv">
+        <p>Oryginalny skill jest napisany 1:1 pod konkretne, działające urządzenie. Jeśli odtworzysz ten zestaw, skill zadziała bez żadnej konfiguracji.</p>
+        <h2>Wymagania sprzętowe</h2>
+        <ul>
+          <li><strong>MCU:</strong> STM32F429ZITx (Cortex-M4F) na płytce custom — <em>nie</em> oryginalne Discovery: HSE 25 MHz, SYSCLK 168 MHz, 2 MB Flash, 192 KB RAM + 64 KB CCM.</li>
+          <li><strong>Wyświetlacz:</strong> matryca LED RGB 64x64 ze złączem HUB75, sterowana z LTDC.</li>
+          <li><strong>Sieć:</strong> PHY DP83848 (RMII) + gniazdo RJ45; stos FreeRTOS + CycloneTCP 1.7.2 (Oryx); statyczne IP <code>10.10.1.131</code> zapisane we Flashu (sektor 13 @ <code>0x08104000</code> — przeżywa reflash).</li>
+          <li><strong>Programator:</strong> ST-Link V2 (SWD + SWO).</li>
+        </ul>
+        <h2>Wymagania software (Windows)</h2>
+        <ul>
+          <li>Keil MDK 5.37 z ARM Compiler 5.06u7 (<code>C:\Keil_v5\UV4\UV4.exe</code>).</li>
+          <li>STM32CubeProgrammer (<code>STM32_Programmer_CLI.exe</code>).</li>
+          <li>PowerShell 5+ (skrypty skilla) i Claude Code.</li>
+        </ul>
+      </div>
+
+      <div class="schemas rv">
+        <figure class="schema">
+          <svg viewBox="0 0 460 200" role="img" aria-label="Schemat blokowy: ST-Link, STM32F429, matryca HUB75 i PHY DP83848">
+            <g fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="10" y="70" width="90" height="60" rx="6"/>
+              <rect x="180" y="50" width="110" height="100" rx="6"/>
+              <rect x="360" y="20" width="90" height="70" rx="6"/>
+              <rect x="360" y="115" width="90" height="70" rx="6"/>
+              <path d="M100 100h80M290 60h70M290 145h70"/>
+            </g>
+            <g fill="currentColor" font-size="12" text-anchor="middle" font-family="inherit">
+              <text x="55" y="95">ST-Link V2</text><text x="55" y="112" font-size="10" opacity="0.7">SWD + SWO</text>
+              <text x="235" y="92">STM32F429</text><text x="235" y="109" font-size="10" opacity="0.7">168 MHz / HSE 25</text>
+              <text x="140" y="92" font-size="10" opacity="0.7">SWD</text>
+              <text x="405" y="50">HUB75</text><text x="405" y="67" font-size="10" opacity="0.7">LED 64x64 (LTDC)</text>
+              <text x="325" y="52" font-size="10" opacity="0.7">GPIO</text>
+              <text x="405" y="147">DP83848</text><text x="405" y="164" font-size="10" opacity="0.7">RJ45 / 10.10.1.131</text>
+              <text x="325" y="137" font-size="10" opacity="0.7">RMII</text>
+            </g>
+          </svg>
+          <figcaption>Schemat blokowy referencyjnego urządzenia.</figcaption>
+        </figure>
+        <figure class="schema">
+          <svg viewBox="0 0 460 200" role="img" aria-label="Mapa pamięci Flash: firmware od 0x08000000, konfiguracja w sektorze 13 pod 0x08104000">
+            <g fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="120" y="20" width="220" height="160" rx="4"/>
+              <path d="M120 120h220M120 150h220"/>
+            </g>
+            <rect x="121" y="121" width="218" height="28" fill="currentColor" opacity="0.15"/>
+            <g fill="currentColor" font-size="11" font-family="inherit">
+              <text x="230" y="75" text-anchor="middle">firmware (sektory 0–12)</text>
+              <text x="230" y="139" text-anchor="middle">sektor 13 — konfig urządzenia</text>
+              <text x="230" y="168" text-anchor="middle" opacity="0.7">sektory 14+ (wolne)</text>
+              <text x="350" y="30" font-size="10" opacity="0.7">2 MB Flash</text>
+              <text x="112" y="26" text-anchor="end" font-size="10">0x08000000</text>
+              <text x="112" y="126" text-anchor="end" font-size="10">0x08104000</text>
+            </g>
+            <g fill="currentColor" font-size="10" opacity="0.7" font-family="inherit">
+              <text x="230" y="196" text-anchor="middle">flash.ps1 kasuje tylko sektory zajęte przez obraz — konfig przeżywa</text>
+            </g>
+          </svg>
+          <figcaption>Mapa pamięci Flash — konfiguracja przeżywa reflash.</figcaption>
+        </figure>
+      </div>
+
+      <div class="cfg-actions rv">
+        <button type="button" class="btn" id="btn-dl-original">Pobierz oryginalny skill (ZIP)</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 powiązane -->
+  <section class="sect sect--dark" aria-labelledby="powiazane">
+    <div class="container">
+      <SectHead eyebrow="04 / Czytaj dalej" title="Powiązane materiały." id="powiazane" small />
+      <div class="link-cards rv">
+        <a class="link-card" href="/ai-dla-embedded"><h3>AI dla embedded</h3><p>Jak wdrażamy agentów AI w zespołach firmware i elektroniki.</p></a>
+        <a class="link-card" href="/claude-code"><h3>Claude Code</h3><p>Instalacja, poziomy myślenia, workflow agentowy od podstaw.</p></a>
+        <a class="link-card" href="/tips-and-tricks"><h3>Tips &amp; Tricks</h3><p>Praktyki, skróty i wzorce, które realnie przyspieszają pracę z AI.</p></a>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand heading="Chcesz taki skill dla własnego hardware'u?" text="Budujemy skille i workflow agentowe pod konkretne zespoły embedded — z weryfikacją na prawdziwym sprzęcie. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens." padTop={false} />
+</Interior>
+
+<style is:global>
+  .hero-img { width: 100%; height: auto; border-radius: 10px; margin: var(--space-lg) 0 var(--space-xl); display: block; }
+  .cfg { display: grid; gap: var(--space-lg); margin-top: var(--space-xl); }
+  .cfg fieldset { border: 1px solid var(--color-border, rgba(128,128,128,.35)); border-radius: 8px; padding: var(--space-md) var(--space-lg); display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--space-md); }
+  .cfg legend { padding: 0 .5em; font-weight: 600; }
+  .cfg label { display: grid; gap: .3em; font-size: .85rem; }
+  .cfg label.wide { grid-column: 1 / -1; }
+  .cfg input[type="text"] { font: inherit; font-size: .9rem; padding: .45em .6em; border: 1px solid var(--color-border, rgba(128,128,128,.35)); border-radius: 6px; background: transparent; color: inherit; }
+  .cfg input[type="text"]:focus { outline: 2px solid currentColor; outline-offset: 1px; }
+  .cfg .toggle { grid-column: 1 / -1; display: flex; gap: .6em; align-items: center; font-size: .9rem; }
+  .cfg fieldset.off label:not(.toggle) { opacity: .4; pointer-events: none; }
+  .cfg .hint { opacity: .6; font-size: .75rem; }
+  .cfg-preview { margin-top: var(--space-xl); }
+  .cfg-preview pre { overflow-x: auto; font-size: .8rem; }
+  .cfg-actions { margin-top: var(--space-lg); display: grid; gap: var(--space-sm); justify-items: start; }
+  .cfg-status { font-size: .85rem; opacity: .8; min-height: 1.2em; margin: 0; }
+  .cfg-auth { display: grid; gap: var(--space-sm); justify-items: start; }
+  .schemas { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-xl); margin-top: var(--space-xl); }
+  .schema { margin: 0; }
+  .schema svg { width: 100%; height: auto; }
+  .schema figcaption { font-size: .8rem; opacity: .7; margin-top: .5em; }
+</style>
+
+<script>
+  import { FIELDS, readConfig, renderPreview, currentUser, signInForDownload, finishLoginIfReturning, downloadSkill } from '../lib/stm32-skill.js';
+
+  const form = document.getElementById('cfg-form');
+  const preview = document.getElementById('cfg-preview');
+  const authBox = document.getElementById('auth-box');
+  const authStatus = document.getElementById('auth-status');
+  const dlMsg = document.getElementById('dl-msg');
+
+  // zbuduj formularz
+  for (const g of FIELDS) {
+    const fs = document.createElement('fieldset');
+    fs.innerHTML = `<legend>${g.group}</legend>`;
+    if (g.toggle) {
+      const t = document.createElement('label');
+      t.className = 'toggle';
+      t.innerHTML = `<input type="checkbox" id="f-${g.toggle}" checked> ${g.toggleLabel}`;
+      fs.appendChild(t);
+      t.querySelector('input').addEventListener('change', (e) => {
+        fs.classList.toggle('off', !e.target.checked);
+        update();
+      });
+    }
+    for (const f of g.items) {
+      const l = document.createElement('label');
+      if (f.wide) l.className = 'wide';
+      const span = document.createElement('span');
+      span.textContent = f.label;
+      const inp = document.createElement('input');
+      inp.type = 'text'; inp.id = `f-${f.id}`; inp.value = f.def;
+      l.append(span, inp);
+      if (f.hint) {
+        const h = document.createElement('span');
+        h.className = 'hint'; h.textContent = f.hint;
+        l.appendChild(h);
+      }
+      fs.appendChild(l);
+    }
+    form.appendChild(fs);
+  }
+  form.addEventListener('input', update);
+
+  function update() {
+    preview.textContent = renderPreview(readConfig(form));
+  }
+  update();
+
+  let user = null;
+  async function refreshAuth() {
+    authBox.hidden = !!user;
+    authStatus.textContent = user ? `Zalogowano: ${user.email}` : '';
+  }
+  (async () => {
+    user = await finishLoginIfReturning() || await currentUser();
+    refreshAuth();
+  })();
+
+  document.getElementById('btn-login').addEventListener('click', async () => {
+    const { error } = await signInForDownload();
+    if (error) authStatus.textContent = `Błąd logowania: ${error}`;
+  });
+
+  async function handleDownload(variant) {
+    dlMsg.textContent = 'Generuję ZIP…';
+    const res = await downloadSkill(variant, variant === 'custom' ? readConfig(form) : null);
+    if (res.error === 'auth') {
+      dlMsg.textContent = '';
+      user = null;
+      authBox.hidden = false;
+      authStatus.textContent = 'Zaloguj się, żeby pobrać skill.';
+      authBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    dlMsg.textContent = res.error ? `Błąd: ${res.error}` : `Pobrano ${res.name}.`;
+  }
+  document.getElementById('btn-dl-custom').addEventListener('click', () => handleDownload('custom'));
+  document.getElementById('btn-dl-original').addEventListener('click', () => handleDownload('original'));
+</script>

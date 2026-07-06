@@ -10,5 +10,6 @@ export const akademia = [
   { slug: 'gemini-cli',               title: 'Gemini CLI',                   desc: 'Google Gemini w terminalu — kiedy i jak używać obok Claude Code.' },
   { slug: 'codex-cli',                title: 'OpenAI Codex CLI',             desc: 'Codex CLI w workflow agentowym — mocne strony i ograniczenia.' },
   { slug: 'lm-studio',                title: 'LM Studio',                    desc: 'Lokalne modele LLM przez LM Studio — prywatność i offline.' },
+  { slug: 'stm32-skill',              title: 'Skill STM32 dla Claude Code', desc: 'Konfigurator skilla embedded: build Keil, flash ST-Link, debug SWO — pod Twoją płytkę.' },
   { slug: 'llama-server',             title: 'Lokalny LLM (llama-server)',   desc: 'Własny serwer modeli na infrastrukturze firmy.' },
 ];
