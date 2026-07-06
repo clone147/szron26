@@ -67,6 +67,14 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
             <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <div class="nav-auth__panel" id="nav-auth-panel" role="dialog" aria-label="Logowanie do strefy zamkniętej">
+            <div class="nav-auth__signed" id="nav-auth-signed" hidden>
+              <h3>Twoje konto</h3>
+              <p class="nav-auth__hint nav-auth__who" id="nav-auth-who"></p>
+              <p class="nav-auth__hint" id="nav-auth-scope"></p>
+              <a class="nav-auth__open" id="nav-auth-panel-link" href="/strefa" hidden>Otwórz panel Strefy →</a>
+              <button class="nav-auth__submit" type="button" id="na-logout">Wyloguj</button>
+            </div>
+            <div id="nav-auth-anon">
             <h3>Strefa zamknięta</h3>
             <p class="nav-auth__hint">Zaloguj się loginem lub przez Google.</p>
             <div class="nav-auth__msg" id="nav-auth-msg" hidden></div>
@@ -82,6 +90,7 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
               Zaloguj przez Google
             </button>
             <a class="nav-auth__open" href="/strefa">Otwórz panel →</a>
+            </div>
           </div>
         </li>
       </ul>
@@ -192,11 +201,38 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
     const close = () => { root.classList.remove('is-open'); toggle.setAttribute('aria-expanded', 'false'); };
     const showErr = (t) => { msg.hidden = false; msg.textContent = t; };
 
+    // Panel świadomy sesji: zalogowany widzi konto/wyloguj zamiast formularza;
+    // link „Otwórz panel Strefy" tylko dla zespołu (allowlista).
+    const signedBox = document.getElementById('nav-auth-signed');
+    const anonBox = document.getElementById('nav-auth-anon');
+    async function renderAuthState() {
+      try {
+        const { getSessionUser, isAllowed } = await lib();
+        const user = await getSessionUser();
+        signedBox.hidden = !user;
+        anonBox.hidden = !!user;
+        if (user) {
+          document.getElementById('nav-auth-who').textContent = user.email;
+          const team = isAllowed(user.email);
+          document.getElementById('nav-auth-panel-link').hidden = !team;
+          document.getElementById('nav-auth-scope').textContent = team
+            ? 'Konto zespołu SZRON — masz dostęp do Strefy.'
+            : 'Masz dostęp do pełnych treści Akademii i pobierania skilli.';
+        }
+        return user;
+      } catch (err) { return null; }
+    }
+    document.getElementById('na-logout')?.addEventListener('click', async () => {
+      const { signOut } = await lib();
+      await signOut();
+      window.location.reload();
+    });
+
     toggle.addEventListener('click', (e) => {
       e.stopPropagation();
       const open = root.classList.toggle('is-open');
       toggle.setAttribute('aria-expanded', String(open));
-      if (open) setTimeout(() => document.getElementById('na-email')?.focus(), 30);
+      if (open) renderAuthState().then((user) => { if (!user) setTimeout(() => document.getElementById('na-email')?.focus(), 30); });
     });
     // Zamykaj tylko gdy NACIŚNIĘCIE myszy zaczęło się poza dialogiem — dzięki temu
     // zaznaczanie tekstu w środku z puszczeniem przycisku na zewnątrz NIE zamyka panelu.
