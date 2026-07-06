@@ -60,18 +60,15 @@ export async function waitForSession(maxTries = 20) {
   return getSessionUser();
 }
 
-// Logowanie e-mail/hasło
+// Logowanie e-mail/hasło. Dowolne konto z projektu może się zalogować (klienci
+// Akademii); `team` mówi, czy to konto zespołu z dostępem do Strefy (allowlista).
 export async function signInPassword(email, password) {
   const { data, error } = await getClient().auth.signInWithPassword({
     email: String(email).trim(),
     password,
   });
   if (error) return { error: error.message };
-  if (!isAllowed(data.user?.email)) {
-    await getClient().auth.signOut();
-    return { error: 'To konto nie ma dostępu do strefy SZRON.' };
-  }
-  return { error: null, user: data.user };
+  return { error: null, user: data.user, team: isAllowed(data.user?.email) };
 }
 
 // Logowanie Google (OAuth, PKCE) — powrót na /strefa/auth/callback

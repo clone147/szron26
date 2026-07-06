@@ -1,6 +1,6 @@
 // Bramka treści Akademii: niezalogowani widzą ~połowę sekcji, reszta ukryta
-// za kartą logowania. Sesja = ta sama co Strefa (wspólny klient Supabase),
-// ale bez allowlisty zespołu — wystarczy dowolne zalogowane konto.
+// za kartą logowania e-mail/hasło. Sesja = ta sama co Strefa (wspólny klient
+// Supabase), ale bez allowlisty zespołu — wystarczy dowolne konto z projektu.
 import { getClient, getSessionUser, waitForSession } from './supabase.js';
 
 const HIDDEN_CLASS = 'agate-hidden';
@@ -13,10 +13,12 @@ function buildGateBox() {
       <div class="agate__card rv">
         <p class="eyebrow">Akademia SZRON · pełna treść</p>
         <h2>Dalsza część szkolenia jest dla zalogowanych.</h2>
-        <p>Konto jest darmowe — logujesz się i czytasz całość wszystkich szkoleń Akademii.</p>
-        <div class="agate__actions">
-          <button type="button" class="btn" data-agate-login>Zaloguj przez Google</button>
-        </div>
+        <p>Zaloguj się swoim kontem, a odblokujesz całość wszystkich szkoleń Akademii.</p>
+        <form class="agate__form" data-agate-form>
+          <input class="agate__input" type="email" name="email" placeholder="E-mail" autocomplete="username" required />
+          <input class="agate__input" type="password" name="password" placeholder="Hasło" autocomplete="current-password" required />
+          <button type="submit" class="btn" data-agate-login>Zaloguj</button>
+        </form>
         <p class="agate__status" data-agate-status role="status"></p>
       </div>
     </div>`;
@@ -42,17 +44,24 @@ export async function initGate() {
     gateBox.remove();
   };
 
-  gateBox.querySelector('[data-agate-login]').addEventListener('click', async () => {
+  gateBox.querySelector('[data-agate-form]').addEventListener('submit', async (e) => {
+    e.preventDefault();
     const status = gateBox.querySelector('[data-agate-status]');
-    status.textContent = 'Przekierowuję do logowania…';
-    const { error } = await getClient().auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}${window.location.pathname}?logged=1`,
-        queryParams: { prompt: 'select_account' },
-      },
+    const btn = gateBox.querySelector('[data-agate-login]');
+    btn.disabled = true;
+    status.textContent = 'Logowanie…';
+    const form = e.currentTarget;
+    const { error } = await getClient().auth.signInWithPassword({
+      email: form.email.value.trim(),
+      password: form.password.value,
     });
-    if (error) status.textContent = `Błąd logowania: ${error.message}`;
+    if (error) {
+      status.textContent = `Błąd logowania: ${error.message}`;
+      btn.disabled = false;
+      return;
+    }
+    status.textContent = '';
+    reveal();
   });
 
   // powrót z OAuth → poczekaj na wymianę kodu PKCE; inaczej zwykły check sesji

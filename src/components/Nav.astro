@@ -264,9 +264,10 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
       msg.hidden = true; loginBtn.disabled = true; loginBtn.textContent = 'Logowanie…';
       try {
         const { signInPassword } = await lib();
-        const { error } = await signInPassword(document.getElementById('na-email').value, document.getElementById('na-pass').value);
+        const { error, team } = await signInPassword(document.getElementById('na-email').value, document.getElementById('na-pass').value);
         if (error) { showErr(error); loginBtn.disabled = false; loginBtn.textContent = 'Zaloguj'; return; }
-        window.location.href = '/strefa';
+        // Zespół → panel Strefy; klienci Akademii → pełne treści szkoleń.
+        window.location.href = team ? '/strefa' : '/akademia';
       } catch (err) { showErr('Błąd połączenia. Spróbuj ponownie.'); loginBtn.disabled = false; loginBtn.textContent = 'Zaloguj'; }
     });
 
