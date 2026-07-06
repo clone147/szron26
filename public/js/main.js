@@ -136,7 +136,7 @@
         if (r.bottom < 0 || r.top > window.innerHeight) el.classList.remove("is-view");
       }
     });
-  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.1 });
+  }, { rootMargin: "0px 0px -8% 0px", threshold: [0, 0.1] });
   targets.forEach(function (el) { io.observe(el); });
 })();
 
