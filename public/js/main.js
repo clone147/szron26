@@ -71,6 +71,8 @@
     return ch === ch.toUpperCase() && ch !== lower ? out.toUpperCase() : out;
   };
   var scramble = function (el) {
+    if (el.__scrambling) return;
+    el.__scrambling = true;
     var nodes = [];
     var len = 0;
     (function walk(n) {
@@ -83,7 +85,7 @@
         }
       });
     })(el);
-    if (!nodes.length) return;
+    if (!nodes.length) { el.__scrambling = false; return; }
     // twarda blokada wysokości + overflow na czas animacji — losowe litery mają
     // inne szerokości, więc bez tego zmienia się liczba linii i wszystko
     // poniżej się trzęsie (minHeight nie wystarcza, gdy tekst łamie się SZERZEJ)
@@ -109,7 +111,7 @@
         item.node.textContent = frame < total ? out : original;
       });
       if (frame < total) requestAnimationFrame(tick);
-      else { el.style.height = ""; el.style.overflow = ""; }
+      else { el.style.height = ""; el.style.overflow = ""; el.__scrambling = false; }
     };
     requestAnimationFrame(tick);
   };
@@ -120,18 +122,19 @@
     targets.forEach(function (el) { el.classList.add("is-view"); });
     return;
   }
-  var seen = new WeakSet();
+  /* replay: animacja odpala się przy KAŻDYM wejściu elementu w viewport —
+     po pełnym wyjściu z ekranu (góra lub dół) element się „uzbraja" ponownie */
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
-      if (seen.has(entry.target)) return;
-      /* szybki scroll / skok kotwicowy: element minął viewport bez klatki
-         z isIntersecting — odsłoń od razu, bez scramble (i tak poza ekranem) */
-      var passed = !entry.isIntersecting && entry.boundingClientRect.bottom < 0;
-      if (!entry.isIntersecting && !passed) return;
-      seen.add(entry.target);
-      entry.target.classList.add("is-view");
-      if (!passed && entry.target.hasAttribute("data-scramble")) scramble(entry.target);
-      io.unobserve(entry.target);
+      var el = entry.target;
+      if (entry.isIntersecting) {
+        if (el.classList.contains("is-view")) return;
+        el.classList.add("is-view");
+        if (el.hasAttribute("data-scramble")) scramble(el);
+      } else {
+        var r = entry.boundingClientRect;
+        if (r.bottom < 0 || r.top > window.innerHeight) el.classList.remove("is-view");
+      }
     });
   }, { rootMargin: "0px 0px -8% 0px", threshold: 0.1 });
   targets.forEach(function (el) { io.observe(el); });

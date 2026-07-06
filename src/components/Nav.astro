@@ -205,6 +205,20 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
     // link „Otwórz panel Strefy" tylko dla zespołu (allowlista).
     const signedBox = document.getElementById('nav-auth-signed');
     const anonBox = document.getElementById('nav-auth-anon');
+
+    // Synchroniczny pre-check (bez importu supabase): sesja leży w localStorage,
+    // więc właściwy widok ustawiamy od razu — bez mignięcia formularza logowania.
+    try {
+      const raw = localStorage.getItem('szron-strefa-auth');
+      if (raw) {
+        const email = JSON.parse(raw)?.user?.email;
+        if (email) {
+          document.getElementById('nav-auth-who').textContent = email;
+          signedBox.hidden = false;
+          anonBox.hidden = true;
+        }
+      }
+    } catch (e) { /* uszkodzony wpis — zostaje widok anonimowy */ }
     async function renderAuthState() {
       try {
         const { getSessionUser, isAllowed } = await lib();
@@ -222,6 +236,10 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
         return user;
       } catch (err) { return null; }
     }
+    // pełna weryfikacja (i zakres zespołu) w tle, zanim user w ogóle kliknie
+    if ('requestIdleCallback' in window) requestIdleCallback(() => renderAuthState());
+    else setTimeout(renderAuthState, 400);
+
     document.getElementById('na-logout')?.addEventListener('click', async () => {
       const { signOut } = await lib();
       await signOut();
