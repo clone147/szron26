@@ -31,18 +31,22 @@
     });
   }
 
-  /* ── nagłówki: scramble jak na eyebrows ────────────── */
-  /* .ws (h1/h2 hero i sekcji) + mniejsze nagłówki dostają rv + data-scramble */
-  document
-    .querySelectorAll(
-      ".ws, .card-tile h3, .step h3, .def-rows dt, " +
-      ".card-tile p, .step p, .def-rows dd, .sect-lead, " +
-      ".page-hero__lead, .quote-card blockquote"
-    )
-    .forEach(function (el) {
-      el.classList.add("rv");
-      el.setAttribute("data-scramble", "");
-    });
+  /* ── scramble na wszystkich tekstach ───────────────── */
+  /* wszystkie blokowe elementy tekstowe; animujemy tylko "liście" (bez
+     zagnieżdżonych bloków), żeby te same text-node'y nie miały dwóch
+     konkurujących animacji; nav pomijamy — jest widoczny od startu */
+  var SCRAMBLE_SEL =
+    "h1, h2, h3, h4, h5, h6, p, li, dt, dd, blockquote, figcaption, summary, th, td";
+  document.querySelectorAll(SCRAMBLE_SEL).forEach(function (el) {
+    if (el.closest("nav")) return;
+    if (el.querySelector(SCRAMBLE_SEL)) return;
+    el.classList.add("rv");
+    el.setAttribute("data-scramble", "");
+  });
+  document.querySelectorAll(".ws").forEach(function (el) {
+    el.classList.add("rv");
+    el.setAttribute("data-scramble", "");
+  });
 
   /* ── scramble (dekodowanie liter) ──────────────────── */
   /* działa na text-node'ach, więc nie niszczy zagnieżdżonych elementów
@@ -119,10 +123,14 @@
   var seen = new WeakSet();
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
-      if (!entry.isIntersecting || seen.has(entry.target)) return;
+      if (seen.has(entry.target)) return;
+      /* szybki scroll / skok kotwicowy: element minął viewport bez klatki
+         z isIntersecting — odsłoń od razu, bez scramble (i tak poza ekranem) */
+      var passed = !entry.isIntersecting && entry.boundingClientRect.bottom < 0;
+      if (!entry.isIntersecting && !passed) return;
       seen.add(entry.target);
       entry.target.classList.add("is-view");
-      if (entry.target.hasAttribute("data-scramble")) scramble(entry.target);
+      if (!passed && entry.target.hasAttribute("data-scramble")) scramble(entry.target);
       io.unobserve(entry.target);
     });
   }, { rootMargin: "0px 0px -8% 0px", threshold: 0.1 });
