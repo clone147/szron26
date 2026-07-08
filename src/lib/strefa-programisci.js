@@ -1,6 +1,6 @@
 // Aplikacja „Programiści" strefy zamkniętej SZRON — kokpit do prowadzenia programistów
 // ku autonomicznemu programowaniu intencyjnemu. Dane w schemacie `strefa` (RLS), styl jak „Szkolenia".
-import { getClient, getTeamUser, startRealtime, pollBlocked } from './supabase.js';
+import { getClient, getTeamUser, startRealtime, pollBlocked, uploadNoteImage, removeStoragePaths } from './supabase.js';
 import { $, $$, esc, toast as uiToast, openModal, closeModal, setOnModalClose, confirmDialog, fmtDate, fmtDateTime, todayStr, telHref, ICONS, STAGES, stageColor, stageName, SUBS, bindSearch, bindFileImport, downloadJSON } from './strefa-ui.js';
 import { createGridNav } from './strefa-grid.js';
 
@@ -41,7 +41,49 @@ const ICO = {
   up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 15 7-7 7 7"/></svg>',
   lines: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>',
   building: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/></svg>',
+  download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>',
 };
+
+/* ── obrazki notatek: miniatury + lightbox z pobieraniem ── */
+// Miniatury do wyświetlenia. delNoteId (opcjonalne) dorzuca przycisk usunięcia obrazka z notatki.
+function thumbsHTML(images, delNoteId) {
+  const imgs = images || [];
+  if (!imgs.length) return '';
+  return `<div class="note-thumbs">${imgs.map((im) => `<div class="note-thumb-wrap">
+    <button type="button" class="note-thumb" data-img="${esc(im.url)}" title="Powiększ / pobierz"><img src="${esc(im.url)}" alt="" loading="lazy"></button>
+    ${delNoteId ? `<button type="button" class="note-thumb__del" data-delimg="${esc(im.path)}" data-note="${esc(delNoteId)}" title="Usuń obrazek">${ICO.x}</button>` : ''}
+  </div>`).join('')}</div>`;
+}
+// Podepnij lightbox pod wszystkie miniatury [data-img] w kontenerze.
+function bindThumbs(host) {
+  host.querySelectorAll('[data-img]').forEach((el) => el.addEventListener('click', (e) => { e.stopPropagation(); openLightbox(el.dataset.img); }));
+}
+// Pobierz obraz jako plik (fetch→blob, żeby pobierało zamiast nawigować przy cross-origin).
+async function downloadImage(url) {
+  try {
+    const blob = await (await fetch(url)).blob();
+    const obj = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = obj; a.download = (url.split('/').pop() || 'obraz').split('?')[0] || 'obraz.png';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(obj), 1000);
+  } catch (_) { window.open(url, '_blank', 'noopener'); }
+}
+function openLightbox(url) {
+  const ov = document.createElement('div');
+  ov.className = 'img-lightbox';
+  ov.innerHTML = `<div class="img-lightbox__bar">
+      <button type="button" class="strefa-btn strefa-btn--accent strefa-btn--sm" data-dl>${ICO.download} Pobierz</button>
+      <button type="button" class="strefa-iconbtn" data-close>${ICO.x}</button>
+    </div><img src="${esc(url)}" alt="">`;
+  document.body.appendChild(ov);
+  const close = () => { ov.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
+  ov.querySelector('[data-close]').addEventListener('click', close);
+  ov.querySelector('[data-dl]').addEventListener('click', (e) => { e.stopPropagation(); downloadImage(url); });
+  document.addEventListener('keydown', onKey);
+}
 
 /* ── model coachingu (STAGES/stageColor/stageName/SUBS — wspólne w ./strefa-ui.js) ── */
 const MINDSETS = ['entuzjasta', 'pragmatyk', 'sceptyk'];
@@ -621,7 +663,8 @@ async function loadSkills(panel, d) {
 async function renderListTab(panel, d, kind) {
   panel.innerHTML = `<div class="strefa-modal__section" id="add-sec"></div><div id="list-sec">Wczytuję…</div>`;
   const addSec = $('#add-sec', panel);
-  if (kind === 'notes') addSec.innerHTML = `<h3>Nowa notatka</h3><textarea class="strefa-textarea" id="x-note" placeholder="Obserwacja, ustalenie, wniosek…"></textarea>
+  if (kind === 'notes') addSec.innerHTML = `<h3>Nowa notatka</h3><textarea class="strefa-textarea" id="x-note" placeholder="Obserwacja, ustalenie, wniosek…  (wklej obrazek: ⌘V / Ctrl+V)"></textarea>
+    <div class="note-stage" id="x-stage" hidden></div>
     <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="x-clear">Wyczyść</button><button class="strefa-btn strefa-btn--accent strefa-btn--sm" id="x-add">Dodaj notatkę</button></div>`;
   if (kind === 'meetings') addSec.innerHTML = `<div id="meet-sync-ind" class="sync-ind" hidden></div><h3>Nowe spotkanie</h3><div class="strefa-grid2">
     <div class="strefa-field"><label>Termin</label><input class="strefa-input fp-dt" type="text" id="x-at" placeholder="kliknij lub wpisz…"></div>
@@ -637,6 +680,41 @@ async function renderListTab(panel, d, kind) {
     <div class="strefa-field" style="margin-top:var(--space-sm)"><label>Treść promptu</label><textarea class="strefa-textarea" id="x-prompt" placeholder="Wklej najlepszy prompt…"></textarea></div>
     <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--accent strefa-btn--sm" id="x-add">Dodaj prompt (${fmtDate(todayStr())})</button></div>`;
   $('#x-clear', addSec)?.addEventListener('click', () => { const t = $('#x-note', addSec); if (t) t.value = ''; });
+  // notatki: wklejanie obrazków (⌘V) → upload do storage, staging miniatur; pending idzie do insertu
+  if (kind === 'notes') {
+    const pending = [];
+    addSec._pending = pending;
+    const stage = $('#x-stage', addSec);
+    const renderStage = () => {
+      if (!pending.length) { stage.hidden = true; stage.innerHTML = ''; return; }
+      stage.hidden = false;
+      stage.innerHTML = pending.map((im, i) => `<div class="note-thumb-wrap">
+        <button type="button" class="note-thumb" data-img="${esc(im.url)}" title="Powiększ / pobierz"><img src="${esc(im.url)}" alt=""></button>
+        <button type="button" class="note-thumb__del" data-rm="${i}" title="Usuń obrazek">${ICO.x}</button></div>`).join('');
+      bindThumbs(stage);
+      stage.querySelectorAll('[data-rm]').forEach((b) => b.addEventListener('click', async (e) => {
+        e.stopPropagation(); const idx = +b.dataset.rm; const im = pending[idx]; if (!im) return;
+        pending.splice(idx, 1); renderStage(); await removeStoragePaths([im.path]);
+      }));
+    };
+    addSec._clearStage = () => { pending.length = 0; renderStage(); };
+    const uploadFile = async (file) => {
+      if (!file || !file.type?.startsWith('image/')) return;
+      toast('Wgrywanie…', file.name || 'obraz');
+      const res = await uploadNoteImage(file, d.id);
+      if (res.error) return toast('Błąd uploadu', res.error, 'err');
+      pending.push({ path: res.path, url: res.url }); renderStage();
+      toast('Dodano', 'Obrazek dołączony', 'ok');
+    };
+    $('#x-note', addSec).addEventListener('paste', (e) => {
+      for (const it of (e.clipboardData?.items || [])) {
+        if (it.kind === 'file' && it.type?.startsWith('image/')) { const f = it.getAsFile(); if (f) { e.preventDefault(); uploadFile(f); } return; }
+      }
+    });
+    $('#x-clear', addSec)?.addEventListener('click', async () => {
+      if (!pending.length) return; const paths = pending.map((im) => im.path); pending.length = 0; renderStage(); await removeStoragePaths(paths);
+    });
+  }
   if (kind === 'meetings') fpDateTime($('#x-at', addSec), new Date());
   if (kind === 'tasks') fpDate($('#x-due', addSec), new Date());
   let busy = false;
@@ -650,9 +728,11 @@ async function renderListTab(panel, d, kind) {
 }
 async function addListItem(d, kind, sec) {
   if (kind === 'notes') {
-    const note = $('#x-note', sec).value.trim(); if (!note) return toast('Pusto', 'Wpisz notatkę', 'err');
-    const { error } = await sb.from('dev_notes').insert({ developer_id: d.id, note });
-    if (error) return toast('Błąd', error.message, 'err'); $('#x-note', sec).value = ''; toast('Dodano', 'Notatka', 'ok');
+    const note = $('#x-note', sec).value.trim();
+    const images = sec._pending || [];
+    if (!note && !images.length) return toast('Pusto', 'Wpisz notatkę lub wklej obrazek', 'err');
+    const { error } = await sb.from('dev_notes').insert({ developer_id: d.id, note, images });
+    if (error) return toast('Błąd', error.message, 'err'); $('#x-note', sec).value = ''; sec._clearStage?.(); toast('Dodano', 'Notatka', 'ok');
   } else if (kind === 'meetings') {
     const title = $('#x-title', sec).value.trim(); const at = $('#x-at', sec).value;
     const dur = +($('#x-dur', sec)?.value || 30);
@@ -676,7 +756,18 @@ async function loadList(d, kind) {
   const host = $('#list-sec'); if (!host) return;
   if (kind === 'notes') {
     const { data } = await sb.from('dev_notes').select('*').eq('developer_id', d.id).order('created_at', { ascending: false });
-    host.innerHTML = (data || []).length ? data.map((n) => `<div class="note" data-id="${n.id}"><div class="note__head"><span class="note__time">${fmtDateTime(n.created_at)}</span><button class="strefa-iconbtn" data-del="dev_notes" data-id="${n.id}">${ICO.trash}</button></div><pre style="white-space:pre-wrap;font-family:var(--font-body);margin:0;font-size:var(--text-s)">${esc(n.note)}</pre></div>`).join('') : '<p class="note-empty">Brak notatek.</p>';
+    host.innerHTML = (data || []).length ? data.map((n) => `<div class="note" data-id="${n.id}"><div class="note__head"><span class="note__time">${fmtDateTime(n.created_at)}</span><button class="strefa-iconbtn" data-del="dev_notes" data-id="${n.id}">${ICO.trash}</button></div>${n.note ? `<pre style="white-space:pre-wrap;font-family:var(--font-body);margin:0;font-size:var(--text-s)">${esc(n.note)}</pre>` : ''}${thumbsHTML(n.images, n.id)}</div>`).join('') : '<p class="note-empty">Brak notatek.</p>';
+    bindThumbs(host);
+    host.querySelectorAll('[data-delimg]').forEach((b) => b.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!(await confirmDialog('Usunąć ten obrazek z notatki?'))) return;
+      const rec = (data || []).find((x) => x.id === b.dataset.note); if (!rec) return;
+      const left = (rec.images || []).filter((im) => im.path !== b.dataset.delimg);
+      const { error } = await sb.from('dev_notes').update({ images: left }).eq('id', b.dataset.note);
+      if (error) return toast('Błąd', error.message, 'err');
+      await removeStoragePaths([b.dataset.delimg]);
+      toast('Usunięto', 'Obrazek', 'ok'); loadList(d, 'notes');
+    }));
   } else if (kind === 'meetings') {
     const { data } = await sb.from('dev_meetings').select('*').eq('developer_id', d.id).order('meeting_at', { ascending: false });
     host.innerHTML = (data || []).length ? data.map((m) => {
@@ -759,6 +850,10 @@ async function loadList(d, kind) {
       const r = await syncMeeting('delete', b.dataset.id);
       if (!r.ok) return toast('Błąd', r.msg, 'err');
     } else {
+      if (b.dataset.del === 'dev_notes') {
+        const { data: rec } = await sb.from('dev_notes').select('images').eq('id', b.dataset.id).single();
+        await removeStoragePaths((rec?.images || []).map((im) => im.path));
+      }
       const { error } = await sb.from(b.dataset.del).delete().eq('id', b.dataset.id);
       if (error) return toast('Błąd', error.message, 'err');
     }
@@ -919,13 +1014,13 @@ async function loadHistory(ym, devId) {
   host.innerHTML = 'Wczytuję…';
   const [start, end] = monthRange(ym);
   let evq = sb.from('dev_events').select('id,developer_id,event_type,summary,created_at').gte('created_at', start).lt('created_at', end);
-  let nq = sb.from('dev_notes').select('id,developer_id,note,created_at').gte('created_at', start).lt('created_at', end);
+  let nq = sb.from('dev_notes').select('id,developer_id,note,images,created_at').gte('created_at', start).lt('created_at', end);
   if (devId) { evq = evq.eq('developer_id', devId); nq = nq.eq('developer_id', devId); }
   const [{ data: ev, error: ee }, { data: nt }] = await Promise.all([evq, nq]);
   if (ee) { host.innerHTML = `<p class="hist-empty">Błąd: ${esc(ee.message)}</p>`; return; }
   const items = [
     ...(ev || []).map((e) => ({ kind: 'event', id: e.id, table: 'dev_events', developer_id: e.developer_id, created_at: e.created_at, type: e.event_type, text: e.summary })),
-    ...(nt || []).map((n) => ({ kind: 'note', id: n.id, table: 'dev_notes', developer_id: n.developer_id, created_at: n.created_at, type: 'notatka', text: n.note })),
+    ...(nt || []).map((n) => ({ kind: 'note', id: n.id, table: 'dev_notes', developer_id: n.developer_id, created_at: n.created_at, type: 'notatka', text: n.note, images: n.images })),
   ].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
   if (!items.length) { host.innerHTML = `<p class="hist-empty">Brak zdarzeń i notatek w miesiącu ${esc(fmtMonth(ym))}.${devId ? '' : ' Zmień miesiąc, by zobaczyć inne okresy.'}</p>`; return; }
   const byDay = new Map();
@@ -934,8 +1029,13 @@ async function loadHistory(ym, devId) {
     <div class="hist-day"><span class="hist-day__date">${esc(fmtDate(day))}</span></div>
     ${list.map(histItemHTML).join('')}`).join('');
   host.querySelectorAll('[data-open]').forEach((el) => el.addEventListener('click', () => openProfile(el.dataset.open)));
+  bindThumbs(host);
   host.querySelectorAll('[data-del-hist]').forEach((b) => b.addEventListener('click', async (e) => {
     e.stopPropagation();
+    if (b.dataset.table === 'dev_notes') {
+      const { data: rec } = await sb.from('dev_notes').select('images').eq('id', b.dataset.id).single();
+      await removeStoragePaths((rec?.images || []).map((im) => im.path));
+    }
     const { error } = await sb.from(b.dataset.table).delete().eq('id', b.dataset.id);
     if (error) return toast('Błąd', error.message, 'err');
     toast('Usunięto', 'Wpis skasowany z historii', 'ok');
@@ -958,6 +1058,7 @@ function histItemHTML(it) {
         <button class="strefa-iconbtn hist-item__del" data-del-hist data-table="${it.table}" data-id="${it.id}" title="Usuń wpis z historii" aria-label="Usuń wpis z historii">${ICO.trash}</button>
       </div>
       <div class="hist-item__txt">${it.kind === 'note' ? `<span class="hist-note-label">Notatka:</span> ${esc(it.text)}` : esc(it.text)}</div>
+      ${it.kind === 'note' ? thumbsHTML(it.images) : ''}
     </div></div>`;
 }
 

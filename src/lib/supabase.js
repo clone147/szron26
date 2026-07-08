@@ -123,6 +123,27 @@ export async function uploadSlideImage(file, trainingId, kind = 'slides') {
   return { url: data.publicUrl, path };
 }
 
+// Upload obrazka notatki programisty (ten sam bucket strefa-slajdy, prefix dev-notes/{devId}).
+// Zwraca { url, path } albo { error }.
+export async function uploadNoteImage(file, developerId) {
+  const ext = (file.name?.split('.').pop() || 'png').toLowerCase();
+  const path = `dev-notes/${developerId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const sb = getClient();
+  const { error } = await sb.storage.from(SLIDES_BUCKET)
+    .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type || 'image/png' });
+  if (error) return { error: error.message };
+  const { data } = sb.storage.from(SLIDES_BUCKET).getPublicUrl(path);
+  return { url: data.publicUrl, path };
+}
+
+// Usuń obiekty ze storage (bucket strefa-slajdy) po ścieżkach. Zwraca { error }.
+export async function removeStoragePaths(paths) {
+  const list = (paths || []).filter(Boolean);
+  if (!list.length) return { error: null };
+  const { error } = await getClient().storage.from(SLIDES_BUCKET).remove(list);
+  return { error: error ? error.message : null };
+}
+
 // Strażnik strony strefy: jeśli brak sesji lub e-mail spoza allowlisty → redirect na login.
 // Zwraca usera, gdy dostęp OK (albo nic nie zwraca i przekierowuje).
 export async function requireAuth(loginPath = '/strefa/login') {
