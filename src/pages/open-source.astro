@@ -54,6 +54,18 @@ const tools = [
     install: 'claude install-skill https://github.com/clone147/subtitle-downloader',
     github: 'https://github.com/clone147/subtitle-downloader',
   },
+  {
+    name: 'stm32f429-disco-skill',
+    badges: [{ label: 'Claude Code Skill' }, { label: 'NEW', kind: 'new' }],
+    desc: 'Agent AI buduje, wgrywa i debuguje firmware STM32 z panelem LED 64×64 — i sam sprawdza efekt na fizycznym sprzęcie przez kamerę RTSP. Dwie platformy: Keil na Windows i w pełni open-source\'owy GCC na macOS.',
+    features: [
+      'Build + flash + debug SWO/GDB: Windows (Keil) i macOS (GCC, st-flash, OpenOCD)',
+      'Weryfikacja na sprzęcie — kamera RTSP mierzy, czy panel naprawdę świeci',
+      'HTTPS na mikrokontrolerze: mbedTLS + CycloneTCP, handshake w 1,7 s na 168 MHz',
+    ],
+    install: 'claude install-skill https://github.com/clone147/stm32f429-disco-skill',
+    github: 'https://github.com/clone147/stm32f429-disco-skill',
+  },
 ];
 ---
 <Interior
@@ -67,7 +79,7 @@ const tools = [
 >
   <!-- proof -->
   <ProofStrip items={[
-    ['4 narzędzia', 'serwer MCP + skille Claude Code'],
+    ['5 narzędzi', 'serwer MCP + skille Claude Code'],
     ['37 wzorców', 'w humanizerze polskiego tekstu'],
     ['MIT License', 'za darmo, bez haczyków'],
   ]} />
