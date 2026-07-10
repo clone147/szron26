@@ -1,0 +1,52 @@
+/* CSS komponentu ShotGallery — przeniesione verbatim ze scoped <style> w
+   src/components/ShotGallery.astro (selektory bez astro-scope; :global() zdjęte). */
+
+.shot-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--shot-cols, 3), 1fr);
+  gap: var(--space-lg);
+  margin-top: var(--space-2xl);
+}
+@media (max-width: 900px) { .shot-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .shot-grid { grid-template-columns: 1fr; } }
+
+.shot { margin: 0; }
+.shot-btn {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  cursor: zoom-in;
+  background: var(--color-paper-2);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.sect--dark .shot-btn { border-color: var(--color-line-dark); background: var(--color-ink-2); }
+.shot-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 32px oklch(17% 0.01 240 / 0.18); }
+.shot-btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.shot-btn img { display: block; width: 100%; height: auto; }
+.shot-zoom {
+  position: absolute; right: .6rem; bottom: .6rem;
+  display: grid; place-items: center;
+  width: 2rem; height: 2rem;
+  border-radius: 50%;
+  background: var(--color-scrim);
+  color: var(--color-text-inv);
+  font-size: 1rem;
+  opacity: 0; transition: opacity .2s ease;
+}
+.shot-btn:hover .shot-zoom { opacity: 1; }
+.shot figcaption {
+  margin-top: var(--space-xs);
+  font-size: var(--text-s, .875rem);
+  color: var(--color-text-2);
+}
+.sect--dark .shot figcaption { color: var(--color-text-inv-2); }
+
+/* ── Adapter DS: neutralizacja reveal-on-scroll ─────────────────────────
+   Na stronie .rv startuje z opacity:0 i czeka na IntersectionObserver
+   (main.js dodaje .is-view). W claude.ai/design nie ma tego skryptu —
+   bez tej reguły każdy element z klasą rv byłby niewidoczny. */
+.rv { opacity: 1; transform: none; }

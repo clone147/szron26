@@ -1,0 +1,16 @@
+export { BtnArrow } from './BtnArrow';
+export type { BtnArrowProps } from './BtnArrow';
+export { SectHead } from './SectHead';
+export type { SectHeadProps } from './SectHead';
+export { ProofStrip } from './ProofStrip';
+export type { ProofStripProps } from './ProofStrip';
+export { Faq } from './Faq';
+export type { FaqProps, FaqItem } from './Faq';
+export { CtaBand } from './CtaBand';
+export type { CtaBandProps } from './CtaBand';
+export { ShotGallery } from './ShotGallery';
+export type { ShotGalleryProps, ShotItem } from './ShotGallery';
+export { Nav } from './Nav';
+export type { NavProps, NavLink } from './Nav';
+export { Footer } from './Footer';
+export type { FooterProps, FooterCol } from './Footer';

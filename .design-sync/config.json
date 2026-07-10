@@ -1,0 +1,26 @@
+{
+  "projectId": "90f71133-7310-4329-938d-f563f190e204",
+  "shape": "package",
+  "pkg": "szron-ds",
+  "globalName": "SzronDS",
+  "srcDir": "src",
+  "cssEntry": "styles/compiled.css",
+  "buildCmd": "npm run build --prefix ds",
+  "overrides": {
+    "Nav": {
+      "cardMode": "single",
+      "primaryStory": "Default",
+      "viewport": "1280x220"
+    },
+    "Footer": {
+      "cardMode": "column"
+    },
+    "CtaBand": {
+      "cardMode": "column"
+    },
+    "ProofStrip": {
+      "cardMode": "column"
+    }
+  },
+  "readmeHeader": ".design-sync/conventions.md"
+}

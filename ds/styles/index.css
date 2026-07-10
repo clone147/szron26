@@ -1,0 +1,6 @@
+/* Wejście CSS design systemu SZRON — repo CSS bez zmian + adaptery DS.
+   tokens.css i main.css jadą wprost z src/styles/ (źródło prawdy strony). */
+@import "../../src/styles/tokens.css";
+@import "./fonts.css";
+@import "../../src/styles/main.css";
+@import "./components.css";
