@@ -11,14 +11,22 @@
  * - MutationObserver — React montuje komponenty po inicjalizacji.
  */
 
-const SCRAMBLE_SEL =
+const BLOCK_SEL =
   'h1, h2, h3, h4, h5, h6, p, li, dt, dd, blockquote, figcaption, summary, th, td';
+const INLINE_SEL =
+  'a, button, span, strong, em, b, small, label, legend, caption, address';
+const SCRAMBLE_SEL = BLOCK_SEL + ', ' + INLINE_SEL;
 
-/* jak na stronie: animujemy tylko liście (bez zagnieżdżonych bloków); nav pomijamy */
+/* jak na stronie: WSZYSTKIE obiekty tekstowe (bloki + przyciski/linki/spany);
+   jeden animator na poddrzewo — kontener z blokiem w środku i element pod już
+   otagowanym przodkiem są pomijane; nav widoczny od startu */
 function tag(root: ParentNode): void {
   root.querySelectorAll(SCRAMBLE_SEL).forEach((el) => {
     if (el.closest('nav')) return;
-    if (el.querySelector(SCRAMBLE_SEL)) return;
+    if (el.closest('[aria-hidden="true"]')) return;
+    if (el.querySelector(BLOCK_SEL)) return;
+    if (el.parentElement?.closest('[data-scramble]')) return;
+    if (!el.textContent || !el.textContent.trim()) return;
     el.classList.add('rv');
     el.setAttribute('data-scramble', '');
   });
@@ -60,6 +68,8 @@ function scramble(el: HTMLElement & { __scrambling?: boolean }): void {
         nodes.push({ node: c as Text, orig: c.textContent });
         len += c.textContent.length;
       } else if (c.nodeType === Node.ELEMENT_NODE) {
+        // ikony/dekoracje (⤢, +, strzałki) nie są tekstem — nie losujemy ich
+        if ((c as Element).getAttribute('aria-hidden') === 'true') continue;
         walk(c);
       }
     }

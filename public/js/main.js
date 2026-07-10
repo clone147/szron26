@@ -32,14 +32,23 @@
   }
 
   /* ── scramble na wszystkich tekstach ───────────────── */
-  /* wszystkie blokowe elementy tekstowe; animujemy tylko "liście" (bez
-     zagnieżdżonych bloków), żeby te same text-node'y nie miały dwóch
-     konkurujących animacji; nav pomijamy — jest widoczny od startu */
-  var SCRAMBLE_SEL =
+  /* WSZYSTKIE obiekty tekstowe — bloki + przyciski, linki, spany w boxach.
+     Zasada „jeden animator na poddrzewo": kontener z zagnieżdżonym blokiem
+     nie jest tagowany (animują się liście), a element, którego przodek już
+     dostał data-scramble, jest pomijany (scramble i tak animuje jego
+     text-node'y — dwóch konkurujących animacji być nie może);
+     nav pomijamy — jest widoczny od startu */
+  var BLOCK_SEL =
     "h1, h2, h3, h4, h5, h6, p, li, dt, dd, blockquote, figcaption, summary, th, td";
+  var INLINE_SEL =
+    "a, button, span, strong, em, b, small, label, legend, caption, address";
+  var SCRAMBLE_SEL = BLOCK_SEL + ", " + INLINE_SEL;
   document.querySelectorAll(SCRAMBLE_SEL).forEach(function (el) {
     if (el.closest("nav")) return;
-    if (el.querySelector(SCRAMBLE_SEL)) return;
+    if (el.closest('[aria-hidden="true"]')) return;
+    if (el.querySelector(BLOCK_SEL)) return;
+    if (el.parentElement && el.parentElement.closest("[data-scramble]")) return;
+    if (!el.textContent.trim()) return;
     el.classList.add("rv");
     el.setAttribute("data-scramble", "");
   });
@@ -81,6 +90,8 @@
           nodes.push({ node: c, orig: c.textContent });
           len += c.textContent.length;
         } else if (c.nodeType === Node.ELEMENT_NODE) {
+          /* ikony/dekoracje (⤢, +, strzałki) nie są tekstem — nie losujemy ich */
+          if (c.getAttribute("aria-hidden") === "true") return;
           walk(c);
         }
       });
