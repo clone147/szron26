@@ -1,3 +1,4 @@
+import './reveal';
 export { BtnArrow } from './BtnArrow';
 export type { BtnArrowProps } from './BtnArrow';
 export { SectHead } from './SectHead';

@@ -15,7 +15,7 @@ Każda sekcja: `<section class="sect">` (jasna) lub `<section class="sect sect--
 - Hero: `hero`, `hero__grid`, `hero__title`, `hero__lead`, `hero__cta`, `hero__panel`, `hero__proof`
 - Nawigacja/stopka: `nav`, `nav__inner`, `nav__links`, `logo`, `footer`, `footer__grid`, `footer__col`, `footer__legal`, `footer__mark`
 - Galerie: `shot-grid`, `shot`, `shot-btn`
-- `rv` (reveal-on-scroll) jest zneutralizowane w DS — możesz je pisać dla zgodności z markupem strony, ale nic nie animuje.
+- `rv` (reveal-on-scroll) DZIAŁA: dawaj klasę `rv` każdemu blokowi tekstu/karcie, która ma się wjeżdżać przy scrollu (nagłówki: `ws` + atrybut `data-scramble` dla efektu literowego). Runtime w bundle uzbraja animacje przy pierwszym scrollu i odpala je przy każdym wejściu elementu na viewport; opóźnienie kaskady per element: `style={{ '--rv-d': '0.12s' }}`. Bez scrolla/JS treść jest po prostu widoczna — klasy są bezpieczne zawsze.
 
 ## Tokeny (tokens.css — pełna lista w styles.css)
 
