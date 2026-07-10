@@ -11,10 +11,12 @@
   (w ds/node_modules jest self-symlink `szron-ds -> ../..` — odtworzyć po świeżym clone).
 - Fonty: build-css kopiuje woff2 z `public/fonts` do `ds/styles/fonts/` (gitignored) i przepisuje
   `url(/fonts/…)` → `./fonts/…` — pliki spoza `ds/` nie przechodzą przez bound cssEntry.
-- Reveal-on-scroll: runtime `ds/src/reveal.ts` (port public/js/main.js — IO + replay + scramble)
-  jedzie w _ds_bundle.js; uzbraja się przy pierwszym scrollu (html.rv-armed). Do tego czasu CSS
-  `html:not(.rv-armed) .rv` trzyma treść widoczną — dlatego screenshoty/render check są stabilne
-  (bez scrolla nic się nie chowa ani nie scrambluje). Po zmianie main.js zsynchronizować port.
+- Animacje tekstu: runtime `ds/src/reveal.ts` = wierny port public/js/main.js (auto-tagowanie
+  wszystkich tekstowych liści rv+data-scramble poza <nav>, IO z replay, scramble z blokadą
+  wysokości, identyczne SETS/KEEP). Startuje od załadowania jak na stronie; wyłącza się przy
+  `navigator.webdriver` (headless capture) i prefers-reduced-motion — wtedy CSS
+  `html:not(.rv-armed) .rv` trzyma treść widoczną, stąd stabilny render check.
+  Po zmianie main.js zsynchronizować port.
 - Nav: wariant statyczny — pominięte dropdowny Oferta/Akademia, panel logowania Strefy i
   `.nav__tel` (scoped CSS + JS w Nav.astro). Podgląd wymaga ciemnego tła (logo-dark = biały napis)
   i viewportu ≥64rem (breakpoint chowa `.nav__links`); override w config: single/1280x220.

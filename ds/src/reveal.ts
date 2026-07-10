@@ -1,17 +1,38 @@
 /**
- * Runtime animacji reveal-on-scroll — port public/js/main.js strony szron.tech.
+ * Runtime animacji tekstu — wierny port public/js/main.js strony szron.tech:
+ * auto-tagowanie wszystkich tekstowych „liści" (rv + data-scramble), reveal
+ * przy wejściu na viewport z replay po pełnym wyjściu, scramble (dekodowanie
+ * losowych liter o zbliżonej szerokości) z twardą blokadą wysokości.
  *
- * Różnica wobec strony: animacje uzbrajają się dopiero przy pierwszej interakcji
- * (scroll/wheel/touch). Do tego czasu CSS `html:not(.rv-armed) .rv` trzyma wszystko
- * widoczne — treść nigdy nie ginie w renderze statycznym (screenshoty, brak JS),
- * a elementy wjeżdżające na viewport przy scrollu animują się jak na stronie
- * (replay przy każdym pełnym wyjściu z ekranu; nagłówki .ws z data-scramble
- * dostają efekt „scramble" liter).
+ * Adaptacje pod DS (reszta 1:1 ze stroną):
+ * - `html.rv-armed` — do czasu uzbrojenia CSS trzyma treść widoczną, więc
+ *   render bez JS nigdy nie ukrywa tekstu;
+ * - `navigator.webdriver` (headless capture) → bez animacji, wszystko widoczne;
+ * - MutationObserver — React montuje komponenty po inicjalizacji.
  */
 
-const KEEP = /[\s.,:;!?()—–-]/;
+const SCRAMBLE_SEL =
+  'h1, h2, h3, h4, h5, h6, p, li, dt, dd, blockquote, figcaption, summary, th, td';
+
+/* jak na stronie: animujemy tylko liście (bez zagnieżdżonych bloków); nav pomijamy */
+function tag(root: ParentNode): void {
+  root.querySelectorAll(SCRAMBLE_SEL).forEach((el) => {
+    if (el.closest('nav')) return;
+    if (el.querySelector(SCRAMBLE_SEL)) return;
+    el.classList.add('rv');
+    el.setAttribute('data-scramble', '');
+  });
+  root.querySelectorAll('.ws').forEach((el) => {
+    el.classList.add('rv');
+    el.setAttribute('data-scramble', '');
+  });
+}
+
+const KEEP = /[\s\/·.,–—:;?!()&+%]/;
+/* losowa litera o zbliżonej szerokości i tej samej wielkości — żeby słowa
+   nie zmieniały szerokości w trakcie animacji i tekst się nie przełamywał */
 const SETS: Record<string, string> = {
-  narrow: 'iljt',
+  narrow: 'ijltfr',
   wide: 'mw',
   regular: 'abcdenoshkuvyz',
   digit: '0123456789',
@@ -21,8 +42,8 @@ function randLike(ch: string): string {
   const lower = ch.toLowerCase();
   let set: string;
   if (/[0-9]/.test(ch)) set = SETS.digit;
-  else if (SETS.narrow.includes(lower)) set = SETS.narrow;
-  else if (SETS.wide.includes(lower)) set = SETS.wide;
+  else if (SETS.narrow.indexOf(lower) !== -1) set = SETS.narrow;
+  else if (SETS.wide.indexOf(lower) !== -1) set = SETS.wide;
   else set = SETS.regular;
   const out = set[(Math.random() * set.length) | 0];
   return ch === ch.toUpperCase() && ch !== lower ? out.toUpperCase() : out;
@@ -45,13 +66,14 @@ function scramble(el: HTMLElement & { __scrambling?: boolean }): void {
   })(el);
   if (!nodes.length) { el.__scrambling = false; return; }
   // twarda blokada wysokości + overflow na czas animacji — losowe litery mają
-  // inne szerokości, więc bez tego zmienia się liczba linii (jak na stronie)
+  // inne szerokości, więc bez tego zmienia się liczba linii i wszystko
+  // poniżej się trzęsie (minHeight nie wystarcza, gdy tekst łamie się SZERZEJ)
   el.style.height = el.offsetHeight + 'px';
   el.style.overflow = 'hidden';
   let frame = 0;
   const total = Math.max(24, Math.min(56, Math.round(len * 0.6)));
   const tick = () => {
-    if (document.hidden) frame = total - 1;
+    if (document.hidden) frame = total - 1; // ukryta karta: dokończ natychmiast
     frame++;
     const progress = frame / total;
     for (const item of nodes) {
@@ -69,11 +91,8 @@ function scramble(el: HTMLElement & { __scrambling?: boolean }): void {
   requestAnimationFrame(tick);
 }
 
-let armed = false;
-
-function arm(): void {
-  if (armed || typeof IntersectionObserver === 'undefined') return;
-  armed = true;
+function start(): void {
+  tag(document);
   const io = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
@@ -83,6 +102,7 @@ function arm(): void {
           el.classList.add('is-view');
           if (el.hasAttribute('data-scramble')) scramble(el);
         } else {
+          /* replay: po pełnym wyjściu z ekranu element „uzbraja się" ponownie */
           const r = entry.boundingClientRect;
           if (r.bottom < 0 || r.top > window.innerHeight) el.classList.remove('is-view');
         }
@@ -95,12 +115,14 @@ function arm(): void {
   const observe = (root: ParentNode) =>
     root.querySelectorAll('.rv, .ws').forEach((el) => io.observe(el));
   observe(document);
-  // React montuje komponenty po inicjalizacji — obserwuj też nowe węzły
+  // React montuje komponenty po inicjalizacji — taguj i obserwuj nowe poddrzewa
   new MutationObserver((muts) => {
     for (const m of muts) {
       for (const n of Array.from(m.addedNodes)) {
         if (n.nodeType !== Node.ELEMENT_NODE) continue;
         const el = n as HTMLElement;
+        if (el.closest('.rv')) continue; // wnętrze animowanego liścia (scramble podmienia text-nodes)
+        tag(el);
         if (el.matches?.('.rv, .ws')) io.observe(el);
         observe(el);
       }
@@ -110,12 +132,11 @@ function arm(): void {
 
 function init(): void {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
+  if (typeof IntersectionObserver === 'undefined') return;
   const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  if (reduceMotion) return; // bramka CSS trzyma wszystko widoczne — nic nie animujemy
-  const once = { once: true, passive: true } as AddEventListenerOptions;
-  window.addEventListener('scroll', arm, once);
-  window.addEventListener('wheel', arm, once);
-  window.addEventListener('touchstart', arm, once);
+  if (reduceMotion || (navigator as any).webdriver) return; // treść widoczna, bez animacji
+  const kick = () => (document.body ? start() : addEventListener('DOMContentLoaded', start, { once: true }));
+  kick();
 }
 
 init();
