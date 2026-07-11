@@ -61,7 +61,10 @@ function mulberry32(a) {
 }
 // Pojedyncza kreska ołówka: łamana z błądzeniem losowym w poprzek + lekkie wygięcie
 // całości (bow) i drobny przestrzał na końcach — bez drugiego przebiegu.
-function sketchLine(g, x1, y1, x2, y2, rnd, overshoot = 0) {
+// frac ∈ (0..1] rysuje tylko część kreski (od początku, po długości łamanej) — kolejność
+// wywołań rnd() jest ZAWSZE identyczna, więc częściowa kreska pokrywa się z docelową.
+// Zwraca punkt „ołówka" (koniec narysowanego fragmentu) przy frac<1, inaczej null.
+function sketchLine(g, x1, y1, x2, y2, rnd, overshoot = 0, frac = 1) {
   const len = Math.hypot(x2 - x1, y2 - y1) || 1;
   const ux = (x2 - x1) / len, uy = (y2 - y1) / len;   // wzdłuż
   const nx = -uy, ny = ux;                            // w poprzek
@@ -78,42 +81,81 @@ function sketchLine(g, x1, y1, x2, y2, rnd, overshoot = 0) {
   const waveP = rnd() * Math.PI * 2;                  // losowa faza
   const waveA = amp * (0.3 + rnd() * 0.9);            // i jej amplituda
   let off = (rnd() - 0.5) * amp;
-  const lw = g.lineWidth;
-  g.lineWidth = lw * (0.85 + rnd() * 0.35);           // minimalnie inny docisk pióra per kreska
-  g.beginPath();
-  g.moveTo(x1 + nx * off, y1 + ny * off);
+  const pts = [[x1 + nx * off, y1 + ny * off]];
   for (let i = 1; i <= segs; i++) {
     const t = i / segs;
     off += (rnd() - 0.5) * amp;
     off = Math.max(-2.8, Math.min(2.8, off));
     const env = Math.sin(Math.PI * t);                // fala i łuk zanikają na końcach kreski
     const o = off + env * (bow + Math.sin(Math.PI * t * waveF + waveP) * waveA);
-    g.lineTo(x1 + (x2 - x1) * t + nx * o, y1 + (y2 - y1) * t + ny * o);
+    pts.push([x1 + (x2 - x1) * t + nx * o, y1 + (y2 - y1) * t + ny * o]);
   }
-  g.stroke();
+  const lw = g.lineWidth;
+  g.lineWidth = lw * (0.85 + rnd() * 0.35);           // minimalnie inny docisk pióra per kreska
+  let tip = null;
+  if (frac > 0) {
+    g.beginPath();
+    g.moveTo(pts[0][0], pts[0][1]);
+    if (frac >= 1) for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]);
+    else {
+      let total = 0;
+      for (let i = 1; i < pts.length; i++) total += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+      let left = total * frac;
+      for (let i = 1; i < pts.length && left > 0; i++) {
+        const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+        if (d <= left) { g.lineTo(pts[i][0], pts[i][1]); tip = pts[i]; }
+        else {
+          const t = left / d;
+          tip = [pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * t, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * t];
+          g.lineTo(tip[0], tip[1]);
+        }
+        left -= d;
+      }
+    }
+    g.stroke();
+  }
   g.lineWidth = lw;
+  return frac < 1 && tip ? { x: tip[0], y: tip[1] } : null;
 }
-function sketchRect(g, x, y, w, h, rnd) {
+// rysuje listę kresek [x1,y1,x2,y2,overshoot] po kolei, globalny frac rozłożony po długościach;
+// kreski poza progiem NIE są rysowane, ale rnd konsumowany jest zawsze (spójność kształtu)
+function partialStrokes(g, strokes, rnd, frac) {
+  const lens = strokes.map((k) => Math.hypot(k[2] - k[0], k[3] - k[1]) || 1);
+  const total = lens.reduce((a, b) => a + b, 0);
+  const target = total * Math.max(0, Math.min(1, frac));
+  let acc = 0, tip = null;
+  for (let i = 0; i < strokes.length; i++) {
+    const f = Math.max(0, Math.min(1, (target - acc) / lens[i]));
+    const t = sketchLine(g, strokes[i][0], strokes[i][1], strokes[i][2], strokes[i][3], rnd, strokes[i][4] || 0, f);
+    if (t) tip = t;
+    acc += lens[i];
+  }
+  return frac < 1 ? tip : null;
+}
+function sketchRect(g, x, y, w, h, rnd, frac = 1) {
   const ov = Math.min(5, Math.max(2, (w + h) / 90)); // rogi lekko „przerysowane"
-  sketchLine(g, x, y, x + w, y, rnd, ov);
-  sketchLine(g, x + w, y, x + w, y + h, rnd, ov);
-  sketchLine(g, x + w, y + h, x, y + h, rnd, ov);
-  sketchLine(g, x, y + h, x, y, rnd, ov);
+  return partialStrokes(g, [
+    [x, y, x + w, y, ov],
+    [x + w, y, x + w, y + h, ov],
+    [x + w, y + h, x, y + h, ov],
+    [x, y + h, x, y, ov],
+  ], rnd, frac);
 }
-function sketchArrow(g, x1, y1, x2, y2, rnd) {
-  sketchLine(g, x1, y1, x2, y2, rnd);
+function sketchArrow(g, x1, y1, x2, y2, rnd, frac = 1) {
   const ang = Math.atan2(y2 - y1, x2 - x1);
   const hl = Math.min(18, Math.max(10, Math.hypot(x2 - x1, y2 - y1) * 0.16));
-  for (const da of [Math.PI * 0.86, -Math.PI * 0.86]) {
-    sketchLine(g, x2, y2, x2 + Math.cos(ang + da) * hl, y2 + Math.sin(ang + da) * hl, rnd);
-  }
+  return partialStrokes(g, [
+    [x1, y1, x2, y2, 0],
+    [x2, y2, x2 + Math.cos(ang + Math.PI * 0.86) * hl, y2 + Math.sin(ang + Math.PI * 0.86) * hl, 0],
+    [x2, y2, x2 + Math.cos(ang - Math.PI * 0.86) * hl, y2 + Math.sin(ang - Math.PI * 0.86) * hl, 0],
+  ], rnd, frac);
 }
-function drawShape(g, s, color) {
+function drawShape(g, s, color, frac = 1) {
   g.strokeStyle = color;
   const rnd = mulberry32(s.seed);
-  if (s.type === 'rect') sketchRect(g, s.x, s.y, s.w, s.h, rnd);
-  else if (s.type === 'arrow') sketchArrow(g, s.x, s.y, s.x + s.w, s.y + s.h, rnd);
-  // 'text' — bez ramki (samą ramkę zaznaczenia rysuje render())
+  if (s.type === 'rect') return sketchRect(g, s.x, s.y, s.w, s.h, rnd, frac);
+  if (s.type === 'arrow') return sketchArrow(g, s.x, s.y, s.x + s.w, s.y + s.h, rnd, frac);
+  return null; // 'text' — bez ramki (samą ramkę zaznaczenia rysuje render())
 }
 
 /* ── render edytora ── */
@@ -152,26 +194,32 @@ function render() {
   ctx.lineWidth = 1.8;
 
   for (const s of shapes) {
-    // tryb Play: rysujemy tylko odsłonięte kształty, świeże z fade-in + lekkim „wzrostem"
-    let popped = false;
+    // tryb Play: kształt „rysuje się" jak ręką — kreska po kresce, tekst znak po znaku
     if (play) {
-      const t0 = play.shown.get(s.id);
-      if (t0 === undefined) continue;
-      const a = Math.min(1, (performance.now() - t0) / PLAY_FADE);
-      ctx.globalAlpha = a;
-      if (a < 1) {
-        const k = 0.9 + 0.1 * (1 - (1 - a) * (1 - a)); // ease-out
-        const cx = s.x + s.w / 2, cy = s.y + s.h / 2;
-        ctx.save();
-        ctx.translate(cx, cy); ctx.scale(k, k); ctx.translate(-cx, -cy);
-        popped = true;
+      const rec = play.shown.get(s.id);
+      if (!rec) continue;
+      const p = (performance.now() - rec.t0) / rec.dur;
+      if (p <= 0) continue;
+      if (p < 1) {
+        const po = rec.of > 0 ? Math.min(1, p / rec.of) : 1;      // faza konturu
+        const pt = rec.of < 1 ? Math.max(0, (p - rec.of) / (1 - rec.of)) : 0; // faza tekstu
+        let tip = drawShape(ctx, s, pal().ink, po);
+        if (s.type !== 'arrow' && s.text && pt > 0) tip = drawText(ctx, s, pt) || tip;
+        if (tip) { // punkt „ołówka" na końcu rysowanej kreski
+          ctx.fillStyle = pal().sel;
+          ctx.beginPath();
+          ctx.arc(tip.x, tip.y, 3 / Math.sqrt(camera.z), 0, Math.PI * 2);
+          ctx.fill();
+        }
+        continue;
       }
+      drawShape(ctx, s, pal().ink);
+      if (s.type !== 'arrow' && s.text) drawText(ctx, s);
+      continue;
     }
-    const sel = !play && s.id === selectedId;
+    const sel = s.id === selectedId;
     drawShape(ctx, s, sel ? pal().sel : pal().ink);
     if (s.type !== 'arrow' && s.text && s.id !== editingId) drawText(ctx, s);
-    if (popped) ctx.restore();
-    if (play) { ctx.globalAlpha = 1; continue; }
     if (s.type === 'text' && sel) { // pole tekstowe: delikatna ramka tylko przy zaznaczeniu
       ctx.save();
       ctx.setLineDash([4 / camera.z, 4 / camera.z]);
@@ -211,14 +259,33 @@ function render() {
   }
 }
 
-function drawText(g, s) {
+// frac<1 — „pisanie ręczne": odsłania znaki po kolei; zwraca pozycję pióra przy frac<1
+function drawText(g, s, frac = 1) {
   g.fillStyle = pal().text;
   g.font = `500 ${FONT}px Caveat, cursive`;
   g.textAlign = 'center';
   g.textBaseline = 'middle';
   const lines = wrapText(g, s.text, Math.max(20, s.w - 16));
   const y0 = s.y + s.h / 2 - ((lines.length - 1) * LINE_H) / 2;
-  lines.forEach((ln, i) => g.fillText(ln, s.x + s.w / 2, y0 + i * LINE_H));
+  const cx = s.x + s.w / 2;
+  if (frac >= 1) {
+    lines.forEach((ln, i) => g.fillText(ln, cx, y0 + i * LINE_H));
+    return null;
+  }
+  const total = lines.reduce((a, l) => a + l.length, 0) || 1;
+  let left = Math.ceil(total * Math.max(0, frac));
+  let pen = null;
+  for (let i = 0; i < lines.length && left > 0; i++) {
+    const ln = lines[i], y = y0 + i * LINE_H;
+    const lx = cx - g.measureText(ln).width / 2; // lewa krawędź docelowej (pełnej) linii
+    const part = ln.slice(0, left);
+    g.textAlign = 'left';
+    g.fillText(part, lx, y);
+    pen = { x: lx + g.measureText(part).width, y };
+    left -= ln.length;
+  }
+  g.textAlign = 'center';
+  return pen;
 }
 function wrapText(g, text, maxW) {
   const out = [];
@@ -529,8 +596,18 @@ function setTool(t) {
 }
 
 /* ── tryb Play: stopniowe odsłanianie diagramu ── */
-const PLAY_FADE = 450; // ms fade-in kształtu
 let playRaf = 0;
+
+// czas rysowania kształtu (jak ręką): kontur wg obwodu, tekst wg liczby znaków
+function shapeTiming(s) {
+  let L = 0;
+  if (s.type === 'rect') L = 2 * (s.w + s.h);
+  else if (s.type === 'arrow') L = Math.hypot(s.w, s.h) * 1.35;
+  const outline = L ? Math.min(1100, Math.max(320, L / 1.3)) : 0;
+  const text = s.type !== 'arrow' && s.text ? Math.min(1500, Math.max(300, String(s.text).length * 42)) : 0;
+  const dur = Math.max(220, outline + text);
+  return { dur, of: outline / dur }; // of = jaka część czasu to kontur
+}
 
 // Kroki odsłaniania (BFS warstwami): korzenie → strzałki wychodzące → ich cele → … → reszta.
 // Korzeń = obiekt spięty strzałkami, do którego żadna nie prowadzi. Reszta (luźne teksty,
@@ -572,12 +649,22 @@ function startPlay() {
   revealStep();
 }
 function revealStep() {
-  const now = performance.now();
-  for (const id of play.steps[play.idx]) play.shown.set(id, now);
+  // kształty warstwy rysują się PO KOLEI (jak ręką), w porządku czytania, z lekkim zazębieniem;
+  // całość kroku skalowana tak, by nie przekroczyć ~2.6 s
+  const shs = play.steps[play.idx].map(byId).filter(Boolean)
+    .sort((a, b) => (a.y - b.y) || (a.x - b.x));
+  const timings = shs.map(shapeTiming);
+  const total = timings.reduce((a, t) => a + t.dur * 0.85, 0);
+  const k = Math.min(1, 2600 / Math.max(1, total));
+  let t = performance.now();
+  shs.forEach((s, i) => {
+    play.shown.set(s.id, { t0: t, dur: timings[i].dur * k, of: timings[i].of });
+    t += timings[i].dur * k * 0.85; // następny startuje tuż przed końcem poprzedniego
+  });
   cancelAnimationFrame(playRaf);
   const tick = () => {
     render();
-    if (play && [...play.shown.values()].some((t) => performance.now() - t < PLAY_FADE))
+    if (play && [...play.shown.values()].some((r) => performance.now() < r.t0 + r.dur + 40))
       playRaf = requestAnimationFrame(tick);
   };
   playRaf = requestAnimationFrame(tick);
