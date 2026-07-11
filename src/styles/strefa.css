@@ -825,6 +825,7 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 }
 .strefa-iconbtn:disabled { opacity: .35; cursor: default; pointer-events: none; }
 #btn-lock.is-locked { background: var(--color-accent-soft); color: var(--color-accent); }
+#btn-play.is-active { background: var(--color-accent-soft); color: var(--color-accent); }
 .diag-hint { font-size: var(--text-caption); color: var(--color-text-inv-3); }
 .diag-canvas-wrap { position: relative; flex: 1; overflow: hidden; touch-action: none; }
 .diag-canvas-wrap canvas { display: block; }

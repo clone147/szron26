@@ -20,6 +20,7 @@ let editingId = null;       // rect z otwartym edytorem tekstu
 let saveTimer = null;
 let dirty = false;
 let locked = false;         // kłódka: diagram tylko do odczytu (stan trzymany w data.locked)
+let play = null;            // tryb Play: { steps: [[id,...],...], idx, shown: Map(id→timestamp) }
 
 const FONT = 36, LINE_H = 43; // tekst w prostokątach (Caveat)
 
@@ -151,9 +152,26 @@ function render() {
   ctx.lineWidth = 1.8;
 
   for (const s of shapes) {
-    const sel = s.id === selectedId;
+    // tryb Play: rysujemy tylko odsłonięte kształty, świeże z fade-in + lekkim „wzrostem"
+    let popped = false;
+    if (play) {
+      const t0 = play.shown.get(s.id);
+      if (t0 === undefined) continue;
+      const a = Math.min(1, (performance.now() - t0) / PLAY_FADE);
+      ctx.globalAlpha = a;
+      if (a < 1) {
+        const k = 0.9 + 0.1 * (1 - (1 - a) * (1 - a)); // ease-out
+        const cx = s.x + s.w / 2, cy = s.y + s.h / 2;
+        ctx.save();
+        ctx.translate(cx, cy); ctx.scale(k, k); ctx.translate(-cx, -cy);
+        popped = true;
+      }
+    }
+    const sel = !play && s.id === selectedId;
     drawShape(ctx, s, sel ? pal().sel : pal().ink);
     if (s.type !== 'arrow' && s.text && s.id !== editingId) drawText(ctx, s);
+    if (popped) ctx.restore();
+    if (play) { ctx.globalAlpha = 1; continue; }
     if (s.type === 'text' && sel) { // pole tekstowe: delikatna ramka tylko przy zaznaczeniu
       ctx.save();
       ctx.setLineDash([4 / camera.z, 4 / camera.z]);
@@ -304,6 +322,10 @@ canvas.addEventListener('pointerdown', (e) => {
   if (editingId) commitText();
   canvas.setPointerCapture(e.pointerId);
   const p = toWorld(e);
+  if (play) { // tryb Play: klik = następny krok, przeciągnięcie = pan
+    drag = { mode: 'pan', sx: e.clientX, sy: e.clientY, cx: camera.x, cy: camera.y, playStep: true };
+    return;
+  }
   if (locked) { // zablokowany diagram: tylko przesuwanie widoku
     drag = { mode: 'pan', sx: e.clientX, sy: e.clientY, cx: camera.x, cy: camera.y };
     return;
@@ -345,6 +367,7 @@ canvas.addEventListener('pointermove', (e) => {
     else { s.w = p.x - s.x; s.h = p.y - s.y; }
     drag.p = p; dirty = true;
   } else if (drag.mode === 'pan') {
+    if (drag.playStep && Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 4) drag.playStep = false;
     camera.x = drag.cx - (e.clientX - drag.sx) / camera.z;
     camera.y = drag.cy - (e.clientY - drag.sy) / camera.z;
   }
@@ -352,6 +375,7 @@ canvas.addEventListener('pointermove', (e) => {
 });
 
 canvas.addEventListener('pointerup', () => {
+  if (drag?.playStep) { drag = null; advancePlay(); return; }
   if (drag?.mode === 'draw') {
     const d = drag;
     if (Math.abs(d.w) > 8 || Math.abs(d.h) > 8) {
@@ -385,7 +409,7 @@ canvas.addEventListener('pointerup', () => {
 });
 
 canvas.addEventListener('dblclick', (e) => {
-  if (locked) return;
+  if (locked || play) return;
   const s = hitShape(toWorld(e));
   if (s && s.type !== 'arrow') startTextEdit(s);
 });
@@ -458,6 +482,11 @@ textEl.addEventListener('keydown', (e) => {
 let clipboard = null; // skopiowany kształt (⌘C/⌘V)
 document.addEventListener('keydown', (e) => {
   if (!current || editingId || e.target.matches('input, textarea, select')) return;
+  if (play) { // tryb Play: Esc kończy, spacja/Enter/→ = następny krok
+    if (e.key === 'Escape') stopPlay();
+    else if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); advancePlay(); }
+    return;
+  }
   if (locked) { // zablokowany: tylko nawigacja
     if (e.key === 'ArrowLeft') navDiagram(-1);
     else if (e.key === 'ArrowRight') navDiagram(1);
@@ -498,6 +527,85 @@ function setTool(t) {
   document.querySelectorAll('.diag-tool').forEach((b) => b.classList.toggle('is-active', b.dataset.tool === t));
   canvas.style.cursor = t === 'select' ? 'default' : 'crosshair';
 }
+
+/* ── tryb Play: stopniowe odsłanianie diagramu ── */
+const PLAY_FADE = 450; // ms fade-in kształtu
+let playRaf = 0;
+
+// Kroki odsłaniania (BFS warstwami): korzenie → strzałki wychodzące → ich cele → … → reszta.
+// Korzeń = obiekt spięty strzałkami, do którego żadna nie prowadzi. Reszta (luźne teksty,
+// nieprzypięte strzałki, nieosiągalne cykle) trafia do ostatniego kroku.
+function buildPlaySteps() {
+  const arrows = shapes.filter((s) => s.type === 'arrow');
+  const nodes = shapes.filter((s) => s.type !== 'arrow');
+  const inGraph = new Set();
+  for (const a of arrows) { if (a.startBind) inGraph.add(a.startBind); if (a.endBind) inGraph.add(a.endBind); }
+  const hasIncoming = new Set(arrows.filter((a) => a.endBind).map((a) => a.endBind));
+  let roots = nodes.filter((n) => inGraph.has(n.id) && !hasIncoming.has(n.id));
+  if (!roots.length) roots = nodes.filter((n) => inGraph.has(n.id)).slice(0, 1); // sam cykl — start od pierwszego
+  const steps = [];
+  const visible = new Set();
+  if (roots.length) { steps.push(roots.map((r) => r.id)); roots.forEach((r) => visible.add(r.id)); }
+  for (;;) {
+    // strzałki, których początek jest już widoczny (lub nie mają początku, a mają cel)
+    const layer = arrows.filter((a) => !visible.has(a.id) && (a.startBind || a.endBind) &&
+      (!a.startBind || visible.has(a.startBind)));
+    if (!layer.length) break;
+    steps.push(layer.map((a) => a.id));
+    layer.forEach((a) => visible.add(a.id));
+    const targets = [...new Set(layer.map((a) => a.endBind).filter((id) => id && !visible.has(id)))];
+    if (targets.length) { steps.push(targets); targets.forEach((id) => visible.add(id)); }
+  }
+  const rest = shapes.filter((s) => !visible.has(s.id)).map((s) => s.id);
+  if (rest.length) steps.push(rest);
+  return steps;
+}
+
+function startPlay() {
+  const steps = buildPlaySteps();
+  if (!steps.length) { toast('Pusty diagram', 'Nie ma czego odtwarzać.', 'err'); return; }
+  if (editingId) commitText();
+  play = { steps, idx: 0, shown: new Map() };
+  selectedId = null;
+  drag = null;
+  applyPlayUI(true);
+  revealStep();
+}
+function revealStep() {
+  const now = performance.now();
+  for (const id of play.steps[play.idx]) play.shown.set(id, now);
+  cancelAnimationFrame(playRaf);
+  const tick = () => {
+    render();
+    if (play && [...play.shown.values()].some((t) => performance.now() - t < PLAY_FADE))
+      playRaf = requestAnimationFrame(tick);
+  };
+  playRaf = requestAnimationFrame(tick);
+}
+function advancePlay() {
+  if (!play) return;
+  if (play.idx < play.steps.length - 1) { play.idx++; revealStep(); }
+  else stopPlay(); // wszystko widoczne — kolejny klik kończy tryb
+}
+function stopPlay() {
+  if (!play) return;
+  play = null;
+  cancelAnimationFrame(playRaf);
+  applyPlayUI(false);
+  render();
+}
+function applyPlayUI(on) {
+  const btn = $('#btn-play');
+  btn.classList.toggle('is-active', on);
+  btn.setAttribute('aria-pressed', String(on));
+  btn.title = on ? 'Zakończ odtwarzanie (Esc)' : 'Odtwórz diagram (krok po kroku)';
+  document.querySelectorAll('.diag-tool[data-tool]').forEach((b) => { b.disabled = on || locked; });
+  $('#btn-rename').disabled = on || locked;
+  $('#btn-delete').disabled = on || locked;
+  if (on) setTool('select');
+  canvas.style.cursor = on ? 'pointer' : 'default';
+}
+$('#btn-play').addEventListener('click', () => (play ? stopPlay() : startPlay()));
 
 /* ── zapis / Supabase ── */
 function setStatus(txt) { const el = $('#save-status'); if (el) el.textContent = txt; }
@@ -587,6 +695,7 @@ function renderGallery() {
 }
 
 async function showGallery() {
+  stopPlay();
   if (dirty) await saveNow();
   current = null;
   $('#diag-editor').hidden = true;
@@ -597,6 +706,7 @@ async function showGallery() {
 
 /* ── otwieranie / tworzenie / edytor ── */
 async function openEditor(id) {
+  stopPlay();
   const { data, error } = await sb.from('diagrams').select('*').eq('id', id).single();
   if (error) { toast('Błąd', error.message, 'err'); return; }
   current = data;
@@ -758,6 +868,7 @@ function applyLock() {
 }
 $('#btn-lock').addEventListener('click', async () => {
   if (!current) return;
+  stopPlay();
   locked = !locked;
   applyLock();
   current.data = { shapes, ...(locked && { locked: true }) };

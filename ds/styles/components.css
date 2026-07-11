@@ -45,8 +45,10 @@
 }
 .sect--dark .shot figcaption { color: var(--color-text-inv-2); }
 
-/* ── Adapter DS: neutralizacja reveal-on-scroll ─────────────────────────
-   Na stronie .rv startuje z opacity:0 i czeka na IntersectionObserver
-   (main.js dodaje .is-view). W claude.ai/design nie ma tego skryptu —
-   bez tej reguły każdy element z klasą rv byłby niewidoczny. */
-.rv { opacity: 1; transform: none; }
+/* ── Adapter DS: reveal-on-scroll ────────────────────────────────────────
+   Runtime w _ds_bundle.js (ds/src/reveal.ts — port main.js strony) uzbraja
+   animacje przy pierwszym scrollu, dodając .rv-armed na <html>. Do tego
+   momentu (i wszędzie, gdzie JS nie działa — screenshoty, render statyczny)
+   ta reguła trzyma treść widoczną. Po uzbrojeniu działają oryginalne reguły
+   .rv/.is-view z main.css — tekst animuje się wchodząc na viewport. */
+html:not(.rv-armed) .rv { opacity: 1; transform: none; }
