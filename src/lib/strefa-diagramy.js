@@ -548,16 +548,19 @@ function animateCamera(to, dur = 500) {
   };
   camRaf = requestAnimationFrame(tick);
 }
-function zoomToShape(s) {
+// przelot kamery tak, by prostokąt świata (x1..x2, y1..y2) wypełnił viewport
+function zoomToRect(x1, y1, x2, y2) {
   const r = canvas.getBoundingClientRect();
   if (!r.width || !r.height) return;
-  const x1 = Math.min(s.x, s.x + s.w), x2 = Math.max(s.x, s.x + s.w);
-  const y1 = Math.min(s.y, s.y + s.h), y2 = Math.max(s.y, s.y + s.h);
   const pad = 48;
   const z = Math.max(0.25, Math.min(8,
     Math.min((r.width - pad * 2) / Math.max(24, x2 - x1), (r.height - pad * 2) / Math.max(24, y2 - y1))));
-  if (!zoomBack) zoomBack = { ...camera }; // seria zoomów → „-" wraca do stanu sprzed pierwszego
   animateCamera({ z, x: (x1 + x2) / 2 - r.width / 2 / z, y: (y1 + y2) / 2 - r.height / 2 / z });
+}
+function zoomToShape(s) {
+  if (!zoomBack) zoomBack = { ...camera }; // seria zoomów → „-" wraca do stanu sprzed pierwszego
+  zoomToRect(Math.min(s.x, s.x + s.w), Math.min(s.y, s.y + s.h),
+    Math.max(s.x, s.x + s.w), Math.max(s.y, s.y + s.h));
 }
 function zoomBackOut() {
   if (!zoomBack) return;
@@ -784,14 +787,14 @@ function buildPlaySteps() {
   }
   const rest = shapes.filter((s) => !visible.has(s.id)).map((s) => s.id);
   if (rest.length) steps.push(rest);
-  return steps;
+  return { steps, conn };
 }
 
 function startPlay() {
-  const steps = buildPlaySteps();
+  const { steps, conn } = buildPlaySteps();
   if (!steps.length) { toast('Pusty diagram', 'Nie ma czego odtwarzać.', 'err'); return; }
   if (editingId) commitText();
-  play = { steps, idx: 0, shown: new Map() };
+  play = { steps, conn, idx: 0, shown: new Map() };
   fxPreview = null;
   selectedId = null;
   drag = null;
@@ -822,8 +825,32 @@ function revealStep() {
 }
 function advancePlay() {
   if (!play) return;
-  if (play.idx < play.steps.length - 1) { play.idx++; revealStep(); }
-  else stopPlay(); // wszystko widoczne — kolejny klik kończy tryb
+  if (play.idx < play.steps.length - 1) {
+    play.idx++;
+    revealStep();
+    if (zoomBack) followPlayCamera(); // kamera zzoomowana → podążaj za nowym krokiem
+  } else stopPlay(); // wszystko widoczne — kolejna spacja kończy tryb
+}
+// przelot kamery na obiekty bieżącego kroku; dla strzałek — na obiekt, który wskazują
+function followPlayCamera() {
+  const targets = [];
+  for (const id of play.steps[play.idx]) {
+    const s = byId(id);
+    if (!s) continue;
+    if (s.type !== 'arrow') targets.push(s);
+    else {
+      const e = play.conn.get(id)?.e;
+      const t = e && byId(e);
+      if (t) targets.push(t);
+    }
+  }
+  if (!targets.length) return; // np. luźne strzałki bez celu — kamera zostaje
+  let x1 = 1e9, y1 = 1e9, x2 = -1e9, y2 = -1e9;
+  for (const s of targets) {
+    x1 = Math.min(x1, s.x, s.x + s.w); x2 = Math.max(x2, s.x, s.x + s.w);
+    y1 = Math.min(y1, s.y, s.y + s.h); y2 = Math.max(y2, s.y, s.y + s.h);
+  }
+  zoomToRect(x1, y1, x2, y2);
 }
 function stopPlay() {
   if (!play) return;
