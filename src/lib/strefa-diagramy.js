@@ -61,10 +61,9 @@ function mulberry32(a) {
 }
 // Pojedyncza kreska ołówka: łamana z błądzeniem losowym w poprzek + lekkie wygięcie
 // całości (bow) i drobny przestrzał na końcach — bez drugiego przebiegu.
-// frac ∈ (0..1] rysuje tylko część kreski (od początku, po długości łamanej) — kolejność
-// wywołań rnd() jest ZAWSZE identyczna, więc częściowa kreska pokrywa się z docelową.
-// Zwraca punkt „ołówka" (koniec narysowanego fragmentu) przy frac<1, inaczej null.
-function sketchLine(g, x1, y1, x2, y2, rnd, overshoot = 0, frac = 1) {
+// Geometria jednej kreski ołówka: łamana + współczynnik „docisku pióra" (lwf).
+// Kolejność wywołań rnd() jest ZAWSZE identyczna, więc każdy przebieg daje tę samą kreskę.
+function sketchPts(x1, y1, x2, y2, rnd, overshoot = 0) {
   const len = Math.hypot(x2 - x1, y2 - y1) || 1;
   const ux = (x2 - x1) / len, uy = (y2 - y1) / len;   // wzdłuż
   const nx = -uy, ny = ux;                            // w poprzek
@@ -90,8 +89,14 @@ function sketchLine(g, x1, y1, x2, y2, rnd, overshoot = 0, frac = 1) {
     const o = off + env * (bow + Math.sin(Math.PI * t * waveF + waveP) * waveA);
     pts.push([x1 + (x2 - x1) * t + nx * o, y1 + (y2 - y1) * t + ny * o]);
   }
+  return { pts, lwf: 0.85 + rnd() * 0.35 };           // minimalnie inny docisk pióra per kreska
+}
+// frac ∈ (0..1] rysuje tylko część kreski (od początku, po długości łamanej).
+// Zwraca punkt „ołówka" (koniec narysowanego fragmentu) przy frac<1, inaczej null.
+function sketchLine(g, x1, y1, x2, y2, rnd, overshoot = 0, frac = 1) {
+  const { pts, lwf } = sketchPts(x1, y1, x2, y2, rnd, overshoot);
   const lw = g.lineWidth;
-  g.lineWidth = lw * (0.85 + rnd() * 0.35);           // minimalnie inny docisk pióra per kreska
+  g.lineWidth = lw * lwf;
   let tip = null;
   if (frac > 0) {
     g.beginPath();
@@ -132,30 +137,59 @@ function partialStrokes(g, strokes, rnd, frac) {
   }
   return frac < 1 ? tip : null;
 }
-function sketchRect(g, x, y, w, h, rnd, frac = 1) {
-  const ov = Math.min(5, Math.max(2, (w + h) / 90)); // rogi lekko „przerysowane"
-  return partialStrokes(g, [
-    [x, y, x + w, y, ov],
-    [x + w, y, x + w, y + h, ov],
-    [x + w, y + h, x, y + h, ov],
-    [x, y + h, x, y, ov],
-  ], rnd, frac);
+// definicje kresek kształtu: [x1, y1, x2, y2, overshoot] w kolejności rysowania
+function shapeStrokes(s) {
+  if (s.type === 'rect') {
+    const { x, y, w, h } = s;
+    const ov = Math.min(5, Math.max(2, (w + h) / 90)); // rogi lekko „przerysowane"
+    return [
+      [x, y, x + w, y, ov],
+      [x + w, y, x + w, y + h, ov],
+      [x + w, y + h, x, y + h, ov],
+      [x, y + h, x, y, ov],
+    ];
+  }
+  if (s.type === 'arrow') {
+    const x1 = s.x, y1 = s.y, x2 = s.x + s.w, y2 = s.y + s.h;
+    const ang = Math.atan2(y2 - y1, x2 - x1);
+    const hl = Math.min(18, Math.max(10, Math.hypot(x2 - x1, y2 - y1) * 0.16));
+    return [
+      [x1, y1, x2, y2, 0],
+      [x2, y2, x2 + Math.cos(ang + Math.PI * 0.86) * hl, y2 + Math.sin(ang + Math.PI * 0.86) * hl, 0],
+      [x2, y2, x2 + Math.cos(ang - Math.PI * 0.86) * hl, y2 + Math.sin(ang - Math.PI * 0.86) * hl, 0],
+    ];
+  }
+  return []; // 'text' — bez ramki (samą ramkę zaznaczenia rysuje render())
 }
-function sketchArrow(g, x1, y1, x2, y2, rnd, frac = 1) {
-  const ang = Math.atan2(y2 - y1, x2 - x1);
-  const hl = Math.min(18, Math.max(10, Math.hypot(x2 - x1, y2 - y1) * 0.16));
-  return partialStrokes(g, [
-    [x1, y1, x2, y2, 0],
-    [x2, y2, x2 + Math.cos(ang + Math.PI * 0.86) * hl, y2 + Math.sin(ang + Math.PI * 0.86) * hl, 0],
-    [x2, y2, x2 + Math.cos(ang - Math.PI * 0.86) * hl, y2 + Math.sin(ang - Math.PI * 0.86) * hl, 0],
-  ], rnd, frac);
+// cache geometrii per kształt: gotowe Path2D (+ zawinięte linie tekstu) zamiast przeliczania
+// PRNG i setek lineTo co klatkę — kluczowe dla płynności pan/zoom/animacji kamery
+const shapeCache = new Map(); // id → { key, strokes: [{path, lwf}], tkey?, lines? }
+function cacheEntry(s) {
+  const key = `${s.type}|${s.seed}|${s.x}|${s.y}|${s.w}|${s.h}`;
+  let c = shapeCache.get(s.id);
+  if (!c || c.key !== key) {
+    const rnd = mulberry32(s.seed);
+    const strokes = shapeStrokes(s).map((d) => {
+      const { pts, lwf } = sketchPts(d[0], d[1], d[2], d[3], rnd, d[4]);
+      const path = new Path2D();
+      path.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length; i++) path.lineTo(pts[i][0], pts[i][1]);
+      return { path, lwf };
+    });
+    c = { key, strokes };
+    shapeCache.set(s.id, c);
+  }
+  return c;
 }
 function drawShape(g, s, color, frac = 1) {
   g.strokeStyle = color;
-  const rnd = mulberry32(s.seed);
-  if (s.type === 'rect') return sketchRect(g, s.x, s.y, s.w, s.h, rnd, frac);
-  if (s.type === 'arrow') return sketchArrow(g, s.x, s.y, s.x + s.w, s.y + s.h, rnd, frac);
-  return null; // 'text' — bez ramki (samą ramkę zaznaczenia rysuje render())
+  if (frac >= 1) { // pełny kształt — z cache
+    const lw = g.lineWidth;
+    for (const st of cacheEntry(s).strokes) { g.lineWidth = lw * st.lwf; g.stroke(st.path); }
+    g.lineWidth = lw;
+    return null;
+  }
+  return partialStrokes(g, shapeStrokes(s), mulberry32(s.seed), frac);
 }
 
 /* ── render edytora ── */
@@ -251,7 +285,10 @@ function drawText(g, s, frac = 1) {
   g.font = `500 ${FONT}px Caveat, cursive`;
   g.textAlign = 'center';
   g.textBaseline = 'middle';
-  const lines = wrapText(g, s.text, Math.max(20, s.w - 16));
+  const c = cacheEntry(s); // zawijanie (measureText per słowo) tylko gdy tekst/szerokość się zmienią
+  const tkey = `${s.text}|${s.w}`;
+  if (c.tkey !== tkey) { c.tkey = tkey; c.lines = wrapText(g, s.text, Math.max(20, s.w - 16)); }
+  const lines = c.lines;
   const y0 = s.y + s.h / 2 - ((lines.length - 1) * LINE_H) / 2;
   const cx = s.x + s.w / 2;
   if (frac >= 1) {
@@ -955,6 +992,7 @@ async function openEditor(id) {
   selectedId = null;
   stopCamAnim();
   zoomBack = null;
+  shapeCache.clear();
   camera = { x: 0, y: 0, z: 1 };
   setStatus('');
   $('#diag-title').textContent = data.title;
