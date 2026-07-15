@@ -611,7 +611,7 @@ textEl.addEventListener('keydown', (e) => {
 /* ── klawiatura ── */
 let clipboard = null; // skopiowany kształt (⌘C/⌘V)
 document.addEventListener('keydown', (e) => {
-  if (!current || editingId || e.target.matches('input, textarea, select')) return;
+  if (!current || editingId || (e.target instanceof Element && e.target.matches('input, textarea, select'))) return;
   if (play) { // tryb Play: Esc kończy, spacja/Enter/→ = następny krok
     if (e.key === 'Escape') stopPlay();
     else if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); advancePlay(); }
