@@ -25,7 +25,8 @@ import Strefa from '../../layouts/Strefa.astro';
         <button class="strefa-iconbtn" id="btn-prev" type="button" title="Poprzedni diagram (←)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
         <button class="strefa-iconbtn" id="btn-next" type="button" title="Następny diagram (→)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
         <button class="strefa-iconbtn" id="btn-lock" type="button" title="Zablokuj edycję" aria-pressed="false"></button>
-        <button class="strefa-iconbtn" id="btn-play" type="button" title="Odtwórz diagram (krok po kroku)" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4.5v15l13-7.5Z"/></svg></button>
+        <button class="strefa-iconbtn" id="btn-play" type="button" title="Odtwórz diagram (spacja = krok, klik = zoom na obiekt)" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4.5v15l13-7.5Z"/></svg></button>
+        <span class="diag-hint" id="play-hint" hidden>spacja — następny krok · klik — zoom na obiekt · klik w tło / „−” — powrót · Esc — koniec</span>
       </div>
       <div class="diag-bar__group diag-tools diag-zoom" role="toolbar" aria-label="Zoom">
         <button class="diag-tool" id="btn-zoom-out" type="button" title="Oddal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>

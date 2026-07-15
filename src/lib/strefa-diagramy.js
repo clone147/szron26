@@ -465,8 +465,14 @@ canvas.addEventListener('pointermove', (e) => {
   render();
 });
 
-canvas.addEventListener('pointerup', () => {
-  if (drag?.playStep) { drag = null; advancePlay(); return; }
+canvas.addEventListener('pointerup', (e) => {
+  if (drag?.playStep) { // tryb Play: klik w widoczny obiekt = zoom na niego, klik w tło = powrót kadru
+    drag = null;
+    const s = hitShape(toWorld(e));
+    if (s && play?.shown.has(s.id)) zoomToShape(s);
+    else zoomBackOut();
+    return;
+  }
   if (drag?.mode === 'draw') {
     const d = drag;
     if (Math.abs(d.w) > 8 || Math.abs(d.h) > 8) {
@@ -612,9 +618,10 @@ textEl.addEventListener('keydown', (e) => {
 let clipboard = null; // skopiowany kształt (⌘C/⌘V)
 document.addEventListener('keydown', (e) => {
   if (!current || editingId || (e.target instanceof Element && e.target.matches('input, textarea, select'))) return;
-  if (play) { // tryb Play: Esc kończy, spacja/Enter/→ = następny krok
+  if (play) { // tryb Play: Esc kończy, spacja/Enter/→ = następny krok, "-" = powrót kadru
     if (e.key === 'Escape') stopPlay();
     else if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); advancePlay(); }
+    else if (e.key === '-' || e.key === '_') { e.preventDefault(); zoomBackOut(); }
     return;
   }
   if (locked) { // zablokowany: tylko nawigacja
@@ -788,6 +795,7 @@ function startPlay() {
   fxPreview = null;
   selectedId = null;
   drag = null;
+  zoomBack = null; // świeży kontekst kadrów dla zoomu-pod-klikiem
   applyPlayUI(true);
   revealStep();
 }
@@ -821,6 +829,7 @@ function stopPlay() {
   if (!play) return;
   play = null;
   cancelAnimationFrame(playRaf);
+  zoomBack = null;
   applyPlayUI(false);
   render();
 }
@@ -828,7 +837,8 @@ function applyPlayUI(on) {
   const btn = $('#btn-play');
   btn.classList.toggle('is-active', on);
   btn.setAttribute('aria-pressed', String(on));
-  btn.title = on ? 'Zakończ odtwarzanie (Esc)' : 'Odtwórz diagram (krok po kroku)';
+  btn.title = on ? 'Zakończ odtwarzanie (Esc)' : 'Odtwórz diagram (spacja = krok, klik = zoom na obiekt)';
+  $('#play-hint').hidden = !on;
   document.querySelectorAll('.diag-tool[data-tool]').forEach((b) => { b.disabled = on || locked; });
   $('#btn-rename').disabled = on || locked;
   $('#btn-delete').disabled = on || locked;
