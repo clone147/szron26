@@ -751,9 +751,11 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
   .deck-thumb, .bg-chip, .deck-thumb__tools { animation: none !important; transition: none !important; }
 }
 
-/* ── Diagramy: edytor „ołówkowy" na pełnym ekranie pod górnym paskiem ── */
+/* ── Diagramy: edytor „ołówkowy" na pełnym ekranie ── */
+/* otwarty edytor chowa górny pasek strefy — cała wysokość okna dla diagramu */
+body:has(#diag-editor:not([hidden])) .strefa-top { display: none; }
 .diag-wrap {
-  position: fixed; top: 3.75rem; left: 0; right: 0; bottom: 0;
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   display: flex; flex-direction: column; background: var(--color-ink);
 }
 .diag-wrap[hidden], #diag-gallery[hidden] { display: none; }
