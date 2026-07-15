@@ -373,6 +373,7 @@ function hitHandle(p) {
 /* ── interakcje myszy ── */
 canvas.addEventListener('pointerdown', (e) => {
   if (editingId) commitText();
+  stopCamAnim(); // ręczna interakcja przerywa przelot kamery
   canvas.setPointerCapture(e.pointerId);
   const p = toWorld(e);
   if (play) { // tryb Play: klik = następny krok, przeciągnięcie = pan
@@ -474,7 +475,7 @@ function centerWorld() {
 }
 // zmienia zoom trzymając punkt p (świat) w miejscu na ekranie; domyślnie środek widoku
 function setZoom(z, p = centerWorld()) {
-  z = Math.max(0.25, Math.min(3, z));
+  z = Math.max(0.25, Math.min(8, z));
   camera.x = p.x - (p.x - camera.x) * (camera.z / z);
   camera.y = p.y - (p.y - camera.y) * (camera.z / z);
   camera.z = z;
@@ -483,10 +484,49 @@ function setZoom(z, p = centerWorld()) {
 }
 function updateZoomLabel() { $('#btn-zoom-100').textContent = Math.round(camera.z * 100) + '%'; }
 
+/* ── zoom na obiekt (klawisze = / + i powrót -) ── */
+let zoomBack = null; // kamera sprzed zoomu na obiekt — „-" wraca dokładnie do tego stanu
+let camRaf = 0;
+function stopCamAnim() { cancelAnimationFrame(camRaf); }
+// płynny przelot kamery do celu; zoom interpolowany logarytmicznie (stałe tempo optyczne)
+function animateCamera(to, dur = 500) {
+  const from = { ...camera };
+  const t0 = performance.now();
+  stopCamAnim();
+  const tick = () => {
+    const t = Math.min(1, (performance.now() - t0) / dur);
+    const e = 1 - (1 - t) ** 3; // ease-out cubic
+    camera.z = from.z * (to.z / from.z) ** e;
+    camera.x = from.x + (to.x - from.x) * e;
+    camera.y = from.y + (to.y - from.y) * e;
+    updateZoomLabel();
+    render();
+    if (t < 1) camRaf = requestAnimationFrame(tick);
+  };
+  camRaf = requestAnimationFrame(tick);
+}
+function zoomToShape(s) {
+  const r = canvas.getBoundingClientRect();
+  if (!r.width || !r.height) return;
+  const x1 = Math.min(s.x, s.x + s.w), x2 = Math.max(s.x, s.x + s.w);
+  const y1 = Math.min(s.y, s.y + s.h), y2 = Math.max(s.y, s.y + s.h);
+  const pad = 48;
+  const z = Math.max(0.25, Math.min(8,
+    Math.min((r.width - pad * 2) / Math.max(24, x2 - x1), (r.height - pad * 2) / Math.max(24, y2 - y1))));
+  if (!zoomBack) zoomBack = { ...camera }; // seria zoomów → „-" wraca do stanu sprzed pierwszego
+  animateCamera({ z, x: (x1 + x2) / 2 - r.width / 2 / z, y: (y1 + y2) / 2 - r.height / 2 / z });
+}
+function zoomBackOut() {
+  if (!zoomBack) return;
+  animateCamera(zoomBack);
+  zoomBack = null;
+}
+
 // scroll = zoom (kursor jako punkt odniesienia)
 wrap.addEventListener('wheel', (e) => {
   e.preventDefault();
   if (editingId) commitText();
+  stopCamAnim();
   setZoom(camera.z * (e.deltaY < 0 ? 1.08 : 0.92), toWorld(e));
 }, { passive: false });
 
@@ -569,6 +609,8 @@ document.addEventListener('keydown', (e) => {
     render();
   } else if (e.key === 'ArrowLeft') navDiagram(-1);
   else if (e.key === 'ArrowRight') navDiagram(1);
+  else if (e.key === '=' || e.key === '+') { const s = byId(selectedId); if (s) { e.preventDefault(); zoomToShape(s); } }
+  else if (e.key === '-' || e.key === '_') { if (zoomBack) { e.preventDefault(); zoomBackOut(); } }
   else if (e.key === 'v' || e.key === 'V') setTool('select');
   else if (e.key === 'r' || e.key === 'R') setTool('rect');
   else if (e.key === 'a' || e.key === 'A') setTool('arrow');
@@ -911,6 +953,8 @@ async function openEditor(id) {
   current = data;
   shapes = Array.isArray(data.data?.shapes) ? data.data.shapes : [];
   selectedId = null;
+  stopCamAnim();
+  zoomBack = null;
   camera = { x: 0, y: 0, z: 1 };
   setStatus('');
   $('#diag-title').textContent = data.title;

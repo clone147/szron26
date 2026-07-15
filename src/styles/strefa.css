@@ -39,12 +39,14 @@
   max-width: 92rem; margin: 0 auto; padding: 0 var(--container-pad); height: 3.75rem;
 }
 .strefa-top .logo { display: inline-flex; align-items: center; gap: var(--space-xs); }
-.strefa-top__tag {
+.strefa-top__nav a.strefa-top__tag {
+  align-self: center;
   font-family: var(--font-display); font-size: .7rem; font-weight: 600; letter-spacing: .12em;
   text-transform: uppercase; color: var(--color-accent);
   border: 1px solid color-mix(in oklch, var(--color-accent) 55%, transparent);
-  padding: .12rem .4rem; border-radius: 999px; line-height: 1;
+  padding: .3rem .55rem; border-radius: 999px; line-height: 1;
 }
+.strefa-top__nav a.strefa-top__tag:hover { background: var(--color-accent-soft); color: var(--color-accent); }
 .strefa-top__nav { display: flex; gap: var(--space-xs); margin-left: var(--space-md); }
 .strefa-top__nav a {
   color: var(--color-text-inv-2); text-decoration: none; font-weight: 500;
