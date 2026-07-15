@@ -827,6 +827,25 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 #btn-lock.is-locked { background: var(--color-accent-soft); color: var(--color-accent); }
 #btn-play.is-active { background: var(--color-accent-soft); color: var(--color-accent); }
 .diag-hint { font-size: var(--text-caption); color: var(--color-text-inv-3); }
+.diag-fx {
+  position: absolute; top: 12px; right: 12px; z-index: 6;
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; border-radius: var(--radius-btn);
+  background: color-mix(in oklch, var(--color-ink-2) 84%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-line-dark);
+}
+.diag-fx__label { font-size: var(--text-caption); color: var(--color-text-inv-3); letter-spacing: .04em; }
+.diag-fx__chips { display: flex; gap: 2px; border: 1px solid var(--color-line-dark); border-radius: var(--radius-btn); padding: 2px; }
+.diag-fx__chip {
+  border: 0; border-radius: calc(var(--radius-btn) - 2px);
+  padding: 3px 9px; font-size: var(--text-caption);
+  background: transparent; color: var(--color-text-inv-2); cursor: pointer;
+}
+.diag-fx__chip:hover { background: var(--color-ink-3); color: var(--color-text-inv); }
+.diag-fx__chip.is-active { background: var(--color-accent); color: var(--color-ink); }
+.diag-fx__chip:disabled { opacity: .35; cursor: default; pointer-events: none; }
+.diag-fx__pulse.is-active { background: var(--color-accent-soft); color: var(--color-accent); }
 .diag-canvas-wrap { position: relative; flex: 1; overflow: hidden; touch-action: none; }
 .diag-canvas-wrap canvas { display: block; }
 .diag-textedit {

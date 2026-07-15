@@ -42,6 +42,16 @@ import Strefa from '../../layouts/Strefa.astro';
     <div class="diag-canvas-wrap" id="canvas-wrap">
       <canvas id="diag-canvas"></canvas>
       <textarea id="diag-text" class="diag-textedit" hidden spellcheck="false"></textarea>
+      <div class="diag-fx" id="fx-panel" hidden role="toolbar" aria-label="Animacja elementu">
+        <span class="diag-fx__label">Animacja</span>
+        <div class="diag-fx__chips">
+          <button class="diag-fx__chip" data-fx="draw" type="button" title="Element rysuje się jak ręką (domyślne)">Rysowanie</button>
+          <button class="diag-fx__chip" data-fx="pop" type="button" title="Wskakuje ze sprężystym przeskalowaniem">Pop</button>
+          <button class="diag-fx__chip" data-fx="slide" type="button" title="Wjeżdża z boku z zanikiem">Wjazd</button>
+          <button class="diag-fx__chip" data-fx="count" type="button" title="Liczba w tekście odlicza od zera">Licznik</button>
+        </div>
+        <button class="diag-fx__chip diag-fx__pulse" id="fx-pulse" type="button" title="Po wejściu element pulsuje kolorem akcentu">Puls</button>
+      </div>
     </div>
   </div>
 

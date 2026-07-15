@@ -194,29 +194,14 @@ function render() {
   ctx.lineWidth = 1.8;
 
   for (const s of shapes) {
-    // tryb Play: kształt „rysuje się" jak ręką — kreska po kresce, tekst znak po znaku
+    // tryb Play: kształty animowane wg przypisanego efektu (rysowanie/pop/wjazd/licznik + puls)
     if (play) {
       const rec = play.shown.get(s.id);
-      if (!rec) continue;
-      const p = (performance.now() - rec.t0) / rec.dur;
-      if (p <= 0) continue;
-      if (p < 1) {
-        const po = rec.of > 0 ? Math.min(1, p / rec.of) : 1;      // faza konturu
-        const pt = rec.of < 1 ? Math.max(0, (p - rec.of) / (1 - rec.of)) : 0; // faza tekstu
-        let tip = drawShape(ctx, s, pal().ink, po);
-        if (s.type !== 'arrow' && s.text && pt > 0) tip = drawText(ctx, s, pt) || tip;
-        if (tip) { // punkt „ołówka" na końcu rysowanej kreski
-          ctx.fillStyle = pal().sel;
-          ctx.beginPath();
-          ctx.arc(tip.x, tip.y, 3 / Math.sqrt(camera.z), 0, Math.PI * 2);
-          ctx.fill();
-        }
-        continue;
-      }
-      drawShape(ctx, s, pal().ink);
-      if (s.type !== 'arrow' && s.text) drawText(ctx, s);
+      if (rec) drawShapeAnimated(s, rec);
       continue;
     }
+    // podgląd efektu w edycji — po wybraniu animacji w panelu
+    if (fxPreview?.id === s.id) { drawShapeAnimated(s, fxPreview.rec); continue; }
     const sel = s.id === selectedId;
     drawShape(ctx, s, sel ? pal().sel : pal().ink);
     if (s.type !== 'arrow' && s.text && s.id !== editingId) drawText(ctx, s);
@@ -257,6 +242,7 @@ function render() {
       ctx.restore();
     }
   }
+  updateFxPanel();
 }
 
 // frac<1 — „pisanie ręczne": odsłania znaki po kolei; zwraca pozycję pióra przy frac<1
@@ -597,16 +583,87 @@ function setTool(t) {
 
 /* ── tryb Play: stopniowe odsłanianie diagramu ── */
 let playRaf = 0;
+const PULSE_DUR = 1400;         // czas „pulsu" akcentem po wejściu elementu
+const FX_LIST = ['pop', 'slide', 'count']; // efekty inne niż domyślne rysowanie
+const backOut = (t, k = 1.7) => 1 + (k + 1) * (t - 1) ** 3 + k * (t - 1) ** 2;
+const easeOut = (t) => 1 - (1 - t) * (1 - t);
 
-// czas rysowania kształtu (jak ręką): kontur wg obwodu, tekst wg liczby znaków
+// czas animacji kształtu; dla rysowania: kontur wg obwodu, tekst wg liczby znaków
 function shapeTiming(s) {
+  const fx = FX_LIST.includes(s.fx) ? s.fx : 'draw';
+  const pulse = !!s.pulse;
+  if (fx === 'pop') return { dur: 520, of: 1, fx, pulse };
+  if (fx === 'slide') return { dur: 560, of: 1, fx, pulse };
+  if (fx === 'count') return { dur: 1400, of: 1, fx, pulse };
   let L = 0;
   if (s.type === 'rect') L = 2 * (s.w + s.h);
   else if (s.type === 'arrow') L = Math.hypot(s.w, s.h) * 1.35;
   const outline = L ? Math.min(1100, Math.max(320, L / 1.3)) : 0;
   const text = s.type !== 'arrow' && s.text ? Math.min(1500, Math.max(300, String(s.text).length * 42)) : 0;
   const dur = Math.max(220, outline + text);
-  return { dur, of: outline / dur }; // of = jaka część czasu to kontur
+  return { dur, of: outline / dur, fx, pulse }; // of = jaka część czasu to kontur
+}
+
+// „licznik": pierwsza liczba w tekście interpolowana 0→wartość
+function countProxy(s, t) {
+  const m = /\d[\d ]*/.exec(s.text || '');
+  if (!m) return s;
+  const target = parseInt(m[0].replace(/\D/g, ''), 10);
+  const cur = Math.round(target * t);
+  return { ...s, text: s.text.slice(0, m.index) + cur + s.text.slice(m.index + m[0].length) };
+}
+
+// rysuje kształt w trakcie animacji wg rec = { t0, dur, of, fx, pulse }
+function drawShapeAnimated(s, rec) {
+  const now = performance.now();
+  const p = (now - rec.t0) / rec.dur;
+  if (p <= 0) return;
+  if (p >= 1) { // stan końcowy + ewentualny puls akcentem
+    let glow = 0, k = 1;
+    if (rec.pulse) {
+      const q = (now - rec.t0 - rec.dur) / PULSE_DUR;
+      if (q < 1) {
+        const w = Math.abs(Math.sin(q * Math.PI * 2)) * Math.sin(Math.PI * q); // 2 pulsy, wygaszane
+        glow = 26 * w; k = 1 + 0.035 * w;
+      }
+    }
+    ctx.save();
+    if (k !== 1) {
+      const cx = s.x + s.w / 2, cy = s.y + s.h / 2;
+      ctx.translate(cx, cy); ctx.scale(k, k); ctx.translate(-cx, -cy);
+    }
+    if (glow > 0) { ctx.shadowColor = pal().sel; ctx.shadowBlur = glow; }
+    drawShape(ctx, s, pal().ink);
+    if (s.type !== 'arrow' && s.text) drawText(ctx, s);
+    ctx.restore();
+    return;
+  }
+  if (rec.fx === 'draw') { // „ręką": kreska po kresce, tekst znak po znaku, punkt ołówka
+    const po = rec.of > 0 ? Math.min(1, p / rec.of) : 1;
+    const pt = rec.of < 1 ? Math.max(0, (p - rec.of) / (1 - rec.of)) : 0;
+    let tip = drawShape(ctx, s, pal().ink, po);
+    if (s.type !== 'arrow' && s.text && pt > 0) tip = drawText(ctx, s, pt) || tip;
+    if (tip) {
+      ctx.fillStyle = pal().sel;
+      ctx.beginPath();
+      ctx.arc(tip.x, tip.y, 3 / Math.sqrt(camera.z), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    return;
+  }
+  ctx.save();
+  ctx.globalAlpha = Math.min(1, p * 2.2);
+  if (rec.fx === 'slide') {
+    ctx.translate(-46 * (1 - easeOut(p)), 0);
+  } else { // pop / count — sprężysty scale-in wokół środka
+    const k = 0.82 + 0.18 * backOut(p);
+    const cx = s.x + s.w / 2, cy = s.y + s.h / 2;
+    ctx.translate(cx, cy); ctx.scale(k, k); ctx.translate(-cx, -cy);
+  }
+  const sd = rec.fx === 'count' ? countProxy(s, easeOut(p)) : s;
+  drawShape(ctx, s, pal().ink);
+  if (s.type !== 'arrow' && s.text) drawText(ctx, sd);
+  ctx.restore();
 }
 
 // Kroki odsłaniania (BFS warstwami): korzenie → strzałki wychodzące → ich cele → … → reszta.
@@ -643,6 +700,7 @@ function startPlay() {
   if (!steps.length) { toast('Pusty diagram', 'Nie ma czego odtwarzać.', 'err'); return; }
   if (editingId) commitText();
   play = { steps, idx: 0, shown: new Map() };
+  fxPreview = null;
   selectedId = null;
   drag = null;
   applyPlayUI(true);
@@ -658,13 +716,13 @@ function revealStep() {
   const k = Math.min(1, 2600 / Math.max(1, total));
   let t = performance.now();
   shs.forEach((s, i) => {
-    play.shown.set(s.id, { t0: t, dur: timings[i].dur * k, of: timings[i].of });
+    play.shown.set(s.id, { ...timings[i], t0: t, dur: timings[i].dur * k });
     t += timings[i].dur * k * 0.85; // następny startuje tuż przed końcem poprzedniego
   });
   cancelAnimationFrame(playRaf);
   const tick = () => {
     render();
-    if (play && [...play.shown.values()].some((r) => performance.now() < r.t0 + r.dur + 40))
+    if (play && [...play.shown.values()].some((r) => performance.now() < r.t0 + r.dur + (r.pulse ? PULSE_DUR : 0) + 40))
       playRaf = requestAnimationFrame(tick);
   };
   playRaf = requestAnimationFrame(tick);
@@ -693,6 +751,54 @@ function applyPlayUI(on) {
   canvas.style.cursor = on ? 'pointer' : 'default';
 }
 $('#btn-play').addEventListener('click', () => (play ? stopPlay() : startPlay()));
+
+/* ── panel „Animacja": przypisywanie efektu do zaznaczonego elementu + podgląd na żywo ── */
+let fxPreview = null; // { id, rec } — pojedynczy kształt animowany w edycji
+let fxRaf = 0;
+let fxSig = '';       // sygnatura ostatniego stanu panelu (unik DOM-writes co klatkę)
+const fxPanel = $('#fx-panel');
+
+function previewFx(s) {
+  const tm = shapeTiming(s);
+  fxPreview = { id: s.id, rec: { ...tm, t0: performance.now() } };
+  const end = fxPreview.rec.t0 + tm.dur + (tm.pulse ? PULSE_DUR : 0) + 40;
+  cancelAnimationFrame(fxRaf);
+  const tick = () => {
+    render();
+    if (fxPreview && performance.now() < end) fxRaf = requestAnimationFrame(tick);
+    else { fxPreview = null; render(); }
+  };
+  fxRaf = requestAnimationFrame(tick);
+}
+
+function updateFxPanel() {
+  const s = !locked && !play && selectedId ? byId(selectedId) : null;
+  const sig = s ? `${s.id}|${s.fx || 'draw'}|${!!s.pulse}|${s.text || ''}` : '';
+  if (sig === fxSig) return;
+  fxSig = sig;
+  fxPanel.hidden = !s;
+  if (!s) return;
+  const fx = FX_LIST.includes(s.fx) ? s.fx : 'draw';
+  fxPanel.querySelectorAll('[data-fx]').forEach((b) => b.classList.toggle('is-active', b.dataset.fx === fx));
+  fxPanel.querySelector('[data-fx="count"]').disabled = s.type === 'arrow' || !/\d/.test(s.text || '');
+  $('#fx-pulse').classList.toggle('is-active', !!s.pulse);
+}
+
+fxPanel.addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  const s = b && byId(selectedId);
+  if (!s) return;
+  if (b.dataset.fx) {
+    if (b.dataset.fx === 'draw') delete s.fx; else s.fx = b.dataset.fx;
+  } else if (b.id === 'fx-pulse') {
+    if (s.pulse) delete s.pulse; else s.pulse = true;
+  }
+  fxSig = '';
+  updateFxPanel();
+  scheduleSave();
+  previewFx(s);
+});
+fxPanel.addEventListener('pointerdown', (e) => e.stopPropagation()); // nie odznaczaj kształtu klikiem w panel
 
 /* ── zapis / Supabase ── */
 function setStatus(txt) { const el = $('#save-status'); if (el) el.textContent = txt; }
@@ -858,6 +964,8 @@ function sanitizeShapes(raw) {
       if (typeof r.startBind === 'string') s.startBind = r.startBind;
       if (typeof r.endBind === 'string') s.endBind = r.endBind;
     }
+    if (['pop', 'slide', 'count'].includes(r.fx)) s.fx = r.fx;
+    if (r.pulse === true) s.pulse = true;
     out.push(s);
   }
   for (const s of out) { // bindy do nieistniejących obiektów precz
