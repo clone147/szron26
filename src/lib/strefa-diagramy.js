@@ -672,9 +672,15 @@ function drawShapeAnimated(s, rec) {
 function buildPlaySteps() {
   const arrows = shapes.filter((s) => s.type === 'arrow');
   const nodes = shapes.filter((s) => s.type !== 'arrow');
+  // graf: bind jawny, a dla odklejonych końcówek wirtualny — obiekt, przy którego ramce
+  // leży końcówka strzałki (żeby odklejona strzałka nie psuła kolejności prezentacji)
+  const conn = new Map(arrows.map((a) => [a.id, {
+    s: a.startBind || bindTargetAt({ x: a.x, y: a.y })?.id,
+    e: a.endBind || bindTargetAt({ x: a.x + a.w, y: a.y + a.h })?.id,
+  }]));
   const inGraph = new Set();
-  for (const a of arrows) { if (a.startBind) inGraph.add(a.startBind); if (a.endBind) inGraph.add(a.endBind); }
-  const hasIncoming = new Set(arrows.filter((a) => a.endBind).map((a) => a.endBind));
+  for (const { s, e } of conn.values()) { if (s) inGraph.add(s); if (e) inGraph.add(e); }
+  const hasIncoming = new Set([...conn.values()].map((c) => c.e).filter(Boolean));
   let roots = nodes.filter((n) => inGraph.has(n.id) && !hasIncoming.has(n.id));
   if (!roots.length) roots = nodes.filter((n) => inGraph.has(n.id)).slice(0, 1); // sam cykl — start od pierwszego
   const steps = [];
@@ -682,12 +688,12 @@ function buildPlaySteps() {
   if (roots.length) { steps.push(roots.map((r) => r.id)); roots.forEach((r) => visible.add(r.id)); }
   for (;;) {
     // strzałki, których początek jest już widoczny (lub nie mają początku, a mają cel)
-    const layer = arrows.filter((a) => !visible.has(a.id) && (a.startBind || a.endBind) &&
-      (!a.startBind || visible.has(a.startBind)));
+    const layer = arrows.filter((a) => !visible.has(a.id) && (conn.get(a.id).s || conn.get(a.id).e) &&
+      (!conn.get(a.id).s || visible.has(conn.get(a.id).s)));
     if (!layer.length) break;
     steps.push(layer.map((a) => a.id));
     layer.forEach((a) => visible.add(a.id));
-    const targets = [...new Set(layer.map((a) => a.endBind).filter((id) => id && !visible.has(id)))];
+    const targets = [...new Set(layer.map((a) => conn.get(a.id).e).filter((id) => id && !visible.has(id)))];
     if (targets.length) { steps.push(targets); targets.forEach((id) => visible.add(id)); }
   }
   const rest = shapes.filter((s) => !visible.has(s.id)).map((s) => s.id);
@@ -1078,6 +1084,9 @@ $('#btn-zoom-100').addEventListener('click', () => setZoom(1));
 $('#btn-import')?.addEventListener('click', importDiagram);
 $('#btn-prev').addEventListener('click', () => navDiagram(-1));
 $('#btn-next').addEventListener('click', () => navDiagram(1));
+
+// diagnostyka z konsoli devtools (stan modułu jest niedostępny inaczej)
+window.__diagDebug = () => ({ shapes, play, camera, selectedId, fxPreview });
 
 /* ── start ── */
 (async () => {

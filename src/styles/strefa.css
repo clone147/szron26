@@ -827,6 +827,7 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 #btn-lock.is-locked { background: var(--color-accent-soft); color: var(--color-accent); }
 #btn-play.is-active { background: var(--color-accent-soft); color: var(--color-accent); }
 .diag-hint { font-size: var(--text-caption); color: var(--color-text-inv-3); }
+.diag-fx[hidden] { display: none; }
 .diag-fx {
   position: absolute; top: 12px; right: 12px; z-index: 6;
   display: flex; align-items: center; gap: 8px;
