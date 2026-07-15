@@ -831,7 +831,8 @@ function advancePlay() {
     if (zoomBack) followPlayCamera(); // kamera zzoomowana → podążaj za nowym krokiem
   } else stopPlay(); // wszystko widoczne — kolejna spacja kończy tryb
 }
-// przelot kamery na obiekty bieżącego kroku; dla strzałek — na obiekt, który wskazują
+// przelot kamery na obiekty bieżącego kroku; dla strzałek — kadr obejmuje strzałkę
+// razem z obiektem, który wskazuje (bez „pustego kadru" zanim cel się odsłoni)
 function followPlayCamera() {
   const targets = [];
   for (const id of play.steps[play.idx]) {
@@ -841,7 +842,7 @@ function followPlayCamera() {
     else {
       const e = play.conn.get(id)?.e;
       const t = e && byId(e);
-      if (t) targets.push(t);
+      if (t) { targets.push(t); targets.push(s); }
     }
   }
   if (!targets.length) return; // np. luźne strzałki bez celu — kamera zostaje
