@@ -212,11 +212,13 @@ import CtaBand from '../components/CtaBand.astro';
     .bm-sublegend { margin: var(--space-sm) .9rem 0; font-size: var(--text-caption); color: var(--color-text-inv-3, #99a); }
     @media (prefers-reduced-motion: reduce) { .bm-seg { transition: none; } .bm-bars .bm-seg { width: var(--w); } }
 
+    /* elementy siatek LED powstają w JS — bez atrybutu scope Astro, stąd :global */
     .bm-flash { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--space-lg); }
-    .bm-flash .cap { font-size: var(--text-caption); margin-bottom: .5rem; display: flex; align-items: center; gap: .5rem; color: var(--color-text-2); }
-    .bm-flash .cap b { font-variant-numeric: tabular-nums; margin-left: auto; color: var(--color-text); }
-    .bm-ledgrid { display: grid; grid-template-columns: repeat(16, 1fr); gap: 3px; }
-    .bm-led { aspect-ratio: 1; border-radius: 50%; background: color-mix(in oklch, currentColor 10%, transparent); transition: background .3s; }
+    .bm-flash :global(.cap) { font-size: var(--text-caption); margin-bottom: .5rem; display: flex; align-items: center; gap: .5rem; color: var(--color-text-2); }
+    .bm-flash :global(.cap b) { font-variant-numeric: tabular-nums; margin-left: auto; color: var(--color-text); }
+    .bm-flash :global(.bm-dot) { flex: none; width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+    .bm-flash :global(.bm-ledgrid) { display: grid; grid-template-columns: repeat(16, 1fr); gap: 3px; }
+    .bm-flash :global(.bm-led) { aspect-ratio: 1; border-radius: 50%; background: color-mix(in oklch, currentColor 10%, transparent); }
 
     .bm-table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: var(--text-s); }
     .bm-table th, .bm-table td { padding: .7rem .9rem; text-align: right; border-top: 1px solid var(--color-line, rgba(0,0,0,.1)); font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -234,7 +236,7 @@ import CtaBand from '../components/CtaBand.astro';
     .bm-details[open] summary { margin-bottom: var(--space-sm); }
     .bm-lede { font-size: 1.08em; }
     .bm-quote { border-left: 3px solid var(--color-accent); padding: var(--space-sm) var(--space-lg); background: color-mix(in oklch, var(--color-accent) 8%, transparent); border-radius: 0 var(--radius-btn, 8px) var(--radius-btn, 8px) 0; font-weight: 500; }
-    .bm-foot { font-size: var(--text-caption); color: var(--color-text-inv-3, #99a); }
+    .bm-foot { font-size: var(--text-caption); color: var(--color-text-inv-2, #b9bec8); }
   </style>
 
   <script>
