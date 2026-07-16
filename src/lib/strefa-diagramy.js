@@ -91,6 +91,16 @@ function sketchPts(x1, y1, x2, y2, rnd, overshoot = 0) {
   }
   return { pts, lwf: 0.85 + rnd() * 0.35 };           // minimalnie inny docisk pióra per kreska
 }
+// Wygładzenie łamanej kreski: krzywe kwadratowe przez środki odcinków. Te same punkty
+// (ten sam rnd → ten sam charakter), ale przy dużym zoomie kreska pozostaje gładka —
+// bez kanciastych segmentów łamanej, które wyglądały jak niska rozdzielczość.
+function smoothPath(g, pts) {
+  g.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length - 1; i++)
+    g.quadraticCurveTo(pts[i][0], pts[i][1], (pts[i][0] + pts[i + 1][0]) / 2, (pts[i][1] + pts[i + 1][1]) / 2);
+  const last = pts[pts.length - 1];
+  g.lineTo(last[0], last[1]);
+}
 // frac ∈ (0..1] rysuje tylko część kreski (od początku, po długości łamanej).
 // Zwraca punkt „ołówka" (koniec narysowanego fragmentu) przy frac<1, inaczej null.
 function sketchLine(g, x1, y1, x2, y2, rnd, overshoot = 0, frac = 1) {
@@ -100,9 +110,9 @@ function sketchLine(g, x1, y1, x2, y2, rnd, overshoot = 0, frac = 1) {
   let tip = null;
   if (frac > 0) {
     g.beginPath();
-    g.moveTo(pts[0][0], pts[0][1]);
-    if (frac >= 1) for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]);
+    if (frac >= 1) smoothPath(g, pts);
     else {
+      g.moveTo(pts[0][0], pts[0][1]);
       let total = 0;
       for (let i = 1; i < pts.length; i++) total += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
       let left = total * frac;
@@ -172,8 +182,7 @@ function cacheEntry(s) {
     const strokes = shapeStrokes(s).map((d) => {
       const { pts, lwf } = sketchPts(d[0], d[1], d[2], d[3], rnd, d[4]);
       const path = new Path2D();
-      path.moveTo(pts[0][0], pts[0][1]);
-      for (let i = 1; i < pts.length; i++) path.lineTo(pts[i][0], pts[i][1]);
+      smoothPath(path, pts);
       return { path, lwf };
     });
     c = { key, strokes };
