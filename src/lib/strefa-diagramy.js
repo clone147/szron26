@@ -621,10 +621,9 @@ textEl.addEventListener('keydown', (e) => {
 let clipboard = null; // skopiowany kształt (⌘C/⌘V)
 document.addEventListener('keydown', (e) => {
   if (!current || editingId || (e.target instanceof Element && e.target.matches('input, textarea, select'))) return;
-  if (play) { // tryb Play: Esc kończy, spacja/Enter/→ = następny krok, ← = krok wstecz, "-" = powrót kadru
+  if (play) { // tryb Play: Esc kończy, spacja/Enter/→ = następny krok, "-" = powrót kadru
     if (e.key === 'Escape') stopPlay();
     else if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); advancePlay(); }
-    else if (e.key === 'ArrowLeft') { e.preventDefault(); rewindPlay(); }
     else if (e.key === '-' || e.key === '_') { e.preventDefault(); zoomBackOut(); }
     return;
   }
@@ -757,11 +756,8 @@ function drawShapeAnimated(s, rec) {
 }
 
 // Kroki odsłaniania (BFS warstwami): korzenie → strzałki wychodzące → ich cele → … → reszta.
-// Korzeń = obiekt spięty strzałkami, do którego żadna nie prowadzi. Luźne POLA TEKSTOWE
-// (spoza grafu) wchodzą na samym początku (tytuły, legendy) — CHYBA że leżą przy strzałce:
-// wtedy są do niej „przypięte" i pojawiają się razem z nią (etykiety typu TAK / NIE).
-// Reszta (nieprzypięte strzałki, nieosiągalne cykle) trafia do ostatniego kroku.
-const PIN_DIST = 110; // maks. odległość środka tekstu od odcinka strzałki = przypięcie
+// Korzeń = obiekt spięty strzałkami, do którego żadna nie prowadzi. Reszta (luźne teksty,
+// nieprzypięte strzałki, nieosiągalne cykle) trafia do ostatniego kroku.
 function buildPlaySteps() {
   const arrows = shapes.filter((s) => s.type === 'arrow');
   const nodes = shapes.filter((s) => s.type !== 'arrow');
@@ -773,35 +769,19 @@ function buildPlaySteps() {
   }]));
   const inGraph = new Set();
   for (const { s, e } of conn.values()) { if (s) inGraph.add(s); if (e) inGraph.add(e); }
-  // przypinanie etykiet: tekst spoza grafu → najbliższa strzałka w promieniu PIN_DIST
-  const pinned = new Map(); // arrowId → [textId, …]
-  const freeTexts = [];
-  for (const t of nodes) {
-    if (t.type !== 'text' || inGraph.has(t.id)) continue;
-    const c = { x: t.x + t.w / 2, y: t.y + t.h / 2 };
-    let best = null, bestD = PIN_DIST;
-    for (const a of arrows) {
-      const d = distSeg(c, a.x, a.y, a.x + a.w, a.y + a.h);
-      if (d < bestD) { bestD = d; best = a.id; }
-    }
-    if (best) pinned.set(best, [...(pinned.get(best) || []), t.id]);
-    else freeTexts.push(t.id);
-  }
   const hasIncoming = new Set([...conn.values()].map((c) => c.e).filter(Boolean));
   let roots = nodes.filter((n) => inGraph.has(n.id) && !hasIncoming.has(n.id));
   if (!roots.length) roots = nodes.filter((n) => inGraph.has(n.id)).slice(0, 1); // sam cykl — start od pierwszego
   const steps = [];
   const visible = new Set();
-  const first = [...freeTexts, ...roots.map((r) => r.id)]; // luźne teksty od razu na starcie
-  if (first.length) { steps.push(first); first.forEach((id) => visible.add(id)); }
+  if (roots.length) { steps.push(roots.map((r) => r.id)); roots.forEach((r) => visible.add(r.id)); }
   for (;;) {
     // strzałki, których początek jest już widoczny (lub nie mają początku, a mają cel)
     const layer = arrows.filter((a) => !visible.has(a.id) && (conn.get(a.id).s || conn.get(a.id).e) &&
       (!conn.get(a.id).s || visible.has(conn.get(a.id).s)));
     if (!layer.length) break;
-    const ids = layer.flatMap((a) => [a.id, ...(pinned.get(a.id) || [])]); // strzałka + jej etykiety
-    steps.push(ids);
-    ids.forEach((id) => visible.add(id));
+    steps.push(layer.map((a) => a.id));
+    layer.forEach((a) => visible.add(a.id));
     const targets = [...new Set(layer.map((a) => conn.get(a.id).e).filter((id) => id && !visible.has(id)))];
     if (targets.length) { steps.push(targets); targets.forEach((id) => visible.add(id)); }
   }
@@ -850,14 +830,6 @@ function advancePlay() {
     revealStep();
     if (zoomBack) followPlayCamera(); // kamera zzoomowana → podążaj za nowym krokiem
   } else stopPlay(); // wszystko widoczne — kolejna spacja kończy tryb
-}
-// ← : chowa ostatnio odsłonięty krok (aż do pustej planszy); → po cofnięciu animuje go od nowa
-function rewindPlay() {
-  if (!play || play.idx < 0) return;
-  for (const id of play.steps[play.idx]) play.shown.delete(id);
-  play.idx--;
-  render();
-  if (zoomBack && play.idx >= 0) followPlayCamera();
 }
 // przelot kamery na obiekty bieżącego kroku; dla strzałek — kadr obejmuje strzałkę
 // razem z obiektem, który wskazuje (bez „pustego kadru" zanim cel się odsłoni)
