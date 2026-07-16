@@ -20,7 +20,7 @@ import CtaBand from '../components/CtaBand.astro';
   <ProofStrip items={[
     ['3,75× szybciej', 'GCC tuned: 51 ms vs 194 ms Keila (cały benchmark)'],
     ['2,4× mniejszy firmware', '220 kB vs 537 kB ROM — ta sama funkcjonalność'],
-    ['0 zł licencji', 'GCC + newlib są w pełni open-source'],
+    ['0 zł licencji', 'Keil MDK Professional kosztuje 7 565 zł netto rocznie za stanowisko'],
   ]} />
 
   <!-- 01 mapa efektywności -->
@@ -141,10 +141,71 @@ import CtaBand from '../components/CtaBand.astro';
     </div>
   </section>
 
-  <!-- 05 artykuł: agent -->
+  <!-- 05 koszty licencji -->
+  <section class="sect" aria-labelledby="koszty">
+    <div class="container">
+      <SectHead eyebrow="05 / Koszty · Cena toolchaina" title="Ile kosztuje ta różnica w licencjach." id="koszty" small />
+      <div class="prose rv"><p>Benchmark wyżej pokazuje, że open source jest szybszy i mniejszy. Cennik dopowiada resztę: Keil MDK jest dziś sprzedawany wyłącznie w subskrypcji per stanowisko, a <strong>Arm GNU Toolchain — ten sam, który wygrał ten benchmark — jest bezpłatny również w projektach komercyjnych</strong>.</p></div>
+
+      <div class="bm-price rv">
+        <div class="bm-card bm-price__tile">
+          <span class="bm-price__k">Keil MDK v6 Professional</span>
+          <span class="bm-price__n">7 565 zł</span>
+          <span class="bm-price__d">netto / rok / stanowisko — oficjalny sklep Arm (lipiec 2026)</span>
+        </div>
+        <div class="bm-card bm-price__tile">
+          <span class="bm-price__k">Keil MDK v6 Essential</span>
+          <span class="bm-price__n">3 780 zł</span>
+          <span class="bm-price__d">netto / rok / stanowisko; u dystrybutorów bywa ~15% drożej</span>
+        </div>
+        <div class="bm-card bm-price__tile bm-price__tile--win">
+          <span class="bm-price__k">Arm GNU Toolchain (GCC)</span>
+          <span class="bm-price__n">0 zł</span>
+          <span class="bm-price__d">bez opłat i bez limitu użycia komercyjnego</span>
+        </div>
+      </div>
+
+      <div class="bm-card rv">
+        <p class="bm-chart-title">Zespół 5 inżynierów, horyzont 3 lat — same licencje toolchaina (PLN netto)</p>
+        <div class="bm-bars bm-bars--light">
+          <div class="bm-row"><span class="bm-row__lbl"><i class="bm-dot" style="background:var(--bm-keil)"></i>MDK v6 Professional</span>
+            <span class="bm-track"><span class="bm-seg" data-w="100" style="background:var(--bm-keil)"></span></span>
+            <span class="bm-val" data-count="113" data-suffix=" tys. zł">0</span></div>
+          <div class="bm-row"><span class="bm-row__lbl"><i class="bm-dot" style="background:var(--bm-keil2)"></i>MDK v6 Essential</span>
+            <span class="bm-track"><span class="bm-seg" data-w="50" style="background:var(--bm-keil2)"></span></span>
+            <span class="bm-val" data-count="57" data-suffix=" tys. zł">0</span></div>
+          <div class="bm-row bm-row--win"><span class="bm-row__lbl"><i class="bm-dot" style="background:var(--bm-tuned)"></i><strong>Arm GNU Toolchain</strong></span>
+            <span class="bm-track"><span class="bm-seg" data-w="0" style="background:var(--bm-tuned)"></span></span>
+            <span class="bm-val" data-count="0" data-suffix=" zł"><strong>0</strong></span></div>
+        </div>
+      </div>
+
+      <div class="bm-card bm-scroll rv" style="margin-top:var(--space-lg)">
+        <table class="bm-table">
+          <thead><tr><th>Licencja</th><th>Model</th><th>Cena katalogowa</th><th>W PLN netto</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>MDK v6 Essential</td><td>subskrypcja / rok / stanowisko</td><td>999&nbsp;$ / rok</td><td>3 780&nbsp;zł / rok</td><td><span class="bm-badge bm-badge--on">w sprzedaży</span></td></tr>
+            <tr><td>MDK v6 Professional</td><td>subskrypcja / rok / stanowisko</td><td>1 999&nbsp;$ / rok</td><td>7 565&nbsp;zł / rok</td><td><span class="bm-badge bm-badge--on">w sprzedaży</span></td></tr>
+            <tr class="bm-tr--old"><td>MDK v5 Professional</td><td>wieczysta node-locked + 20% / rok maintenance</td><td>9 500&nbsp;$</td><td>≈36 100&nbsp;zł</td><td><span class="bm-badge bm-badge--off">wycofana — sprzedaż do 30.06.2025</span></td></tr>
+            <tr class="bm-total"><td>Arm GNU Toolchain (GCC)</td><td>open source — GPL z wyjątkami runtime</td><td><strong>0&nbsp;$</strong></td><td><strong>0&nbsp;zł</strong></td><td><span class="bm-badge bm-badge--on">bez ograniczeń komercyjnych</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="prose rv" style="margin-top:var(--space-lg)">
+        <details class="bm-details"><summary>Źródła i założenia cen (rozwiń)</summary>
+          <p><strong>Subskrypcje MDK v6:</strong> oficjalny sklep Arm (store.arm.com), ceny wyświetlane w PLN netto, stan: lipiec 2026 (katalogowo 999&nbsp;$ Essential i 1 999&nbsp;$ Professional rocznie). Subskrypcja 3-letnia ok. 20% taniej; u dystrybutorów (np. DigiKey) bywa ok. 15% drożej. Darmowa edycja Community obejmuje wyłącznie projekty niekomercyjne.</p>
+          <p><strong>Licencje wieczyste MDK v5</strong> (już niedostępne): ceny wg archiwalnych cenników dystrybutorów Keil (USD; zbieżne z archiwalnym sklepem Arm), przeliczone po ~3,8&nbsp;zł/USD. Arm zakończył ich sprzedaż 30 czerwca 2025, a odnowienia maintenance przyjmuje tylko do 30 czerwca 2026. Maintenance kosztował 20% ceny licencji rocznie (40% przy wznowieniu po przerwie); pierwszy rok był wliczony.</p>
+          <p><strong>Wykres „5 inżynierów × 3 lata":</strong> licencje node-locked per stanowisko, ceny bieżące ze sklepu Arm (5 × 3 × 7 565&nbsp;zł ≈ 113 tys. zł; 5 × 3 × 3 780&nbsp;zł ≈ 57 tys. zł), bez rabatów wolumenowych i bez kosztów administracji licencjami.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 artykuł: agent -->
   <section class="sect sect--dark" aria-labelledby="agent">
     <div class="container">
-      <SectHead eyebrow="05 / Puenta · Jak to zmierzono" title="Cały eksperyment wykonał agent AI — na prawdziwym sprzęcie." id="agent" small />
+      <SectHead eyebrow="06 / Puenta · Jak to zmierzono" title="Cały eksperyment wykonał agent AI — na prawdziwym sprzęcie." id="agent" small />
       <img class="hero-img rv" src="/img/sub/keil-vs-gcc-film.webp" alt="Laptop z terminalem agenta AI obok matrycy LED 64×64 wyświetlającej padający śnieg — kadr jak z filmu „Od promptu do pikseli"" width="1380" height="768" loading="lazy" />
       <div class="prose prose--inv rv">
         <p class="bm-lede">Cały eksperyment — dopisanie benchmarku do firmware, pięć kompilacji dwoma toolchainami, flashowanie, pomiary na sprzęcie i weryfikacja obrazu na fizycznym panelu LED — wykonał agent AI, sterując narzędziami z linii poleceń. Dokładnie ten sam zestaw i ta sama pętla, które widzisz w naszym filmie <strong>„Od promptu do pikseli"</strong>.</p>
@@ -172,7 +233,7 @@ import CtaBand from '../components/CtaBand.astro';
   <!-- 06 powiązane -->
   <section class="sect" aria-labelledby="powiazane">
     <div class="container">
-      <SectHead eyebrow="06 / Czytaj dalej" title="Zrób to u siebie." id="powiazane" small />
+      <SectHead eyebrow="07 / Czytaj dalej" title="Zrób to u siebie." id="powiazane" small />
       <div class="link-cards rv">
         <a class="link-card" href="/stm32-skill"><h3>Skill STM32 dla Claude Code</h3><p>Ten sam workflow build → flash → weryfikacja, spakowany do pobrania — z konfiguratorem pod Twoją płytkę.</p></a>
         <a class="link-card" href="/ai-dla-embedded"><h3>AI dla embedded</h3><p>Jak wdrażamy agentów AI w zespołach firmware i elektroniki.</p></a>
@@ -232,6 +293,19 @@ import CtaBand from '../components/CtaBand.astro';
     .prose--inv strong, .prose--inv h2, .prose--inv h3 { color: var(--color-text-inv); }
     .prose--inv code { background: color-mix(in oklch, var(--color-text-inv) 12%, transparent); padding: 1px 5px; border-radius: 4px; font-size: .92em; }
     .prose code { background: color-mix(in oklch, currentColor 8%, transparent); padding: 1px 5px; border-radius: 4px; font-size: .92em; }
+    /* sekcja kosztów */
+    .bm-price { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg); }
+    .bm-price__tile { display: grid; gap: .35rem; align-content: start; }
+    .bm-price__k { font-size: var(--text-caption); text-transform: uppercase; letter-spacing: .08em; color: var(--color-text-2); font-weight: 600; }
+    .bm-price__n { font-family: var(--font-display); font-size: clamp(1.9rem, 3.4vw, 2.5rem); font-weight: 650; letter-spacing: -.02em; font-variant-numeric: tabular-nums; color: var(--color-text); }
+    .bm-price__tile--win .bm-price__n { color: var(--color-accent); }
+    .bm-price__d { font-size: var(--text-caption); color: var(--color-text-2); }
+    .bm-chart-title { font-weight: 600; font-size: var(--text-s); margin: 0 .9rem var(--space-sm); color: var(--color-text); }
+    .bm-bars--light .bm-row__lbl, .bm-bars--light .bm-val { color: var(--color-text); }
+    .bm-badge { display: inline-block; font-size: .72rem; font-weight: 600; letter-spacing: .03em; padding: .12rem .55rem; border-radius: 999px; border: 1px solid color-mix(in oklch, currentColor 45%, transparent); color: var(--color-text-2); white-space: nowrap; }
+    .bm-badge--on { color: var(--bm-gcc2); }
+    .bm-badge--off { color: oklch(55% 0.15 25); }
+    .bm-tr--old td { color: var(--color-text-2); }
     .bm-details summary { cursor: pointer; font-weight: 600; }
     .bm-details[open] summary { margin-bottom: var(--space-sm); }
     .bm-lede { font-size: 1.08em; }
@@ -265,27 +339,28 @@ import CtaBand from '../components/CtaBand.astro';
       host.appendChild(cell);
     }
 
-    // Paski + liczniki startują, gdy sekcja wjedzie w viewport
-    const bars = document.getElementById('bm-bars');
-    bars.querySelectorAll('.bm-seg').forEach((s) => s.style.setProperty('--w', s.dataset.w + '%'));
-    const counters = [...bars.querySelectorAll('.bm-val')];
+    // Paski + liczniki startują, gdy dany wykres wjedzie w viewport (anatomia czasu i koszty)
     const runCount = (el) => {
       const target = +el.dataset.count;
+      const suffix = el.dataset.suffix || ' ms';
       const strong = el.querySelector('strong');
       const t0 = performance.now();
       const tick = () => {
         const p = Math.min(1, (performance.now() - t0) / 1100);
         const v = Math.round(target * (1 - (1 - p) * (1 - p)));
-        (strong || el).textContent = `${v} ms`;
+        (strong || el).textContent = `${v}${suffix}`;
         if (p < 1) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);
     };
-    new IntersectionObserver((entries, obs) => {
-      if (!entries.some((e) => e.isIntersecting)) return;
-      bars.classList.add('is-in');
-      counters.forEach(runCount);
-      obs.disconnect();
-    }, { threshold: 0.35 }).observe(bars);
+    document.querySelectorAll('.bm-bars').forEach((bars) => {
+      bars.querySelectorAll('.bm-seg').forEach((s) => s.style.setProperty('--w', s.dataset.w + '%'));
+      new IntersectionObserver((entries, obs) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        bars.classList.add('is-in');
+        bars.querySelectorAll('.bm-val').forEach(runCount);
+        obs.disconnect();
+      }, { threshold: 0.35 }).observe(bars);
+    });
   </script>
 </Interior>
