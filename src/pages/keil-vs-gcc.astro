@@ -100,8 +100,8 @@ import CtaBand from '../components/CtaBand.astro';
   <!-- 03 mapa flash LED -->
   <section class="sect" aria-labelledby="flash">
     <div class="container">
-      <SectHead eyebrow="03 / Pamięć · W duchu urządzenia" title="Zajętość flasha jako matryca LED." id="flash" small />
-      <div class="prose rv"><p>Każda dioda to 16&nbsp;kB z 2&nbsp;MB flasha STM32F429 — wizualizacja jak na panelu, którym steruje ten firmware. GCC −O2 zapala 13 z 128 diod; Keil potrzebuje ich prawie trzykrotnie więcej. Wolna przestrzeń to miejsce na przyszłe animacje, fonty i bufory.</p></div>
+      <SectHead eyebrow="03 / Pamięć · Ile zostaje na rozwój" title="Zajętość pamięci flash." id="flash" small />
+      <div class="prose rv"><p>Każdy punkt to 16&nbsp;kB z 2&nbsp;MB flasha STM32F429. Firmware z GCC −O2 zajmuje 13 ze 128 bloków; Keil potrzebuje ich prawie trzykrotnie więcej. Wolna przestrzeń to realny zapas na rozwój produktu — kolejne funkcje, fonty, bufory.</p></div>
       <div class="bm-card rv"><div class="bm-flash" id="bm-flash"></div></div>
     </div>
   </section>
@@ -240,7 +240,7 @@ import CtaBand from '../components/CtaBand.astro';
   </style>
 
   <script>
-    // Mapa flasha jako matryca LED — generowana, w duchu urządzenia z benchmarku
+    // Mapa zajętości flasha — siatka bloków po 16 kB, generowana per wariant
     const variants = [
       { name: 'GCC −O0', v: '--bm-gcc0', kb: 584.2 },
       { name: 'Keil default', v: '--bm-keil', kb: 536.7 },
