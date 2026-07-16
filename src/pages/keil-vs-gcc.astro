@@ -3,6 +3,7 @@ import Interior from '../layouts/Interior.astro';
 import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
+import BtnArrow from '../components/BtnArrow.astro';
 ---
 <Interior
   updated="2026-07-16"
@@ -184,13 +185,10 @@ import CtaBand from '../components/CtaBand.astro';
         <table class="bm-table">
           <thead><tr><th>Licencja</th><th>Model</th><th>Cena katalogowa</th><th>W PLN netto</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td>MDK v6 Community</td><td>subskrypcja</td><td>0&nbsp;$</td><td>0&nbsp;zł</td><td><span class="bm-badge">tylko projekty niekomercyjne</span></td></tr>
             <tr><td>MDK v6 Essential</td><td>subskrypcja / rok / stanowisko</td><td>999&nbsp;$ / rok</td><td>3 780&nbsp;zł / rok</td><td><span class="bm-badge bm-badge--on">w sprzedaży</span></td></tr>
             <tr><td>MDK v6 Professional</td><td>subskrypcja / rok / stanowisko</td><td>1 999&nbsp;$ / rok</td><td>7 565&nbsp;zł / rok</td><td><span class="bm-badge bm-badge--on">w sprzedaży</span></td></tr>
-            <tr class="bm-tr--old"><td>MDK v5 Essential</td><td>wieczysta node-locked + 20% / rok maintenance</td><td>3 840&nbsp;$</td><td>≈14 600&nbsp;zł</td><td><span class="bm-badge bm-badge--off">wycofana — sprzedaż do 30.06.2025</span></td></tr>
-            <tr class="bm-tr--old"><td>MDK v5 Plus</td><td>wieczysta node-locked + 20% / rok maintenance</td><td>6 600&nbsp;$</td><td>≈25 100&nbsp;zł</td><td><span class="bm-badge bm-badge--off">wycofana</span></td></tr>
-            <tr class="bm-tr--old"><td>MDK v5 Professional</td><td>wieczysta node-locked (floating ~20% drożej)</td><td>9 500&nbsp;$</td><td>≈36 100&nbsp;zł</td><td><span class="bm-badge bm-badge--off">wycofana</span></td></tr>
-            <tr class="bm-total"><td>Arm GNU Toolchain (GCC)</td><td>open source — GPL z wyjątkami runtime</td><td><strong>0&nbsp;$</strong></td><td><strong>0&nbsp;zł</strong></td><td><span class="bm-badge bm-badge--on">bez ograniczeń komercyjnych</span></td></tr>
+            <tr class="bm-tr--old"><td>MDK v5 Professional</td><td>wieczysta node-locked + 20% / rok maintenance</td><td>9 500&nbsp;$</td><td>≈36 100&nbsp;zł</td><td><span class="bm-badge bm-badge--off">wycofana — sprzedaż do 30.06.2025</span></td></tr>
+            <tr class="bm-total"><td>Arm GNU Toolchain (GCC)</td><td>open source — Twój firmware na dowolnej licencji</td><td><strong>0&nbsp;$</strong></td><td><strong>0&nbsp;zł</strong></td><td><span class="bm-badge bm-badge--on">bez ograniczeń komercyjnych</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -198,7 +196,7 @@ import CtaBand from '../components/CtaBand.astro';
       <div class="prose rv" style="margin-top:var(--space-lg)">
         <details class="bm-details"><summary>Źródła i założenia cen (rozwiń)</summary>
           <p><strong>Subskrypcje MDK v6:</strong> oficjalny sklep Arm (store.arm.com), ceny wyświetlane w PLN netto, stan: lipiec 2026 (katalogowo 999&nbsp;$ Essential i 1 999&nbsp;$ Professional rocznie). Subskrypcja 3-letnia ok. 20% taniej; u dystrybutorów (np. DigiKey) bywa ok. 15% drożej. Darmowa edycja Community obejmuje wyłącznie projekty niekomercyjne.</p>
-          <p><strong>Licencje wieczyste MDK v5</strong> (już niedostępne): ceny wg archiwalnych cenników dystrybutorów Keil (USD; zbieżne z archiwalnym sklepem Arm), przeliczone po ~3,8&nbsp;zł/USD. Arm zakończył ich sprzedaż 30 czerwca 2025, a odnowienia maintenance przyjmuje tylko do 30 czerwca 2026. Maintenance kosztował 20% ceny licencji rocznie (40% przy wznowieniu po przerwie); pierwszy rok był wliczony.</p>
+          <p><strong>Licencje wieczyste MDK v5</strong> (już niedostępne): ceny wg archiwalnych cenników dystrybutorów Keil (USD; zbieżne z archiwalnym sklepem Arm), przeliczone po ~3,8&nbsp;zł/USD. Pozostałe edycje wieczyste: Essential 3 840&nbsp;$ (≈14 600&nbsp;zł), Plus 6 600&nbsp;$ (≈25 100&nbsp;zł); licencje floating ~20% drożej od node-locked. Arm zakończył ich sprzedaż 30 czerwca 2025, a odnowienia maintenance przyjmuje tylko do 30 czerwca 2026. Maintenance kosztował 20% ceny licencji rocznie (40% przy wznowieniu po przerwie); pierwszy rok był wliczony.</p>
           <p><strong>Wykres „5 inżynierów × 3 lata":</strong> licencje node-locked per stanowisko, ceny bieżące ze sklepu Arm (5 × 3 × 7 565&nbsp;zł ≈ 113 tys. zł; 5 × 3 × 3 780&nbsp;zł ≈ 57 tys. zł), bez rabatów wolumenowych i bez kosztów administracji licencjami.</p>
         </details>
       </div>
@@ -226,9 +224,19 @@ import CtaBand from '../components/CtaBand.astro';
           <li><strong>git</strong> — każdy krok eksperymentu zapisany atomowym commitem: wynik odtwarzalny i audytowalny.</li>
         </ul>
         <blockquote class="bm-quote">Zamknięte IDE ogranicza agenta do roli klikacza. Otwarty toolchain robi z niego inżyniera: może przeczytać źródło biblioteki, zmierzyć skutek na sprzęcie i poprawić wynik — w jednej, samodzielnej pętli.</blockquote>
-        <h2>Co z tego wynika</h2>
-        <p>Po pierwsze: <strong>agent + dowolny toolchain z CLI</strong> bije ręczną pracę w IDE, bo iteracja jest tania i weryfikowalna. Po drugie: <strong>agent + open source</strong> bije agenta z narzędziami zamkniętymi, bo przewaga agenta rośnie z przezroczystością stosu. Po trzecie: koszt wejścia to zero złotych i jeden plik <code>build.sh</code> — cała reszta to sprzęt, który już leży na biurku.</p>
-        <p class="bm-foot">Pomiar: 16.07.2026 · DWT→CYCCNT @ 168 MHz · Keil MDK 5.37 (ARMCC 5.06u7) · Arm GNU Toolchain 14.2.Rel1 · weryfikacja: SWO + kamera RTSP + HTTP</p>
+        <h2>Co z tego wynika: trzy oszczędności naraz</h2>
+        <p>Agent z dowolnym toolchainem CLI wygrywa z ręcznym klikaniem w IDE, a z open source dostaje pełną dźwignię. W programowaniu mikrokontrolerów przekłada się to wprost na budżet projektu:</p>
+        <ul>
+          <li><strong>Czas inżyniera — najdroższa pozycja każdego projektu firmware.</strong> Agent domyka pętlę „zmiana → build → flash → dowód na sprzęcie" w ~2 minuty i powtarza ją bez znużenia. Inżynier przestaje czekać i klikać, a zaczyna decydować — ta sama liczba etatów domyka więcej tematów w tygodniu, a eksperymenty odkładane „na kiedyś" (jak ten benchmark) po prostu się dzieją.</li>
+          <li><strong>Licencje: 0 zł.</strong> Cała pętla — kompilator, debug, flashowanie — działa na open source. Zamiast 7 565 zł netto rocznie za stanowisko: w 5-osobowym zespole ~113 tys. zł zostaje w budżecie co 3 lata (<a href="#koszty">rachunek wyżej</a>).</li>
+          <li><strong>Zapas na sprzęcie.</strong> Firmware 2,4× mniejszy i 3,75× szybszy to nowe funkcje bez przesiadki na droższy mikrokontroler — a przy większych seriach często tańszy układ w BOM.</li>
+        </ul>
+        <p>Koszt wejścia: jeden plik <code>build.sh</code> i płytka, która już leży na biurku. Dokładnie takie pętle wdrażamy w zespołach embedded — na Waszym kodzie i Waszym sprzęcie, z pomiarem zamiast obietnic.</p>
+        <div class="contact__cta">
+          <BtnArrow href="/umow-rozmowe">Umów 30 minut — policzymy Wasz przypadek</BtnArrow>
+          <a class="btn btn--ghost" href="/darmowy-audyt">Darmowy audyt</a>
+        </div>
+        <p class="bm-foot" style="margin-top:var(--space-lg)">Pomiar: 16.07.2026 · DWT→CYCCNT @ 168 MHz · Keil MDK 5.37 (ARMCC 5.06u7) · Arm GNU Toolchain 14.2.Rel1 · weryfikacja: SWO + kamera RTSP + HTTP</p>
       </div>
     </div>
   </section>
@@ -245,7 +253,7 @@ import CtaBand from '../components/CtaBand.astro';
     </div>
   </section>
 
-  <CtaBand heading="Chcesz taką pętlę w swoim zespole embedded?" text="Wdrażamy agentów AI, które budują, wgrywają i weryfikują firmware na Waszym sprzęcie — z pomiarem zamiast obietnic. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens." padTop={false} />
+  <CtaBand heading="Policzmy ten sam rachunek na Waszym firmware." text="Bierzemy jeden Wasz projekt, uruchamiamy agentową pętlę build → flash → pomiar na Waszym sprzęcie i pokazujemy liczby: czas iteracji, rozmiar binarki, koszt licencji. 30 minut rozmowy wystarczy, żeby ustalić, od czego zacząć — bez zobowiązań." btnLabel="Zarezerwuj 30 minut" padTop={false} />
 
   <style>
     /* tokeny wykresów — serie w języku DS: Keil = niebieskie, GCC = neutral/zieleń, zwycięzca = akcent */
