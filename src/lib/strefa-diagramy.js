@@ -621,9 +621,10 @@ textEl.addEventListener('keydown', (e) => {
 let clipboard = null; // skopiowany kształt (⌘C/⌘V)
 document.addEventListener('keydown', (e) => {
   if (!current || editingId || (e.target instanceof Element && e.target.matches('input, textarea, select'))) return;
-  if (play) { // tryb Play: Esc kończy, spacja/Enter/→ = następny krok, "-" = powrót kadru
+  if (play) { // tryb Play: Esc kończy, spacja/Enter/→ = następny krok, ← = krok wstecz, "-" = powrót kadru
     if (e.key === 'Escape') stopPlay();
     else if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); advancePlay(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); retreatPlay(); }
     else if (e.key === '-' || e.key === '_') { e.preventDefault(); zoomBackOut(); }
     return;
   }
@@ -830,6 +831,19 @@ function advancePlay() {
     revealStep();
     if (zoomBack) followPlayCamera(); // kamera zzoomowana → podążaj za nowym krokiem
   } else stopPlay(); // wszystko widoczne — kolejna spacja kończy tryb
+}
+// krok wstecz: chowa obiekty bieżącego kroku (bez ponownej animacji poprzednich)
+function retreatPlay() {
+  if (!play || play.idx === 0) return;
+  for (const id of play.steps[play.idx]) play.shown.delete(id);
+  play.idx--;
+  // poprzedni krok ma być od razu w pełni widoczny, nie animowany od nowa
+  for (const id of play.steps[play.idx]) {
+    const rec = play.shown.get(id);
+    if (rec) { rec.t0 = -1e9; rec.pulse = false; }
+  }
+  if (zoomBack) followPlayCamera();
+  render();
 }
 // przelot kamery na obiekty bieżącego kroku; dla strzałek — kadr obejmuje strzałkę
 // razem z obiektem, który wskazuje (bez „pustego kadru" zanim cel się odsłoni)
