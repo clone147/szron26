@@ -12,9 +12,9 @@ import BtnArrow from '../components/BtnArrow.astro';
   ogDescription="Benchmark na prawdziwym STM32F429: open-source GCC bije komercyjny Keil 3,75× na szybkości i 2,4× na rozmiarze. Eksperyment od kodu po pomiar wykonał agent AI."
   ogImage="/img/sub/keil-vs-gcc.webp"
   eyebrow="Embedded · Benchmark na sprzęcie"
-  heading="GCC kontra Keil: open-source wygrywa na rozmiarze i szybkości."
+  heading="Kompilator za 7 565 zł rocznie właśnie przegrał z darmowym. Na prawdziwym sprzęcie, w każdym teście."
   headingSmall
-  lead="Ten sam kod źródłowy — panel LED 64×64, FreeRTOS + CycloneTCP — zbudowany pięcioma wariantami toolchaina i zmierzony licznikiem cykli DWT bezpośrednio na STM32F429. Po tuningu bibliotek GCC 14.2 bije komercyjny Keil ARMCC w każdym teście. A cały eksperyment, od kodu po pomiar, wykonał agent AI."
+  lead="Ten sam kod źródłowy — panel LED 64×64, FreeRTOS + CycloneTCP — zbudowany pięcioma wariantami toolchaina i zmierzony licznikiem cykli bezpośrednio na STM32F429. Wynik przeczy temu, za co branża płaci od dwudziestu lat. Niżej: pełne pomiary bez skrótów, winowajca ukryty w trzech funkcjach biblioteki, których nikt nie podejrzewa — a na końcu odpowiedź na pytanie, kto właściwie wykonał cały ten eksperyment. Bo to nie był człowiek."
   heroImage="/img/sub/keil-vs-gcc.webp"
   heroAlt="Płytka STM32 połączona z matrycą LED 64×64 wyświetlającą wykres słupkowy porównania wydajności"
 >
@@ -24,10 +24,21 @@ import BtnArrow from '../components/BtnArrow.astro';
     ['0 zł licencji', 'Keil MDK Professional kosztuje 7 565 zł netto rocznie za stanowisko'],
   ]} />
 
-  <!-- 01 mapa efektywności -->
+  <!-- 01 przekonanie -->
+  <section class="sect" aria-labelledby="przekonanie">
+    <div class="container">
+      <SectHead eyebrow="01 / Punkt wyjścia · Znajome zdanie" title="„Na produkcję bierzemy komercyjny toolchain. Open source to ryzyko.”" id="przekonanie" small />
+      <div class="prose rv">
+        <p>Jeśli to zdanie padło kiedyś na naradzie w Waszej firmie — ta strona jest dokładnie dla Was. Płaci się za nie dwa razy: raz w licencjach (7 565 zł netto rocznie za stanowisko Keil MDK Professional), drugi raz w przekonaniu, że w zamian dostaje się szybszy i mniejszy firmware. Pierwszą pozycję widać na fakturze. Drugą postanowiliśmy po prostu <strong>zmierzyć</strong> — nie na syntetycznym benchmarku z ulotki, tylko na kompletnym, produkcyjnym firmware z RTOS-em i stosem sieciowym, wgranym na prawdziwą płytkę.</p>
+        <p>Zmierzyliśmy pięć wariantów. I w danych wyszło coś, czego się nie spodziewaliśmy — wąskie gardło, które siedzi w miejscu, do którego prawie nikt nie zagląda. Ale po kolei.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 mapa efektywności -->
   <section class="sect" aria-labelledby="mapa">
     <div class="container">
-      <SectHead eyebrow="01 / Wynik · Jeden wykres" title="Mapa efektywności: rozmiar × szybkość." id="mapa" small />
+      <SectHead eyebrow="02 / Wynik · Jeden wykres" title="Mapa efektywności: rozmiar × szybkość." id="mapa" small />
       <div class="prose rv"><p>Każdy punkt to jeden kompletny firmware wgrany i zmierzony na płytce. Ideał — mały i szybki — leży w lewym dolnym rogu. Warianty Keila siedzą w prawej, „ciężkiej" części wykresu i nie schodzą poniżej 194&nbsp;ms. <strong>GCC −O2 tuned łączy mały rozmiar z czasem niedostępnym dla Keila — dominuje wykres w sensie Pareto.</strong></p></div>
       <figure class="bm-card bm-scroll rv" aria-label="Wykres punktowy: rozmiar ROM na osi X, czas benchmarku na osi Y">
         <svg viewBox="0 0 720 400" width="100%" role="img" style="min-width:620px">
@@ -63,10 +74,10 @@ import BtnArrow from '../components/BtnArrow.astro';
     </div>
   </section>
 
-  <!-- 02 anatomia czasu -->
+  <!-- 03 anatomia czasu -->
   <section class="sect sect--dark" aria-labelledby="anatomia">
     <div class="container">
-      <SectHead eyebrow="02 / Anatomia · Skąd ten czas" title="Z czego składa się każdy pasek." id="anatomia" small />
+      <SectHead eyebrow="03 / Anatomia · Winowajca" title="Trzy funkcje, których nikt nie podejrzewa." id="anatomia" small />
       <div class="prose prose--inv rv"><p>Cykle CPU w podziale na trzy testy (wspólna skala, 100% = GCC −O0). W obu „fabrycznych" buildach GCC czas pożera segment MEM — bajtowe <code>memcpy</code>/<code>memset</code> z newlib-nano. Podmiana tych trzech funkcji (<code>fast_libc.c</code>) skraca pasek o ~40&nbsp;mln cykli; u Keila analogiczny segment to wciąż 25&nbsp;mln.</p></div>
       <div class="bm-bars rv" id="bm-bars">
         <div class="bm-row"><span class="bm-row__lbl"><i class="bm-dot" style="background:var(--bm-gcc0)"></i>GCC −O0</span>
@@ -98,19 +109,19 @@ import BtnArrow from '../components/BtnArrow.astro';
     </div>
   </section>
 
-  <!-- 03 mapa flash LED -->
+  <!-- 04 mapa flash LED -->
   <section class="sect" aria-labelledby="flash">
     <div class="container">
-      <SectHead eyebrow="03 / Pamięć · Ile zostaje na rozwój" title="Zajętość pamięci flash." id="flash" small />
+      <SectHead eyebrow="04 / Pamięć · Ile zostaje na rozwój" title="Zajętość pamięci flash." id="flash" small />
       <div class="prose rv"><p>Każdy punkt to 16&nbsp;kB z 2&nbsp;MB flasha STM32F429. Firmware z GCC −O2 zajmuje 13 ze 128 bloków; Keil potrzebuje ich prawie trzykrotnie więcej. Wolna przestrzeń to realny zapas na rozwój produktu — kolejne funkcje, fonty, bufory.</p></div>
       <div class="bm-card rv"><div class="bm-flash" id="bm-flash"></div></div>
     </div>
   </section>
 
-  <!-- 04 pełne dane -->
+  <!-- 05 pełne dane -->
   <section class="sect" aria-labelledby="dane">
     <div class="container">
-      <SectHead eyebrow="04 / Dane · Bez skrótów" title="Pełne wyniki pomiarowe." id="dane" small />
+      <SectHead eyebrow="05 / Dane · Bez skrótów" title="Pełne wyniki pomiarowe." id="dane" small />
       <div class="bm-card bm-scroll rv">
         <table class="bm-table">
           <thead><tr>
@@ -142,10 +153,10 @@ import BtnArrow from '../components/BtnArrow.astro';
     </div>
   </section>
 
-  <!-- 05 koszty licencji -->
+  <!-- 06 koszty licencji -->
   <section class="sect" aria-labelledby="koszty">
     <div class="container">
-      <SectHead eyebrow="05 / Koszty · Cena toolchaina" title="Ile kosztuje ta różnica w licencjach." id="koszty" small />
+      <SectHead eyebrow="06 / Koszty · Cena toolchaina" title="Ile kosztuje ta różnica w licencjach." id="koszty" small />
       <div class="prose rv"><p>Benchmark wyżej pokazuje, że open source jest szybszy i mniejszy. Cennik dopowiada resztę: Keil MDK jest dziś sprzedawany wyłącznie w subskrypcji per stanowisko, a <strong>Arm GNU Toolchain — ten sam, który wygrał ten benchmark — jest bezpłatny również w projektach komercyjnych</strong>.</p></div>
 
       <div class="bm-price rv">
@@ -206,13 +217,13 @@ import BtnArrow from '../components/BtnArrow.astro';
     </div>
   </section>
 
-  <!-- 06 artykuł: agent -->
+  <!-- 07 artykuł: agent -->
   <section class="sect sect--dark" aria-labelledby="agent">
     <div class="container">
-      <SectHead eyebrow="06 / Puenta · Jak to zmierzono" title="Cały eksperyment wykonał agent AI — na prawdziwym sprzęcie." id="agent" small />
+      <SectHead eyebrow="07 / Puenta · Obiecana odpowiedź" title="Cały eksperyment wykonał agent AI — na prawdziwym sprzęcie." id="agent" small />
       <img class="hero-img rv" src="/img/sub/keil-vs-gcc-film.webp" alt="Laptop z terminalem agenta AI obok matrycy LED 64×64 wyświetlającej padający śnieg — kadr jak z filmu „Od promptu do pikseli"" width="1380" height="768" loading="lazy" />
       <div class="prose prose--inv rv">
-        <p class="bm-lede">Cały eksperyment — dopisanie benchmarku do firmware, pięć kompilacji dwoma toolchainami, flashowanie, pomiary na sprzęcie i weryfikacja obrazu na fizycznym panelu LED — wykonał agent AI, sterując narzędziami z linii poleceń. Dokładnie ten sam zestaw i ta sama pętla, które widzisz w naszym filmie <strong>„Od promptu do pikseli"</strong>.</p>
+        <p class="bm-lede">Czas na obiecaną odpowiedź. Cały eksperyment — dopisanie benchmarku do firmware, pięć kompilacji dwoma toolchainami, flashowanie, pomiary na sprzęcie i weryfikacja obrazu na fizycznym panelu LED — wykonał agent AI, sterując narzędziami z linii poleceń. Dokładnie ten sam zestaw i ta sama pętla, które widzisz w naszym filmie <strong>„Od promptu do pikseli"</strong>.</p>
         <h2>Keil z agentem: szybciej niż człowiek z Keilem</h2>
         <p>Agentowe programowanie embedded działa też na komercyjnym stacku. Keil ma CLI (<code>UV4.exe -r</code>), STM32CubeProgrammer flashuje i czyta SWO z konsoli — agent w pętli edytuje kod, buduje, wgrywa i czyta logi ITM szybciej, niż człowiek zdąży przeklikać się przez µVision. Każda iteracja „zmiana → build → flash → dowód w SWO" zamykała się w ~2 minuty, a numer buildu w banerze startowym dawał twardy dowód, że na płytce działa właściwy firmware.</p>
         <h2>Ale prawdziwa dźwignia to open source</h2>
@@ -244,10 +255,10 @@ import BtnArrow from '../components/BtnArrow.astro';
     </div>
   </section>
 
-  <!-- 06 powiązane -->
+  <!-- 08 powiązane -->
   <section class="sect" aria-labelledby="powiazane">
     <div class="container">
-      <SectHead eyebrow="07 / Czytaj dalej" title="Zrób to u siebie." id="powiazane" small />
+      <SectHead eyebrow="08 / Czytaj dalej" title="Zrób to u siebie." id="powiazane" small />
       <div class="link-cards rv">
         <a class="link-card" href="/stm32-skill"><h3>Skill STM32 dla Claude Code</h3><p>Ten sam workflow build → flash → weryfikacja, spakowany do pobrania — z konfiguratorem pod Twoją płytkę.</p></a>
         <a class="link-card" href="/ai-dla-embedded"><h3>AI dla embedded</h3><p>Jak wdrażamy agentów AI w zespołach firmware i elektroniki.</p></a>
