@@ -901,6 +901,8 @@ h1, h2, h3, h4 {
   color: var(--color-text-inv-3);
 }
 .nav__dd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+.nav__dd-panel--narrow { width: 20rem; }
+.nav__dd-grid--1col { grid-template-columns: 1fr; }
 .nav__dd-grid a {
   padding: 0.5rem 0.75rem; border-radius: var(--radius-btn); text-decoration: none;
   color: var(--color-text-inv-2); font-size: 0.82rem; letter-spacing: 0; white-space: nowrap;

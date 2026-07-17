@@ -31,7 +31,6 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
           </button>
           <div class="nav__dd-panel" id="dd-oferta" role="menu">
             <a class="nav__dd-head" href="/metoda" role="menuitem">Metoda — wdrożenie AI w dwa kwartały →</a>
-            <p class="nav__dd-group">Usługi</p>
             <div class="nav__dd-grid">
               <a href="/transformacja-ai-dla-programistow" role="menuitem"><span>Transformacja AI dla programistów</span></a>
               <a href="/ai-dla-dev-teamow" role="menuitem"><span>AI dla zespołów software</span></a>
@@ -40,12 +39,6 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
               <a href="/ai-sektor-regulowany" role="menuitem"><span>AI dla sektora regulowanego</span></a>
               <a href="/ai-act-compliance" role="menuitem"><span>Zgodność z AI Act</span></a>
               <a href="/devlens" role="menuitem"><span>DevLens Pro — analityka zespołów</span></a>
-            </div>
-            <p class="nav__dd-group">Raporty i narzędzia</p>
-            <div class="nav__dd-grid">
-              <a href="/keil-vs-gcc" role="menuitem"><span>Benchmark: GCC vs Keil na STM32</span></a>
-              <a href="/cra-terminy" role="menuitem"><span>CRA — terminy 2026/2027</span></a>
-              <a href="/kalkulator-roi-ai" role="menuitem"><span>Kalkulator ROI AI</span></a>
             </div>
           </div>
         </li>
@@ -64,7 +57,21 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
           </div>
         </li>
         <li><a href="/case-studies">Case studies</a></li>
-        <li><a href="/open-source">Open source</a></li>
+        <li class="nav__dd">
+          <button type="button" class="nav__dd-toggle" aria-expanded="false" aria-controls="dd-opensource">
+            Open source
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="nav__dd-panel nav__dd-panel--narrow" id="dd-opensource" role="menu">
+            <a class="nav__dd-head" href="/open-source" role="menuitem">Open source — nasze projekty →</a>
+            <p class="nav__dd-group">Raporty i narzędzia</p>
+            <div class="nav__dd-grid nav__dd-grid--1col">
+              <a href="/keil-vs-gcc" role="menuitem"><span>Benchmark: GCC vs Keil na STM32</span></a>
+              <a href="/cra-terminy" role="menuitem"><span>CRA — terminy 2026/2027</span></a>
+              <a href="/kalkulator-roi-ai" role="menuitem"><span>Kalkulator ROI AI</span></a>
+            </div>
+          </div>
+        </li>
         <li><a href="/o-nas">Zespół</a></li>
         <li><a href="/kontakt">Kontakt</a></li>
         <li class="nav-auth" id="nav-auth">
@@ -123,18 +130,18 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
       <a href="/devlens">DevLens Pro</a>
     </details>
     <details class="nav__menu-acc">
-      <summary>Raporty i narzędzia</summary>
-      <a href="/keil-vs-gcc">Benchmark: GCC vs Keil</a>
-      <a href="/cra-terminy">CRA — terminy 2026/2027</a>
-      <a href="/kalkulator-roi-ai">Kalkulator ROI AI</a>
-    </details>
-    <details class="nav__menu-acc">
       <summary>Akademia</summary>
       <a href="/akademia">Wszystkie szkolenia →</a>
       {akademia.map((a) => <a href={`/${a.slug}`}>{a.title}</a>)}
     </details>
     <a href="/case-studies">Case studies</a>
-    <a href="/open-source">Open source</a>
+    <details class="nav__menu-acc">
+      <summary>Open source</summary>
+      <a href="/open-source">Nasze projekty →</a>
+      <a href="/keil-vs-gcc">Benchmark: GCC vs Keil</a>
+      <a href="/cra-terminy">CRA — terminy 2026/2027</a>
+      <a href="/kalkulator-roi-ai">Kalkulator ROI AI</a>
+    </details>
     <a href="/o-nas">Zespół</a>
     <a href="/kontakt">Kontakt</a>
     <a href="/strefa/login">Strefa zamknięta →</a>
