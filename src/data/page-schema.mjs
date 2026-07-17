@@ -30,7 +30,7 @@ const SERVICES = {
 };
 // Case studies — Article
 const CASE_STUDIES = new Set(['case-studies/stm32', 'case-studies/hmi', 'case-studies/regiobus']);
-const COMPARISON = new Set(['outsourcing-vs-inhouse-ai']); // Article
+const COMPARISON = new Set(['outsourcing-vs-inhouse-ai', 'cra-terminy']); // Article
 const CONTACT = new Set(['kontakt', 'umow-rozmowe']);
 
 export function pageSchema(pathname, ctx) {

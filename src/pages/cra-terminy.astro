@@ -1,0 +1,249 @@
+---
+import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
+import BtnArrow from '../components/BtnArrow.astro';
+---
+<Interior
+  updated="2026-07-17"
+  title="CRA nie został przesunięty — terminy 2026/2027 dla producentów embedded | SZRON"
+  description="W czerwcu 2026 UE przesunęła terminy AI Act — i wiele firm uznało, że „cyberrozporządzenie” też poczeka. Nie. Cyber Resilience Act idzie zgodnie z planem: raportowanie podatności i incydentów od 11 września 2026, pełne wymogi (SBOM, CE, secure by design) od 11 grudnia 2027. Sprawdzamy, co to znaczy dla producentów elektroniki."
+  ogDescription="AI Act przesunięto, CRA — nie. Od 11 września 2026 każdy producent urządzeń z software'em musi raportować exploitowane podatności w 24h. Także dla produktów już na rynku. Harmonogram, klasy produktów i lista pierwszych kroków."
+  ogImage="/img/sub/cra-terminy.webp"
+  eyebrow="Embedded · Regulacje UE"
+  heading="CRA nie został przesunięty. Zegar tyka: 11 września 2026."
+  headingSmall
+  lead="W czerwcu 2026 Unia rozdzieliła i przesunęła terminy <strong>AI Act</strong> — i po branży poszła plotka, że „unijne cyberprzepisy” poczekają. Nie poczekają. <strong>Cyber Resilience Act</strong> idzie dokładnie według pierwotnego planu: za niecałe dwa miesiące każdy producent urządzeń z oprogramowaniem — także tych sprzedanych lata temu — musi raportować wykorzystywane podatności w 24 godziny. Wyjaśniamy, skąd zamieszanie i co konkretnie trzeba zrobić."
+  heroImage="/img/sub/cra-terminy.webp"
+  heroAlt="Płytka PCB z oznaczeniem CE obok flagi UE; nad nią holograficzna oś czasu z dwoma terminami"
+>
+  <ProofStrip items={[
+    ['11.09.2026', 'start raportowania 24h/72h — obejmuje też produkty już na rynku'],
+    ['11.12.2027', 'pełne wymogi: secure by design, SBOM, dokumentacja, CE'],
+    ['do 15 mln €', 'lub 2,5% światowego obrotu — górna granica kar'],
+  ]} />
+
+  <!-- 01 skąd plotka -->
+  <section class="sect" aria-labelledby="plotka">
+    <div class="container">
+      <SectHead eyebrow="01 / Fakty · Skąd zamieszanie" title="Przesunięto AI Act. CRA — nie." id="plotka" small />
+      <div class="prose rv"><p>Źródło plotki jest łatwe do wskazania. <strong>7 maja 2026</strong> Rada i Parlament uzgodniły tzw. Digital Omnibus dla AI Act: obowiązki dla systemów wysokiego ryzyka, które miały wejść <strong>2 sierpnia 2026</strong>, rozdzielono i przesunięto — część na grudzień 2027, część na sierpień 2028. Zmiana przeszła przez Parlament (16.06) i Radę (29.06) i już obowiązuje. Jeśli ktoś w firmie usłyszał „unijne przepisy o cyfrowych produktach przesunięte — część teraz, część za rok”, to niemal na pewno chodziło o AI Act. <strong>Terminy CRA Komisja potwierdziła bez zmian</strong> (aktualizacja oficjalnej strony: 22 czerwca 2026).</p></div>
+      <div class="cra-duo rv">
+        <div class="cra-card cra-duo__tile">
+          <span class="cra-badge cra-badge--moved">przesunięty</span>
+          <h3>AI Act <span>(systemy AI)</span></h3>
+          <ul>
+            <li>High-risk (Annex III): <s>2.08.2026</s> → <strong>2.12.2027</strong></li>
+            <li>AI w produktach regulowanych (Annex I): → <strong>2.08.2028</strong></li>
+            <li>Obowiązki transparentności: zostają na 2.08.2026</li>
+          </ul>
+        </div>
+        <div class="cra-card cra-duo__tile cra-duo__tile--hot">
+          <span class="cra-badge cra-badge--on">bez zmian</span>
+          <h3>Cyber Resilience Act <span>(produkty z software'em)</span></h3>
+          <ul>
+            <li>Raportowanie podatności i incydentów: <strong>11.09.2026</strong></li>
+            <li>Pełne wymogi + CE: <strong>11.12.2027</strong></li>
+            <li>Przepisy o jednostkach notyfikowanych: obowiązują od 11.06.2026</li>
+          </ul>
+        </div>
+      </div>
+      <div class="prose rv" style="margin-top:var(--space-lg)"><p>Jedyna rzecz, która przy CRA wisi w legislacji, to propozycja z Digital Omnibus „cyfrowego” (listopad 2025): <em>Single Entry Point</em> — jedno okienko raportowania incydentów wspólne dla NIS2/RODO/DORA/CRA. To uproszczenie sposobu zgłaszania, nie przesunięcie terminów — i wciąż jest tylko propozycją.</p></div>
+    </div>
+  </section>
+
+  <!-- 02 oś czasu -->
+  <section class="sect sect--dark" aria-labelledby="terminy">
+    <div class="container">
+      <SectHead eyebrow="02 / Harmonogram · Trzy fazy z art. 71" title="CRA od początku wchodzi etapami." id="terminy" small />
+      <div class="prose prose--inv rv"><p>„Część teraz, część później” w CRA to nie żadna nowość z 2026 roku — fazowanie jest zapisane w rozporządzeniu od dnia publikacji. Problem w tym, że większość firm zapamiętała tylko ostatnią datę (grudzień 2027) i planuje zgodność „na spokojnie”. <strong>Pierwszy twardy obowiązek wchodzi już we wrześniu 2026.</strong></p></div>
+      <figure class="cra-card cra-scroll rv" aria-label="Oś czasu Cyber Resilience Act: cztery daty od grudnia 2024 do grudnia 2027">
+        <svg viewBox="0 0 760 250" width="100%" role="img" style="min-width:640px">
+          <line x1="30" y1="125" x2="730" y2="125" stroke="color-mix(in oklch, currentColor 35%, transparent)" stroke-width="2"/>
+          <!-- 12.2024 -->
+          <circle cx="80" cy="125" r="7" fill="var(--cra-past)"/>
+          <text class="cra-t cra-t--date" x="80" y="100" text-anchor="middle">10.12.2024</text>
+          <text class="cra-t" x="80" y="152" text-anchor="middle">wejście w życie</text>
+          <!-- 06.2026 -->
+          <circle cx="280" cy="125" r="7" fill="var(--cra-past)"/>
+          <text class="cra-t cra-t--date" x="280" y="100" text-anchor="middle">11.06.2026</text>
+          <text class="cra-t" x="280" y="152" text-anchor="middle">jednostki notyfikowane</text>
+          <text class="cra-t" x="280" y="170" text-anchor="middle">(już obowiązuje)</text>
+          <!-- dziś -->
+          <line x1="330" y1="55" x2="330" y2="185" stroke="var(--cra-now)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <text class="cra-t cra-t--now" x="330" y="42" text-anchor="middle">dziś · 17.07.2026</text>
+          <!-- 09.2026 -->
+          <circle cx="420" cy="125" r="9" fill="var(--cra-hot)"/>
+          <circle class="cra-halo" cx="420" cy="125" r="14" fill="none" stroke="var(--cra-hot)" stroke-width="1.5"/>
+          <text class="cra-t cra-t--date cra-t--hot" x="420" y="94" text-anchor="middle">11.09.2026</text>
+          <text class="cra-t cra-t--hot" x="420" y="152" text-anchor="middle">raportowanie 24h/72h</text>
+          <text class="cra-t" x="420" y="170" text-anchor="middle">za ~8 tygodni</text>
+          <!-- 12.2027 -->
+          <circle cx="660" cy="125" r="7" fill="var(--cra-future)"/>
+          <text class="cra-t cra-t--date" x="660" y="100" text-anchor="middle">11.12.2027</text>
+          <text class="cra-t" x="660" y="152" text-anchor="middle">pełne stosowanie:</text>
+          <text class="cra-t" x="660" y="170" text-anchor="middle">SBOM, dokumentacja, CE</text>
+        </svg>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 03 co startuje 11.09 -->
+  <section class="sect" aria-labelledby="wrzesien">
+    <div class="container">
+      <SectHead eyebrow="03 / Wrzesień 2026 · Pierwszy twardy termin" title="Co dokładnie startuje 11 września." id="wrzesien" small />
+      <div class="prose rv"><p>Artykuł 14 CRA: gdy dowiadujesz się, że podatność w Twoim produkcie jest <strong>aktywnie wykorzystywana</strong> — albo masz <strong>poważny incydent</strong> wpływający na jego bezpieczeństwo — zgłaszasz to do ENISA i krajowego CSIRT przez wspólną platformę raportowania. I najważniejsze: <strong>obowiązek obejmuje wszystkie produkty z elementami cyfrowymi będące w okresie wsparcia — nie tylko te wprowadzane na rynek po tej dacie.</strong> Sterownik sprzedany w 2023, który wciąż wspieracie, też się liczy.</p></div>
+      <div class="cra-steps rv">
+        <div class="cra-card cra-step">
+          <span class="cra-step__n">24 h</span>
+          <h3>Early warning</h3>
+          <p>Wstępne ostrzeżenie do ENISA/CSIRT od momentu, gdy dowiedzieliście się o exploitowanej podatności lub poważnym incydencie.</p>
+        </div>
+        <div class="cra-card cra-step">
+          <span class="cra-step__n">72 h</span>
+          <h3>Pełne zgłoszenie</h3>
+          <p>Charakterystyka podatności/incydentu, dotknięte produkty, dostępne środki zaradcze i obejścia.</p>
+        </div>
+        <div class="cra-card cra-step">
+          <span class="cra-step__n">14 dni / 1 mies.</span>
+          <h3>Raport końcowy</h3>
+          <p>14 dni po udostępnieniu poprawki (podatność) lub miesiąc po zgłoszeniu (incydent): opis, przyczyny, podjęte działania.</p>
+        </div>
+      </div>
+      <div class="prose rv" style="margin-top:var(--space-lg)"><p>Za niedopełnienie obowiązków raportowania grożą kary do <strong>15 mln EUR lub 2,5% światowego obrotu</strong> (wyższa z kwot). Platforma raportowania ENISA (Single Reporting Platform) ma być operacyjna na 11 września; w czerwcu ENISA prowadziła rejestracje i testy z producentami.</p></div>
+    </div>
+  </section>
+
+  <!-- 04 kogo dotyczy / klasy -->
+  <section class="sect" aria-labelledby="klasy">
+    <div class="container">
+      <SectHead eyebrow="04 / Zakres · Kogo to dotyczy" title="Klasy produktów i ścieżki oceny zgodności." id="klasy" small />
+      <div class="prose rv"><p>CRA obejmuje praktycznie każdy produkt „z elementami cyfrowymi” sprzedawany w UE — od sterownika przemysłowego po tablicę informacji pasażerskiej. Wyłączenia sektorowe dotyczą m.in. wyrobów medycznych, lotnictwa i motoryzacji (mają własne reżimy) — <strong>elektroniki kolejowej i przemysłowej na tej liście nie ma</strong>. Od klasy produktu zależy, czy wystarczy samoocena, czy potrzebna jest jednostka notyfikowana.</p></div>
+      <div class="cra-card cra-scroll rv">
+        <table class="cra-table">
+          <thead><tr><th>Klasa</th><th>Przykłady</th><th>Ścieżka zgodności</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Default</strong> (~90% rynku)</td><td>sterowniki, wyświetlacze, urządzenia IoT, elektronika pokładowa i przystankowa bez funkcji stricte „security”</td><td>samoocena producenta (moduł A)</td></tr>
+            <tr><td>Important — klasa I</td><td>routery, smart home z funkcją bezpieczeństwa, menedżery haseł</td><td>norma zharmonizowana albo jednostka notyfikowana</td></tr>
+            <tr><td>Important — klasa II</td><td>firewalle, hypervisory, mikrokontrolery odporne na manipulacje</td><td>zawsze ocena strony trzeciej</td></tr>
+            <tr><td>Critical (Annex IV)</td><td>karty inteligentne, HSM, inteligentne liczniki</td><td>docelowo certyfikacja europejska</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="prose rv" style="margin-top:var(--space-lg)"><p>Ważny niuans na dziś: przepisy o jednostkach notyfikowanych obowiązują od 11 czerwca 2026, ale w unijnej bazie NANDO wciąż praktycznie <strong>nie ma jednostek notyfikowanych dla CRA</strong> — Komisja celuje w „wystarczającą liczbę” do grudnia 2026. Dla klasy default to bez znaczenia (samoocena), ale jeśli macie produkt z klasy important, kolejka do audytów będzie długa — tym bardziej nie warto czekać.</p></div>
+    </div>
+  </section>
+
+  <!-- 05 co zrobić teraz -->
+  <section class="sect sect--dark" aria-labelledby="kroki">
+    <div class="container">
+      <SectHead eyebrow="05 / Plan · Od czego zacząć" title="Osiem kroków na najbliższe tygodnie." id="kroki" small />
+      <img class="hero-img rv" src="/img/sub/cra-terminy-sbom.webp" alt="Rack modułów elektroniki przemysłowej obok laptopa z wizualizacją grafu zależności oprogramowania (SBOM) i teczką dokumentacji technicznej" width="1380" height="776" loading="lazy" />
+      <div class="prose prose--inv rv">
+        <p class="cra-lede">Do 11 września wystarczy dowieźć punkty 1–3. Reszta to przygotowanie do grudnia 2027 — rozłożone na spokojne kwartały zamiast paniki w ostatnim roku, gdy audytorzy i jednostki notyfikowane będą oblegani.</p>
+        <ol class="cra-list">
+          <li><strong>Inwentaryzacja produktów w okresie wsparcia.</strong> Lista wszystkiego, co sprzedaliście i wciąż wspieracie — to te produkty od września podlegają raportowaniu.</li>
+          <li><strong>Procedura 24h/72h.</strong> Kto decyduje, że zdarzenie jest zgłaszalne, kto zgłasza, gotowe szablony zgłoszeń. Rejestracja w platformie ENISA, gdy otworzy się dla Waszej kategorii.</li>
+          <li><strong>Monitoring podatności.</strong> Śledzenie CVE/CERT dla własnego firmware'u i komponentów (RTOS, stosy TCP/IP, biblioteki), żeby o exploitacji nie dowiedzieć się od klienta.</li>
+          <li><strong>Klasyfikacja produktów.</strong> Default / important I / important II / critical — od tego zależy ścieżka na 2027.</li>
+          <li><strong>SBOM z pipeline'u budowania.</strong> Automatyczny spis komponentów (CycloneDX/SPDX) generowany przy każdym buildzie — Yocto, Zephyr i współczesne toolchainy mają to wbudowane.</li>
+          <li><strong>Polityka Coordinated Vulnerability Disclosure.</strong> Kontakt security@, zasady przyjmowania zgłoszeń od badaczy, publikacja advisories.</li>
+          <li><strong>Secure by design w procesie.</strong> Threat modeling, secure boot, podpisywane aktualizacje OTA, hardening domyślnej konfiguracji; okres wsparcia (min. 5 lat) z bezpłatnymi poprawkami bezpieczeństwa.</li>
+          <li><strong>Dokumentacja techniczna pod CE.</strong> Risk assessment cyberbezpieczeństwa, architektura, wyniki testów — zbierane na bieżąco, nie odtwarzane wstecznie w 2027.</li>
+        </ol>
+        <blockquote class="cra-quote">Większość z tych punktów to nie „projekt compliance”, tylko dobra inżynieria firmware'u, którą i tak warto mieć: SBOM, podpisane aktualizacje, monitoring podatności. CRA jedynie wyznacza datę, od której jej brak zaczyna kosztować.</blockquote>
+        <p>Pomagamy zespołom embedded domknąć te punkty w praktyce — od automatycznego SBOM w pipeline, przez podpisywane OTA, po procedury raportowania. Zaczynamy od bezpłatnej, godzinnej diagnozy: co już macie, czego brakuje na wrzesień, co można odłożyć na 2027.</p>
+        <div class="contact__cta">
+          <BtnArrow href="/umow-rozmowe">Umów rozmowę o gotowości na CRA</BtnArrow>
+          <a class="btn btn--ghost" href="/darmowy-audyt">Darmowy audyt</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 źródła -->
+  <section class="sect" aria-labelledby="zrodla">
+    <div class="container">
+      <SectHead eyebrow="06 / Źródła · Stan prawny" title="Co jest pewne, a co propozycją." id="zrodla" small />
+      <div class="prose rv">
+        <p><strong>Pewne (obowiązujące prawo):</strong> harmonogram CRA — 11.06.2026 (jednostki notyfikowane), 11.09.2026 (raportowanie), 11.12.2027 (pełne stosowanie) — potwierdzony przez Komisję Europejską (strona zaktualizowana 22.06.2026, daty bez zmian). Przesunięcie AI Act (high-risk → 2.12.2027 i 2.08.2028) — przyjęte przez Parlament 16.06.2026 i Radę 29.06.2026.</p>
+        <p><strong>Propozycje (mogą się zmienić):</strong> Single Entry Point dla raportowania incydentów (Digital Omnibus, w toku w PE i Radzie), rewizja Cybersecurity Act, normy zharmonizowane CRA (prace CEN/CENELEC trwają).</p>
+        <details class="cra-details"><summary>Pełna lista źródeł (rozwiń)</summary>
+          <ul>
+            <li><a href="https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act" rel="noopener noreferrer" target="_blank">Komisja Europejska — Cyber Resilience Act</a> (aktualizacja 22.06.2026)</li>
+            <li><a href="https://digital-strategy.ec.europa.eu/en/policies/cra-reporting" rel="noopener noreferrer" target="_blank">Komisja Europejska — CRA reporting obligations</a></li>
+            <li><a href="https://www.consilium.europa.eu/en/press/press-releases/2026/05/07/artificial-intelligence-council-and-parliament-agree-to-simplify-and-streamline-rules/" rel="noopener noreferrer" target="_blank">Rada UE — porozumienie ws. omnibusu AI</a> (7.05.2026)</li>
+            <li><a href="https://www.twobirds.com/en/insights/2026/cra%E2%80%99s-phased-entry-into-application-starts-in-september-2026" rel="noopener noreferrer" target="_blank">Bird &amp; Bird — CRA phased entry into application</a></li>
+            <li><a href="https://www.crowell.com/en/insights/client-alerts/eu-cyber-resilience-act-countdown-11-september-2026-incidentvulnerability-reporting-deadline-is-less-than-100-days-away" rel="noopener noreferrer" target="_blank">Crowell &amp; Moring — countdown do 11.09.2026</a></li>
+            <li><a href="https://www.cyberresilienceact.eu/news/cra-notified-bodies-rules-apply-11-june-2026.html" rel="noopener noreferrer" target="_blank">cyberresilienceact.eu — przepisy o notified bodies od 11.06.2026</a></li>
+            <li><a href="https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/" rel="noopener noreferrer" target="_blank">Gibson Dunn — przesunięte terminy AI Act</a></li>
+          </ul>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 powiązane -->
+  <section class="sect" aria-labelledby="powiazane">
+    <div class="container">
+      <SectHead eyebrow="07 / Czytaj dalej" title="Powiązane tematy." id="powiazane" small />
+      <div class="link-cards rv">
+        <a class="link-card" href="/ai-dla-embedded"><h3>AI dla embedded</h3><p>Agenci AI w zespołach firmware — m.in. automatyczny SBOM i testy bezpieczeństwa w pipeline.</p></a>
+        <a class="link-card" href="/ai-act-compliance"><h3>Zgodność z AI Act</h3><p>Druga regulacja z tej historii — co faktycznie przesunięto i kogo dotyczy transparentność od 2.08.2026.</p></a>
+        <a class="link-card" href="/keil-vs-gcc"><h3>Benchmark: GCC vs Keil</h3><p>Nasz raport z pomiarów na prawdziwym STM32 — open source kontra komercyjny toolchain.</p></a>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand heading="Sprawdźmy Waszą gotowość na wrzesień." text="Godzina rozmowy: przechodzimy po Waszym portfolio produktów, klasyfikujemy je pod CRA i wskazujemy, co musi być gotowe na 11 września 2026, a co może poczekać do grudnia 2027. Bez zobowiązań." btnLabel="Zarezerwuj godzinę" padTop={false} />
+
+  <style>
+    .sect { --cra-past: #8b95a3; --cra-hot: var(--color-accent); --cra-future: #3c56f4; --cra-now: #34b47e; }
+    .cra-card { background: var(--color-paper, #fff); border: 1px solid var(--color-line, rgba(0,0,0,.12)); border-radius: var(--radius-card, 14px); padding: var(--space-lg); margin: 0; }
+    .sect--dark .cra-card { background: var(--color-ink-2); border-color: var(--color-line-dark); }
+    .cra-scroll { overflow-x: auto; }
+
+    /* 01 — dwa kafle AI Act / CRA */
+    .cra-duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-md); }
+    .cra-duo__tile h3 { margin: .4rem 0 .6rem; font-family: var(--font-display); }
+    .cra-duo__tile h3 span { font-size: .72em; font-weight: 500; color: var(--color-text-2); }
+    .cra-duo__tile ul { margin: 0; padding-left: 1.1rem; display: grid; gap: .4rem; font-size: var(--text-s); }
+    .cra-duo__tile--hot { outline: 2px solid color-mix(in oklch, var(--color-accent) 45%, transparent); }
+    .cra-badge { display: inline-block; font-size: .72rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: .14rem .6rem; border-radius: 999px; border: 1px solid color-mix(in oklch, currentColor 45%, transparent); }
+    .cra-badge--moved { color: var(--color-text-2); }
+    .cra-badge--on { color: oklch(45% 0.14 150); background: color-mix(in oklch, var(--color-accent) 12%, transparent); }
+
+    /* 02 — oś czasu */
+    .cra-t { font: 12.5px var(--font-body, system-ui); fill: var(--color-text-inv-2, #b9bec8); }
+    .cra-t--date { font-weight: 700; font-size: 14px; fill: var(--color-text-inv, #eee); }
+    .cra-t--hot { fill: var(--cra-hot); font-weight: 600; }
+    .cra-t--now { fill: var(--cra-now); font-weight: 600; }
+    .cra-halo { opacity: .45; animation: cra-pulse 2.4s ease-in-out infinite; transform-origin: 420px 125px; }
+    @keyframes cra-pulse { 0%,100% { opacity: .45; transform: scale(1); } 50% { opacity: .15; transform: scale(1.35); } }
+    @media (prefers-reduced-motion: reduce) { .cra-halo { animation: none; } }
+
+    /* 03 — karty 24/72 */
+    .cra-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-md); }
+    .cra-step { display: grid; gap: .35rem; align-content: start; }
+    .cra-step__n { font-family: var(--font-display); font-size: clamp(1.7rem, 3vw, 2.2rem); font-weight: 650; letter-spacing: -.02em; color: var(--color-accent); font-variant-numeric: tabular-nums; }
+    .cra-step h3 { margin: 0; font-size: 1.02rem; }
+    .cra-step p { margin: 0; font-size: var(--text-s); color: var(--color-text-2); }
+
+    /* 04 — tabela klas */
+    .cra-table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: var(--text-s); }
+    .cra-table th, .cra-table td { padding: .7rem .9rem; text-align: left; border-top: 1px solid var(--color-line, rgba(0,0,0,.1)); }
+    .cra-table th { font-size: var(--text-caption); letter-spacing: .06em; text-transform: uppercase; color: var(--color-text-2); border-top: none; }
+
+    /* 05 — lista kroków */
+    .cra-lede { font-size: 1.08em; }
+    .cra-list { display: grid; gap: .65rem; padding-left: 1.3rem; }
+    .cra-list li { padding-left: .2rem; }
+    .cra-quote { border-left: 3px solid var(--color-accent); padding: var(--space-sm) var(--space-lg); background: color-mix(in oklch, var(--color-accent) 8%, transparent); border-radius: 0 var(--radius-btn, 8px) var(--radius-btn, 8px) 0; font-weight: 500; }
+
+    .cra-details summary { cursor: pointer; font-weight: 600; }
+    .cra-details[open] summary { margin-bottom: var(--space-sm); }
+    .prose--inv p, .prose--inv li { color: var(--color-text-inv-2); }
+    .prose--inv strong, .prose--inv h2, .prose--inv h3 { color: var(--color-text-inv); }
+  </style>
+</Interior>

@@ -895,6 +895,11 @@ h1, h2, h3, h4 {
   font-size: var(--text-caption); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--color-accent); text-decoration: none; border-bottom: 1px solid var(--color-line-dark);
 }
+.nav__dd-group {
+  margin: 0.65rem 0 0.25rem; padding: 0 0.75rem;
+  font-size: 0.68rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--color-text-inv-3);
+}
 .nav__dd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
 .nav__dd-grid a {
   padding: 0.5rem 0.75rem; border-radius: var(--radius-btn); text-decoration: none;
