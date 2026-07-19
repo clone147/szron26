@@ -37,5 +37,11 @@ jeden ciepły pomarańczowy akcent `#ff7a00`, premium tech-editorial.
 | cs-stm32 | /case-studies/stm32 | makro oszronionej płytki STM32, lód na goldpinach, świecące pomarańczowe ścieżki |
 | cs-hmi | /case-studies/hmi | oszroniony przemysłowy panel HMI na stali, pomarańczowe światło interfejsu pod lodem |
 | cs-regiobus | /case-studies/regiobus | miejski autobus nocą za oszronioną szybą, pomarańczowe światło wnętrza i walidatora NFC |
+| keil-vs-gcc | /keil-vs-gcc | płytka STM32 podpięta do matrycy LED 64×64 wyświetlającej świecący wykres słupkowy, ciemny stół laboratoryjny |
+| keil-vs-gcc-film | /keil-vs-gcc (sekcja agenta) | laptop z terminalem agenta AI obok panelu LED 64×64 z padającym śniegiem |
+| cra-terminy | /cra-terminy | przemysłowa płytka PCB z oznaczeniem CE obok flagi UE, holograficzna oś czasu z dwoma terminami |
+| cra-terminy-sbom | /cra-terminy (sekcja SBOM) | rack modułów elektroniki obok laptopa z grafem zależności oprogramowania i teczką dokumentacji |
 
-Prompty pełne (EN) trzymane są w skrypcie generującym `/tmp/gen-sub.py`.
+Prompty pełne (EN) trzymane są w skrypcie generującym `/tmp/gen-sub.py` (efemeryczny — po
+sesji zostaje ta tabela; pełny przepis promptu i wspólny sufiks: Design System
+„SZRON Web (szron.tech) DS" → `brand/Imagery/Imagery.prompt.md` oraz `docs/prompty-obrazki.md`).
