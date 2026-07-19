@@ -1,0 +1,61 @@
+---
+// Wykres punktowy (waffle) — każda kropka to `perDot` jednostek z puli `total * perDot`.
+// Kropki zapalają się kaskadą z lekkim overshootem, gdy wykres wjedzie w viewport.
+interface Item {
+  name: string;
+  value: number;
+  color: string; // dowolny CSS color, np. var(--bm-keil)
+}
+interface Props {
+  items: Item[];
+  total?: number;   // liczba kropek w siatce
+  perDot?: number;  // ile jednostek reprezentuje jedna kropka
+  columns?: number;
+  unit?: string;
+  decimals?: number;
+}
+const { items, total = 128, perDot = 16, columns = 16, unit = 'kB', decimals = 0 } = Astro.props;
+const STAG_ON = 26;  // ms między kolejnymi zapalonymi kropkami
+const STAG_OFF = 4;  // ms między kropkami tła
+---
+<div class="dm" data-dotmatrix>
+  {items.map((it) => {
+    const lit = Math.min(total, Math.round(it.value / perDot));
+    return (
+      <div class="dm__cell">
+        <div class="dm__cap">
+          <i class="dm__swatch" style={`background:${it.color}`}></i>{it.name}
+          <b>{it.value.toFixed(decimals)}&nbsp;{unit}</b>
+        </div>
+        <div class="dm__grid" style={`grid-template-columns:repeat(${columns},1fr)`} role="img" aria-label={`${it.name}: ${it.value.toFixed(decimals)} ${unit} — ${lit} z ${total} bloków`}>
+          {Array.from({ length: total }, (_, i) =>
+            i < lit
+              ? <i class="dm__dot dm__dot--on" style={`background:${it.color};--d:${i * STAG_ON}ms`}></i>
+              : <i class="dm__dot" style={`--d:${lit * STAG_ON + (i - lit) * STAG_OFF}ms`}></i>
+          )}
+        </div>
+      </div>
+    );
+  })}
+</div>
+
+<style>
+  .dm { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--space-lg, 2rem); }
+  .dm__cap { font-size: var(--text-caption, .8rem); margin-bottom: .5rem; display: flex; align-items: center; gap: .5rem; color: var(--color-text-2, #667); }
+  .dm__cap b { font-variant-numeric: tabular-nums; margin-left: auto; color: var(--color-text, #1c1e22); }
+  .dm__swatch { flex: none; width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .dm__grid { display: grid; gap: 3px; }
+  .dm__dot { aspect-ratio: 1; border-radius: 50%; background: color-mix(in oklch, currentColor 10%, transparent); opacity: 0; transform: scale(.2); }
+  .dm.is-in .dm__dot { opacity: 1; transform: scale(1); transition: transform .55s cubic-bezier(.34, 1.56, .64, 1) var(--d), opacity .4s ease var(--d); }
+  .dm.is-in .dm__dot:not(.dm__dot--on) { transition: opacity .5s ease var(--d); }
+  @media (prefers-reduced-motion: reduce) {
+    .dm .dm__dot { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+
+<script>
+  const io = new IntersectionObserver((entries, obs) => {
+    for (const e of entries) if (e.isIntersecting) { e.target.classList.add('is-in'); obs.unobserve(e.target); }
+  }, { threshold: 0.2 });
+  document.querySelectorAll('[data-dotmatrix]').forEach((el) => io.observe(el));
+</script>
