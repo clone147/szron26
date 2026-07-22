@@ -77,6 +77,8 @@ const ICONS = [
   { k: 'magnifier', label: 'Audyt', ext: 'svg' },
   { k: 'chart', label: 'Wykres', ext: 'svg' },
   { k: 'clock', label: 'Czas', ext: 'svg' },
+  { k: 'webcam', label: 'Webcam', ext: 'svg' },
+  { k: 'camera-tripod', label: 'Kamera', ext: 'svg' },
 ];
 const ICON_SRC = (k) => `/img/doodle/${k}.${ICONS.find((i) => i.k === k)?.ext || 'webp'}`;
 const iconStore = new Map(); // k → { img, ready, tints: Map(kolor → canvas) }
