@@ -64,8 +64,21 @@ const ICONS = [
   { k: 'clipboard', label: 'Checklista' },
   { k: 'lock', label: 'Kłódka' },
   { k: 'lightbulb', label: 'Pomysł' },
+  // partia 2 (2026-07-22): wektorowe SVG (vtracer z rastrów /imagegen)
+  { k: 'gear', label: 'Proces', ext: 'svg' },
+  { k: 'document', label: 'Dokument', ext: 'svg' },
+  { k: 'folder', label: 'Folder', ext: 'svg' },
+  { k: 'envelope', label: 'E-mail', ext: 'svg' },
+  { k: 'user', label: 'Osoba', ext: 'svg' },
+  { k: 'users', label: 'Zespół', ext: 'svg' },
+  { k: 'branch', label: 'Gałąź gita', ext: 'svg' },
+  { k: 'bug', label: 'Bug', ext: 'svg' },
+  { k: 'rocket', label: 'Rakieta', ext: 'svg' },
+  { k: 'magnifier', label: 'Audyt', ext: 'svg' },
+  { k: 'chart', label: 'Wykres', ext: 'svg' },
+  { k: 'clock', label: 'Czas', ext: 'svg' },
 ];
-const ICON_SRC = (k) => `/img/doodle/${k}.webp`;
+const ICON_SRC = (k) => `/img/doodle/${k}.${ICONS.find((i) => i.k === k)?.ext || 'webp'}`;
 const iconStore = new Map(); // k → { img, ready, tints: Map(kolor → canvas) }
 function iconEntry(k) {
   let e = iconStore.get(k);
