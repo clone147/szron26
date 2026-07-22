@@ -1,6 +1,6 @@
 // Strefa / Diagramy — prosty edytor diagramów w stylu Excalidraw (rysowanie „ołówkiem").
 // Galeria diagramów z miniaturami (renderowane z jsonb) → klik otwiera edytor pełnoekranowy.
-// Kształt: { id, type: 'rect'|'arrow', x, y, w, h, text?, seed, startBind?, endBind? }
+// Kształt: { id, type: 'rect'|'arrow'|'text'|'icon', x, y, w, h, text?, icon?, seed, startBind?, endBind? }
 // (strzałka: x,y = początek, w,h = wektor do końca; rect trzymany znormalizowany w>0,h>0;
 //  startBind/endBind = id obiektu, do którego przyklejona jest końcówka strzałki).
 import { getClient, getTeamUser } from './supabase.js';
@@ -49,6 +49,79 @@ new MutationObserver(() => {
   if (!$('#diag-editor').hidden) render();
   if (!$('#diag-gallery').hidden) renderGallery();
 }).observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+
+/* ── biblioteka ikon doodle (rysunkowe PNG/WebP, czarny tusz na przezroczystym tle) ── */
+const ICONS = [
+  { k: 'editor', label: 'Edytor kodu' },
+  { k: 'terminal', label: 'Terminal' },
+  { k: 'browser', label: 'Przeglądarka' },
+  { k: 'laptop', label: 'Laptop' },
+  { k: 'server', label: 'Serwer' },
+  { k: 'database', label: 'Baza danych' },
+  { k: 'cloud', label: 'Chmura' },
+  { k: 'chip', label: 'Mikrokontroler' },
+  { k: 'robot', label: 'Robot AI' },
+  { k: 'clipboard', label: 'Checklista' },
+  { k: 'lock', label: 'Kłódka' },
+  { k: 'lightbulb', label: 'Pomysł' },
+];
+const ICON_SRC = (k) => `/img/doodle/${k}.webp`;
+const iconStore = new Map(); // k → { img, ready, tints: Map(kolor → canvas) }
+function iconEntry(k) {
+  let e = iconStore.get(k);
+  if (!e) {
+    const img = new Image();
+    e = { img, ready: false, tints: new Map() };
+    img.onload = () => {
+      e.ready = true;
+      if (!$('#diag-editor').hidden) render();
+      if (!$('#diag-gallery').hidden) renderGallery();
+    };
+    img.src = ICON_SRC(k);
+    iconStore.set(k, e);
+  }
+  return e;
+}
+// przebarwienie czarnego tuszu na kolor kreski motywu (alpha rysunku zachowana)
+function iconTinted(k, color) {
+  const e = iconEntry(k);
+  if (!e.ready) return null;
+  let cv = e.tints.get(color);
+  if (!cv) {
+    cv = document.createElement('canvas');
+    cv.width = e.img.naturalWidth;
+    cv.height = e.img.naturalHeight;
+    const g = cv.getContext('2d');
+    g.drawImage(e.img, 0, 0);
+    g.globalCompositeOperation = 'source-in';
+    g.fillStyle = color;
+    g.fillRect(0, 0, cv.width, cv.height);
+    e.tints.set(color, cv);
+  }
+  return cv;
+}
+// rysuje ikonę; frac<1 = odsłanianie od lewej (tryb Play „rysowanie"); zwraca punkt „ołówka"
+function drawIcon(g, s, color, frac = 1) {
+  const cv = iconTinted(s.icon, color);
+  if (!cv) { // obrazek jeszcze się ładuje — delikatna ramka zamiast pustki
+    g.save();
+    g.setLineDash([4, 4]);
+    g.lineWidth = 1;
+    g.strokeStyle = pal().muted;
+    g.strokeRect(s.x, s.y, s.w, s.h);
+    g.restore();
+    return null;
+  }
+  if (frac >= 1) { g.drawImage(cv, s.x, s.y, s.w, s.h); return null; }
+  const f = Math.max(0, Math.min(1, frac));
+  g.save();
+  g.beginPath();
+  g.rect(s.x, s.y, s.w * f, s.h);
+  g.clip();
+  g.drawImage(cv, s.x, s.y, s.w, s.h);
+  g.restore();
+  return { x: s.x + s.w * f, y: s.y + s.h / 2 };
+}
 
 /* ── „ołówkowe" rysowanie: seedowany PRNG, JEDNA falująca kreska ── */
 function mulberry32(a) {
@@ -191,6 +264,10 @@ function drawShape(g, s, color, frac = 1) {
   }
   return partialStrokes(g, shapeStrokes(s), mulberry32(s.seed), frac);
 }
+// jeden punkt wejścia rysowania kształtu: ikona → bitmapa z tintem, reszta → kreski ołówka
+function paintShape(g, s, color, frac = 1) {
+  return s.type === 'icon' ? drawIcon(g, s, color, frac) : drawShape(g, s, color, frac);
+}
 
 /* ── render edytora ── */
 function resize() {
@@ -237,7 +314,7 @@ function render() {
     // podgląd efektu w edycji — po wybraniu animacji w panelu
     if (fxPreview?.id === s.id) { drawShapeAnimated(s, fxPreview.rec); continue; }
     const sel = s.id === selectedId;
-    drawShape(ctx, s, sel ? pal().sel : pal().ink);
+    paintShape(ctx, s, sel ? pal().sel : pal().ink);
     if (s.type !== 'arrow' && s.text && s.id !== editingId) drawText(ctx, s);
     if (s.type === 'text' && sel) { // pole tekstowe: delikatna ramka tylko przy zaznaczeniu
       ctx.save();
@@ -410,6 +487,7 @@ function hitHandle(p) {
 /* ── interakcje myszy ── */
 canvas.addEventListener('pointerdown', (e) => {
   if (editingId) commitText();
+  if (!iconPanel.hidden) toggleIconPanel(false);
   stopCamAnim(); // ręczna interakcja przerywa przelot kamery
   canvas.setPointerCapture(e.pointerId);
   const p = toWorld(e);
@@ -453,7 +531,10 @@ canvas.addEventListener('pointermove', (e) => {
     // na czas przeciągania końcówki odklejamy ją (ponowne przyklejenie przy puszczeniu)
     if (drag.k === 'a1') delete s.startBind;
     else if (drag.k === 'a2') delete s.endBind;
-    if (drag.k === 'se') { s.w = Math.max(20, p.x - s.x); s.h = Math.max(20, p.y - s.y); }
+    if (drag.k === 'se') {
+      s.w = Math.max(20, p.x - s.x); s.h = Math.max(20, p.y - s.y);
+      if (s.type === 'icon') { const d = Math.max(s.w, s.h); s.w = d; s.h = d; } // ikony zawsze w proporcji 1:1
+    }
     else if (drag.k === 'a1') { s.w += s.x - p.x; s.h += s.y - p.y; s.x = p.x; s.y = p.y; }
     else { s.w = p.x - s.x; s.h = p.y - s.y; }
     drag.p = p; dirty = true;
@@ -508,7 +589,7 @@ canvas.addEventListener('pointerup', (e) => {
 canvas.addEventListener('dblclick', (e) => {
   if (locked || play) return;
   const s = hitShape(toWorld(e));
-  if (s && s.type !== 'arrow') startTextEdit(s);
+  if (s && s.type !== 'arrow' && s.type !== 'icon') startTextEdit(s);
 });
 
 /* ── zoom ── */
@@ -663,6 +744,8 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'r' || e.key === 'R') setTool('rect');
   else if (e.key === 'a' || e.key === 'A') setTool('arrow');
   else if (e.key === 't' || e.key === 'T') setTool('text');
+  else if (e.key === 'i' || e.key === 'I') toggleIconPanel();
+  else if (e.key === 'Escape' && !iconPanel.hidden) toggleIconPanel(false);
 });
 
 function setTool(t) {
@@ -670,6 +753,41 @@ function setTool(t) {
   document.querySelectorAll('.diag-tool').forEach((b) => b.classList.toggle('is-active', b.dataset.tool === t));
   canvas.style.cursor = t === 'select' ? 'default' : 'crosshair';
 }
+
+/* ── panel „Ikony": biblioteka rysunkowych ikon wstawianych na kanwę ── */
+const iconPanel = $('#icon-panel');
+const iconBtn = $('#btn-icons');
+iconPanel.innerHTML = ICONS.map((i) => `
+  <button class="diag-icon" type="button" role="option" data-icon="${i.k}" title="${i.label}">
+    <img src="${ICON_SRC(i.k)}" alt="" loading="lazy" draggable="false"><span>${i.label}</span>
+  </button>`).join('');
+function toggleIconPanel(force) {
+  const show = force ?? iconPanel.hidden;
+  if (show && (locked || play)) return;
+  iconPanel.hidden = !show;
+  iconBtn.classList.toggle('is-active', show);
+  iconBtn.setAttribute('aria-pressed', String(show));
+}
+// wstawienie ikony: na środku widoku, od razu zaznaczona — gotowa do przesunięcia/skalowania
+function insertIcon(k) {
+  const c = centerWorld();
+  const SIZE = 180;
+  const s = {
+    id: uid(), type: 'icon', icon: k, seed: (Math.random() * 1e9) | 0,
+    x: Math.round(c.x - SIZE / 2), y: Math.round(c.y - SIZE / 2), w: SIZE, h: SIZE,
+  };
+  shapes.push(s);
+  selectedId = s.id;
+  setTool('select');
+  scheduleSave();
+  render();
+}
+iconBtn.addEventListener('click', () => toggleIconPanel());
+iconPanel.addEventListener('pointerdown', (e) => e.stopPropagation());
+iconPanel.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-icon]');
+  if (b) { insertIcon(b.dataset.icon); toggleIconPanel(false); }
+});
 
 /* ── tryb Play: stopniowe odsłanianie diagramu ── */
 let playRaf = 0;
@@ -682,6 +800,7 @@ const easeOut = (t) => 1 - (1 - t) * (1 - t);
 function shapeTiming(s) {
   const fx = FX_LIST.includes(s.fx) ? s.fx : 'draw';
   const pulse = !!s.pulse;
+  if (s.type === 'icon' && fx === 'draw') return { dur: 650, of: 1, fx, pulse }; // ikona: odsłanianie od lewej
   if (fx === 'pop') return { dur: 520, of: 1, fx, pulse };
   if (fx === 'slide') return { dur: 560, of: 1, fx, pulse };
   if (fx === 'count') return { dur: 1400, of: 1, fx, pulse };
@@ -723,7 +842,7 @@ function drawShapeAnimated(s, rec) {
       ctx.translate(cx, cy); ctx.scale(k, k); ctx.translate(-cx, -cy);
     }
     if (glow > 0) { ctx.shadowColor = pal().sel; ctx.shadowBlur = glow; }
-    drawShape(ctx, s, pal().ink);
+    paintShape(ctx, s, pal().ink);
     if (s.type !== 'arrow' && s.text) drawText(ctx, s);
     ctx.restore();
     return;
@@ -731,7 +850,7 @@ function drawShapeAnimated(s, rec) {
   if (rec.fx === 'draw') { // „ręką": kreska po kresce, tekst znak po znaku, punkt ołówka
     const po = rec.of > 0 ? Math.min(1, p / rec.of) : 1;
     const pt = rec.of < 1 ? Math.max(0, (p - rec.of) / (1 - rec.of)) : 0;
-    let tip = drawShape(ctx, s, pal().ink, po);
+    let tip = paintShape(ctx, s, pal().ink, po);
     if (s.type !== 'arrow' && s.text && pt > 0) tip = drawText(ctx, s, pt) || tip;
     if (tip) {
       ctx.fillStyle = pal().sel;
@@ -751,7 +870,7 @@ function drawShapeAnimated(s, rec) {
     ctx.translate(cx, cy); ctx.scale(k, k); ctx.translate(-cx, -cy);
   }
   const sd = rec.fx === 'count' ? countProxy(s, easeOut(p)) : s;
-  drawShape(ctx, s, pal().ink);
+  paintShape(ctx, s, pal().ink);
   if (s.type !== 'arrow' && s.text) drawText(ctx, sd);
   ctx.restore();
 }
@@ -882,6 +1001,8 @@ function applyPlayUI(on) {
   btn.title = on ? 'Zakończ odtwarzanie (Esc)' : 'Odtwórz diagram (spacja = krok, klik = zoom na obiekt)';
   $('#play-hint').hidden = !on;
   document.querySelectorAll('.diag-tool[data-tool]').forEach((b) => { b.disabled = on || locked; });
+  iconBtn.disabled = on || locked;
+  if (on) toggleIconPanel(false);
   $('#btn-rename').disabled = on || locked;
   $('#btn-delete').disabled = on || locked;
   if (on) setTool('select');
@@ -990,7 +1111,7 @@ function drawThumb(cv, shs) {
   g.lineCap = 'round'; g.lineJoin = 'round';
   g.lineWidth = 1.6 / sc;
   for (const s of shs) {
-    drawShape(g, s, pal().inkThumb);
+    paintShape(g, s, pal().inkThumb);
     if (s.type !== 'arrow' && s.text) drawText(g, s);
   }
 }
@@ -1084,7 +1205,8 @@ function sanitizeShapes(raw) {
   const out = [];
   const ids = new Set();
   for (const r of Array.isArray(raw) ? raw : []) {
-    if (!r || !['rect', 'arrow', 'text'].includes(r.type)) continue;
+    if (!r || !['rect', 'arrow', 'text', 'icon'].includes(r.type)) continue;
+    if (r.type === 'icon' && !ICONS.some((i) => i.k === r.icon)) continue;
     let x = num(r.x), y = num(r.y), w = num(r.w), h = num(r.h);
     if (x === null || y === null || w === null || h === null) continue;
     if (r.type !== 'arrow') { // rect/text trzymamy znormalizowane: w,h > 0
@@ -1099,7 +1221,8 @@ function sanitizeShapes(raw) {
     };
     if (ids.has(s.id)) s.id = uid();
     ids.add(s.id);
-    if (s.type !== 'arrow') s.text = typeof r.text === 'string' ? r.text : '';
+    if (s.type === 'icon') s.icon = r.icon;
+    else if (s.type !== 'arrow') s.text = typeof r.text === 'string' ? r.text : '';
     else {
       if (typeof r.startBind === 'string') s.startBind = r.startBind;
       if (typeof r.endBind === 'string') s.endBind = r.endBind;
@@ -1120,7 +1243,7 @@ function importDiagram() {
     <div class="strefa-modal__body">
       <h3 style="margin:0 0 var(--space-md)">Import diagramu z JSON</h3>
       <textarea class="strefa-input" id="dg-json" rows="12" spellcheck="false" style="font-family:monospace;font-size:.8rem;resize:vertical"
-        placeholder='{"title":"Mój diagram","shapes":[{"type":"rect","x":0,"y":0,"w":300,"h":140,"text":"Hello"},{"type":"arrow","x":150,"y":150,"w":0,"h":120}]}'></textarea>
+        placeholder='{"title":"Mój diagram","shapes":[{"type":"rect","x":0,"y":0,"w":300,"h":140,"text":"Hello"},{"type":"arrow","x":150,"y":150,"w":0,"h":120},{"type":"icon","icon":"robot","x":0,"y":300,"w":180,"h":180}]}'></textarea>
       <div class="strefa-actions-row" style="margin-top:var(--space-lg)">
         <button class="strefa-btn strefa-btn--ghost" data-no>Anuluj</button>
         <button class="strefa-btn strefa-btn--accent" data-yes>Importuj</button>
@@ -1192,6 +1315,8 @@ function applyLock() {
   btn.setAttribute('aria-pressed', String(locked));
   btn.classList.toggle('is-locked', locked);
   document.querySelectorAll('.diag-tool[data-tool]').forEach((b) => { b.disabled = locked; });
+  iconBtn.disabled = locked;
+  if (locked) toggleIconPanel(false);
   $('#btn-rename').disabled = locked;
   $('#btn-delete').disabled = locked;
   if (locked) {
