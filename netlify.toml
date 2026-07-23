@@ -56,15 +56,17 @@
     X-Frame-Options = "SAMEORIGIN"
     Referrer-Policy = "strict-origin-when-cross-origin"
 
+# obrazy i skrypty NIE mają hasha w nazwie i bywają podmieniane pod tym samym URL-em —
+# przeglądarka może ich używać z cache, ale musi rewalidować (ETag → tanie 304)
 [[headers]]
   for = "/img/*"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
   for = "/js/*"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 # bundle Astro/Vite — nazwy z hashem treści, bezpieczne do cache'owania na rok
 [[headers]]
