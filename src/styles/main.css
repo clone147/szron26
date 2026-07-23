@@ -901,7 +901,10 @@ h1, h2, h3, h4 {
   color: var(--color-text-inv-3);
 }
 .nav__dd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
-.nav__dd-panel--narrow { width: 20rem; }
+/* wąski panel (Open source i raporty) siedzi przy prawej krawędzi nawigacji —
+   dosunięty do prawej krawędzi toggle'a, żeby nie wystawał poza ekran */
+.nav__dd-panel--narrow { width: min(94vw, 26rem); left: auto; right: 0; transform: translateX(0) translateY(-6px); }
+.nav__dd:hover .nav__dd-panel--narrow, .nav__dd:focus-within .nav__dd-panel--narrow { transform: translateX(0) translateY(0); }
 .nav__dd-grid--1col { grid-template-columns: 1fr; }
 .nav__dd-grid a {
   padding: 0.5rem 0.75rem; border-radius: var(--radius-btn); text-decoration: none;
