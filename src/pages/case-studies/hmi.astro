@@ -2,6 +2,7 @@
 import Interior from '../../layouts/Interior.astro';
 import SectHead from '../../components/SectHead.astro';
 import ProofStrip from '../../components/ProofStrip.astro';
+import CtaBand from '../../components/CtaBand.astro';
 ---
 <Interior
   title="Case study: panel HMI Qt/QML w energetyce | SZRON"
@@ -147,20 +148,13 @@ import ProofStrip from '../../components/ProofStrip.astro';
   </section>
 
   <!-- kontakt CTA -->
-  <section class="sect sect--dark cta-band" aria-labelledby="cta" style="padding-top:0">
-    <div class="container">
-      <p class="eyebrow rv" data-scramble>Wasza aplikacja Qt też wymaga modernizacji?</p>
-      <h2 class="ws" id="cta" style="margin-top:var(--space-lg)">Qt/QML też się da. Z transferem wiedzy włącznie.</h2>
-      <p class="rv">30-minutowa rozmowa — pokażemy, czy migrację Qt 5 → Qt 6 da się ogarnąć przy okazji nowego feature'u, czy wymaga osobnego sprintu.</p>
-      <div class="contact__cta rv">
-        <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę
-          <span class="btn__arr" aria-hidden="true">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg>
-          </span>
-        </a>
-        <a class="btn btn--ghost" href="/case-studies">Inne realizacje</a>
-      </div>
-    </div>
-  </section>
+  <CtaBand
+    padTop={false}
+    eyebrow="Wasza aplikacja Qt też wymaga modernizacji?"
+    heading="Qt/QML też się da. Z transferem wiedzy włącznie."
+    text="30-minutowa rozmowa — pokażemy, czy migrację Qt 5 → Qt 6 da się ogarnąć przy okazji nowego feature'u, czy wymaga osobnego sprintu."
+    btnLabel="Umów diagnozę"
+    ghostLabel="Inne realizacje"
+    ghostHref="/case-studies"
+  />
 </Interior>
