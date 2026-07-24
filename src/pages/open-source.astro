@@ -66,11 +66,31 @@ const tools = [
     install: 'claude install-skill https://github.com/clone147/stm32f429-disco-skill',
     github: 'https://github.com/clone147/stm32f429-disco-skill',
   },
+  {
+    name: 'chrome-tab-ungrouper',
+    category: 'Wtyczki do przeglądarki',
+    badges: [{ label: 'Wtyczka Chrome' }, { label: 'NEW', kind: 'new' }],
+    desc: 'Chrome grupuje karty i nie da się tego wyłączyć w ustawieniach. Ta wtyczka rozgrupowuje każdą grupę w momencie jej powstania — także te tworzone przez Claude Code / Claude in Chrome.',
+    features: [
+      'Manifest V3, service worker — bez UI, bez opcji, ~30 linii kodu',
+      'Reaguje na nową grupę, zmianę grupy i kartę dołożoną do grupy',
+      'Zero dostępu do treści stron i zero ruchu sieciowego',
+    ],
+    install: 'git clone https://github.com/clone147/chrome-tab-ungrouper',
+    github: 'https://github.com/clone147/chrome-tab-ungrouper',
+  },
 ];
+
+// Kolejność sekcji na stronie; narzędzia bez `category` lądują w domyślnej grupie.
+const categories = ['Serwery MCP', 'Skille do Claude Code', 'Wtyczki do przeglądarki'];
+const catOf = (t) => t.category ?? (t.name === 'szron-db2-mcp' ? 'Serwery MCP' : 'Skille do Claude Code');
+const grouped = categories
+  .map((c) => ({ name: c, items: tools.filter((t) => catOf(t) === c) }))
+  .filter((g) => g.items.length);
 ---
 <Interior
   title="Open source — narzędzia AI od SZRON"
-  description="Narzędzia open source, które tworzymy przy wdrożeniach AI — serwer MCP dla IBM DB2 i skille do Claude Code. Udostępniamy za darmo na licencji MIT."
+  description="Narzędzia open source, które tworzymy przy wdrożeniach AI — serwer MCP dla IBM DB2, skille do Claude Code i wtyczki do przeglądarki. Udostępniamy za darmo na licencji MIT."
   eyebrow="Open source"
   heading="Budujemy na otwarto."
   lead="Narzędzia, które tworzymy przy wdrożeniach AI — udostępniamy za darmo. Używaj, kontrybuuj, rozwijaj."
@@ -79,7 +99,7 @@ const tools = [
 >
   <!-- proof -->
   <ProofStrip items={[
-    ['5 narzędzi', 'serwer MCP + skille Claude Code'],
+    ['6 narzędzi', 'serwer MCP, skille Claude Code, wtyczka Chrome'],
     ['37 wzorców', 'w humanizerze polskiego tekstu'],
     ['MIT License', 'za darmo, bez haczyków'],
   ]} />
@@ -89,25 +109,30 @@ const tools = [
     <div class="container">
       <SectHead eyebrow="01 / Narzędzia · Sprawdzone w boju" title="Każde powstało przy realnym projekcie wdrożeniowym." id="narzedzia" small />
       <img class="hero-img rv" src="/img/sub/open-source-biurko.webp" alt="Laptop z naklejkami projektów open source i otwartym repozytorium kodu" width="1380" height="768" loading="lazy" />
-      <div class="tools-grid">
-        {tools.map((t, i) => (
-          <article class="card-tile tool-card rv" style={`--rv-d:${(i * 0.08).toFixed(2)}s`}>
-            <div class="badges">
-              {t.badges.map((b) => <span class={`badge${b.kind === 'new' ? ' badge--new' : ''}`}>{b.label}</span>)}
-            </div>
-            <h3>{t.name}</h3>
-            <p>{t.desc}</p>
-            <ul class="features">
-              {t.features.map((f) => <li>{f}</li>)}
-            </ul>
-            <div class="install">
-              <code>{t.install}</code>
-              <button type="button" class="install__btn" data-copy={t.install} aria-label={`Kopiuj komendę instalacji ${t.name}`}>Kopiuj</button>
-            </div>
-            <p class="tool-foot"><a href={t.github} target="_blank" rel="noopener noreferrer">Zobacz na GitHub →</a></p>
-          </article>
-        ))}
-      </div>
+      {grouped.map((g) => (
+        <div class="tools-cat">
+          <p class="eyebrow tools-cat__head rv" data-scramble>{g.name}</p>
+          <div class="tools-grid">
+            {g.items.map((t, i) => (
+              <article class="card-tile tool-card rv" style={`--rv-d:${(i * 0.08).toFixed(2)}s`}>
+                <div class="badges">
+                  {t.badges.map((b) => <span class={`badge${b.kind === 'new' ? ' badge--new' : ''}`}>{b.label}</span>)}
+                </div>
+                <h3>{t.name}</h3>
+                <p>{t.desc}</p>
+                <ul class="features">
+                  {t.features.map((f) => <li>{f}</li>)}
+                </ul>
+                <div class="install">
+                  <code>{t.install}</code>
+                  <button type="button" class="install__btn" data-copy={t.install} aria-label={`Kopiuj komendę instalacji ${t.name}`}>Kopiuj</button>
+                </div>
+                <p class="tool-foot"><a href={t.github} target="_blank" rel="noopener noreferrer">Zobacz na GitHub →</a></p>
+              </article>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   </section>
 

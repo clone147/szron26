@@ -1129,6 +1129,9 @@ form [name="bot-field"], form label:has([name="bot-field"]), p.hidden, .hidden-f
   gap: var(--space-lg);
 }
 @media (max-width: 44rem) { .tools-grid { grid-template-columns: 1fr; } }
+/* kategorie narzędzi: MCP / skille / wtyczki */
+.tools-cat + .tools-cat { margin-top: var(--space-xl); }
+.tools-cat__head { margin-bottom: var(--space-sm); }
 .tool-card { gap: var(--space-md); }
 .tool-card > h3 {
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
