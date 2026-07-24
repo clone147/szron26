@@ -1,7 +1,7 @@
 // Bramka treści Akademii: niezalogowani widzą ~połowę sekcji, reszta ukryta
 // za kartą logowania e-mail/hasło. Sesja = ta sama co Strefa (wspólny klient
 // Supabase), ale bez allowlisty zespołu — wystarczy dowolne konto z projektu.
-import { getClient, getSessionUser, waitForSession } from './supabase.js';
+import { signInPassword, getSessionUser, waitForSession } from './supabase.js';
 
 const HIDDEN_CLASS = 'agate-hidden';
 
@@ -51,12 +51,9 @@ export async function initGate() {
     btn.disabled = true;
     status.textContent = 'Logowanie…';
     const form = e.currentTarget;
-    const { error } = await getClient().auth.signInWithPassword({
-      email: form.email.value.trim(),
-      password: form.password.value,
-    });
+    const { error } = await signInPassword(form.email.value, form.password.value);
     if (error) {
-      status.textContent = `Błąd logowania: ${error.message}`;
+      status.textContent = `Błąd logowania: ${error}`;
       btn.disabled = false;
       return;
     }

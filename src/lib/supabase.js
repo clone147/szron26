@@ -110,24 +110,10 @@ export async function updatePassword(password) {
 // Bucket na obrazki slajdów i tła (public read; zapis tylko dla zespołu — RLS storage.objects).
 export const SLIDES_BUCKET = 'strefa-slajdy';
 
-// Upload obrazka do bucketa slajdów. `kind`: 'slides' (obrazek slajdu) lub 'bg' (tło decku).
-// Zwraca { url, path } albo { error }.
-export async function uploadSlideImage(file, trainingId, kind = 'slides') {
-  const ext = (file.name.split('.').pop() || 'png').toLowerCase();
-  const path = `${trainingId}/${kind}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const sb = getClient();
-  const { error } = await sb.storage.from(SLIDES_BUCKET)
-    .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type });
-  if (error) return { error: error.message };
-  const { data } = sb.storage.from(SLIDES_BUCKET).getPublicUrl(path);
-  return { url: data.publicUrl, path };
-}
-
-// Upload obrazka notatki programisty (ten sam bucket strefa-slajdy, prefix dev-notes/{devId}).
-// Zwraca { url, path } albo { error }.
-export async function uploadNoteImage(file, developerId) {
+// Upload pliku do bucketa slajdów pod zadany prefix. Zwraca { url, path } albo { error }.
+async function uploadToSlides(file, prefix) {
   const ext = (file.name?.split('.').pop() || 'png').toLowerCase();
-  const path = `dev-notes/${developerId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const path = `${prefix}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
   const sb = getClient();
   const { error } = await sb.storage.from(SLIDES_BUCKET)
     .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type || 'image/png' });
@@ -135,6 +121,12 @@ export async function uploadNoteImage(file, developerId) {
   const { data } = sb.storage.from(SLIDES_BUCKET).getPublicUrl(path);
   return { url: data.publicUrl, path };
 }
+
+// Obrazek slajdu. `kind`: 'slides' (obrazek slajdu) lub 'bg' (tło decku).
+export const uploadSlideImage = (file, trainingId, kind = 'slides') => uploadToSlides(file, `${trainingId}/${kind}`);
+
+// Obrazek notatki programisty (ten sam bucket, prefix dev-notes/{devId}).
+export const uploadNoteImage = (file, developerId) => uploadToSlides(file, `dev-notes/${developerId}`);
 
 // Usuń obiekty ze storage (bucket strefa-slajdy) po ścieżkach. Zwraca { error }.
 export async function removeStoragePaths(paths) {

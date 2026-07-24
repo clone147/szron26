@@ -1359,9 +1359,6 @@ $('#btn-import')?.addEventListener('click', importDiagram);
 $('#btn-prev').addEventListener('click', () => navDiagram(-1));
 $('#btn-next').addEventListener('click', () => navDiagram(1));
 
-// diagnostyka z konsoli devtools (stan modułu jest niedostępny inaczej)
-window.__diagDebug = () => ({ shapes, play, camera, selectedId, fxPreview });
-
 /* ── start ── */
 (async () => {
   if (!(await getTeamUser())) return; // layout przekieruje

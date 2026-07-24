@@ -53,7 +53,7 @@ const gated = akademia.some((a) => a.slug === slug);
         {heroImage && (
           <figure class="page-hero__media rv">
             <img src={heroImage} alt={heroAlt} loading="eager" decoding="async"
-                 onload="this.parentElement.classList.add('has-img')" onerror="this.closest('.page-hero').classList.remove('page-hero--media'); this.parentElement.remove()" />
+                 onerror="this.closest('.page-hero').classList.remove('page-hero--media'); this.parentElement.remove()" />
           </figure>
         )}
       </div>

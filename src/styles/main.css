@@ -656,6 +656,8 @@ h1, h2, h3, h4 {
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: 0.05em;
+  position: relative;
+  overflow: hidden;
 }
 .person h3 { font-size: var(--text-h4); }
 .person__role { margin-top: 2px; font-size: 0.875rem; color: var(--color-text-2); }
@@ -813,7 +815,7 @@ h1, h2, h3, h4 {
 }
 
 /* ── placeholdery obrazów ────────────────────────────── */
-/* gdy plik z img/ istnieje, <img> zakrywa wzór i etykietę (onload → .has-img) */
+/* gdy plik z img/ istnieje, <img> zakrywa wzór i etykietę */
 .ph {
   position: relative;
   overflow: hidden;
@@ -849,8 +851,6 @@ h1, h2, h3, h4 {
 }
 .hero__panel.has-img::after { opacity: 1; }
 .hero__panel-num, .hero__panel-cap { position: relative; z-index: 1; }
-
-.person__avatar { position: relative; overflow: hidden; }
 
 .path > .ph { margin-bottom: var(--space-xl); }
 .case-card .ph { margin-top: var(--space-xl); }

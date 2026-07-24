@@ -46,7 +46,6 @@ export function pageSchema(pathname, ctx) {
   // 1) BreadcrumbList — zawsze (Home → [Akademia] → strona)
   const crumbs = [{ '@type': 'ListItem', position: 1, name: 'Strona główna', item: url('/') }];
   let pos = 2;
-  const underAkademia = ACADEMY.has(slug) || slug === 'akademia';
   if (ACADEMY.has(slug)) {
     crumbs.push({ '@type': 'ListItem', position: pos++, name: 'Akademia', item: url('/akademia') });
   } else if (slug.startsWith('case-studies/')) {

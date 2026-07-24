@@ -615,10 +615,9 @@ span.flatpickr-weekday { background: var(--color-ink-2) !important; color: var(-
 .slides-stage .slide-viewport.stage-trans-fade { animation: stage-fade .45s ease; }
 .slides-stage .slide-viewport.stage-trans-push { animation: stage-push .5s cubic-bezier(.2, .7, .2, 1); }
 /* builds — animacje wejścia obiektów */
-@keyframes build-fade { from { opacity: 0 } to { opacity: 1 } }
 @keyframes build-slide { from { opacity: 0; transform: translateY(40px) } to { opacity: 1; transform: none } }
 @keyframes build-scale { from { opacity: 0; transform: scale(.6) } to { opacity: 1; transform: none } }
-.slide-obj.build-in-fade > * { animation: build-fade .4s ease both; }
+.slide-obj.build-in-fade > * { animation: stage-fade .4s ease both; }
 .slide-obj.build-in-slide > * { animation: build-slide .45s cubic-bezier(.2, .7, .2, 1) both; }
 .slide-obj.build-in-scale > * { animation: build-scale .4s cubic-bezier(.2, .7, .2, 1) both; }
 /* przycisk widoku prezentera */
@@ -766,7 +765,6 @@ body:has(#diag-editor:not([hidden])) .strefa-top { display: none; }
   background: var(--color-ink-2, color-mix(in oklch, var(--color-ink) 88%, white));
 }
 .diag-bar__group { display: flex; align-items: center; gap: var(--space-xs); }
-.diag-bar__right { margin-left: auto; gap: var(--space-md); }
 .diag-title {
   font-family: var(--font-display); font-weight: 600; font-size: var(--text-s);
   max-width: 18rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;

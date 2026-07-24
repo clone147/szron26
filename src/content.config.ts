@@ -9,7 +9,6 @@ const blog = defineCollection({
     title: z.string(),
     excerpt: z.string().default(''),
     category: z.string().default('blog'),
-    tags: z.array(z.string()).default([]),
     author: z.string().default('Tomek Wojciechowski'),
     publishedAt: z.coerce.date(),
   }),
