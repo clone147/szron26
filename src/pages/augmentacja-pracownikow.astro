@@ -3,6 +3,14 @@ import Interior from '../layouts/Interior.astro';
 import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
+import Faq from '../components/Faq.astro';
+const faq = [
+  { q: 'Co to znaczy „augmentacja pracownika" w praktyce?', a: 'Przychodzimy, patrzymy jak pracujecie, dobieramy narzędzia, konfigurujemy skille i integracje, trenujemy na waszych taskach i budujemy kompetencje w zespole. Cały cykl trwa 2–8 tygodni w zależności od rozmiaru zespołu. Po sprincie sprawdzamy postępy i planujemy, co dalej.' },
+  { q: 'Co to są MCP Tools i jak przyspieszają development?', a: 'MCP to standard, który pozwala AI sięgać do waszych systemów — GitHub, Jira, baza danych, Figma, przeglądarka. Agent nie tylko pisze kod — testuje, debuguje, deployuje. Przykład z praktyki: agent czyta design z Figmy, pisze komponent React, testuje w Playwright, wrzuca do bazy. Dev tylko nadzoruje.' },
+  { q: 'Ile czasu mój zespół musi poświęcić na wdrożenie?', a: 'Pierwszy miesiąc to intensywność — 2 dni szkolenia, setup narzędzi, potem około 2h tygodniowo follow-up. Później godzina tygodniowo i tyle. Czasem potrzeba dodatkowego tygodnia, ale wyniki przychodzą.' },
+  { q: 'Czy AI nie zabierze pracy moim programistom?', a: 'To pytanie pada na każdym spotkaniu. Nie, AI nie zastąpi dobrych devów — zmieni ich rolę. Junior z AI dowozi jak mid, senior z AI robi robotę małego zespołu. Zagrożeni są ci, którzy ignorują AI, a nie ci, którzy się go uczą.' },
+  { q: 'Dlaczego mówicie, że agent AI to „drugi mózg programisty"?', a: 'Dev myśli — agent pisze. Programista formułuje zadanie, agent pisze, testuje przypadki brzegowe, dodaje obsługę błędów. To uwolnienie człowieka od rutyny, żeby mógł robić to, co naprawdę wymaga głowy.' },
+];
 ---
 <Interior
   title="Coaching AI — trening zespołu na waszym kodzie | SZRON"
@@ -77,28 +85,7 @@ import CtaBand from '../components/CtaBand.astro';
   <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
     <div class="container">
       <SectHead eyebrow="04 / FAQ · Pytania o Coaching Sprinty" title="Jak przygotować zespół i czego oczekiwać." id="faq-title" small />
-      <div class="faq rv">
-        <details>
-          <summary><span class="num">01</span> Co to znaczy „augmentacja pracownika" w praktyce? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Przychodzimy, patrzymy jak pracujecie, dobieramy narzędzia, konfigurujemy skille i integracje, trenujemy na waszych taskach i budujemy kompetencje w zespole. Cały cykl trwa 2–8 tygodni w zależności od rozmiaru zespołu. Po sprincie sprawdzamy postępy i planujemy, co dalej.</p>
-        </details>
-        <details>
-          <summary><span class="num">02</span> Co to są MCP Tools i jak przyspieszają development? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>MCP to standard, który pozwala AI sięgać do waszych systemów — GitHub, Jira, baza danych, Figma, przeglądarka. Agent nie tylko pisze kod — testuje, debuguje, deployuje. Przykład z praktyki: agent czyta design z Figmy, pisze komponent React, testuje w Playwright, wrzuca do bazy. Dev tylko nadzoruje.</p>
-        </details>
-        <details>
-          <summary><span class="num">03</span> Ile czasu mój zespół musi poświęcić na wdrożenie? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Pierwszy miesiąc to intensywność — 2 dni szkolenia, setup narzędzi, potem około 2h tygodniowo follow-up. Później godzina tygodniowo i tyle. Czasem potrzeba dodatkowego tygodnia, ale wyniki przychodzą.</p>
-        </details>
-        <details>
-          <summary><span class="num">04</span> Czy AI nie zabierze pracy moim programistom? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>To pytanie pada na każdym spotkaniu. Nie, AI nie zastąpi dobrych devów — zmieni ich rolę. Junior z AI dowozi jak mid, senior z AI robi robotę małego zespołu. Zagrożeni są ci, którzy ignorują AI, a nie ci, którzy się go uczą.</p>
-        </details>
-        <details>
-          <summary><span class="num">05</span> Dlaczego mówicie, że agent AI to „drugi mózg programisty"? <span class="ico" aria-hidden="true">+</span></summary>
-          <p>Dev myśli — agent pisze. Programista formułuje zadanie, agent pisze, testuje przypadki brzegowe, dodaje obsługę błędów. To uwolnienie człowieka od rutyny, żeby mógł robić to, co naprawdę wymaga głowy.</p>
-        </details>
-      </div>
+      <Faq items={faq} />
     </div>
   </section>
 

@@ -2,6 +2,7 @@
 // Główna nawigacja SZRON — realne trasy + dropdown Akademia
 import { akademia } from '../data/akademia.mjs';
 import { execSync } from 'node:child_process';
+import BtnArrow from './BtnArrow.astro';
 
 // Znacznik buildu (commit + czas buildu, Europe/Warsaw) — prawie niewidoczny
 // w toolbarze; służy tylko do sprawdzenia, że deploy na Netlify się wgrał.
@@ -15,7 +16,6 @@ const buildTime = new Intl.DateTimeFormat('pl-PL', {
   hour: '2-digit', minute: '2-digit',
 }).format(new Date());
 const buildTag = `${buildSha} · ${buildTime}`;
-const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg><svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8"/></svg></span>`;
 ---
 <header class="nav" id="nav">
   <div class="container nav__inner">
@@ -107,7 +107,7 @@ const arrow = `<span class="btn__arr" aria-hidden="true"><svg viewBox="0 0 16 16
         </li>
       </ul>
     </nav>
-    <a class="btn btn--accent" href="/umow-rozmowe">Umów diagnozę<Fragment set:html={arrow} /></a>
+    <BtnArrow href="/umow-rozmowe">Umów diagnozę</BtnArrow>
     <a class="nav__tel" href="tel:+48505091200">
       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.6 2h2.2l1.1 2.8-1.4 1.1a9.5 9.5 0 0 0 4.6 4.6l1.1-1.4L14 10.2v2.2c0 .9-.7 1.6-1.6 1.6C7 14 2 9 2 3.6 2 2.7 2.7 2 3.6 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
       505 091 200
