@@ -3,6 +3,7 @@ import Interior from '../layouts/Interior.astro';
 import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
+import RelatedCards from '../components/RelatedCards.astro';
 ---
 <Interior
   updated="2026-07-06"
@@ -136,16 +137,16 @@ import CtaBand from '../components/CtaBand.astro';
   </section>
 
   <!-- 04 powiązane -->
-  <section class="sect sect--dark" aria-labelledby="powiazane">
-    <div class="container">
-      <SectHead eyebrow="04 / Czytaj dalej" title="Powiązane materiały." id="powiazane" small />
-      <div class="link-cards rv">
-        <a class="link-card" href="/ai-dla-embedded"><h3>AI dla embedded</h3><p>Jak wdrażamy agentów AI w zespołach firmware i elektroniki.</p></a>
-        <a class="link-card" href="/claude-code"><h3>Claude Code</h3><p>Instalacja, poziomy myślenia, workflow agentowy od podstaw.</p></a>
-        <a class="link-card" href="/tips-and-tricks"><h3>Tips &amp; Tricks</h3><p>Praktyki, skróty i wzorce, które realnie przyspieszają pracę z AI.</p></a>
-      </div>
-    </div>
-  </section>
+  <RelatedCards
+    items={[
+    { href: '/ai-dla-embedded', title: 'AI dla embedded', desc: 'Jak wdrażamy agentów AI w zespołach firmware i elektroniki.' },
+    { href: '/claude-code', title: 'Claude Code', desc: 'Instalacja, poziomy myślenia, workflow agentowy od podstaw.' },
+    { href: '/tips-and-tricks', title: 'Tips &amp; Tricks', desc: 'Praktyki, skróty i wzorce, które realnie przyspieszają pracę z AI.' },
+  ]}
+    eyebrow="04 / Czytaj dalej"
+    title="Powiązane materiały."
+    dark
+  />
 
   <CtaBand heading="Chcesz taki skill dla własnego hardware'u?" text="Budujemy skille i workflow agentowe pod konkretne zespoły embedded — z weryfikacją na prawdziwym sprzęcie. 30 minut wystarczy, żeby sprawdzić, czy ma to u Was sens." padTop={false} />
 </Interior>

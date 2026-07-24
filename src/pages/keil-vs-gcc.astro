@@ -6,6 +6,7 @@ import CtaBand from '../components/CtaBand.astro';
 import BtnArrow from '../components/BtnArrow.astro';
 import DotMatrixChart from '../components/charts/DotMatrixChart.astro';
 import SegBarChart from '../components/charts/SegBarChart.astro';
+import RelatedCards from '../components/RelatedCards.astro';
 ---
 <Interior
   updated="2026-07-16"
@@ -251,16 +252,15 @@ import SegBarChart from '../components/charts/SegBarChart.astro';
   </section>
 
   <!-- 08 powiązane -->
-  <section class="sect" aria-labelledby="powiazane">
-    <div class="container">
-      <SectHead eyebrow="08 / Czytaj dalej" title="Zrób to u siebie." id="powiazane" small />
-      <div class="link-cards rv">
-        <a class="link-card" href="/stm32-skill"><h3>Skill STM32 dla Claude Code</h3><p>Ten sam workflow build → flash → weryfikacja, spakowany do pobrania — z konfiguratorem pod Twoją płytkę.</p></a>
-        <a class="link-card" href="/ai-dla-embedded"><h3>AI dla embedded</h3><p>Jak wdrażamy agentów AI w zespołach firmware i elektroniki.</p></a>
-        <a class="link-card" href="/warsztat-embedded"><h3>Warsztat embedded</h3><p>Warsztat na żywym kodzie Twojego zespołu — z weryfikacją na prawdziwym sprzęcie.</p></a>
-      </div>
-    </div>
-  </section>
+  <RelatedCards
+    items={[
+    { href: '/stm32-skill', title: 'Skill STM32 dla Claude Code', desc: 'Ten sam workflow build → flash → weryfikacja, spakowany do pobrania — z konfiguratorem pod Twoją płytkę.' },
+    { href: '/ai-dla-embedded', title: 'AI dla embedded', desc: 'Jak wdrażamy agentów AI w zespołach firmware i elektroniki.' },
+    { href: '/warsztat-embedded', title: 'Warsztat embedded', desc: 'Warsztat na żywym kodzie Twojego zespołu — z weryfikacją na prawdziwym sprzęcie.' },
+  ]}
+    eyebrow="08 / Czytaj dalej"
+    title="Zrób to u siebie."
+  />
 
   <CtaBand heading="Policzmy ten sam rachunek na Waszym firmware." text="Bierzemy jeden Wasz projekt, uruchamiamy agentową pętlę build → flash → pomiar na Waszym sprzęcie i pokazujemy liczby: czas iteracji, rozmiar binarki, koszt licencji. 30 minut rozmowy wystarczy, żeby ustalić, od czego zacząć — bez zobowiązań." btnLabel="Zarezerwuj 30 minut" padTop={false} />
 

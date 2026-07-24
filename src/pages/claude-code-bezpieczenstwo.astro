@@ -3,6 +3,7 @@ import Interior from '../layouts/Interior.astro';
 import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
+import RelatedCards from '../components/RelatedCards.astro';
 ---
 <Interior
   title="Claude Code — bezpieczeństwo i ochrona kodu | Akademia SZRON"
@@ -245,25 +246,15 @@ NIE wypisuj prawdziwych wartosci sekretow — tylko wskaz ich obecnosc.</code></
   </section>
 
   <!-- powiązane szkolenia -->
-  <section class="sect" aria-labelledby="powiazane">
-    <div class="container">
-      <SectHead eyebrow="Powiązane szkolenia" title="Kolejne kroki w Akademii." id="powiazane" small />
-      <div class="link-cards rv">
-        <a class="link-card" href="/claude-code">
-          <h3>Claude Code</h3>
-          <p>Instalacja, poziomy myślenia i workflow agentowy od podstaw.</p>
-        </a>
-        <a class="link-card" href="/serwery-mcp">
-          <h3>Serwery MCP</h3>
-          <p>Łączenie agenta z bazami, API i narzędziami — i jak robić to bezpiecznie.</p>
-        </a>
-        <a class="link-card" href="/tips-and-tricks">
-          <h3>Tips &amp; Tricks</h3>
-          <p>Praktyki i skróty, w tym świadome zarządzanie uprawnieniami i kontekstem.</p>
-        </a>
-      </div>
-    </div>
-  </section>
+  <RelatedCards
+    items={[
+    { href: '/claude-code', title: 'Claude Code', desc: 'Instalacja, poziomy myślenia i workflow agentowy od podstaw.' },
+    { href: '/serwery-mcp', title: 'Serwery MCP', desc: 'Łączenie agenta z bazami, API i narzędziami — i jak robić to bezpiecznie.' },
+    { href: '/tips-and-tricks', title: 'Tips &amp; Tricks', desc: 'Praktyki i skróty, w tym świadome zarządzanie uprawnieniami i kontekstem.' },
+  ]}
+    eyebrow="Powiązane szkolenia"
+    title="Kolejne kroki w Akademii."
+  />
 
   <!-- CTA -->
   <CtaBand

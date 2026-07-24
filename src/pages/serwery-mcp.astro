@@ -3,6 +3,7 @@ import Interior from '../layouts/Interior.astro';
 import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
+import RelatedCards from '../components/RelatedCards.astro';
 ---
 <Interior
   title="Serwery MCP — Chrome DevTools MCP | Akademia SZRON"
@@ -85,16 +86,16 @@ claude mcp remove chrome-devtools
   </section>
 
   <!-- 02 powiązane szkolenia (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="powiazane">
-    <div class="container">
-      <SectHead eyebrow="02 / Akademia · Czytaj dalej" title="Powiązane szkolenia." id="powiazane" small />
-      <div class="link-cards rv">
-        <a class="link-card" href="/claude-code"><h3>Claude Code</h3><p>Instalacja, poziomy myślenia i workflow agentowy od podstaw.</p></a>
-        <a class="link-card" href="/szkolenie-supabase-mcp"><h3>MCP Supabase</h3><p>Połączenie agenta z bazą Supabase — tryb read-only i bezpieczeństwo.</p></a>
-        <a class="link-card" href="/szkolenie-mysql"><h3>MySQL MCP Server</h3><p>Agent na bazie MySQL: konfiguracja, operacje zapisu, pułapki wersji.</p></a>
-      </div>
-    </div>
-  </section>
+  <RelatedCards
+    items={[
+    { href: '/claude-code', title: 'Claude Code', desc: 'Instalacja, poziomy myślenia i workflow agentowy od podstaw.' },
+    { href: '/szkolenie-supabase-mcp', title: 'MCP Supabase', desc: 'Połączenie agenta z bazą Supabase — tryb read-only i bezpieczeństwo.' },
+    { href: '/szkolenie-mysql', title: 'MySQL MCP Server', desc: 'Agent na bazie MySQL: konfiguracja, operacje zapisu, pułapki wersji.' },
+  ]}
+    eyebrow="02 / Akademia · Czytaj dalej"
+    title="Powiązane szkolenia."
+    dark
+  />
 
   <!-- kontakt CTA -->
   <CtaBand heading="Chcecie, żeby tak pracował cały Wasz zespół?" padTop={false} />

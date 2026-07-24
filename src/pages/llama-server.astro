@@ -4,6 +4,7 @@ import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
 import { akademia } from '../data/akademia.mjs';
+import RelatedCards from '../components/RelatedCards.astro';
 const related = akademia.filter((a) => ['lm-studio', 'claude-code-bezpieczenstwo', 'serwery-mcp'].includes(a.slug));
 ---
 <Interior
@@ -155,19 +156,12 @@ cmake --build build --config Release -j</code></pre>
   </section>
 
   <!-- powiazane szkolenia -->
-  <section class="sect" aria-labelledby="powiazane" style="padding-top:0">
-    <div class="container">
-      <SectHead eyebrow="Powiązane szkolenia" title="Czytaj dalej w Akademii." id="powiazane" small />
-      <div class="link-cards rv">
-        {related.map((a) => (
-          <a class="link-card" href={`/${a.slug}`}>
-            <h3>{a.title}</h3>
-            <p>{a.desc}</p>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <RelatedCards
+    items={related.map((a) => ({ href: `/${a.slug}`, title: a.title, desc: a.desc }))}
+    eyebrow="Powiązane szkolenia"
+    title="Czytaj dalej w Akademii."
+    padTop={false}
+  />
 
   <!-- kontakt CTA -->
   <CtaBand

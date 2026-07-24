@@ -3,6 +3,7 @@ import Interior from '../layouts/Interior.astro';
 import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
+import RelatedCards from '../components/RelatedCards.astro';
 ---
 <Interior
   title="Pętle agentowe — /goal i /loop | Akademia SZRON"
@@ -94,16 +95,16 @@ tym wypisie wszystkie checkboxy są zaznaczone [x]</code></pre>
   </section>
 
   <!-- powiązane -->
-  <section class="sect" aria-labelledby="powiazane" style="padding-top:0">
-    <div class="container">
-      <SectHead eyebrow="Powiązane" title="Dalej w Akademii." id="powiazane" small />
-      <div class="link-cards rv">
-        <a class="link-card" href="/claude-code"><h3>Claude Code</h3><p>Podstawy: instalacja, poziomy myślenia, workflow agentowy.</p></a>
-        <a class="link-card" href="/tips-and-tricks"><h3>Tips &amp; Tricks</h3><p>Praktyki i wzorce, które realnie przyspieszają pracę z AI.</p></a>
-        <a class="link-card" href="/serwery-mcp"><h3>Serwery MCP</h3><p>Podłącz agenta do narzędzi i danych przez MCP.</p></a>
-      </div>
-    </div>
-  </section>
+  <RelatedCards
+    items={[
+    { href: '/claude-code', title: 'Claude Code', desc: 'Podstawy: instalacja, poziomy myślenia, workflow agentowy.' },
+    { href: '/tips-and-tricks', title: 'Tips &amp; Tricks', desc: 'Praktyki i wzorce, które realnie przyspieszają pracę z AI.' },
+    { href: '/serwery-mcp', title: 'Serwery MCP', desc: 'Podłącz agenta do narzędzi i danych przez MCP.' },
+  ]}
+    eyebrow="Powiązane"
+    title="Dalej w Akademii."
+    padTop={false}
+  />
 
   <!-- CTA -->
   <CtaBand

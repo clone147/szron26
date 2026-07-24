@@ -4,6 +4,7 @@ import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
 import BtnArrow from '../components/BtnArrow.astro';
+import RelatedCards from '../components/RelatedCards.astro';
 ---
 <Interior
   updated="2026-07-17"
@@ -196,16 +197,15 @@ import BtnArrow from '../components/BtnArrow.astro';
   </section>
 
   <!-- 08 powiązane -->
-  <section class="sect" aria-labelledby="powiazane">
-    <div class="container">
-      <SectHead eyebrow="08 / Czytaj dalej" title="Powiązane tematy." id="powiazane" small />
-      <div class="link-cards rv">
-        <a class="link-card" href="/ai-dla-embedded"><h3>AI dla embedded</h3><p>Agenci AI w zespołach firmware — m.in. automatyczny SBOM i testy bezpieczeństwa w pipeline.</p></a>
-        <a class="link-card" href="/ai-act-compliance"><h3>Zgodność z AI Act</h3><p>Druga regulacja z tej historii — co faktycznie przesunięto i kogo dotyczy transparentność od 2.08.2026.</p></a>
-        <a class="link-card" href="/keil-vs-gcc"><h3>Benchmark: GCC vs Keil</h3><p>Nasz raport z pomiarów na prawdziwym STM32 — open source kontra komercyjny toolchain.</p></a>
-      </div>
-    </div>
-  </section>
+  <RelatedCards
+    items={[
+    { href: '/ai-dla-embedded', title: 'AI dla embedded', desc: 'Agenci AI w zespołach firmware — m.in. automatyczny SBOM i testy bezpieczeństwa w pipeline.' },
+    { href: '/ai-act-compliance', title: 'Zgodność z AI Act', desc: 'Druga regulacja z tej historii — co faktycznie przesunięto i kogo dotyczy transparentność od 2.08.2026.' },
+    { href: '/keil-vs-gcc', title: 'Benchmark: GCC vs Keil', desc: 'Nasz raport z pomiarów na prawdziwym STM32 — open source kontra komercyjny toolchain.' },
+  ]}
+    eyebrow="08 / Czytaj dalej"
+    title="Powiązane tematy."
+  />
 
   <CtaBand heading="Sprawdźmy Waszą gotowość na wrzesień." text="Godzina rozmowy: przechodzimy po Waszym portfolio produktów, klasyfikujemy je pod CRA i wskazujemy, co musi być gotowe na 11 września 2026, a co może poczekać do grudnia 2027. Bez zobowiązań." btnLabel="Zarezerwuj godzinę" padTop={false} />
 

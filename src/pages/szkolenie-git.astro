@@ -3,6 +3,7 @@ import Interior from '../layouts/Interior.astro';
 import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
+import RelatedCards from '../components/RelatedCards.astro';
 ---
 <Interior
   updated="2026-06-29"
@@ -125,16 +126,16 @@ claude /install-github-app</code></pre>
   </section>
 
   <!-- 02 powiązane szkolenia (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="powiazane">
-    <div class="container">
-      <SectHead eyebrow="02 / Akademia · Czytaj dalej" title="Powiązane szkolenia." id="powiazane" small />
-      <div class="link-cards rv">
-        <a class="link-card" href="/claude-code"><h3>Claude Code</h3><p>Instalacja, poziomy myślenia, workflow agentowy od podstaw.</p></a>
-        <a class="link-card" href="/serwery-mcp"><h3>Serwery MCP</h3><p>Chrome DevTools MCP i ekosystem serwerów MCP w codziennej pracy.</p></a>
-        <a class="link-card" href="/tips-and-tricks"><h3>Tips &amp; Tricks</h3><p>Praktyki, skróty i wzorce, które realnie przyspieszają pracę z AI.</p></a>
-      </div>
-    </div>
-  </section>
+  <RelatedCards
+    items={[
+    { href: '/claude-code', title: 'Claude Code', desc: 'Instalacja, poziomy myślenia, workflow agentowy od podstaw.' },
+    { href: '/serwery-mcp', title: 'Serwery MCP', desc: 'Chrome DevTools MCP i ekosystem serwerów MCP w codziennej pracy.' },
+    { href: '/tips-and-tricks', title: 'Tips &amp; Tricks', desc: 'Praktyki, skróty i wzorce, które realnie przyspieszają pracę z AI.' },
+  ]}
+    eyebrow="02 / Akademia · Czytaj dalej"
+    title="Powiązane szkolenia."
+    dark
+  />
 
   <!-- kontakt CTA -->
   <CtaBand heading="Chcecie, żeby tak pracował cały Wasz zespół?" padTop={false} />

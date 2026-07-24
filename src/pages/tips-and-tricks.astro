@@ -3,6 +3,7 @@ import Interior from '../layouts/Interior.astro';
 import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
+import RelatedCards from '../components/RelatedCards.astro';
 ---
 <Interior
   title="Claude Code — Tips & Tricks | Akademia SZRON"
@@ -212,25 +213,15 @@ i podatnosci — zwiezle, bez czepiania sie nazewnictwa.</code></pre>
   </section>
 
   <!-- powiązane szkolenia -->
-  <section class="sect" aria-labelledby="powiazane">
-    <div class="container">
-      <SectHead eyebrow="Powiązane szkolenia" title="Kolejne kroki w Akademii." id="powiazane" small />
-      <div class="link-cards rv">
-        <a class="link-card" href="/claude-code">
-          <h3>Claude Code</h3>
-          <p>Instalacja, poziomy myślenia i workflow agentowy od podstaw.</p>
-        </a>
-        <a class="link-card" href="/claude-code-bezpieczenstwo">
-          <h3>Claude Code — bezpieczeństwo</h3>
-          <p>Deny rules, sandbox i hooki — zanim włączysz pomijanie uprawnień.</p>
-        </a>
-        <a class="link-card" href="/szkolenie-git">
-          <h3>Claude Code i Git</h3>
-          <p>Automatyczne commity i git workflow prowadzone przez agenta.</p>
-        </a>
-      </div>
-    </div>
-  </section>
+  <RelatedCards
+    items={[
+    { href: '/claude-code', title: 'Claude Code', desc: 'Instalacja, poziomy myślenia i workflow agentowy od podstaw.' },
+    { href: '/claude-code-bezpieczenstwo', title: 'Claude Code — bezpieczeństwo', desc: 'Deny rules, sandbox i hooki — zanim włączysz pomijanie uprawnień.' },
+    { href: '/szkolenie-git', title: 'Claude Code i Git', desc: 'Automatyczne commity i git workflow prowadzone przez agenta.' },
+  ]}
+    eyebrow="Powiązane szkolenia"
+    title="Kolejne kroki w Akademii."
+  />
 
   <!-- CTA -->
   <CtaBand

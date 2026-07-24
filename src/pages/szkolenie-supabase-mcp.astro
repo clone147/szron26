@@ -3,6 +3,7 @@ import Interior from '../layouts/Interior.astro';
 import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
+import RelatedCards from '../components/RelatedCards.astro';
 ---
 <Interior
   title="MCP Supabase + Claude Code | Akademia SZRON"
@@ -85,16 +86,16 @@ import CtaBand from '../components/CtaBand.astro';
   </section>
 
   <!-- 02 powiązane szkolenia (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="powiazane">
-    <div class="container">
-      <SectHead eyebrow="02 / Akademia · Czytaj dalej" title="Powiązane szkolenia." id="powiazane" small />
-      <div class="link-cards rv">
-        <a class="link-card" href="/szkolenie-mysql"><h3>MySQL MCP Server</h3><p>Agent na bazie MySQL: konfiguracja, operacje zapisu, pułapki wersji.</p></a>
-        <a class="link-card" href="/serwery-mcp"><h3>Serwery MCP</h3><p>Chrome DevTools MCP i ekosystem serwerów MCP w codziennej pracy.</p></a>
-        <a class="link-card" href="/claude-code-bezpieczenstwo"><h3>Claude Code — bezpieczeństwo</h3><p>Praca z AI na kodzie firmowym bez wycieku: VPC, modele lokalne, audit log.</p></a>
-      </div>
-    </div>
-  </section>
+  <RelatedCards
+    items={[
+    { href: '/szkolenie-mysql', title: 'MySQL MCP Server', desc: 'Agent na bazie MySQL: konfiguracja, operacje zapisu, pułapki wersji.' },
+    { href: '/serwery-mcp', title: 'Serwery MCP', desc: 'Chrome DevTools MCP i ekosystem serwerów MCP w codziennej pracy.' },
+    { href: '/claude-code-bezpieczenstwo', title: 'Claude Code — bezpieczeństwo', desc: 'Praca z AI na kodzie firmowym bez wycieku: VPC, modele lokalne, audit log.' },
+  ]}
+    eyebrow="02 / Akademia · Czytaj dalej"
+    title="Powiązane szkolenia."
+    dark
+  />
 
   <!-- kontakt CTA -->
   <CtaBand heading="Chcecie, żeby tak pracował cały Wasz zespół?" padTop={false} />

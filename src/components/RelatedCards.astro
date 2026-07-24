@@ -1,0 +1,19 @@
+---
+// Sekcja „Powiązane szkolenia / Czytaj dalej" — wspólna dla stron Akademii i raportów.
+// items: [{ href, title, desc }] — kolejność kart taka, jak w tablicy.
+import SectHead from './SectHead.astro';
+const { items, eyebrow = 'Powiązane szkolenia', title, dark = false, padTop = true } = Astro.props;
+---
+<section class={dark ? 'sect sect--dark' : 'sect'} aria-labelledby="powiazane" style={padTop ? undefined : 'padding-top:0'}>
+  <div class="container">
+    <SectHead eyebrow={eyebrow} title={title} id="powiazane" small />
+    <div class="link-cards rv">
+      {items.map((i) => (
+        <a class="link-card" href={i.href}>
+          <h3 set:html={i.title} />
+          <p set:html={i.desc} />
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
