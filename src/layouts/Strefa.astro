@@ -5,6 +5,7 @@
 import '../styles/fonts.css';
 import '../styles/main.css';
 import '../styles/strefa.css';
+import HeadAssets from '../components/HeadAssets.astro';
 const { title = 'Strefa SZRON', active = '' } = Astro.props;
 ---
 <!doctype html>
@@ -14,11 +15,7 @@ const { title = 'Strefa SZRON', active = '' } = Astro.props;
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{title} — Strefa SZRON</title>
   <meta name="robots" content="noindex, nofollow" />
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/albert-sans-v4-latin.woff2" crossorigin />
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/albert-sans-v4-latin-ext.woff2" crossorigin />
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-v22-latin.woff2" crossorigin />
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-v22-latin-ext.woff2" crossorigin />
-  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+  <HeadAssets />
 </head>
 <body class="strefa-body">
   <script is:inline>

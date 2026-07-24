@@ -3,6 +3,7 @@ import '../styles/fonts.css';
 import '../styles/main.css';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import HeadAssets from '../components/HeadAssets.astro';
 
 // Cache-busting: /js/* ma na Netlify roczny immutable cache, a main.js nie ma
 // hasha w nazwie — wersjonujemy query paramem liczonym z treści przy buildzie.
@@ -93,11 +94,7 @@ const orgSchema = {
   <meta name="twitter:image" content={ogImageAbs} />
   <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
   {schema.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/albert-sans-v4-latin.woff2" crossorigin />
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/albert-sans-v4-latin-ext.woff2" crossorigin />
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-v22-latin.woff2" crossorigin />
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-v22-latin-ext.woff2" crossorigin />
-  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+  <HeadAssets />
 </head>
 <body>
   <slot />

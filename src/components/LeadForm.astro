@@ -1,0 +1,53 @@
+---
+// Formularz leada (Netlify Forms) — identyczny na /kontakt i /umow-rozmowe.
+// `name` musi zgadzać się z nazwą formularza zdefiniowaną w Netlify (hidden form-name).
+import SectHead from './SectHead.astro';
+import BtnArrow from './BtnArrow.astro';
+const { name } = Astro.props;
+---
+<section class="sect sect--dark" aria-labelledby="formularz">
+  <div class="container">
+    <SectHead eyebrow="01 / Formularz · Wracamy w 24h" title="Krótki formularz — wracamy w 24h." id="formularz" />
+    <p class="rv">Pracujemy z firmami, których zespół IT liczy 30+ osób. Jeśli Wasz jest mniejszy — napiszcie, ale uprzedzamy: program kwartalny projektujemy pod duże organizacje. Pięć pól. Wystarczy, żebyśmy się przygotowali do rozmowy i nie zmarnowali Waszego czasu na podstawowe pytania.</p>
+    <form name={name} method="POST" data-netlify="true" netlify-honeypot="bot-field" class="rv">
+      <input type="hidden" name="form-name" value={name} />
+      <p hidden><label>Nie wypełniaj: <input name="bot-field" /></label></p>
+      <p>
+        <label for="firma">Firma</label>
+        <input type="text" id="firma" name="firma" required />
+      </p>
+      <p>
+        <label for="branza">Branża</label>
+        <select id="branza" name="branza" required>
+          <option value="">Wybierzcie branżę</option>
+          <option>Transport / mobilność</option>
+          <option>Przemysł / produkcja</option>
+          <option>Energetyka / utilities</option>
+          <option>Embedded / IoT / hardware</option>
+          <option>Fintech / regulowane</option>
+          <option>SaaS / produkt cyfrowy</option>
+          <option>Inna</option>
+        </select>
+      </p>
+      <p>
+        <label for="zespol">Zespół IT</label>
+        <select id="zespol" name="zespol" required>
+          <option value="">Wybierzcie wielkość zespołu</option>
+          <option>30–100 osób</option>
+          <option>100–300 osób</option>
+          <option>300+ osób</option>
+        </select>
+      </p>
+      <p>
+        <label for="opis">Jednym zdaniem — zespół i aplikacja</label>
+        <textarea id="opis" name="opis" rows="4" required placeholder="Ile osób, jaki stos, co Was spowalnia."></textarea>
+      </p>
+      <p>
+        <label for="email">Email kontaktowy</label>
+        <input type="email" id="email" name="email" required />
+      </p>
+      <BtnArrow type="submit">Wyślij zgłoszenie</BtnArrow>
+    </form>
+    <p class="rv"><small>Wysyłając formularz akceptujesz przetwarzanie danych zgodnie z <a href="/privacy-policy">polityką prywatności</a>. Nie zapisujemy na newsletter, nie sprzedajemy danych, nie dzwonimy bez umówienia.</small></p>
+  </div>
+</section>

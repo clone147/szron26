@@ -1,0 +1,49 @@
+---
+// Sekcje „Co przygotować" (02) i „Co dostaniecie" (03) — wspólne dla /kontakt i /umow-rozmowe.
+import SectHead from './SectHead.astro';
+---
+<section class="sect" aria-labelledby="przygotowac">
+  <div class="container">
+    <SectHead eyebrow="02 / Przygotowanie · Co przygotować" title="3 rzeczy, które przyspieszą rozmowę." id="przygotowac" small />
+    <div class="grid-cards">
+      <article class="card-tile rv">
+        <p class="eyebrow">i</p>
+        <h3>Stos technologiczny aplikacji.</h3>
+        <p>Język, framework, baza, deployment. Wystarczy nazwa — nie potrzebujemy diagramu.</p>
+      </article>
+      <article class="card-tile rv" style="--rv-d:.1s">
+        <p class="eyebrow">ii</p>
+        <h3>Najboleśniejszy problem.</h3>
+        <p>Jedno zdanie: co Was tu sprowadziło. „Nikt nie chce tego dalej rozwijać." „Każda zmiana to dwa tygodnie." „Nowy junior odpada po miesiącu."</p>
+      </article>
+      <article class="card-tile rv" style="--rv-d:.2s">
+        <p class="eyebrow">iii</p>
+        <h3>Kto będzie na rozmowie.</h3>
+        <p>Najlepiej CTO lub lider zespołu — ktoś, kto zna kod i ograniczenia. Zarząd opcjonalnie.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="sect sect--dark" aria-labelledby="dostaniecie">
+  <div class="container">
+    <SectHead eyebrow="03 / Efekt · Co dostaniecie" title="Konkretną odpowiedź. Nie ofertę." id="dostaniecie" small />
+    <div class="grid-cards">
+      <article class="card-tile rv">
+        <p class="eyebrow">i</p>
+        <h3>Gdzie zespół traci tempo.</h3>
+        <p>Po 30 minutach pokażemy 2–3 najbardziej kosztowne miejsca w Waszym procesie wytwórczym.</p>
+      </article>
+      <article class="card-tile rv" style="--rv-d:.1s">
+        <p class="eyebrow">ii</p>
+        <h3>Podsumowanie na jednej stronie.</h3>
+        <p>Tak, nie, albo wróćmy za kwartał — z uzasadnieniem, nie z formułkami. Mailem w 24h.</p>
+      </article>
+      <article class="card-tile rv" style="--rv-d:.2s">
+        <p class="eyebrow">iii</p>
+        <h3>Stała wycena w 48h.</h3>
+        <p>Jeśli widzimy sens współpracy, dostajecie konkretną cenę kwartału mailem.</p>
+      </article>
+    </div>
+  </div>
+</section>

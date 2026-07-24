@@ -3,6 +3,7 @@
 // Style strony dochodzą przez importy CSS w frontmatterze strony; <style> stron Astro
 // hoistuje do <head> automatycznie. Fonty self-hosted (fonts.css + preload woff2).
 import '../styles/fonts.css';
+import HeadAssets from '../components/HeadAssets.astro';
 const { title, viewport = 'width=device-width, initial-scale=1' } = Astro.props;
 ---
 <!doctype html>
@@ -12,11 +13,7 @@ const { title, viewport = 'width=device-width, initial-scale=1' } = Astro.props;
   <meta name="viewport" content={viewport} />
   <title>{title}</title>
   <meta name="robots" content="noindex, nofollow" />
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/albert-sans-v4-latin.woff2" crossorigin />
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/albert-sans-v4-latin-ext.woff2" crossorigin />
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-v22-latin.woff2" crossorigin />
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/space-grotesk-v22-latin-ext.woff2" crossorigin />
-  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+  <HeadAssets />
   <slot name="head" />
 </head>
 <body class="strefa-body">
