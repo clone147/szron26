@@ -118,7 +118,8 @@ function iconTinted(k, color) {
 // rysuje ikonę; frac<1 = odsłanianie od lewej (tryb Play „rysowanie"); zwraca punkt „ołówka"
 function drawIcon(g, s, color, frac = 1) {
   const cv = iconTinted(s.icon, color);
-  if (!cv) { // obrazek jeszcze się ładuje — delikatna ramka zamiast pustki
+  if (!cv) { // obrazek jeszcze się ładuje — delikatna ramka zamiast pustki (w prezentacji: nic)
+    if (play) return null;
     g.save();
     g.setLineDash([4, 4]);
     g.lineWidth = 1;
@@ -920,12 +921,31 @@ function buildPlaySteps() {
     const targets = [...new Set(layer.map((a) => conn.get(a.id).e).filter((id) => id && !visible.has(id)))];
     if (targets.length) { steps.push(targets); targets.forEach((id) => visible.add(id)); }
   }
-  const rest = shapes.filter((s) => !visible.has(s.id)).map((s) => s.id);
-  if (rest.length) steps.push(rest);
+  // luźne kształty (ikony, podpisy niespięte strzałkami) nie mogą czekać hurtem na koniec —
+  // dołączamy je do kroku obiektu, przy którym leżą (najbliższy środek), a bezdomne na koniec
+  const rest = shapes.filter((s) => !visible.has(s.id));
+  const placed = shapes.filter((s) => visible.has(s.id) && s.type !== 'arrow');
+  const orphans = [];
+  const mid = (s) => ({ x: s.x + s.w / 2, y: s.y + s.h / 2 });
+  for (const s of rest) {
+    const c = mid(s);
+    let best = null, bestD = Infinity;
+    for (const p of placed) {
+      const pc = mid(p);
+      const d = Math.hypot(c.x - pc.x, c.y - pc.y) - Math.max(Math.abs(p.w), Math.abs(p.h)) / 2;
+      if (d < bestD) { bestD = d; best = p; }
+    }
+    const step = best && bestD < 520 ? steps.find((st) => st.includes(best.id)) : null;
+    if (step) step.push(s.id); else orphans.push(s.id);
+  }
+  if (orphans.length) steps.push(orphans);
   return { steps, conn };
 }
 
 function startPlay() {
+  // ikony ładują się leniwie przy pierwszym rysowaniu — w prezentacji byłoby za późno
+  // (animacja kroku zdążyłaby przelecieć na przerywanej ramce), więc grzejemy je z góry
+  for (const s of shapes) if (s.type === 'icon' && s.icon) { iconEntry(s.icon); iconTinted(s.icon, pal().ink); }
   const { steps, conn } = buildPlaySteps();
   if (!steps.length) { toast('Pusty diagram', 'Nie ma czego odtwarzać.', 'err'); return; }
   if (editingId) commitText();
@@ -937,7 +957,8 @@ function startPlay() {
   applyPlayUI(true);
   revealStep();
 }
-function revealStep() {
+// odsłania bieżący krok; startAt = kiedy zacząć (domyślnie teraz), zwraca czas końca animacji
+function revealStep(startAt) {
   // kształty warstwy rysują się PO KOLEI (jak ręką), w porządku czytania, z lekkim zazębieniem;
   // całość kroku skalowana tak, by nie przekroczyć ~2.6 s
   const shs = play.steps[play.idx].map(byId).filter(Boolean)
@@ -945,7 +966,7 @@ function revealStep() {
   const timings = shs.map(shapeTiming);
   const total = timings.reduce((a, t) => a + t.dur * 0.85, 0);
   const k = Math.min(1, 2600 / Math.max(1, total));
-  let t = performance.now();
+  let t = startAt ?? performance.now();
   shs.forEach((s, i) => {
     play.shown.set(s.id, { ...timings[i], t0: t, dur: timings[i].dur * k });
     t += timings[i].dur * k * 0.85; // następny startuje tuż przed końcem poprzedniego
@@ -957,12 +978,20 @@ function revealStep() {
       playRaf = requestAnimationFrame(tick);
   };
   playRaf = requestAnimationFrame(tick);
+  return t;
 }
+const isArrowStep = (i) => play.steps[i]?.length && play.steps[i].every((id) => byId(id)?.type === 'arrow');
 function advancePlay() {
   if (!play) return;
   if (play.idx < play.steps.length - 1) {
     play.idx++;
-    revealStep();
+    const end = revealStep();
+    // krok złożony z samych strzałek nie jest osobną „klatką" prezentacji — od razu dociągamy
+    // obiekty, do których prowadzą (jedno naciśnięcie = strzałka + jej cel)
+    if (isArrowStep(play.idx) && play.idx < play.steps.length - 1) {
+      play.idx++;
+      revealStep(end);
+    }
     if (zoomBack) followPlayCamera(); // kamera zzoomowana → podążaj za nowym krokiem
   } else stopPlay(); // wszystko widoczne — kolejna spacja kończy tryb
 }
@@ -971,6 +1000,11 @@ function retreatPlay() {
   if (!play || play.idx === 0) return;
   for (const id of play.steps[play.idx]) play.shown.delete(id);
   play.idx--;
+  // krok ze strzałkami był pokazany razem z celem — cofamy je razem
+  if (isArrowStep(play.idx) && play.idx > 0) {
+    for (const id of play.steps[play.idx]) play.shown.delete(id);
+    play.idx--;
+  }
   // poprzedni krok ma być od razu w pełni widoczny, nie animowany od nowa
   for (const id of play.steps[play.idx]) {
     const rec = play.shown.get(id);
@@ -983,7 +1017,9 @@ function retreatPlay() {
 // razem z obiektem, który wskazuje (bez „pustego kadru" zanim cel się odsłoni)
 function followPlayCamera() {
   const targets = [];
-  for (const id of play.steps[play.idx]) {
+  // krok pokazany razem z poprzednim (strzałki) — kadr obejmuje oba
+  const ids = isArrowStep(play.idx - 1) ? [...play.steps[play.idx - 1], ...play.steps[play.idx]] : play.steps[play.idx];
+  for (const id of ids) {
     const s = byId(id);
     if (!s) continue;
     if (s.type !== 'arrow') targets.push(s);
