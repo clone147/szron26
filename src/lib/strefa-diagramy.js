@@ -1013,20 +1013,18 @@ function retreatPlay() {
   if (zoomBack) followPlayCamera();
   render();
 }
-// przelot kamery na obiekty bieżącego kroku; dla strzałek — kadr obejmuje strzałkę
-// razem z obiektem, który wskazuje (bez „pustego kadru" zanim cel się odsłoni)
+// przelot kamery na obiekty bieżącego kroku; kadr trzyma się obiektów, nie strzałek —
+// dla kroku samych strzałek celujemy w to, na co wskazują
 function followPlayCamera() {
   const targets = [];
-  // krok pokazany razem z poprzednim (strzałki) — kadr obejmuje oba
-  const ids = isArrowStep(play.idx - 1) ? [...play.steps[play.idx - 1], ...play.steps[play.idx]] : play.steps[play.idx];
-  for (const id of ids) {
+  for (const id of play.steps[play.idx]) {
     const s = byId(id);
     if (!s) continue;
     if (s.type !== 'arrow') targets.push(s);
     else {
       const e = play.conn.get(id)?.e;
       const t = e && byId(e);
-      if (t) { targets.push(t); targets.push(s); }
+      if (t) targets.push(t);
     }
   }
   if (!targets.length) return; // np. luźne strzałki bez celu — kamera zostaje
