@@ -9,7 +9,7 @@ import BtnArrow from '../components/BtnArrow.astro';
 // FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html), stąd np. T&amp;M
 const faq = [
   { q: 'Co z bezpieczeństwem naszych danych?', a: 'Wasz kod nie idzie do publicznych modeli. Dla branż regulowanych — Bedrock w AWS, dane w Waszej VPC. Dla obronności i wrażliwego embedded — lokalne modele (Ollama, vLLM) na Waszych serwerach. Audit log każdej interakcji z AI. NDA podpisujemy przed pierwszą rozmową.' },
-  { q: 'Co jeśli zespół nie kupi tej zmiany?', a: 'Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny". Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. Opór znika, gdy programiści widzą, że dostarczają szybciej. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.' },
+  { q: 'Co jeśli zespół nie kupi tej zmiany?', a: 'Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny”. Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. Opór znika, gdy programiści widzą, że dostarczają szybciej. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.' },
   { q: 'Jak zmierzymy efekt?', a: 'DORA metrics jako baseline w tygodniu 1: czas od ticketu do PR, czas merge, bug escape rate, pokrycie testami. Mierzymy ponownie w tygodniu 12. Raport ROI dla zarządu — dashboard z twardymi liczbami.' },
   { q: 'Rynek AI zmienia się co kwartał. Skąd pewność, że wybierzecie narzędzia, które się utrzymają?', a: 'Dobór technologii to nasz zawód od 25 lat — przeszliśmy zmiany platform od Delphi, przez C++ i mobile, po agentów, i widzieliśmy, które wybory firmy spłacały latami. Z agentami pracujemy w produkcji od premiery Claude Code, więc koszt prób i błędów ponieśliśmy u siebie, nie u klientów. A program kończymy tak, żeby zespół sam umiał ocenić i przyjąć kolejne narzędzie — przewaga zostaje u Was, nie w naszym cenniku.' },
   { q: 'Ile to kosztuje?', a: 'Programy kwartalne nie są dla każdej firmy. Stała opłata kwartalna, zamknięty zakres, bez T&amp;M. Kwotę ustalamy po diagnozie i podajemy mailem w 48h.' },
@@ -118,7 +118,7 @@ const faq = [
       <SectHead eyebrow="02 / Dlaczego teraz · Okno przewagi" title="Rynek już to liczy. Pytanie, kto w Waszej branży policzy to pierwszy." id="teraz-title" />
       <div>
         <figure class="quote-card rv">
-          <blockquote>„W produkcji oprogramowania rozwiązania agentowe przyspieszają pracę o 30 do 60 proc., a przy modernizacji systemów ERP pod kątem AI i chmury liczymy na kolejne 30–50 proc. wzrostu produktywności."</blockquote>
+          <blockquote>„W produkcji oprogramowania rozwiązania agentowe przyspieszają pracę o 30 do 60 proc., a przy modernizacji systemów ERP pod kątem AI i chmury liczymy na kolejne 30–50 proc. wzrostu produktywności.”</blockquote>
           <figcaption><strong>Zbigniew Rymarczyk</strong> — wiceprezes Comarch, dyrektor sektora ERP · wypowiedź prasowa, czerwiec 2026</figcaption>
         </figure>
         <div class="now-stats">
@@ -170,7 +170,7 @@ const faq = [
           </figure>
           <p class="eyebrow">Ścieżka 01</p>
           <h3>Trening z AI</h3>
-          <p>Uczymy Wasz zespół, jak realnie pracować z AI. Nie szkolenie z promptów — codzienne ramy pracy: agent AI jako daily driver, AGENTS.md jako konstytucja zespołu, dedykowane MCP servery połączone wprost z Waszą bazą danych (MS SQL, MySQL, IBM DB2, Postgres, Oracle).</p>
+          <p>Uczymy Wasz zespół, jak realnie pracować z AI. Zamiast szkolenia z promptów dostajecie codzienne ramy pracy: agent AI jako daily driver, AGENTS.md jako konstytucja zespołu, MCP servery podpięte wprost do Waszej bazy danych (MS SQL, MySQL, IBM DB2, Postgres, Oracle).</p>
           <ul role="list">
             <li>Wspólne sesje na żywym kodzie</li>
             <li>Pełny workflow agentowy: plan mode, subagenci, skille, MCP</li>
@@ -201,7 +201,7 @@ const faq = [
             <dl class="spec-rows">
               <div><dt>Platforma</dt><dd>Desktop, web, SaaS — jedna aplikacja, wybór formy dostawy</dd></div>
               <div><dt>Mobile</dt><dd>Natywne iOS i Android z jednego kodu, w tych samych dwóch kwartałach</dd></div>
-              <div><dt>Architektura</dt><dd>Monolit → moduły, stopniowo, bez „big bang"</dd></div>
+              <div><dt>Architektura</dt><dd>Monolit → moduły, stopniowo, bez „big bang”</dd></div>
               <div><dt>Dane i integracje</dt><dd>Wasza baza zostaje bez zmian (MS SQL, MySQL, PostgreSQL, DB2, Oracle), API działają jak wcześniej</dd></div>
             </dl>
             <div class="path-aside">
@@ -211,7 +211,7 @@ const faq = [
               <article>
                 <h4>Czego nie obiecujemy</h4>
                 <ul role="list">
-                  <li>Nie obiecujemy „identycznej kopii". Pilot to okazja, żeby naprawić to, co od lat irytowało użytkowników.</li>
+                  <li>Nie obiecujemy „identycznej kopii”. Pilot to okazja, żeby naprawić to, co od lat irytowało użytkowników.</li>
                   <li>Nie zaczynamy bez analizy. Diagnoza mówi uczciwie, czy pilot ma sens i od którego modułu zacząć.</li>
                 </ul>
               </article>
@@ -237,7 +237,7 @@ const faq = [
       <SectHead eyebrow="04 / Co robimy inaczej · Szkolenie a wdrożenie" title="Samo szkolenie to za mało. Bez wdrożenia w codzienną pracę zostajecie z certyfikatami i starym tempem." id="inaczej-title" small />
       <div class="twocol">
         <p class="rv">Trzy ścieżki idą równolegle, nie po kolei. Zespół uczy się AI na własnej aplikacji — w stosie, który zna. Kiedy startuje pilot modernizacji, programiści już wiedzą, jak prowadzić agenta. Nowy sposób pracy od pierwszego dnia jest ich sposobem, nie naszym.</p>
-        <p class="rv" style="--rv-d:.1s">Cały program trwa 3 miesiące, nie rok. Stara aplikacja działa bez przerwy, pilot wchodzi obok, mobile razem z webem. Bez „big bang" i bez ryzyka, że wszystko padnie w jeden weekend.</p>
+        <p class="rv" style="--rv-d:.1s">Cały program trwa 3 miesiące, nie rok. Stara aplikacja działa bez przerwy, pilot wchodzi obok, mobile razem z webem. Bez „big bang” i bez ryzyka, że wszystko padnie w jeden weekend.</p>
       </div>
     </div>
   </section>
@@ -255,7 +255,7 @@ const faq = [
         <article class="benefit rv" style="--rv-d:.1s">
           <p class="eyebrow">02 / Ludzie</p>
           <h3>Ci sami ludzie, nowe kompetencje.</h3>
-          <p>Nie zatrudniacie nowych ludzi i nie tracicie wiedzy o biznesie. Programiści, którzy pracują z AI, rzadziej odchodzą — a Wasza firma staje się pracodawcą, do którego się aplikuje.</p>
+          <p>Nie zatrudniacie nowych ludzi i nie tracicie wiedzy o biznesie. Programiści, którzy pracują z AI, rzadziej odchodzą — a Wasza firma staje się pracodawcą, do którego ludzie sami wysyłają CV.</p>
         </article>
         <article class="benefit rv" style="--rv-d:.2s">
           <p class="eyebrow">03 / Koszt</p>
@@ -371,7 +371,7 @@ const faq = [
       <div class="after-note rv">
         <div>
           <h3>A po dwóch kwartałach?</h3>
-          <p>Dla firm, które chcą utrzymać tempo: stała współpraca — doradca technologiczny zarządu i zewnętrzny dział R&D.</p>
+          <p>Firmom, które chcą utrzymać tempo, prowadzimy stałą współpracę: doradztwo technologiczne dla zarządu i zewnętrzny dział R&D.</p>
         </div>
         <BtnArrow class="btn btn--dark" href="/doradztwo-technologiczne">Zobacz Doradztwo</BtnArrow>
       </div>
@@ -407,7 +407,7 @@ const faq = [
         </article>
       </div>
       <div class="team-quote rv">
-        <blockquote>„Byliśmy programistami, liderami, doradcami zarządów, CTO i klientami zewnętrznych dostawców. Wiemy dokładnie, gdzie projekty się sypią — z każdej z tych stron osobno."</blockquote>
+        <blockquote>„Byliśmy programistami, liderami, doradcami zarządów, CTO i klientami zewnętrznych dostawców. Wiemy dokładnie, gdzie projekty się sypią — z każdej z tych stron osobno.”</blockquote>
         <BtnArrow class="btn btn--dark" href="/o-nas" style="align-self: flex-start">Zobacz zespół na osobnej stronie</BtnArrow>
       </div>
     </div>

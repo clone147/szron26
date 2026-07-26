@@ -20,13 +20,13 @@ import CtaBand from '../components/CtaBand.astro';
       <SectHead eyebrow="01 / Kontekst · Ograniczenia, nie życzenia" title="Dlaczego embedded to inna gra." id="inna-gra" />
       <img class="hero-img rv" src="/img/sub/ai-dla-embedded-warsztat.webp" alt="Tomek przy stanowisku elektronicznym z płytką STM32 i oscyloskopem, obok laptop z terminalem AI" width="1380" height="768" loading="lazy" />
       <div class="prose rv">
-        <p>Większość narzędzi AI projektowano pod web i backend — repozytorium, internet pod ręką, szybki cykl build-run. W embedded żadne z tych założeń nie obowiązuje na ślepo. Zanim zaczniemy mówić, „co AI robi", trzeba uczciwie nazwać, w czym pracujemy.</p>
+        <p>Większość narzędzi AI projektowano pod web i backend — repozytorium, internet pod ręką, szybki cykl build-run. W embedded żadne z tych założeń nie obowiązuje na ślepo. Zanim zaczniemy mówić, „co AI robi”, trzeba uczciwie nazwać, w czym pracujemy.</p>
       </div>
       <dl class="def-rows rv">
-        <div><dt>Toolchainy<small>Keil, STM32CubeIDE, arm-none-eabi</small></dt><dd>Kompilacja, flashowanie i debug przez sprzętowy programator. Pętla feedbacku liczona w minutach, nie w sekundach — AI nie „uruchomi" za Was kodu, dopóki nie zbudujecie szybszego cyklu (host-testy, mocki HAL).</dd></div>
+        <div><dt>Toolchainy<small>Keil, STM32CubeIDE, arm-none-eabi</small></dt><dd>Kompilacja, flashowanie i debug przez sprzętowy programator. Pętla feedbacku liczona w minutach, nie w sekundach — AI nie „uruchomi” za Was kodu, dopóki nie zbudujecie szybszego cyklu (host-testy, mocki HAL).</dd></div>
         <div><dt>Hardware-in-the-loop<small>ławka testowa, oscyloskop, analizator</small></dt><dd>Część prawdy o systemie żyje wyłącznie na fizycznej ławce. Jedna ławka dzielona przez kilku inżynierów to realne wąskie gardło — model językowy go nie usunie, ale potrafi przesunąć większość testów do symulacji.</dd></div>
         <div><dt>Brak lub ograniczony internet<small>urządzenie i czasem proces dev</small></dt><dd>Tam, gdzie kod nie może wyciekać poza sieć firmy, liczą się modele lokalne i workflow działający offline. AI musi zmieścić się w tych ramach, a nie odwrotnie.</dd></div>
-        <div><dt>Bezpieczeństwo i safety<small>certyfikacja, krytyczne ścieżki</small></dt><dd>W kodzie, który steruje maszyną, nie ma „wygeneruj i zapomnij". Każda linia przechodzi review, statyczną analizę i testy jak każda inna — niezależnie od tego, kto ją napisał.</dd></div>
+        <div><dt>Bezpieczeństwo i safety<small>certyfikacja, krytyczne ścieżki</small></dt><dd>W kodzie, który steruje maszyną, nie ma „wygeneruj i zapomnij”. Każda linia przechodzi review, statyczną analizę i testy jak każda inna — niezależnie od tego, kto ją napisał.</dd></div>
       </dl>
     </div>
   </section>
@@ -38,7 +38,7 @@ import CtaBand from '../components/CtaBand.astro';
       <div class="prose rv">
         <p>Zacznijmy od tego, czego AI <strong>nie</strong> robi. Nie generuje firmware'u od zera. Nie zastąpi inżyniera, który czyta datasheet, rozumie timing przerwań i wie, dlaczego ten konkretny rejestr trzeba zapisać dwa razy. Kod w ISR, dobór peryferiów, walka z erratą układu — to dalej praca człowieka przy sprzęcie.</p>
         <p>To, co AI realnie przyspiesza, to cała warstwa <em>dookoła</em> tego twardego rdzenia. Testy unit na hoście z mockami HAL. Parsery protokołów — Modbus, CANopen, ramki CAN bus, telemetria OBD-II. Dokumentacja rejestrów i mapy pamięci. Kod CRUD-owy na strukturach konfiguracyjnych, serializacja, walidacja danych z magistrali. Skrypty symulujące master/slave, żeby nie blokować ławki na każdą zmianę.</p>
-        <p>I tu pada liczba, która zmienia rachunek opłacalności: w typowym projekcie embedded to właśnie ta warstwa pochłania <strong>około 70% czasu projektu</strong> — nie kod w przerwaniach. Jeśli AI zdejmuje większość tej pracy, inżynier zostaje z czasem na to, co faktycznie wymaga jego głowy.</p>
+        <p>W typowym projekcie embedded to właśnie ta warstwa pochłania <strong>około 70% czasu projektu</strong>, a nie kod w przerwaniach. Jeśli AI zdejmuje większość tej pracy, inżynier zostaje z czasem na to, co faktycznie wymaga jego głowy.</p>
       </div>
       <div class="callout rv">
         <p><strong>Najkrócej:</strong> AI w embedded to nie generowanie firmware'u od zera — to przyspieszenie wszystkiego, co nie jest „magicznym” kodem hardware'owym: testy, parsery protokołów, dokumentacja rejestrów, kod CRUD-owy na strukturach. Tam jest 70% czasu projektu, nie w ISR-ach.</p>
@@ -90,7 +90,7 @@ import CtaBand from '../components/CtaBand.astro';
       <div class="prose rv">
         <p>Dla przemysłu, energetyki, kolei i systemów sygnalizacji zgodność z MISRA C to nie formalność, tylko warunek wejścia. Zbudowaliśmy workflow, w którym agent sprawdza kod — wygenerowany i ludzki — pod kątem reguł MISRA jeszcze przed review. To zamienia AI z ryzyka certyfikacyjnego w dodatkową linię obrony.</p>
         <p>Ten workflow, razem z regułami CLAUDE.md pod STM32/Zephyr/Qt i serwerem MCP do datasheetów, przekazujemy zespołom na jednodniowym warsztacie — na Waszym sprzęcie, bez dotykania Waszego repo.</p>
-        <div class="callout"><p><strong>Zobacz przykład:</strong> nasz open-source'owy <a href="/stm32-skill">skill STM32 dla Claude Code</a> — kompletny workflow build/flash/debug, który możesz skonfigurować pod własną płytkę i pobrać.</p></div>
+        <div class="callout"><p><strong>Zobacz przykład:</strong> nasz open-source'owy <a href="/stm32-skill">skill STM32 dla Claude Code</a> — kompletny workflow build/flash/debug, który skonfigurujecie pod własną płytkę i pobierzecie.</p></div>
       </div>
       <p class="rv" style="margin-top:var(--space-lg)">
         <BtnArrow class="btn btn--dark" href="/warsztat-embedded">Warsztat: Claude Code dla embedded/C++</BtnArrow>
@@ -100,9 +100,9 @@ import CtaBand from '../components/CtaBand.astro';
 
   <!-- kontakt CTA -->
   <CtaBand
-    eyebrow="Chcesz to zobaczyć na kodzie ze swojej branży?"
+    eyebrow="Chcecie to zobaczyć na kodzie ze swojej branży?"
     heading="30 minut live demo. Bez NDA."
-    text="Agent na żywo, na kodzie open-source z Waszej domeny — Modbus, CANopen, SCPI, OCPP, co u Was gra. Zobaczysz, co AI naprawdę przyspiesza w bare-metal, a czego nie tknie. Termin pod Was."
+    text="Agent na żywo, na kodzie open-source z Waszej domeny — Modbus, CANopen, SCPI, OCPP, co u Was gra. Zobaczycie, co AI przyspiesza w bare-metal, a czego nie tknie. Termin pod Was."
     btnLabel="Umów live demo"
     btnHref="/warsztat-embedded#zgloszenie"
     padTop={false}

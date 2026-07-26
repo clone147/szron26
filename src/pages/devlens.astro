@@ -8,9 +8,9 @@ import ShotGallery from '../components/ShotGallery.astro';
 
 // FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html)
 const faq = [
-  { q: 'Czym DevLens różni się od standardowego GitHub lub GitLab analytics?', a: 'GitHub i GitLab dostarczają surowe dane techniczne dla programistów. DevLens tłumaczy je na język biznesu dla zarządu: nie „commits", tylko tempo dostarczania wartości. Dochodzi Bus Factor — wskaźnik ryzyka ciągłości nieobecny w standardowych narzędziach — agregacja multi-repo i raporty wykonawcze gotowe do prezentacji. To narzędzie dla C-level, nie dla developerów.' },
+  { q: 'Czym DevLens różni się od standardowego GitHub lub GitLab analytics?', a: 'GitHub i GitLab dostarczają surowe dane techniczne dla programistów. DevLens tłumaczy je na język biznesu dla zarządu: nie „commits”, tylko tempo dostarczania wartości. Dochodzi Bus Factor — wskaźnik ryzyka ciągłości nieobecny w standardowych narzędziach — agregacja multi-repo i raporty wykonawcze gotowe do prezentacji. To narzędzie dla C-level, nie dla developerów.' },
   { q: 'Co to jest Bus Factor i dlaczego jest krytyczny dla zarządu?', a: 'Bus Factor to liczba kluczowych osób, których odejście całkowicie sparaliżuje projekt. Bus Factor równy 1 oznacza, że odejście jednej osoby zatrzyma rozwój. Konsekwencje biznesowe to ryzyko ciągłości, koszt i czas rekrutacji oraz utracone przychody. DevLens identyfikuje projekty z niskim Bus Factor i sugeruje akcje: cross-team code review, dokumentację, pair programming.' },
-  { q: 'Czy moje dane z repozytoriów są bezpieczne?', a: 'Tak — bezpieczeństwo to fundament. Lokalne przetwarzanie: wszystkie tokeny dostępu i dane analityczne trzymane są tylko w Waszej przeglądarce. Zero wysyłania danych do naszych serwerów, weryfikowalne audytem kodu. Przy włączonej integracji AI do zewnętrznego API trafiają wyłącznie zagregowane statystyki, nie kod, i tylko za Waszą zgodą. Zgodność z RODO out-of-the-box, możliwość self-hostingu w wariancie enterprise.' },
+  { q: 'Czy moje dane z repozytoriów są bezpieczne?', a: 'Tak. Wszystkie tokeny dostępu i dane analityczne trzymane są tylko w Waszej przeglądarce. Zero wysyłania danych do naszych serwerów, weryfikowalne audytem kodu. Przy włączonej integracji AI do zewnętrznego API trafiają wyłącznie zagregowane statystyki, nie kod, i tylko za Waszą zgodą. Zgodność z RODO od pierwszego dnia, możliwość self-hostingu w wariancie enterprise.' },
   { q: 'Jak długo trwa wdrożenie?', a: 'Platformę można uruchomić w 1–2 dni. Dnia pierwszego generujecie token dostępu read-only z GitHub lub GitLab i konfigurujecie repozytoria. Dnia drugiego DevLens agreguje dane i generuje pierwsze raporty. W pierwszym tygodniu dostrajamy dashboardy do Waszych KPI. Brak infrastruktury — działa w przeglądarce, zero instalacji serwerów.' },
   { q: 'Jakie repozytoria i platformy są wspierane?', a: 'DevLens obsługuje dwie platformy do wyboru: GitHub (github.com oraz GitHub Enterprise) i GitLab (gitlab.com oraz self-hosted GitLab). W danym wdrożeniu integrujemy się z jedną z nich i łączymy dowolną liczbę repozytoriów w jej obrębie. Wymagany jest read-only access token — bez uprawnień do zapisu.' },
 ];
@@ -38,8 +38,8 @@ const faq = [
       <dl class="def-rows rv">
         <div><dt>Strategiczne wskaźniki biznesowe<small>Dane z GitHuba w języku zarządu</small></dt><dd>Liczba zmian i tempo prac zespołu, wzorce wydajności poszczególnych programistów, analiza rotacji kodu (code churn) oraz trendy historyczne z identyfikacją sezonowości.</dd></div>
         <div><dt>Identyfikacja ryzyk operacyjnych<small>Bus Factor — większość firm nie zna tej liczby</small></dt><dd>Bus Factor pokazuje, ile kluczowych osób musi odejść, by projekt stanął. Do tego wskaźniki stagnacji projektów, dywersyfikacja wiedzy w zespole i analiza zależności między projektami.</dd></div>
-        <div><dt>Przejrzysty wgląd w efektywność<small>Wszystkie projekty w jednym miejscu</small></dt><dd>Agregacja danych z repozytoriów GitHub lub GitLab, intuicyjne dashboardy dla kadry zarządzającej, raporty wykonawcze gotowe do prezentacji i eksport danych do analizy offline.</dd></div>
-        <div><dt>Bezpieczeństwo i prywatność<small>Wasze dane nigdy nie opuszczają przeglądarki</small></dt><dd>Tokeny dostępu trzymane tylko w przeglądarce użytkownika, zero wysyłania danych do zewnętrznych serwerów, pełna kontrola nad danymi analitycznymi i compliance korporacyjny out-of-the-box.</dd></div>
+        <div><dt>Przejrzysty wgląd w efektywność<small>Wszystkie projekty w jednym miejscu</small></dt><dd>Agregacja danych z repozytoriów GitHub lub GitLab, dashboardy dla kadry zarządzającej, raporty wykonawcze gotowe do prezentacji i eksport danych do analizy offline.</dd></div>
+        <div><dt>Bezpieczeństwo i prywatność<small>Wasze dane nigdy nie opuszczają przeglądarki</small></dt><dd>Tokeny dostępu trzymane tylko w przeglądarce użytkownika, zero wysyłania danych do zewnętrznych serwerów, pełna kontrola nad danymi analitycznymi i zgodność z politykami korporacyjnymi od pierwszego dnia.</dd></div>
       </dl>
       <ShotGallery items={[
         { src: '/img/devlens/01-dashboard.webp', alt: 'Panel zespołu DevLens: 24,2 tys. zmian, 45 programistów, wykres produktywności zespołu z trendem +124%', caption: 'Panel zespołu — produktywność, ryzyko i aktywność 45 programistów w jednym widoku.' },
@@ -56,7 +56,7 @@ const faq = [
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">01 / Transparentność procesów</p>
-          <h3>Widzisz, co robi zespół</h3>
+          <h3>Widzicie, co robi zespół</h3>
           <p>Bez czytania kodu. Raporty w języku zarządu.</p>
         </article>
         <article class="card-tile rv" style="--rv-d:.06s">
@@ -96,7 +96,7 @@ const faq = [
   <section class="sect sect--dark" aria-labelledby="ai">
     <div class="container">
       <SectHead eyebrow="03 / Integracja z AI · Opcjonalnie" title="AI generuje podsumowania wykonawcze i rekomendacje." id="ai">
-        <p class="sect-lead rv">Opcjonalna integracja z AI generuje automatyczne podsumowania wykonawcze i rekomendacje strategiczne.</p>
+        <p class="sect-lead rv">Integrację włączacie opcjonalnie. Do zewnętrznego API trafiają wtedy wyłącznie zagregowane statystyki, nigdy kod.</p>
       </SectHead>
       <div class="grid-cards">
         <article class="card-tile rv">
@@ -119,7 +119,7 @@ const faq = [
         { src: '/img/devlens/07-prompty-ai.webp', alt: 'Widok Analiza AI: lista promptów wysłanych do agenta Claude Code pogrupowana w sesje i projekty', caption: 'Analiza AI — jak zespół realnie korzysta z agentów: prompty, sesje i projekty w jednym widoku.' },
       ]} />
       <figure class="quote-card rv" style="margin-top:var(--space-2xl)">
-        <blockquote>„Włączasz AI i dostajesz gotowe podsumowanie tygodnia lub kwartału. W języku, który rozumie zarząd — bez tłumaczenia z technicznego."</blockquote>
+        <blockquote>„Włączasz AI i dostajesz gotowe podsumowanie tygodnia lub kwartału. W języku, który rozumie zarząd — bez tłumaczenia z technicznego.”</blockquote>
         <figcaption><strong>DevLens Pro</strong> — integracja z AI</figcaption>
       </figure>
     </div>
@@ -142,7 +142,7 @@ const faq = [
   <section class="sect sect--dark" aria-labelledby="bezp">
     <div class="container">
       <SectHead eyebrow="05 / Bezpieczeństwo · Korporacyjne" title="Dane wrażliwe zostają wyłącznie w przeglądarce." id="bezp">
-        <p class="sect-lead rv">Wszystkie dane wrażliwe — tokeny dostępu i dane analityczne — przechowywane są wyłącznie lokalnie, w przeglądarce użytkownika.</p>
+        <p class="sect-lead rv">Tokeny dostępu i dane analityczne zostają w przeglądarce użytkownika. Na nasze serwery nie trafia nic.</p>
       </SectHead>
       <div class="grid-cards">
         <article class="card-tile rv">
@@ -152,7 +152,7 @@ const faq = [
         </article>
         <article class="card-tile rv" style="--rv-d:.08s">
           <p class="eyebrow">02 / Compliance RODO</p>
-          <h3>Zgodność out-of-the-box</h3>
+          <h3>Zgodność od pierwszego dnia</h3>
           <p>Pełna kontrola nad danymi — zgodność z regulacjami od pierwszego dnia.</p>
         </article>
         <article class="card-tile rv" style="--rv-d:.16s">
@@ -175,7 +175,7 @@ const faq = [
   <!-- kontakt CTA -->
   <CtaBand
     eyebrow="Kontakt"
-    heading="Przekształć dane w decyzje."
+    heading="Zobaczcie te liczby na własnych repozytoriach."
     text="Co robi zespół? Czy inwestycja się zwraca? Kto jest niezastąpiony? Umówmy demo platformy dostosowane do Waszej organizacji — dane zostają u Was."
     btnLabel="Zarezerwuj demo platformy"
   />

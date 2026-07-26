@@ -17,7 +17,7 @@ import RelatedCards from '../components/RelatedCards.astro';
   eyebrow="Embedded · Benchmark na sprzęcie"
   heading="Kompilator za 7 565 zł rocznie właśnie przegrał z darmowym. Na prawdziwym sprzęcie, w każdym teście."
   headingSmall
-  lead="Ten sam kod źródłowy — panel LED 64×64, FreeRTOS + CycloneTCP — zbudowany pięcioma wariantami toolchaina i zmierzony licznikiem cykli bezpośrednio na STM32F429. Wynik przeczy temu, za co branża płaci od dwudziestu lat. Niżej: pełne pomiary bez skrótów, winowajca ukryty w trzech funkcjach biblioteki, których nikt nie podejrzewa — a na końcu odpowiedź na pytanie, kto właściwie wykonał cały ten eksperyment. Bo to nie był człowiek."
+  lead="Ten sam kod źródłowy — panel LED 64×64, FreeRTOS + CycloneTCP — zbudowany pięcioma wariantami toolchaina i zmierzony licznikiem cykli bezpośrednio na STM32F429. Wynik przeczy temu, za co branża płaci od dwudziestu lat. Niżej: pełne pomiary bez skrótów, winowajca ukryty w trzech funkcjach biblioteki, których nikt nie podejrzewa — a na końcu odpowiedź na pytanie, kto właściwie wykonał cały ten eksperyment — bo nie człowiek."
   heroImage="/img/sub/keil-vs-gcc.webp"
   heroAlt="Płytka STM32 połączona z matrycą LED 64×64 wyświetlającą wykres słupkowy porównania wydajności"
 >
@@ -42,7 +42,7 @@ import RelatedCards from '../components/RelatedCards.astro';
   <section class="sect" aria-labelledby="mapa">
     <div class="container">
       <SectHead eyebrow="02 / Wynik · Jeden wykres" title="Mapa efektywności: rozmiar × szybkość." id="mapa" small />
-      <div class="prose rv"><p>Każdy punkt to jeden kompletny firmware wgrany i zmierzony na płytce. Ideał — mały i szybki — leży w lewym dolnym rogu. Warianty Keila siedzą w prawej, „ciężkiej" części wykresu i nie schodzą poniżej 194&nbsp;ms. <strong>GCC −O2 tuned łączy mały rozmiar z czasem niedostępnym dla Keila — dominuje wykres w sensie Pareto.</strong></p></div>
+      <div class="prose rv"><p>Każdy punkt to jeden kompletny firmware wgrany i zmierzony na płytce. Ideał — mały i szybki — leży w lewym dolnym rogu. Warianty Keila siedzą w prawej, „ciężkiej” części wykresu i nie schodzą poniżej 194&nbsp;ms. <strong>GCC −O2 tuned łączy mały rozmiar z czasem niedostępnym dla Keila — dominuje wykres w sensie Pareto.</strong></p></div>
       <figure class="bm-card bm-scroll rv" aria-label="Wykres punktowy: rozmiar ROM na osi X, czas benchmarku na osi Y">
         <svg viewBox="0 0 720 400" width="100%" role="img" style="min-width:620px">
           <line class="bm-grid" x1="70" y1="269" x2="690" y2="269"/><line class="bm-grid" x1="70" y1="198" x2="690" y2="198"/>
@@ -81,7 +81,7 @@ import RelatedCards from '../components/RelatedCards.astro';
   <section class="sect sect--dark" aria-labelledby="anatomia">
     <div class="container">
       <SectHead eyebrow="03 / Anatomia · Winowajca" title="Trzy funkcje, których nikt nie podejrzewa." id="anatomia" small />
-      <div class="prose prose--inv rv"><p>Cykle CPU w podziale na trzy testy (wspólna skala, 100% = GCC −O0). W obu „fabrycznych" buildach GCC czas pożera segment MEM — bajtowe <code>memcpy</code>/<code>memset</code> z newlib-nano. Podmiana tych trzech funkcji (<code>fast_libc.c</code>) skraca pasek o ~40&nbsp;mln cykli; u Keila analogiczny segment to wciąż 25&nbsp;mln.</p></div>
+      <div class="prose prose--inv rv"><p>Cykle CPU w podziale na trzy testy (wspólna skala, 100% = GCC −O0). W obu „fabrycznych” buildach GCC czas pożera segment MEM — bajtowe <code>memcpy</code>/<code>memset</code> z newlib-nano. Podmiana tych trzech funkcji (<code>fast_libc.c</code>) skraca pasek o ~40&nbsp;mln cykli; u Keila analogiczny segment to wciąż 25&nbsp;mln.</p></div>
       <div class="rv">
         <SegBarChart
           suffix=" ms"
@@ -143,8 +143,8 @@ import RelatedCards from '../components/RelatedCards.astro';
       </div>
       <div class="prose rv" style="margin-top:var(--space-lg)">
         <details class="bm-details"><summary>Metodologia i uczciwość porównania (rozwiń)</summary>
-          <p><strong>Warianty.</strong> Keil MDK 5.37 (ARMCC 5.06u7): „default" to domyślna optymalizacja armcc (≈−O2 — jawne ustawienie −O2 nie zmieniło czasów, zmniejszyło tylko ROM przez split sections). GCC: Arm GNU Toolchain 14.2.Rel1, newlib-nano, linker script z SW4STM32.</p>
-          <p><strong>Wariant „tuned"</strong> = GCC −O2 + trzy zmiany: <strong>(a)</strong> własne słowo-po-słowie <code>memcpy</code>/<code>memset</code> i wielomianowy <code>sinf</code> (<code>fast_libc.c</code> — nadpisują bajtowe wersje newlib-nano przy linkowaniu), <strong>(b)</strong> <code>-ffast-math -funroll-loops</code> (główny zysk w INT), <strong>(c)</strong> prefetch flasha (<code>FLASH_ACR_PRFTEN</code>).</p>
+          <p><strong>Warianty.</strong> Keil MDK 5.37 (ARMCC 5.06u7): „default” to domyślna optymalizacja armcc (≈−O2 — jawne ustawienie −O2 nie zmieniło czasów, zmniejszyło tylko ROM przez split sections). GCC: Arm GNU Toolchain 14.2.Rel1, newlib-nano, linker script z SW4STM32.</p>
+          <p><strong>Wariant „tuned”</strong> = GCC −O2 + trzy zmiany: <strong>(a)</strong> własne słowo-po-słowie <code>memcpy</code>/<code>memset</code> i wielomianowy <code>sinf</code> (<code>fast_libc.c</code> — nadpisują bajtowe wersje newlib-nano przy linkowaniu), <strong>(b)</strong> <code>-ffast-math -funroll-loops</code> (główny zysk w INT), <strong>(c)</strong> prefetch flasha (<code>FLASH_ACR_PRFTEN</code>).</p>
           <p><strong>Uczciwość porównania.</strong> Prefetch włączono w kodzie wspólnym i Keil został z nim przebudowany i zmierzony ponownie — wynik identyczny co do ~0,001% (pętle mieszczą się w I-cache ART). Ta sama technika <code>fast_libc.c</code> dołączona do projektu Keila poprawiłaby i jego wynik — ale kompilator open-source już teraz robi to samo zadanie szybciej, mniejszym binarium i za darmo.</p>
           <p><strong>Weryfikacja.</strong> Każdy wariant flashowany na płytkę i sprawdzony: baner SWO (toolchain + wyniki DWT), animacja scrollującego tekstu na kamerze RTSP, ping i panel HTTP. Pomiar: <code>DWT→CYCCNT</code> @ 168 MHz, jednorazowo po starcie, sekcja krytyczna bez sieci.</p>
         </details>
@@ -207,7 +207,7 @@ import RelatedCards from '../components/RelatedCards.astro';
         <details class="bm-details"><summary>Źródła i założenia cen (rozwiń)</summary>
           <p><strong>Subskrypcje MDK v6:</strong> oficjalny sklep Arm (store.arm.com), ceny wyświetlane w PLN netto, stan: lipiec 2026 (katalogowo 999&nbsp;$ Essential i 1 999&nbsp;$ Professional rocznie). Subskrypcja 3-letnia ok. 20% taniej; u dystrybutorów (np. DigiKey) bywa ok. 15% drożej. Darmowa edycja Community obejmuje wyłącznie projekty niekomercyjne.</p>
           <p><strong>Licencje wieczyste MDK v5</strong> (już niedostępne): ceny wg archiwalnych cenników dystrybutorów Keil (USD; zbieżne z archiwalnym sklepem Arm), przeliczone po ~3,8&nbsp;zł/USD. Arm zakończył ich sprzedaż 30 czerwca 2025, a odnowienia maintenance przyjmuje tylko do 30 czerwca 2026. Maintenance kosztował 20% ceny licencji rocznie (40% przy wznowieniu po przerwie); pierwszy rok był wliczony.</p>
-          <p><strong>Wykres „5 inżynierów × 3 lata":</strong> licencje node-locked per stanowisko, ceny bieżące ze sklepu Arm (5 × 3 × 7 565&nbsp;zł ≈ 113 tys. zł; 5 × 3 × 3 780&nbsp;zł ≈ 57 tys. zł), bez rabatów wolumenowych i bez kosztów administracji licencjami.</p>
+          <p><strong>Wykres „5 inżynierów × 3 lata”:</strong> licencje node-locked per stanowisko, ceny bieżące ze sklepu Arm (5 × 3 × 7 565&nbsp;zł ≈ 113 tys. zł; 5 × 3 × 3 780&nbsp;zł ≈ 57 tys. zł), bez rabatów wolumenowych i bez kosztów administracji licencjami.</p>
         </details>
       </div>
     </div>
@@ -219,9 +219,9 @@ import RelatedCards from '../components/RelatedCards.astro';
       <SectHead eyebrow="07 / Puenta · Obiecana odpowiedź" title="Cały eksperyment wykonał agent AI — na prawdziwym sprzęcie." id="agent" small />
       <img class="hero-img rv" src="/img/sub/keil-vs-gcc-film.webp" alt="Laptop z terminalem agenta AI obok matrycy LED 64×64 wyświetlającej padający śnieg" width="1380" height="768" loading="lazy" />
       <div class="prose prose--inv rv">
-        <p class="bm-lede">Czas na obiecaną odpowiedź. Cały eksperyment — dopisanie benchmarku do firmware, pięć kompilacji dwoma toolchainami, flashowanie, pomiary na sprzęcie i weryfikacja obrazu na fizycznym panelu LED — wykonał agent AI, sterując narzędziami z linii poleceń.</p>
+        <p class="bm-lede">Cały eksperyment — dopisanie benchmarku do firmware, pięć kompilacji dwoma toolchainami, flashowanie, pomiary na sprzęcie i weryfikacja obrazu na fizycznym panelu LED — wykonał agent AI, sterując narzędziami z linii poleceń.</p>
         <h2>Keil z agentem: szybciej niż człowiek z Keilem</h2>
-        <p>Agentowe programowanie embedded działa też na komercyjnym stacku. Keil ma CLI (<code>UV4.exe -r</code>), STM32CubeProgrammer flashuje i czyta SWO z konsoli — agent w pętli edytuje kod, buduje, wgrywa i czyta logi ITM szybciej, niż człowiek zdąży przeklikać się przez µVision. Każda iteracja „zmiana → build → flash → dowód w SWO" zamykała się w ~2 minuty, a numer buildu w banerze startowym dawał twardy dowód, że na płytce działa właściwy firmware.</p>
+        <p>Agentowe programowanie embedded działa też na komercyjnym stacku. Keil ma CLI (<code>UV4.exe -r</code>), STM32CubeProgrammer flashuje i czyta SWO z konsoli — agent w pętli edytuje kod, buduje, wgrywa i czyta logi ITM szybciej, niż człowiek zdąży przeklikać się przez µVision. Każda iteracja „zmiana → build → flash → dowód w SWO” zamykała się w ~2 minuty, a numer buildu w banerze startowym dawał twardy dowód, że na płytce działa właściwy firmware.</p>
         <h2>Ale prawdziwa dźwignia to open source</h2>
         <p>Keil w tej pętli pozostaje wąskim gardłem: zamknięty kompilator bez wglądu w biblioteki, licencja per stanowisko, tylko Windows. Agent może go obsługiwać, ale nie może z nim <em>współpracować</em>. Z narzędziami open-source pętla domyka się w całości:</p>
         <ul>
@@ -230,14 +230,14 @@ import RelatedCards from '../components/RelatedCards.astro';
           <li><strong>GNU make + skrypty shell</strong> — build deterministyczny i tekstowy, idealny interfejs dla agenta (i dla CI);</li>
           <li><strong>OpenOCD + st-flash + GDB</strong> — flashowanie i pełny debug source-level bez licencji, na Windows, Linuksie i macOS;</li>
           <li><strong>DWT/ITM (SWO)</strong> — benchmark z tego raportu to 60 linii C i <code>printf</code> przez SWO, zero dodatkowego sprzętu;</li>
-          <li><strong>ffmpeg + kamera RTSP</strong> — agent „patrzy" na fizyczny panel i sam potwierdza, że animacja scrolluje bez artefaktów;</li>
+          <li><strong>ffmpeg + kamera RTSP</strong> — agent „patrzy” na fizyczny panel i sam potwierdza, że animacja scrolluje bez artefaktów;</li>
           <li><strong>git</strong> — każdy krok eksperymentu zapisany atomowym commitem: wynik odtwarzalny i audytowalny.</li>
         </ul>
         <blockquote class="bm-quote">Zamknięte IDE ogranicza agenta do roli klikacza. Otwarty toolchain robi z niego inżyniera: może przeczytać źródło biblioteki, zmierzyć skutek na sprzęcie i poprawić wynik — w jednej, samodzielnej pętli.</blockquote>
         <h2>Co z tego wynika: trzy oszczędności naraz</h2>
         <p>Agent z dowolnym toolchainem CLI wygrywa z ręcznym klikaniem w IDE, a z open source dostaje pełną dźwignię. W programowaniu mikrokontrolerów przekłada się to wprost na budżet projektu:</p>
         <ul>
-          <li><strong>Czas inżyniera — najdroższa pozycja każdego projektu firmware.</strong> Agent domyka pętlę „zmiana → build → flash → dowód na sprzęcie" w ~2 minuty i powtarza ją bez znużenia. Inżynier przestaje czekać i klikać, a zaczyna decydować — ta sama liczba etatów domyka więcej tematów w tygodniu, a eksperymenty odkładane „na kiedyś" (jak ten benchmark) po prostu się dzieją.</li>
+          <li><strong>Czas inżyniera — najdroższa pozycja każdego projektu firmware.</strong> Agent domyka pętlę „zmiana → build → flash → dowód na sprzęcie” w ~2 minuty i powtarza ją bez znużenia. Inżynier przestaje czekać i klikać, a zaczyna decydować — ta sama liczba etatów domyka więcej tematów w tygodniu, a eksperymenty odkładane „na kiedyś” (jak ten benchmark) po prostu się dzieją.</li>
           <li><strong>Licencje: 0 zł.</strong> Cała pętla — kompilator, debug, flashowanie — działa na open source. Zamiast 7 565 zł netto rocznie za stanowisko: w 5-osobowym zespole ~113 tys. zł zostaje w budżecie co 3 lata (<a href="#koszty">rachunek wyżej</a>).</li>
           <li><strong>Zapas na sprzęcie.</strong> Firmware 2,4× mniejszy i 3,75× szybszy to nowe funkcje bez przesiadki na droższy mikrokontroler — a przy większych seriach często tańszy układ w BOM.</li>
         </ul>

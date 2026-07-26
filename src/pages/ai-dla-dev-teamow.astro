@@ -9,7 +9,7 @@ import CtaBand from '../components/CtaBand.astro';
 const faq = [
   { q: 'Jak zmierzymy efekt?', a: 'DORA metrics jako baseline w tygodniu 1: czas od ticketu do PR, czas merge, bug escape rate, pokrycie testami. Mierzymy ponownie w tygodniu 12. Raport ROI dla zarządu — dashboard z twardymi liczbami.' },
   { q: 'Co z bezpieczeństwem naszych danych?', a: 'Wasz kod nie idzie do publicznych modeli. Dla branż regulowanych — Bedrock w AWS, dane w Waszej VPC. Dla obronności i wrażliwego embedded — lokalne modele (Ollama, vLLM) na Waszych serwerach. Audit log każdej interakcji z AI. NDA podpisujemy przed pierwszą rozmową.' },
-  { q: 'Co jeśli zespół nie kupi tej zmiany?', a: 'Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny". Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.' },
+  { q: 'Co jeśli zespół nie kupi tej zmiany?', a: 'Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny”. Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.' },
   { q: 'Czy stara aplikacja będzie działać w trakcie?', a: 'Tak. Pilot wchodzi obok: dwa systemy równolegle, moduł po module, testy regresyjne na danych z produkcji. Wasza baza danych zostaje bez zmian.' },
 ];
 ---
@@ -18,7 +18,7 @@ const faq = [
   description="Jak zmienia się codzienna praca programisty z agentem AI: plan mode, subagenci, MCP servery, AGENTS.md jako kontrakt. Efekt mierzony DORA i DEVLens."
   eyebrow="Dla zespołów software · codzienny workflow"
   heading="Tak wygląda dzień programisty, który prowadzi agenta."
-  lead="Najbardziej operacyjna z naszych stron — bez ogólników. Pokazujemy, jak konkretnie zmienia się codzienna praca, jakich narzędzi używamy i jak mierzymy efekt od pierwszego tygodnia."
+  lead="Najbardziej operacyjna z naszych stron. Pokazujemy, jak konkretnie zmienia się codzienna praca, jakich narzędzi używamy i jak mierzymy efekt od pierwszego tygodnia."
   heroImage="/img/sub/ai-dla-dev-teamow.webp"
   heroAlt="Sieć oszronionych węzłów połączonych pomarańczowymi liniami"
 >
@@ -63,7 +63,7 @@ const faq = [
   <!-- 02 pełny workflow agentowy (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="workflow">
     <div class="container">
-      <SectHead eyebrow="02 / Workflow · Jak prowadzi się agenta" title="Pełny workflow agentowy, nie czat z promptami." id="workflow" />
+      <SectHead eyebrow="02 / Workflow · Jak prowadzi się agenta" title="Pełny workflow agentowy zamiast czatu z promptami." id="workflow" />
       <dl class="def-rows rv">
         <div>
           <dt>Plan mode<small>najpierw plan, potem kod</small></dt>
@@ -75,7 +75,7 @@ const faq = [
         </div>
         <div>
           <dt>MCP servery<small>połączenie wprost z Waszym kontekstem</small></dt>
-          <dd>Dedykowane MCP servery łączą agenta wprost z Waszą bazą danych (MS SQL, MySQL, IBM DB2, Postgres, Oracle) i narzędziami zespołu.</dd>
+          <dd>MCP servery pisane pod projekt łączą agenta wprost z Waszą bazą danych (MS SQL, MySQL, IBM DB2, Postgres, Oracle) i narzędziami zespołu.</dd>
         </div>
         <div>
           <dt>AGENTS.md / CLAUDE.md<small>kontrakt zespołu</small></dt>

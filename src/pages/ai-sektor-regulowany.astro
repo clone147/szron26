@@ -9,9 +9,9 @@ import CtaBand from '../components/CtaBand.astro';
 // FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html), stąd np. R&D
 const faq = [
   { q: 'Czy dane i kod naprawdę nie opuszczają naszej infrastruktury?', a: 'Tak. Przy wariancie on-premise używamy modeli lokalnych — przez Ollama lub vLLM — uruchamianych na Waszych serwerach lub stacjach roboczych. Żadne dane nie trafiają do zewnętrznych API ani publicznych modeli. Przy wariancie VPC inferencja odbywa się w prywatnym VPC w AWS, bez wyjścia do publicznego internetu.' },
-  { q: 'Jak adresujecie wymogi AI Act, NIS2 i RODO?', a: 'Przed startem ustalamy ramy regulacyjne Waszej branży i dobieramy architekturę tak, żeby się w nich mieściła — od wariantu air-gapped po audit log każdej interakcji z AI. Kontrolujemy, co trafia do promptu i gdzie fizycznie jest przetwarzane.' },
+  { q: 'Jak spełniacie wymogi AI Act, NIS2 i RODO?', a: 'Przed startem ustalamy ramy regulacyjne Waszej branży i dobieramy architekturę tak, żeby się w nich mieściła — od wariantu air-gapped po audit log każdej interakcji z AI. Kontrolujemy, co trafia do promptu i gdzie fizycznie jest przetwarzane.' },
   { q: 'Czy podpisujecie NDA i umowę o poufności?', a: 'Zawsze. NDA podpisujemy przed pierwszą rozmową techniczną. Mamy doświadczenie z NDA w sektorze obronnym, finansowym i R&D.' },
-  { q: 'Kto ma dostęp do naszego kodu?', a: 'Tylko nasza dwójka i Wasz zespół. Pracujemy bezpośrednio — nikt z zewnątrz nie dotyka Waszego kodu — w oparciu o 25 lat doświadczenia w wytwarzaniu oprogramowania.' },
+  { q: 'Kto ma dostęp do naszego kodu?', a: 'Tylko nasza dwójka i Wasz zespół. Pracujemy bezpośrednio, nikt z zewnątrz nie dotyka Waszego kodu. Za nami 25 lat wytwarzania oprogramowania.' },
   { q: 'Jakich modeli AI używacie w środowiskach offline?', a: 'Modele lokalne serwowane przez Ollama lub vLLM, dobrane do zadania i dostępnego hardware. Konfigurujemy je w pełni wewnątrz Waszej infrastruktury, w wariancie air-gapped — bez połączenia z internetem.' },
 ];
 ---
@@ -20,7 +20,7 @@ const faq = [
   description="AI w obronności, fintechu i medycynie bez kompromisów w bezpieczeństwie: modele lokalne, Bedrock w VPC lub air-gapped, audit log. AI Act, NIS2, RODO."
   eyebrow="Obronność · fintech · medycyna"
   heading="AI tam, gdzie dane nie mogą wyjść poza ścianę."
-  lead="Compliance i suwerenność danych to nie dodatek — to oś projektu. W obronności, fintechu i medycynie pokazujemy najpierw architekturę bezpieczeństwa, dopiero potem prędkość. Kod nie trafia do publicznych modeli, a każda interakcja z AI zostaje w audit logu."
+  lead="Compliance i suwerenność danych są tu osią projektu. W obronności, fintechu i medycynie pokazujemy najpierw architekturę bezpieczeństwa, dopiero potem prędkość. Kod nie trafia do publicznych modeli, a każda interakcja z AI zostaje w audit logu."
   headingSmall={false}
   heroImage="/img/sub/ai-sektor-regulowany.webp"
   heroAlt="Krystaliczny sejf z lodu osłaniający świecący rdzeń danych"
@@ -47,7 +47,7 @@ const faq = [
   <section class="sect sect--dark" aria-labelledby="architektura">
     <div class="container">
       <SectHead eyebrow="02 / Architektura · Gdzie fizycznie są dane" title="Architektura, która nie wypuszcza danych." id="architektura">
-        <p class="rv" style="--rv-d:.06s">Bezpieczeństwo nie jest deklaracją — jest decyzją architektoniczną. Pokazujemy ją wprost, warstwa po warstwie, zanim napiszemy pierwszą linię kodu.</p>
+        <p class="rv" style="--rv-d:.06s">Bezpieczeństwo to decyzja architektoniczna. Pokazujemy ją wprost, warstwa po warstwie, zanim napiszemy pierwszą linię kodu.</p>
       </SectHead>
       <dl class="def-rows rv">
         <div><dt>Kod nie idzie do publicznych modeli<small>Zasada zerowego wycieku</small></dt><dd>Żaden fragment Waszego kodu ani danych nie trafia do publicznych API modeli. Punktem wyjścia jest pytanie, gdzie fizycznie odbywa się każda inferencja — a nie wygoda dostawcy.</dd></div>
@@ -63,7 +63,7 @@ const faq = [
   <section class="sect" aria-labelledby="warianty">
     <div class="container">
       <SectHead eyebrow="03 / Wybór · Dwa modele wdrożenia" title="Kiedy VPC, a kiedy on-premise." id="warianty" small>
-        <p class="rv" style="--rv-d:.06s">Nie ma jednego dobrego wariantu — jest ten, który mieści się w Waszych ograniczeniach. O wyborze decyduje kryterium bezpieczeństwa, nie wygoda. Oto jak to rozkładamy.</p>
+        <p class="rv" style="--rv-d:.06s">Nie ma jednego dobrego wariantu; liczy się ten, który mieści się w Waszych ograniczeniach. O wyborze decyduje bezpieczeństwo, nie wygoda.</p>
       </SectHead>
       <table class="results-table rv">
         <thead><tr><th scope="col">Kryterium</th><th scope="col">Bedrock w VPC</th><th scope="col">On-premise · air-gapped</th></tr></thead>
