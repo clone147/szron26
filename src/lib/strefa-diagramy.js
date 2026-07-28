@@ -892,9 +892,10 @@ function runSearch() {
       const out = [];
       for (let i = 0; i < Math.max(...lists.map((l) => l.length), 0); i++)
         for (const l of lists) if (l[i]) out.push(l[i]);
-      paintResults(out.slice(0, 48));
-      imgNote.textContent = out.length
-        ? `${out.length} wyników${done < keys.length ? ' · szukam dalej…' : ''}`
+      const shown = out.slice(0, 48);
+      paintResults(shown);
+      imgNote.textContent = shown.length
+        ? `${shown.length}${out.length > shown.length ? ` z ${out.length}` : ''} wyników${done < keys.length ? ' · szukam dalej…' : ''}`
         : (done < keys.length ? 'Szukam…' : 'Brak wyników — spróbuj innej frazy albo innego źródła.');
     });
   }, 260);
@@ -1265,7 +1266,7 @@ function previewFx(s) {
 
 function updateFxPanel() {
   const s = !locked && !play && selectedId ? byId(selectedId) : null;
-  const sig = s ? `${s.id}|${s.fx || 'draw'}|${!!s.pulse}|${s.text || ''}` : '';
+  const sig = s ? `${s.id}|${s.fx || 'draw'}|${!!s.pulse}|${!!s.tint}|${s.text || ''}` : '';
   if (sig === fxSig) return;
   fxSig = sig;
   fxPanel.hidden = !s;
@@ -1274,6 +1275,10 @@ function updateFxPanel() {
   fxPanel.querySelectorAll('[data-fx]').forEach((b) => b.classList.toggle('is-active', b.dataset.fx === fx));
   fxPanel.querySelector('[data-fx="count"]').disabled = s.type === 'arrow' || !/\d/.test(s.text || '');
   $('#fx-pulse').classList.toggle('is-active', !!s.pulse);
+  // barwienie tuszem ma sens tylko dla wstawionej grafiki (ikony biblioteki są barwione zawsze)
+  const tintBtn = $('#fx-tint');
+  tintBtn.hidden = s.type !== 'image';
+  tintBtn.classList.toggle('is-active', !!s.tint);
 }
 
 fxPanel.addEventListener('click', (e) => {
@@ -1284,6 +1289,9 @@ fxPanel.addEventListener('click', (e) => {
     if (b.dataset.fx === 'draw') delete s.fx; else s.fx = b.dataset.fx;
   } else if (b.id === 'fx-pulse') {
     if (s.pulse) delete s.pulse; else s.pulse = true;
+  } else if (b.id === 'fx-tint') {
+    if (s.tint) delete s.tint; else s.tint = true;
+    if (s.tint) tintedBmp(s.src, pal().ink);
   }
   fxSig = '';
   updateFxPanel();
