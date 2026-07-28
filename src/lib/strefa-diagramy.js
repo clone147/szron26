@@ -109,8 +109,8 @@ const aspectOf = (s) => {
   return s.h > 0 ? s.w / s.h : 1;
 };
 // przebarwienie czarnego tuszu na kolor kreski motywu (alpha rysunku zachowana)
-function iconTinted(k, color) {
-  const e = bmpEntry(ICON_SRC(k));
+function tintedBmp(src, color) {
+  const e = bmpEntry(src);
   if (!e.ready) return null;
   let cv = e.tints.get(color);
   if (!cv) {
@@ -129,8 +129,10 @@ function iconTinted(k, color) {
 // rysuje bitmapę kształtu (ikona = barwiona kolorem kreski, obrazek = w oryginalnych barwach);
 // frac<1 = odsłanianie od lewej (tryb Play „rysowanie"); zwraca punkt „ołówka"
 function drawIcon(g, s, color, frac = 1) {
-  const e = s.type === 'image' ? bmpEntry(s.src) : null;
-  const cv = s.type === 'image' ? (e.ready ? e.img : null) : iconTinted(s.icon, color);
+  const src = shapeSrc(s);
+  const e = bmpEntry(src);
+  // ikony biblioteki i grafiki jednokolorowe (flaga tint) barwimy kolorem kreski, resztę rysujemy 1:1
+  const cv = s.type === 'icon' || s.tint ? tintedBmp(src, color) : (e.ready ? e.img : null);
   if (!cv) { // obrazek jeszcze się ładuje — delikatna ramka zamiast pustki (w prezentacji: nic)
     if (play) return null;
     g.save();
@@ -857,6 +859,7 @@ function paintResults(items, { recent = false } = {}) {
     <button class="diag-imgres" type="button" data-n="${n}" title="${esc(i.title || '')}${i.credit ? ' · ' + esc(i.credit) : ''}">
       <img src="${esc(i.thumb || i.src)}" alt="" loading="lazy" draggable="false">
       <span>${esc(i.title || '')}</span>
+      ${i.source ? `<em>${esc(i.source)}</em>` : ''}
     </button>`).join('');
   imgGrid.dataset.recent = recent ? '1' : '';
   imgGrid._items = items;
@@ -864,7 +867,7 @@ function paintResults(items, { recent = false } = {}) {
 
 function showRecent() {
   const list = recentList();
-  imgNote.textContent = list.length ? 'Ostatnio użyte' : 'Wpisz, czego szukasz — np. „docker logo”, „arduino”, „serwerownia”.';
+  imgNote.textContent = list.length ? 'Ostatnio użyte' : 'Wpisz, czego szukasz — np. „docker”, „database”, „serwerownia”. Ikony i logotypy szukają po angielsku.';
   paintResults(list.map((r) => ({ ...r, url: r.src, thumb: r.src })), { recent: true });
 }
 
@@ -934,7 +937,7 @@ function bmpReady(e) {
 }
 
 // wstawienie obrazka: na środku widoku, szerokość 260 px, wysokość wg proporcji oryginału
-async function insertImage(src, title) {
+async function insertImage(src, title, tint = false) {
   const e = bmpEntry(src);
   if (!(await bmpReady(e))) return false;
   const c = centerWorld();
@@ -943,13 +946,14 @@ async function insertImage(src, title) {
   const s = {
     id: uid(), type: 'image', src, seed: (Math.random() * 1e9) | 0,
     x: Math.round(c.x - W / 2), y: Math.round(c.y - W / ratio / 2), w: W, h: Math.round(W / ratio),
+    ...(tint && { tint: true }),
   };
   shapes.push(s);
   selectedId = s.id;
   setTool('select');
   scheduleSave();
   render();
-  pushRecent({ src, title: title || '' });
+  pushRecent({ src, title: title || '', ...(tint && { tint: true }) });
   return true;
 }
 
@@ -962,7 +966,7 @@ imgGrid.addEventListener('click', async (e) => {
   try {
     const src = imgGrid.dataset.recent ? item.src : await materialize(item, uploadImage);
     if (!isImageSrc(src)) throw new Error(`zły adres obrazka: ${src}`);
-    if (!(await insertImage(src, item.title))) throw new Error(`bitmapa się nie wczytała: ${src.slice(0, 80)}`);
+    if (!(await insertImage(src, item.title, !!item.tint))) throw new Error(`bitmapa się nie wczytała: ${src.slice(0, 80)}`);
     toggleImgPanel(false);
   } catch (err) {
     console.error('[diagramy] wstawianie obrazka:', err);
@@ -1122,8 +1126,8 @@ function startPlay() {
   // ikony ładują się leniwie przy pierwszym rysowaniu — w prezentacji byłoby za późno
   // (animacja kroku zdążyłaby przelecieć na przerywanej ramce), więc grzejemy je z góry
   for (const s of shapes) {
-    if (s.type === 'icon' && s.icon) { bmpEntry(ICON_SRC(s.icon)); iconTinted(s.icon, pal().ink); }
-    else if (s.type === 'image' && s.src) bmpEntry(s.src);
+    if (s.type === 'icon' && s.icon) tintedBmp(ICON_SRC(s.icon), pal().ink);
+    else if (s.type === 'image' && s.src) { bmpEntry(s.src); if (s.tint) tintedBmp(s.src, pal().ink); }
   }
   const { steps, conn } = buildPlaySteps();
   if (!steps.length) { toast('Pusty diagram', 'Nie ma czego odtwarzać.', 'err'); return; }
@@ -1453,7 +1457,7 @@ function sanitizeShapes(raw) {
     if (ids.has(s.id)) s.id = uid();
     ids.add(s.id);
     if (s.type === 'icon') s.icon = r.icon;
-    else if (s.type === 'image') s.src = r.src;
+    else if (s.type === 'image') { s.src = r.src; if (r.tint === true) s.tint = true; }
     else if (s.type !== 'arrow') s.text = typeof r.text === 'string' ? r.text : '';
     else {
       if (typeof r.startBind === 'string') s.startBind = r.startBind;

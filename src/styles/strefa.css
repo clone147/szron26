@@ -254,7 +254,7 @@ body:has(.strefa-main[data-page="programisci"]) .strefa-top__inner { max-width: 
 .strefa-tile__ico { width: 2.4rem; height: 2.4rem; border-radius: var(--radius-btn); background: var(--color-accent-soft); color: var(--color-accent); display: grid; place-content: center; margin-bottom: var(--space-md); }
 .strefa-tile__ico svg { width: 20px; height: 20px; }
 /* kafelek-akcja (np. „Dostęp") — ten sam wygląd co kafelek-link, ale to <button> */
-.strefa-tile--btn { font: inherit; text-align: left; cursor: pointer; width: 100%; }
+.strefa-tile--btn { font: inherit; text-align: left; cursor: pointer; width: 100%; display: flex; flex-direction: column; align-items: stretch; }
 
 /* lista klucz–wartość w modalach strefy */
 .strefa-kv { display: grid; grid-template-columns: auto 1fr; gap: .35rem var(--space-md); margin: 0; font-size: var(--text-s); }
@@ -934,10 +934,12 @@ body:has(#diag-editor:not([hidden])) .strefa-top { display: none; }
   width: 100%; height: 5.4rem; object-fit: contain; background: #fff;
   border: 1px solid oklch(0% 0 0 / .08); border-radius: 6px;
 }
-.diag-imgres span {
-  display: block; width: 100%; font-size: .68rem; line-height: 1.15; color: #4a4f5c;
+.diag-imgres span, .diag-imgres em {
+  display: block; width: 100%; line-height: 1.15;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+.diag-imgres span { font-size: .68rem; color: #4a4f5c; }
+.diag-imgres em { font-size: .6rem; font-style: normal; color: #8a8f9c; }
 @media (prefers-reduced-motion: reduce) { .diag-icon { transition: none !important; } }
 .diag-canvas-wrap { position: relative; flex: 1; overflow: hidden; touch-action: none; }
 .diag-canvas-wrap canvas { display: block; }
