@@ -1,10 +1,12 @@
 // Strefa / Diagramy — prosty edytor diagramów w stylu Excalidraw (rysowanie „ołówkiem").
 // Galeria diagramów z miniaturami (renderowane z jsonb) → klik otwiera edytor pełnoekranowy.
-// Kształt: { id, type: 'rect'|'arrow'|'text'|'icon', x, y, w, h, text?, icon?, seed, startBind?, endBind? }
+// Kształt: { id, type: 'rect'|'arrow'|'text'|'icon'|'image', x, y, w, h, text?, icon?, src?, seed, startBind?, endBind? }
+// ('icon' = biblioteka doodle barwiona kolorem kreski, 'image' = obrazek z wyszukiwarki rysowany 1:1)
 // (strzałka: x,y = początek, w,h = wektor do końca; rect trzymany znormalizowany w>0,h>0;
 //  startBind/endBind = id obiektu, do którego przyklejona jest końcówka strzałki).
 import { getClient, getTeamUser } from './supabase.js';
 import { $, esc, fmtDateTime, toast, confirmDialog, openModal, closeModal } from './strefa-ui.js';
+import { searchImages, materialize, PROVIDER_LIST } from './diagram-image-search.js';
 
 const sb = getClient();
 
@@ -81,9 +83,9 @@ const ICONS = [
   { k: 'camera-tripod', label: 'Kamera', ext: 'svg' },
 ];
 const ICON_SRC = (k) => `/img/doodle/${k}.${ICONS.find((i) => i.k === k)?.ext || 'webp'}`;
-const iconStore = new Map(); // k → { img, ready, tints: Map(kolor → canvas) }
-function iconEntry(k) {
-  let e = iconStore.get(k);
+const bmpStore = new Map(); // src → { img, ready, tints: Map(kolor → canvas) }
+function bmpEntry(src) {
+  let e = bmpStore.get(src);
   if (!e) {
     const img = new Image();
     e = { img, ready: false, tints: new Map() };
@@ -92,14 +94,22 @@ function iconEntry(k) {
       if (!$('#diag-editor').hidden) render();
       if (!$('#diag-gallery').hidden) renderGallery();
     };
-    img.src = ICON_SRC(k);
-    iconStore.set(k, e);
+    img.src = src;
+    bmpStore.set(src, e);
   }
   return e;
 }
+// adres bitmapy kształtu: ikona z biblioteki albo obrazek z wyszukiwarki
+const shapeSrc = (s) => (s.type === 'icon' ? ICON_SRC(s.icon) : s.src);
+// proporcje obrazka (do skalowania) — z wczytanej bitmapy, a przed wczytaniem z bieżącej ramki
+const aspectOf = (s) => {
+  const e = bmpEntry(s.src);
+  if (e.ready && e.img.naturalHeight) return e.img.naturalWidth / e.img.naturalHeight;
+  return s.h > 0 ? s.w / s.h : 1;
+};
 // przebarwienie czarnego tuszu na kolor kreski motywu (alpha rysunku zachowana)
 function iconTinted(k, color) {
-  const e = iconEntry(k);
+  const e = bmpEntry(ICON_SRC(k));
   if (!e.ready) return null;
   let cv = e.tints.get(color);
   if (!cv) {
@@ -115,9 +125,11 @@ function iconTinted(k, color) {
   }
   return cv;
 }
-// rysuje ikonę; frac<1 = odsłanianie od lewej (tryb Play „rysowanie"); zwraca punkt „ołówka"
+// rysuje bitmapę kształtu (ikona = barwiona kolorem kreski, obrazek = w oryginalnych barwach);
+// frac<1 = odsłanianie od lewej (tryb Play „rysowanie"); zwraca punkt „ołówka"
 function drawIcon(g, s, color, frac = 1) {
-  const cv = iconTinted(s.icon, color);
+  const e = s.type === 'image' ? bmpEntry(s.src) : null;
+  const cv = s.type === 'image' ? (e.ready ? e.img : null) : iconTinted(s.icon, color);
   if (!cv) { // obrazek jeszcze się ładuje — delikatna ramka zamiast pustki (w prezentacji: nic)
     if (play) return null;
     g.save();
@@ -280,9 +292,9 @@ function drawShape(g, s, color, frac = 1) {
   }
   return partialStrokes(g, shapeStrokes(s), mulberry32(s.seed), frac);
 }
-// jeden punkt wejścia rysowania kształtu: ikona → bitmapa z tintem, reszta → kreski ołówka
+// jeden punkt wejścia rysowania kształtu: ikona/obrazek → bitmapa, reszta → kreski ołówka
 function paintShape(g, s, color, frac = 1) {
-  return s.type === 'icon' ? drawIcon(g, s, color, frac) : drawShape(g, s, color, frac);
+  return s.type === 'icon' || s.type === 'image' ? drawIcon(g, s, color, frac) : drawShape(g, s, color, frac);
 }
 
 /* ── render edytora ── */
@@ -504,6 +516,7 @@ function hitHandle(p) {
 canvas.addEventListener('pointerdown', (e) => {
   if (editingId) commitText();
   if (!iconPanel.hidden) toggleIconPanel(false);
+  if (!imgPanel.hidden) toggleImgPanel(false);
   stopCamAnim(); // ręczna interakcja przerywa przelot kamery
   canvas.setPointerCapture(e.pointerId);
   const p = toWorld(e);
@@ -550,6 +563,7 @@ canvas.addEventListener('pointermove', (e) => {
     if (drag.k === 'se') {
       s.w = Math.max(20, p.x - s.x); s.h = Math.max(20, p.y - s.y);
       if (s.type === 'icon') { const d = Math.max(s.w, s.h); s.w = d; s.h = d; } // ikony zawsze w proporcji 1:1
+      if (s.type === 'image') s.h = Math.max(20, s.w / aspectOf(s));              // obrazek trzyma proporcje oryginału
     }
     else if (drag.k === 'a1') { s.w += s.x - p.x; s.h += s.y - p.y; s.x = p.x; s.y = p.y; }
     else { s.w = p.x - s.x; s.h = p.y - s.y; }
@@ -605,7 +619,7 @@ canvas.addEventListener('pointerup', (e) => {
 canvas.addEventListener('dblclick', (e) => {
   if (locked || play) return;
   const s = hitShape(toWorld(e));
-  if (s && s.type !== 'arrow' && s.type !== 'icon') startTextEdit(s);
+  if (s && !['arrow', 'icon', 'image'].includes(s.type)) startTextEdit(s);
 });
 
 /* ── zoom ── */
@@ -761,7 +775,9 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'a' || e.key === 'A') setTool('arrow');
   else if (e.key === 't' || e.key === 'T') setTool('text');
   else if (e.key === 'i' || e.key === 'I') toggleIconPanel();
+  else if (e.key === 'g' || e.key === 'G') { toggleIconPanel(false); toggleImgPanel(); }
   else if (e.key === 'Escape' && !iconPanel.hidden) toggleIconPanel(false);
+  else if (e.key === 'Escape' && !imgPanel.hidden) toggleImgPanel(false);
 });
 
 function setTool(t) {
@@ -805,6 +821,135 @@ iconPanel.addEventListener('click', (e) => {
   if (b) { insertIcon(b.dataset.icon); toggleIconPanel(false); }
 });
 
+/* ── panel „Obrazki": wyszukiwarka grafik z kilku źródeł (Simple Icons / Wikimedia / Openverse) ── */
+const imgPanel = $('#img-panel');
+const imgBtn = $('#btn-images');
+const imgInput = $('#img-q');
+const imgGrid = $('#img-results');
+const imgNote = $('#img-note');
+const RECENT_KEY = 'strefa.diag.recentImages';
+let imgProvider = 'all';
+let imgSeq = 0; // licznik zapytań — starsza odpowiedź nie nadpisze nowszej
+
+const isImageSrc = (v) => typeof v === 'string' && (/^https:\/\//.test(v) || /^data:image\//.test(v));
+const recentList = () => { try { return JSON.parse(localStorage.getItem(RECENT_KEY)) || []; } catch { return []; } };
+function pushRecent(item) {
+  const list = recentList().filter((r) => r.src !== item.src);
+  list.unshift(item);
+  try { localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, 24))); } catch { /* pełny storage — trudno */ }
+}
+
+$('#img-tabs').innerHTML = PROVIDER_LIST.map((p) => `
+  <button class="diag-imgtab${p.k === 'all' ? ' is-active' : ''}" type="button" data-prov="${p.k}">${p.label}</button>`).join('');
+$('#img-tabs').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-prov]');
+  if (!b) return;
+  imgProvider = b.dataset.prov;
+  $('#img-tabs').querySelectorAll('.diag-imgtab').forEach((x) => x.classList.toggle('is-active', x === b));
+  runSearch();
+});
+
+function paintResults(items, { recent = false } = {}) {
+  imgGrid.innerHTML = items.map((i, n) => `
+    <button class="diag-imgres" type="button" data-n="${n}" title="${esc(i.title || '')}${i.credit ? ' · ' + esc(i.credit) : ''}">
+      <img src="${esc(i.thumb || i.src)}" alt="" loading="lazy" draggable="false">
+      <span>${esc(i.title || '')}</span>
+    </button>`).join('');
+  imgGrid.dataset.recent = recent ? '1' : '';
+  imgGrid._items = items;
+}
+
+function showRecent() {
+  const list = recentList();
+  imgNote.textContent = list.length ? 'Ostatnio użyte' : 'Wpisz, czego szukasz — np. „docker logo”, „arduino”, „serwerownia”.';
+  paintResults(list.map((r) => ({ ...r, url: r.src, thumb: r.src })), { recent: true });
+}
+
+let searchTimer = null;
+function runSearch() {
+  clearTimeout(searchTimer);
+  const q = imgInput.value.trim();
+  if (!q) { showRecent(); return; }
+  searchTimer = setTimeout(async () => {
+    const seq = ++imgSeq;
+    imgNote.textContent = 'Szukam…';
+    const items = await searchImages(q, imgProvider).catch(() => []);
+    if (seq !== imgSeq) return;
+    imgNote.textContent = items.length ? `${items.length} wyników` : 'Brak wyników — spróbuj innej frazy albo innego źródła.';
+    paintResults(items);
+  }, 260);
+}
+imgInput.addEventListener('input', runSearch);
+imgInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { toggleImgPanel(false); canvas.focus(); }
+  else if (e.key === 'Enter') { clearTimeout(searchTimer); runSearch(); }
+});
+
+function toggleImgPanel(force) {
+  const show = force ?? imgPanel.hidden;
+  if (show && (locked || play)) return;
+  imgPanel.hidden = !show;
+  imgBtn.classList.toggle('is-active', show);
+  imgBtn.setAttribute('aria-pressed', String(show));
+  if (show) { if (!imgGrid._items?.length) showRecent(); imgInput.focus(); imgInput.select(); }
+}
+imgBtn.addEventListener('click', () => { toggleIconPanel(false); toggleImgPanel(); });
+imgPanel.addEventListener('pointerdown', (e) => e.stopPropagation());
+
+// kopia obrazka do bucketu strefy — dzięki temu diagram nie zależy od cudzego serwera
+async function uploadImage(blob, item) {
+  const ext = (item.ext || blob.type.split('/')[1] || 'png').replace('jpeg', 'jpg').replace('svg+xml', 'svg');
+  const path = `${current?.id || 'scratch'}/${uid()}.${ext}`;
+  const { error } = await sb.storage.from('strefa-diagramy').upload(path, blob, { contentType: blob.type, upsert: false });
+  if (error) return null;
+  return sb.storage.from('strefa-diagramy').getPublicUrl(path).data.publicUrl;
+}
+
+// wstawienie obrazka: na środku widoku, szerokość 260 px, wysokość wg proporcji oryginału
+function insertImage(src, title) {
+  const c = centerWorld();
+  const W = 260;
+  const e = bmpEntry(src);
+  const ratio = e.ready && e.img.naturalHeight ? e.img.naturalWidth / e.img.naturalHeight : 1;
+  const s = {
+    id: uid(), type: 'image', src, seed: (Math.random() * 1e9) | 0,
+    x: Math.round(c.x - W / 2), y: Math.round(c.y - W / ratio / 2), w: W, h: Math.round(W / ratio),
+  };
+  // proporcje znane dopiero po wczytaniu — poprawiamy wysokość, gdy bitmapa dojedzie
+  if (!e.ready) e.img.addEventListener('load', () => {
+    if (shapes.includes(s) && e.img.naturalHeight) { s.h = Math.round(s.w / (e.img.naturalWidth / e.img.naturalHeight)); scheduleSave(); render(); }
+  }, { once: true });
+  shapes.push(s);
+  selectedId = s.id;
+  setTool('select');
+  scheduleSave();
+  render();
+  pushRecent({ src, title: title || '' });
+}
+
+imgGrid.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-n]');
+  if (!b) return;
+  const item = imgGrid._items[+b.dataset.n];
+  if (!item) return;
+  if (imgGrid.dataset.recent) { insertImage(item.src, item.title); toggleImgPanel(false); return; }
+  b.classList.add('is-busy');
+  const src = await materialize(item, uploadImage);
+  b.classList.remove('is-busy');
+  if (!isImageSrc(src)) { toast('Nie udało się pobrać', 'Źródło nie udostępniło pliku.', 'err'); return; }
+  insertImage(src, item.title);
+  toggleImgPanel(false);
+});
+
+// „Wklej adres": obrazek prosto z URL-a (bez kopii w buckecie — adres zostaje cudzy)
+$('#img-url').addEventListener('click', async () => {
+  const url = (await promptTitle('Adres obrazka (https://…)', ''))?.trim();
+  if (!url) return;
+  if (!isImageSrc(url)) { toast('Zły adres', 'Podaj adres https:// do pliku graficznego.', 'err'); return; }
+  insertImage(url, 'z adresu');
+  toggleImgPanel(false);
+});
+
 /* ── tryb Play: stopniowe odsłanianie diagramu ── */
 let playRaf = 0;
 const PULSE_DUR = 1400;         // czas „pulsu" akcentem po wejściu elementu
@@ -816,7 +961,7 @@ const easeOut = (t) => 1 - (1 - t) * (1 - t);
 function shapeTiming(s) {
   const fx = FX_LIST.includes(s.fx) ? s.fx : 'draw';
   const pulse = !!s.pulse;
-  if (s.type === 'icon' && fx === 'draw') return { dur: 650, of: 1, fx, pulse }; // ikona: odsłanianie od lewej
+  if ((s.type === 'icon' || s.type === 'image') && fx === 'draw') return { dur: 650, of: 1, fx, pulse }; // bitmapa: odsłanianie od lewej
   if (fx === 'pop') return { dur: 520, of: 1, fx, pulse };
   if (fx === 'slide') return { dur: 560, of: 1, fx, pulse };
   if (fx === 'count') return { dur: 1400, of: 1, fx, pulse };
@@ -945,7 +1090,10 @@ function buildPlaySteps() {
 function startPlay() {
   // ikony ładują się leniwie przy pierwszym rysowaniu — w prezentacji byłoby za późno
   // (animacja kroku zdążyłaby przelecieć na przerywanej ramce), więc grzejemy je z góry
-  for (const s of shapes) if (s.type === 'icon' && s.icon) { iconEntry(s.icon); iconTinted(s.icon, pal().ink); }
+  for (const s of shapes) {
+    if (s.type === 'icon' && s.icon) { bmpEntry(ICON_SRC(s.icon)); iconTinted(s.icon, pal().ink); }
+    else if (s.type === 'image' && s.src) bmpEntry(s.src);
+  }
   const { steps, conn } = buildPlaySteps();
   if (!steps.length) { toast('Pusty diagram', 'Nie ma czego odtwarzać.', 'err'); return; }
   if (editingId) commitText();
@@ -1051,6 +1199,8 @@ function applyPlayUI(on) {
   $('#play-hint').hidden = !on;
   document.querySelectorAll('.diag-tool[data-tool]').forEach((b) => { b.disabled = on || locked; });
   iconBtn.disabled = on || locked;
+  imgBtn.disabled = on || locked;
+  if (on) toggleImgPanel(false);
   if (on) toggleIconPanel(false);
   $('#btn-rename').disabled = on || locked;
   $('#btn-delete').disabled = on || locked;
@@ -1254,8 +1404,9 @@ function sanitizeShapes(raw) {
   const out = [];
   const ids = new Set();
   for (const r of Array.isArray(raw) ? raw : []) {
-    if (!r || !['rect', 'arrow', 'text', 'icon'].includes(r.type)) continue;
+    if (!r || !['rect', 'arrow', 'text', 'icon', 'image'].includes(r.type)) continue;
     if (r.type === 'icon' && !ICONS.some((i) => i.k === r.icon)) continue;
+    if (r.type === 'image' && !isImageSrc(r.src)) continue;
     let x = num(r.x), y = num(r.y), w = num(r.w), h = num(r.h);
     if (x === null || y === null || w === null || h === null) continue;
     if (r.type !== 'arrow') { // rect/text trzymamy znormalizowane: w,h > 0
@@ -1271,6 +1422,7 @@ function sanitizeShapes(raw) {
     if (ids.has(s.id)) s.id = uid();
     ids.add(s.id);
     if (s.type === 'icon') s.icon = r.icon;
+    else if (s.type === 'image') s.src = r.src;
     else if (s.type !== 'arrow') s.text = typeof r.text === 'string' ? r.text : '';
     else {
       if (typeof r.startBind === 'string') s.startBind = r.startBind;
@@ -1365,6 +1517,8 @@ function applyLock() {
   btn.classList.toggle('is-locked', locked);
   document.querySelectorAll('.diag-tool[data-tool]').forEach((b) => { b.disabled = locked; });
   iconBtn.disabled = locked;
+  imgBtn.disabled = locked;
+  if (locked) toggleImgPanel(false);
   if (locked) toggleIconPanel(false);
   $('#btn-rename').disabled = locked;
   $('#btn-delete').disabled = locked;
