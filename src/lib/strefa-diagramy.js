@@ -682,6 +682,8 @@ function zoomBackOut() {
 
 // scroll = zoom (kursor jako punkt odniesienia)
 wrap.addEventListener('wheel', (e) => {
+  // panele pływające nad kanwą (ikony, wyszukiwarka) mają własne przewijanie — kółko należy do nich
+  if (e.target instanceof Element && e.target.closest('.diag-icons, .diag-imgsearch, .diag-fx')) return;
   e.preventDefault();
   if (editingId) commitText();
   stopCamAnim();
