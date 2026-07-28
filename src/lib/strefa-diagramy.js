@@ -6,7 +6,7 @@
 //  startBind/endBind = id obiektu, do którego przyklejona jest końcówka strzałki).
 import { getClient, getTeamUser } from './supabase.js';
 import { $, esc, fmtDateTime, toast, confirmDialog, openModal, closeModal } from './strefa-ui.js';
-import { searchImages, materialize, PROVIDER_LIST } from './diagram-image-search.js';
+import { searchProvider, providerKeys, materialize, PROVIDER_LIST } from './diagram-image-search.js';
 
 const sb = getClient();
 
@@ -88,12 +88,13 @@ function bmpEntry(src) {
   let e = bmpStore.get(src);
   if (!e) {
     const img = new Image();
-    e = { img, ready: false, tints: new Map() };
+    e = { img, ready: false, failed: false, tints: new Map() };
     img.onload = () => {
       e.ready = true;
       if (!$('#diag-editor').hidden) render();
       if (!$('#diag-gallery').hidden) renderGallery();
     };
+    img.onerror = () => { e.failed = true; };
     img.src = src;
     bmpStore.set(src, e);
   }
@@ -870,13 +871,27 @@ function runSearch() {
   clearTimeout(searchTimer);
   const q = imgInput.value.trim();
   if (!q) { showRecent(); return; }
-  searchTimer = setTimeout(async () => {
+  searchTimer = setTimeout(() => {
     const seq = ++imgSeq;
+    const keys = providerKeys(imgProvider);
+    const packs = new Map();  // źródło → wyniki (dorzucane w miarę odpowiedzi)
     imgNote.textContent = 'Szukam…';
-    const items = await searchImages(q, imgProvider).catch(() => []);
-    if (seq !== imgSeq) return;
-    imgNote.textContent = items.length ? `${items.length} wyników` : 'Brak wyników — spróbuj innej frazy albo innego źródła.';
-    paintResults(items);
+    paintResults([]);
+    let done = 0;
+    for (const k of keys) searchProvider(k, q).then((items) => {
+      if (seq !== imgSeq) return; // zdążyła wyjść nowsza fraza — ta odpowiedź już nieaktualna
+      done++;
+      packs.set(k, items);
+      // wyniki przeplatane źródło po źródle, żeby logotypy nie zepchnęły zdjęć na sam dół
+      const lists = keys.map((x) => packs.get(x) || []);
+      const out = [];
+      for (let i = 0; i < Math.max(...lists.map((l) => l.length), 0); i++)
+        for (const l of lists) if (l[i]) out.push(l[i]);
+      paintResults(out.slice(0, 48));
+      imgNote.textContent = out.length
+        ? `${out.length} wyników${done < keys.length ? ' · szukam dalej…' : ''}`
+        : (done < keys.length ? 'Szukam…' : 'Brak wyników — spróbuj innej frazy albo innego źródła.');
+    });
   }, 260);
 }
 imgInput.addEventListener('input', runSearch);
@@ -905,26 +920,35 @@ async function uploadImage(blob, item) {
   return sb.storage.from('strefa-diagramy').getPublicUrl(path).data.publicUrl;
 }
 
+// czeka na wczytanie bitmapy (albo na błąd) — wstawiamy dopiero pewny obrazek, nie ślepy adres
+function bmpReady(e) {
+  if (e.ready) return Promise.resolve(true);
+  if (e.failed) return Promise.resolve(false);
+  return new Promise((ok) => {
+    e.img.addEventListener('load', () => ok(true), { once: true });
+    e.img.addEventListener('error', () => ok(false), { once: true });
+    setTimeout(() => ok(e.ready), 12000);
+  });
+}
+
 // wstawienie obrazka: na środku widoku, szerokość 260 px, wysokość wg proporcji oryginału
-function insertImage(src, title) {
+async function insertImage(src, title) {
+  const e = bmpEntry(src);
+  if (!(await bmpReady(e))) return false;
   const c = centerWorld();
   const W = 260;
-  const e = bmpEntry(src);
-  const ratio = e.ready && e.img.naturalHeight ? e.img.naturalWidth / e.img.naturalHeight : 1;
+  const ratio = e.img.naturalWidth && e.img.naturalHeight ? e.img.naturalWidth / e.img.naturalHeight : 1;
   const s = {
     id: uid(), type: 'image', src, seed: (Math.random() * 1e9) | 0,
     x: Math.round(c.x - W / 2), y: Math.round(c.y - W / ratio / 2), w: W, h: Math.round(W / ratio),
   };
-  // proporcje znane dopiero po wczytaniu — poprawiamy wysokość, gdy bitmapa dojedzie
-  if (!e.ready) e.img.addEventListener('load', () => {
-    if (shapes.includes(s) && e.img.naturalHeight) { s.h = Math.round(s.w / (e.img.naturalWidth / e.img.naturalHeight)); scheduleSave(); render(); }
-  }, { once: true });
   shapes.push(s);
   selectedId = s.id;
   setTool('select');
   scheduleSave();
   render();
   pushRecent({ src, title: title || '' });
+  return true;
 }
 
 imgGrid.addEventListener('click', async (e) => {
@@ -932,13 +956,18 @@ imgGrid.addEventListener('click', async (e) => {
   if (!b) return;
   const item = imgGrid._items[+b.dataset.n];
   if (!item) return;
-  if (imgGrid.dataset.recent) { insertImage(item.src, item.title); toggleImgPanel(false); return; }
   b.classList.add('is-busy');
-  const src = await materialize(item, uploadImage);
-  b.classList.remove('is-busy');
-  if (!isImageSrc(src)) { toast('Nie udało się pobrać', 'Źródło nie udostępniło pliku.', 'err'); return; }
-  insertImage(src, item.title);
-  toggleImgPanel(false);
+  try {
+    const src = imgGrid.dataset.recent ? item.src : await materialize(item, uploadImage);
+    if (!isImageSrc(src)) throw new Error(`zły adres obrazka: ${src}`);
+    if (!(await insertImage(src, item.title))) throw new Error(`bitmapa się nie wczytała: ${src.slice(0, 80)}`);
+    toggleImgPanel(false);
+  } catch (err) {
+    console.error('[diagramy] wstawianie obrazka:', err);
+    toast('Nie udało się wstawić', 'Źródło nie oddało pliku — spróbuj innego wyniku.', 'err');
+  } finally {
+    b.classList.remove('is-busy');
+  }
 });
 
 // „Wklej adres": obrazek prosto z URL-a (bez kopii w buckecie — adres zostaje cudzy)
@@ -946,8 +975,8 @@ $('#img-url').addEventListener('click', async () => {
   const url = (await promptTitle('Adres obrazka (https://…)', ''))?.trim();
   if (!url) return;
   if (!isImageSrc(url)) { toast('Zły adres', 'Podaj adres https:// do pliku graficznego.', 'err'); return; }
-  insertImage(url, 'z adresu');
-  toggleImgPanel(false);
+  if (await insertImage(url, 'z adresu')) toggleImgPanel(false);
+  else toast('Nie udało się wstawić', 'Spod tego adresu nie wczytał się obrazek.', 'err');
 });
 
 /* ── tryb Play: stopniowe odsłanianie diagramu ── */

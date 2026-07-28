@@ -16,7 +16,7 @@ import Strefa from '../../layouts/Strefa.astro';
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
       </span>
       <h2>Szkolenia</h2>
-      <p>Lista szkoleń, uczestnicy, obecność, abonamenty i notatki. Edycja tabeli z klawiatury.</p>
+      <p>Lista szkoleń, uczestnicy, obecność, abonamenty i notatki. Edycja tabeli z klawiatury. Stąd też prowadzisz slajdy.</p>
     </a>
     <a class="strefa-tile" href="/strefa/programisci">
       <span class="strefa-tile__ico">
@@ -25,12 +25,67 @@ import Strefa from '../../layouts/Strefa.astro';
       <h2>Programiści</h2>
       <p>Prowadzenie programistów ku autonomii: etapy, umiejętności, notatki, spotkania, zadania, prompty i maile.</p>
     </a>
-    <div class="strefa-tile" style="cursor:default">
+    <a class="strefa-tile" href="/strefa/diagramy">
+      <span class="strefa-tile__ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><path d="M10 6.5h4a3 3 0 0 1 3 3V14"/></svg>
+      </span>
+      <h2>Diagramy</h2>
+      <p>Rysowany ręcznie szkicownik: prostokąty, strzałki, ikony, obrazki z wyszukiwarki i tryb prezentacji.</p>
+    </a>
+    <button class="strefa-tile strefa-tile--btn" type="button" id="tile-access">
       <span class="strefa-tile__ico">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/><path d="m9 12 2 2 4-4"/></svg>
       </span>
       <h2>Dostęp</h2>
-      <p>Logowanie Google lub loginem. Dostęp wyłącznie dla adresów z allowlisty zespołu SZRON.</p>
-    </div>
+      <p>Twoje konto, sposób logowania i allowlista zespołu. Stąd zmienisz hasło albo się wylogujesz.</p>
+    </button>
   </div>
+
+  <div id="modal-root"></div>
+  <div class="strefa-toasts" id="toasts" aria-live="polite"></div>
+
+  <script>
+    import { ALLOWLIST, getTeamUser, signOut } from '../../lib/supabase.js';
+    import { $, esc, fmtDateTime, openModal, closeModal } from '../../lib/strefa-ui.js';
+
+    // kafelek „Dostęp" — podsumowanie konta zalogowanego do strefy (dane z sesji Supabase)
+    $('#tile-access').addEventListener('click', async () => {
+      const user = await getTeamUser();
+      if (!user) { window.location.href = '/strefa/login'; return; }
+      const provider = user.app_metadata?.provider === 'google' ? 'Google' : 'e-mail i hasło';
+      const box = openModal(`
+        <div class="strefa-modal__head">
+          <div>
+            <h2>Dostęp</h2>
+            <p>Konto zalogowane do strefy zamkniętej</p>
+          </div>
+          <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" data-x type="button">Zamknij</button>
+        </div>
+        <div class="strefa-modal__body">
+          <div class="strefa-modal__section">
+            <h3>Twoje konto</h3>
+            <dl class="strefa-kv">
+              <dt>E-mail</dt><dd>${esc(user.email || '—')}</dd>
+              <dt>Logowanie</dt><dd>${provider}</dd>
+              <dt>Ostatnie wejście</dt><dd>${esc(fmtDateTime(user.last_sign_in_at) || '—')}</dd>
+            </dl>
+          </div>
+          <div class="strefa-modal__section">
+            <h3>Allowlista zespołu</h3>
+            <p style="color:var(--color-text-inv-2);font-size:var(--text-s);margin:0 0 var(--space-sm)">
+              Tylko te adresy przechodzą strażnika strefy — reszta wraca na ekran logowania.</p>
+            <ul class="strefa-kv__list">${ALLOWLIST.map((a) => `<li>${esc(a)}${a === user.email ? ' <span class="strefa-kv__me">to Ty</span>' : ''}</li>`).join('')}</ul>
+          </div>
+          <div class="strefa-actions-row" style="margin-top:var(--space-lg)">
+            <a class="strefa-btn strefa-btn--ghost" href="/strefa/reset">Zmień hasło</a>
+            <button class="strefa-btn strefa-btn--accent" data-out type="button">Wyloguj</button>
+          </div>
+        </div>`);
+      box.querySelector('[data-x]').addEventListener('click', closeModal);
+      box.querySelector('[data-out]').addEventListener('click', async () => {
+        await signOut();
+        window.location.href = '/strefa/login';
+      });
+    });
+  </script>
 </Strefa>

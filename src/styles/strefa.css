@@ -253,6 +253,15 @@ body:has(.strefa-main[data-page="programisci"]) .strefa-top__inner { max-width: 
 .strefa-tile p { color: var(--color-text-inv-2); font-size: var(--text-s); margin: 0; }
 .strefa-tile__ico { width: 2.4rem; height: 2.4rem; border-radius: var(--radius-btn); background: var(--color-accent-soft); color: var(--color-accent); display: grid; place-content: center; margin-bottom: var(--space-md); }
 .strefa-tile__ico svg { width: 20px; height: 20px; }
+/* kafelek-akcja (np. „Dostęp") — ten sam wygląd co kafelek-link, ale to <button> */
+.strefa-tile--btn { font: inherit; text-align: left; cursor: pointer; width: 100%; }
+
+/* lista klucz–wartość w modalach strefy */
+.strefa-kv { display: grid; grid-template-columns: auto 1fr; gap: .35rem var(--space-md); margin: 0; font-size: var(--text-s); }
+.strefa-kv dt { color: var(--color-text-inv-3); }
+.strefa-kv dd { margin: 0; }
+.strefa-kv__list { margin: 0; padding: 0; list-style: none; font-size: var(--text-s); display: grid; gap: .3rem; }
+.strefa-kv__me { color: var(--color-accent); font-size: var(--text-caption); }
 
 /* ── toast ── */
 .strefa-toasts { position: fixed; right: var(--space-lg); bottom: var(--space-lg); z-index: 80; display: flex; flex-direction: column; gap: var(--space-sm); max-width: 22rem; }
