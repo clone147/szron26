@@ -1,0 +1,33 @@
+---
+import Strefa from '../../layouts/Strefa.astro';
+---
+<Strefa title="Reżyserka" active="rezyserka">
+  <div id="rez-lib">
+    <div class="strefa-head">
+      <div>
+        <p class="strefa-eyebrow">Strefa zamknięta · Reżyserka</p>
+        <h1>Reżyserka</h1>
+        <p>Planowanie odcinków kanału: kręgosłup, narracja z timecodami, nakładki. Wynikiem jest diagram scenopisu — a zmiany w Diagramach wracają tu na żywo.</p>
+      </div>
+      <div class="strefa-actions-row">
+        <button class="strefa-btn strefa-btn--ghost" id="btn-z-diagramu" type="button">Film z diagramu</button>
+        <button class="strefa-btn strefa-btn--accent" id="btn-nowy-film" type="button">Nowy film</button>
+      </div>
+    </div>
+    <div class="rez-karty" id="rez-grid"></div>
+  </div>
+
+  <div id="rez-film" hidden>
+    <div class="rez-pasek" id="rez-pasek"></div>
+    <div id="rez-brief"></div>
+    <div id="rez-uwagi"></div>
+    <div class="rez-sb" id="rez-sb"></div>
+  </div>
+
+  <div id="modal-root"></div>
+  <div class="strefa-toasts" id="toasts" aria-live="polite"></div>
+
+  <script>
+    import '../../lib/strefa-rezyserka.js';
+  </script>
+</Strefa>

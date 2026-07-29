@@ -801,6 +801,7 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     const s = { ...clipboard, id: uid(), x: clipboard.x + 16, y: clipboard.y + 16 };
     delete s.startBind; delete s.endBind; // kopia strzałki nie dziedziczy przyklejenia
+    delete s.film; // kopia karty sceny to NOWA scena, nie duplikat starej (meta scenopisu precz)
     clipboard = { ...s }; // kolejne wklejenia kaskadowo
     shapes.push(s);
     selectedId = s.id;
@@ -1659,10 +1660,16 @@ function scheduleSave() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(saveNow, 800);
 }
+// data budowane przez rozszerzenie — dodatkowe klucze (np. `film` scenopisu reżyserki) przeżywają zapis
+function buildData() {
+  const data = { ...current.data, shapes };
+  if (locked) data.locked = true; else delete data.locked;
+  return data;
+}
 async function saveNow() {
   if (!current || !dirty) return;
   dirty = false;
-  current.data = { shapes, ...(locked && { locked: true }) };
+  current.data = buildData();
   const { error } = await sb.from('diagrams')
     .update({ data: current.data, updated_at: new Date().toISOString() })
     .eq('id', current.id);
@@ -1718,7 +1725,7 @@ function renderGallery() {
     </button>` +
     diagrams.map((d) => `
     <button class="diag-card" type="button" data-id="${d.id}">
-      <span class="diag-card__thumb"><canvas></canvas><span class="diag-card__del" role="button" aria-label="Usuń diagram" title="Usuń diagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></span></span>
+      <span class="diag-card__thumb"><canvas></canvas>${d.data?.film ? '<span class="diag-card__badge" title="Diagram scenopisu — powiązany z filmem w Reżyserce, zmiany wracają tam na żywo">scenopis</span>' : ''}<span class="diag-card__del" role="button" aria-label="Usuń diagram" title="Usuń diagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></span></span>
       <span class="diag-card__title">${esc(d.title)}</span>
       <span class="diag-card__date">${fmtDateTime(d.updated_at)}</span>
     </button>`).join('');
@@ -1928,7 +1935,7 @@ $('#btn-lock').addEventListener('click', async () => {
   stopPlay();
   locked = !locked;
   applyLock();
-  current.data = { shapes, ...(locked && { locked: true }) };
+  current.data = buildData();
   const { error } = await sb.from('diagrams').update({ data: current.data }).eq('id', current.id);
   if (error) { toast('Błąd', error.message, 'err'); }
 });
@@ -1947,6 +1954,9 @@ $('#btn-next').addEventListener('click', () => navDiagram(1));
   window.addEventListener('resize', resize);
   new ResizeObserver(resize).observe(wrap); // łapie też moment odsłonięcia shell'a przez guard auth
   await loadList();
+  // ?open=<id> — bezpośrednie wejście do edytora (np. z Reżyserki: „Otwórz diagram scenopisu")
+  const open = new URLSearchParams(location.search).get('open');
+  if (open && diagrams.some((d) => d.id === open)) { openEditor(open); return; }
   if (!diagrams.length) createDiagram('Nowy diagram'); // brak diagramów → od razu do edytora
   else renderGallery();
 })();
