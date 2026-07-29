@@ -836,8 +836,32 @@ body:has(#diag-editor:not([hidden])) .strefa-top { display: none; }
 }
 .strefa-iconbtn:disabled { opacity: .35; cursor: default; pointer-events: none; }
 #btn-lock.is-locked { background: var(--color-accent-soft); color: var(--color-accent); }
-#btn-play.is-active { background: var(--color-accent-soft); color: var(--color-accent); }
+#btn-play.is-active, #btn-pres.is-active { background: var(--color-accent-soft); color: var(--color-accent); }
 .diag-hint { font-size: var(--text-caption); color: var(--color-text-inv-3); }
+
+/* tryb Prezentacja: pasek narzędzi znika — czysty kadr pod nagrywanie */
+.diag-wrap.is-pres .diag-bar { display: none; }
+.diag-pres[hidden] { display: none; }
+.diag-pres {
+  position: absolute; inset: 0; z-index: 5;
+  pointer-events: none;
+  font-family: 'Caveat', cursive;
+  color: var(--color-text-inv);
+}
+.diag-pres__title {
+  position: absolute; top: 14px; left: 22px;
+  font-size: 1.4rem; font-weight: 500; opacity: .4;
+}
+.diag-pres__counter {
+  position: absolute; right: 22px; bottom: 12px;
+  font-size: 1.3rem; opacity: .45; font-variant-numeric: tabular-nums;
+}
+.diag-pres__hint {
+  position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%);
+  font-size: 1.1rem; white-space: nowrap; opacity: 0;
+  animation: diagPresHint 8s ease forwards; /* podpowiedź gaśnie sama — nie wejdzie w nagranie */
+}
+@keyframes diagPresHint { 0% { opacity: 0; } 6% { opacity: .55; } 70% { opacity: .55; } 100% { opacity: 0; } }
 .diag-fx[hidden] { display: none; }
 .diag-fx {
   position: absolute; top: 12px; right: 12px; z-index: 6;

@@ -338,6 +338,21 @@ function render() {
   for (const s of shapes) {
     // tryb Play: kształty animowane wg przypisanego efektu (rysowanie/pop/wjazd/licznik + puls)
     if (play) {
+      if (play.pres) { // Prezentacja: focus pełny, reszta przygaszona, nieodsłonięte jako duchy
+        const rec = play.shown.get(s.id);
+        const now = performance.now();
+        const a = presAlpha(s);
+        if (a > 0.004) {
+          ctx.globalAlpha = a;
+          if (rec && now >= rec.t0 && now < rec.t0 + rec.dur + (rec.pulse ? PULSE_DUR : 0) + 40) drawShapeAnimated(s, rec);
+          else {
+            paintShape(ctx, s, pal().ink);
+            if (s.type !== 'arrow' && s.text) drawText(ctx, s);
+          }
+          ctx.globalAlpha = 1;
+        }
+        continue;
+      }
       const rec = play.shown.get(s.id);
       if (rec) drawShapeAnimated(s, rec);
       continue;
@@ -356,6 +371,19 @@ function render() {
       ctx.restore();
     }
     if (sel) drawHandles(s);
+  }
+  // Prezentacja, widok całej mapy: ramka wokół bieżącego kadru (jak slajd w graph-slides)
+  if (play?.pres && play.over && play.idx >= 0 && !play.steps[play.idx].finale) {
+    const fr = presFrameRect(play.steps[play.idx]);
+    const p = 26;
+    ctx.save();
+    ctx.strokeStyle = pal().sel;
+    ctx.lineWidth = 1.6 / camera.z;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(fr.x1 - p, fr.y1 - p, fr.x2 - fr.x1 + p * 2, fr.y2 - fr.y1 + p * 2, 16);
+    else ctx.rect(fr.x1 - p, fr.y1 - p, fr.x2 - fr.x1 + p * 2, fr.y2 - fr.y1 + p * 2);
+    ctx.stroke();
+    ctx.restore();
   }
   // podświetlenie obiektu, do którego przyklei się końcówka strzałki
   const bindPt = drag?.mode === 'draw' && drag.tool === 'arrow' ? { x: drag.x + drag.w, y: drag.y + drag.h }
@@ -583,6 +611,12 @@ canvas.addEventListener('pointerup', (e) => {
   if (drag?.playStep) { // tryb Play: klik w widoczny obiekt = zoom na niego, klik w tło = powrót kadru
     drag = null;
     const s = hitShape(toWorld(e));
+    if (play?.pres) { // Prezentacja: klik = dalej; klik w inny odsłonięty obiekt (lub na mapie) = skok
+      if (play.over) { if (s) presTravel(s.id); else presOverview(false); }
+      else if (s && play.shown.has(s.id) && !play.steps[play.idx]?.ids?.includes(s.id)) presTravel(s.id);
+      else presAdvance();
+      return;
+    }
     if (s && play?.shown.has(s.id)) zoomToShape(s);
     else zoomBackOut();
     return;
@@ -737,6 +771,13 @@ textEl.addEventListener('keydown', (e) => {
 let clipboard = null; // skopiowany kształt (⌘C/⌘V)
 document.addEventListener('keydown', (e) => {
   if (!current || editingId || (e.target instanceof Element && e.target.matches('input, textarea, select'))) return;
+  if (play?.pres) { // Prezentacja: spacja/→ = krok, ← = wstecz, O/„-" = cała mapa, Esc = koniec
+    if (e.key === 'Escape') stopPlay();
+    else if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); presAdvance(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); presRetreat(); }
+    else if (e.key === 'o' || e.key === 'O' || e.key === '-' || e.key === '_') { e.preventDefault(); presOverview(); }
+    return;
+  }
   if (play) { // tryb Play: Esc kończy, spacja/Enter/→ = następny krok, ← = krok wstecz, "-" = powrót kadru
     if (e.key === 'Escape') stopPlay();
     else if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); advancePlay(); }
@@ -744,9 +785,10 @@ document.addEventListener('keydown', (e) => {
     else if (e.key === '-' || e.key === '_') { e.preventDefault(); zoomBackOut(); }
     return;
   }
-  if (locked) { // zablokowany: tylko nawigacja
+  if (locked) { // zablokowany: tylko nawigacja + prezentacja
     if (e.key === 'ArrowLeft') navDiagram(-1);
     else if (e.key === 'ArrowRight') navDiagram(1);
+    else if (e.key === 'p' || e.key === 'P') startPres();
     return;
   }
   if ((e.metaKey || e.ctrlKey) && (e.key === 'c' || e.key === 'C')) {
@@ -781,6 +823,7 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 't' || e.key === 'T') setTool('text');
   else if (e.key === 'i' || e.key === 'I') toggleIconPanel();
   else if (e.key === 'g' || e.key === 'G') { toggleIconPanel(false); toggleImgPanel(); }
+  else if (e.key === 'p' || e.key === 'P') startPres();
   else if (e.key === 'Escape' && !iconPanel.hidden) toggleIconPanel(false);
   else if (e.key === 'Escape' && !imgPanel.hidden) toggleImgPanel(false);
 });
@@ -1221,10 +1264,12 @@ function followPlayCamera() {
 }
 function stopPlay() {
   if (!play) return;
+  const wasPres = !!play.pres;
   play = null;
   cancelAnimationFrame(playRaf);
+  cancelAnimationFrame(presRaf);
   zoomBack = null;
-  applyPlayUI(false);
+  if (wasPres) applyPresUI(false); else applyPlayUI(false);
   render();
 }
 function applyPlayUI(on) {
@@ -1244,6 +1289,312 @@ function applyPlayUI(on) {
   canvas.style.cursor = on ? 'pointer' : 'default';
 }
 $('#btn-play').addEventListener('click', () => (play ? stopPlay() : startPlay()));
+
+/* ── tryb Prezentacja: kamera-slajdy jak w „graph-based slides" ──
+   Jeden krok = jeden obiekt (plus doklejone podpisy i strzałka dochodząca). Kamera nurkuje
+   między kadrami po łuku van Wijka–Nuij (jak d3.interpolateZoom): przy dalekich skokach sama
+   odjeżdża pokazując całą mapę i wchodzi w nowy region. Focus pełną kreską, wcześniejsze
+   kroki przygaszone, nieodsłonięte jako ledwo widoczne duchy. Czysty ekran pod nagrywanie. */
+let presRaf = 0;
+let presCursorTimer = 0;
+const PRES = { ghost: 0.06, ghostOver: 0.09, dim: 0.22, dimOver: 0.55, maxZ: 2.4 };
+
+function boundsOf(shs) {
+  let x1 = 1e9, y1 = 1e9, x2 = -1e9, y2 = -1e9;
+  for (const s of shs) {
+    x1 = Math.min(x1, s.x, s.x + s.w); x2 = Math.max(x2, s.x, s.x + s.w);
+    y1 = Math.min(y1, s.y, s.y + s.h); y2 = Math.max(y2, s.y, s.y + s.h);
+  }
+  return { x1, y1, x2, y2 };
+}
+
+// Kroki prezentacji: kolejność BFS jak w Play, ale nody POJEDYNCZO. Luźne podpisy/ikony
+// dołączają do kroku najbliższego obiektu, strzałka odsłania się w kroku swojego celu
+// (rysuje się tuż przed nim — „skąd przyszliśmy"), bezdomne kształty dostają własne kroki.
+function buildPresSteps() {
+  const arrows = shapes.filter((s) => s.type === 'arrow');
+  const nodes = shapes.filter((s) => s.type !== 'arrow');
+  const conn = new Map(arrows.map((a) => [a.id, {
+    s: a.startBind || bindTargetAt({ x: a.x, y: a.y })?.id,
+    e: a.endBind || bindTargetAt({ x: a.x + a.w, y: a.y + a.h })?.id,
+  }]));
+  const inGraph = new Set();
+  for (const { s, e } of conn.values()) { if (s) inGraph.add(s); if (e) inGraph.add(e); }
+  const hasIncoming = new Set([...conn.values()].map((c) => c.e).filter(Boolean));
+  const read = (a, b) => (a.y - b.y) || (a.x - b.x); // porządek czytania w obrębie warstwy
+  const order = [];
+  const seen = new Set();
+  let layer = nodes.filter((n) => inGraph.has(n.id) && !hasIncoming.has(n.id)).sort(read);
+  if (!layer.length) layer = nodes.filter((n) => inGraph.has(n.id)).slice(0, 1); // sam cykl
+  while (layer.length) {
+    for (const n of layer) { order.push(n); seen.add(n.id); }
+    const next = new Set();
+    for (const { s, e } of conn.values())
+      if (e && !seen.has(e) && (!s || seen.has(s))) next.add(e);
+    layer = nodes.filter((n) => next.has(n.id)).sort(read);
+  }
+  for (const n of nodes.filter((n) => inGraph.has(n.id) && !seen.has(n.id)).sort(read)) { order.push(n); seen.add(n.id); }
+  // luźne kształty → do kroku najbliższego obiektu grafu albo własny krok na końcu
+  const loose = nodes.filter((n) => !seen.has(n.id));
+  const att = new Map();
+  const solo = [];
+  const mid = (s) => ({ x: s.x + s.w / 2, y: s.y + s.h / 2 });
+  for (const s of loose) {
+    const c = mid(s);
+    let best = null, bestD = Infinity;
+    for (const p of order) {
+      const pc = mid(p);
+      const d = Math.hypot(c.x - pc.x, c.y - pc.y) - Math.max(Math.abs(p.w), Math.abs(p.h)) / 2;
+      if (d < bestD) { bestD = d; best = p; }
+    }
+    if (best && bestD < 520) { if (!att.has(best.id)) att.set(best.id, []); att.get(best.id).push(s); }
+    else solo.push(s);
+  }
+  const steps = order.map((n) => ({ ids: [n.id, ...(att.get(n.id) || []).sort(read).map((x) => x.id)] }));
+  for (const s of solo.sort(read)) steps.push({ ids: [s.id] });
+  const stepIdx = new Map();
+  steps.forEach((st, i) => st.ids.forEach((id) => stepIdx.set(id, i)));
+  for (const a of arrows) {
+    const { s, e } = conn.get(a.id);
+    const ie = e != null ? stepIdx.get(e) : undefined;
+    const is = s != null ? stepIdx.get(s) : undefined;
+    const target = ie !== undefined && is !== undefined ? Math.max(ie, is) : ie ?? is;
+    if (target === undefined) { steps.push({ ids: [a.id] }); continue; } // strzałka w próżni
+    // dochodząca rysuje się przed nodem kroku, wychodząca wstecz — po nim
+    if (ie === target) steps[target].ids.unshift(a.id); else steps[target].ids.push(a.id);
+  }
+  return steps;
+}
+
+// kadr kroku: bbox obiektów + dociągnięcie w stronę końcówek strzałek (kontekst „skąd"),
+// ale bez odjeżdżania od bohatera dalej niż ~1 przekątną
+function presFrameRect(st) {
+  const shs = st.ids.map(byId).filter(Boolean);
+  const solid = shs.filter((s) => s.type !== 'arrow');
+  const b = boundsOf(solid.length ? solid : shs);
+  if (solid.length) {
+    const cx = (b.x1 + b.x2) / 2, cy = (b.y1 + b.y2) / 2;
+    const lim = Math.max(b.x2 - b.x1, b.y2 - b.y1) * 0.9 + 60;
+    for (const s of shs) {
+      if (s.type !== 'arrow') continue;
+      for (const p of [{ x: s.x, y: s.y }, { x: s.x + s.w, y: s.y + s.h }]) {
+        const dx = Math.max(-lim, Math.min(lim, p.x - cx));
+        const dy = Math.max(-lim, Math.min(lim, p.y - cy));
+        b.x1 = Math.min(b.x1, cx + dx); b.x2 = Math.max(b.x2, cx + dx);
+        b.y1 = Math.min(b.y1, cy + dy); b.y2 = Math.max(b.y2, cy + dy);
+      }
+    }
+  }
+  return b;
+}
+
+// kamera, przy której prostokąt świata wypełnia viewport (z marginesem, zoom ograniczony)
+function camForRect(rect, maxZ = PRES.maxZ, padScale = 0.14) {
+  const r = canvas.getBoundingClientRect();
+  const pad = Math.max(48, Math.min(r.width, r.height) * padScale);
+  const z = Math.max(0.08, Math.min(maxZ,
+    Math.min((r.width - pad * 2) / Math.max(24, rect.x2 - rect.x1),
+      (r.height - pad * 2) / Math.max(24, rect.y2 - rect.y1))));
+  return { z, x: (rect.x1 + rect.x2) / 2 - r.width / 2 / z, y: (rect.y1 + rect.y2) / 2 - r.height / 2 / z };
+}
+
+// przelot van Wijka–Nuij (jak d3.interpolateZoom) — naturalny łuk „odjazd nad mapę i nurkowanie";
+// zwraca czas trwania przelotu w ms (do zsynchronizowania startu animacji odsłaniania)
+function flyCamera(to) {
+  const r = canvas.getBoundingClientRect();
+  if (!r.width) { camera = { ...to }; render(); return 0; }
+  const rho = 1.42, rho2 = rho * rho;
+  const w0 = r.width / camera.z, w1 = r.width / to.z;
+  const ux0 = camera.x + r.width / 2 / camera.z, uy0 = camera.y + r.height / 2 / camera.z;
+  const ux1 = to.x + r.width / 2 / to.z, uy1 = to.y + r.height / 2 / to.z;
+  const dx = ux1 - ux0, dy = uy1 - uy0, d2 = dx * dx + dy * dy, d1 = Math.sqrt(d2);
+  let S, at;
+  if (d2 < 1) { // czysty zoom (albo brak ruchu)
+    S = Math.abs(Math.log(w1 / w0)) / rho;
+    at = (t) => ({ cx: ux0 + t * dx, cy: uy0 + t * dy, w: w0 * Math.exp(Math.log(w1 / w0) * t) });
+  } else {
+    const b0 = (w1 * w1 - w0 * w0 + rho2 * rho2 * d2) / (2 * w0 * rho2 * d1);
+    const b1 = (w1 * w1 - w0 * w0 - rho2 * rho2 * d2) / (2 * w1 * rho2 * d1);
+    const r0 = Math.log(Math.sqrt(b0 * b0 + 1) - b0);
+    const r1 = Math.log(Math.sqrt(b1 * b1 + 1) - b1);
+    S = (r1 - r0) / rho;
+    at = (t) => {
+      const s = t * S;
+      const u = (w0 / (rho2 * d1)) * (Math.cosh(r0) * Math.tanh(rho * s + r0) - Math.sinh(r0));
+      return { cx: ux0 + u * dx, cy: uy0 + u * dy, w: (w0 * Math.cosh(r0)) / Math.cosh(rho * s + r0) };
+    };
+  }
+  const dur = Math.max(480, Math.min(1700, Math.abs(S) * 190));
+  const t0 = performance.now();
+  stopCamAnim();
+  const tick = () => {
+    const t = Math.min(1, (performance.now() - t0) / dur);
+    const f = at((1 - Math.cos(Math.PI * t)) / 2); // delikatne wejście/wyjście
+    camera.z = r.width / f.w;
+    camera.x = f.cx - r.width / 2 / camera.z;
+    camera.y = f.cy - r.height / 2 / camera.z;
+    updateZoomLabel();
+    render();
+    if (t < 1) camRaf = requestAnimationFrame(tick);
+  };
+  camRaf = requestAnimationFrame(tick);
+  return dur;
+}
+
+// docelowa widoczność kształtu w bieżącym stanie prezentacji
+function presTargetAlpha(s) {
+  const st = play.steps[play.idx];
+  const rec = play.shown.get(s.id);
+  const started = rec && performance.now() >= rec.t0;
+  if (st?.finale) return started ? 1 : PRES.ghost;
+  if (started && st && st.ids.includes(s.id)) return 1;
+  if (started) return play.over ? PRES.dimOver : PRES.dim;
+  return play.over || play.idx < 0 ? PRES.ghostOver : PRES.ghost;
+}
+const presAlpha = (s) => play.alph.get(s.id) ?? presTargetAlpha(s);
+
+// stała pętla renderu prezentacji: wygładza alfa i utrzymuje 60 fps pod nagrywanie
+function presTick(now) {
+  if (!play?.pres) return;
+  const dt = Math.min(64, now - (play.t || now));
+  play.t = now;
+  const k = 1 - Math.exp(-dt / 130);
+  for (const s of shapes) {
+    const t = presTargetAlpha(s);
+    const cur = play.alph.get(s.id) ?? 0;
+    play.alph.set(s.id, cur + (t - cur) * k);
+  }
+  render();
+  presRaf = requestAnimationFrame(presTick);
+}
+
+// harmonogram odsłaniania kroku: strzałka → obiekt → podpisy, z zazębieniem jak w Play;
+// delay czeka, aż kamera zdąży dolecieć w okolice kadru
+function presReveal(st, delay = 0) {
+  const shs = st.ids.map(byId).filter(Boolean);
+  const timings = shs.map(shapeTiming);
+  const total = timings.reduce((a, t) => a + t.dur * 0.85, 0);
+  const k = Math.min(1, 2600 / Math.max(1, total));
+  let t = performance.now() + delay;
+  shs.forEach((s, i) => {
+    play.shown.set(s.id, { ...timings[i], t0: t, dur: timings[i].dur * k });
+    t += timings[i].dur * k * 0.85;
+  });
+}
+
+function presAdvance() {
+  if (!play?.pres || play.idx >= play.steps.length - 1) return; // po finale kończy tylko Esc
+  play.idx++;
+  play.over = false;
+  const st = play.steps[play.idx];
+  if (st.finale) flyCamera(camForRect(boundsOf(shapes), 1, 0.08)); // wielki finał: cała mapa
+  else {
+    const dur = flyCamera(camForRect(presFrameRect(st)));
+    presReveal(st, dur * 0.55);
+  }
+  updatePresUI();
+}
+
+function presRetreat() {
+  if (!play?.pres || play.idx < 0) return;
+  const st = play.steps[play.idx];
+  if (!st.finale) for (const id of st.ids) play.shown.delete(id);
+  play.idx--;
+  play.over = false;
+  const prev = play.steps[play.idx];
+  if (!prev || prev.finale) flyCamera(camForRect(boundsOf(shapes), 1, 0.08));
+  else {
+    for (const id of prev.ids) { // poprzedni krok od razu w pełni, bez ponownej animacji
+      const rec = play.shown.get(id);
+      if (rec) { rec.t0 = -1e9; rec.pulse = false; }
+    }
+    flyCamera(camForRect(presFrameRect(prev)));
+  }
+  updatePresUI();
+}
+
+// skok do kroku zawierającego kliknięty kształt: wcześniejsze odsłonięte od razu,
+// późniejsze schowane, sam cel odgrywa swoją animację od nowa
+function presTravel(id) {
+  const i = play.steps.findIndex((st) => !st.finale && st.ids.includes(id));
+  if (i < 0) return;
+  play.steps.forEach((st, j) => {
+    if (st.finale) return;
+    if (j < i) for (const sid of st.ids) play.shown.set(sid, { t0: -1e9, dur: 1, of: 1, fx: 'draw', pulse: false });
+    else for (const sid of st.ids) play.shown.delete(sid);
+  });
+  play.idx = i;
+  play.over = false;
+  const st = play.steps[i];
+  const dur = flyCamera(camForRect(presFrameRect(st)));
+  presReveal(st, dur * 0.55);
+  updatePresUI();
+}
+
+function presOverview(force) {
+  if (!play?.pres) return;
+  const on = force ?? !play.over;
+  play.over = on;
+  const st = play.idx >= 0 ? play.steps[play.idx] : null;
+  if (on || !st || st.finale) flyCamera(camForRect(boundsOf(shapes), 1, 0.08));
+  else flyCamera(camForRect(presFrameRect(st)));
+  updatePresUI();
+}
+
+function updatePresUI() {
+  const n = play.steps.length;
+  $('#pres-counter').textContent = play.idx < 0 ? `— / ${n}` : `${play.idx + 1} / ${n}`;
+}
+
+// kursor znika po chwili bezruchu — czysty kadr do nagrywania
+function presCursorWake() {
+  if (!play?.pres) return;
+  canvas.style.cursor = 'default';
+  clearTimeout(presCursorTimer);
+  presCursorTimer = setTimeout(() => { if (play?.pres) canvas.style.cursor = 'none'; }, 2200);
+}
+canvas.addEventListener('pointermove', presCursorWake);
+
+function applyPresUI(on) {
+  applyPlayUI(on); // ta sama blokada narzędzi/paneli co w Play…
+  $('#btn-play').classList.remove('is-active'); // …ale bez oznaczania przycisku Play
+  $('#btn-play').setAttribute('aria-pressed', 'false');
+  $('#play-hint').hidden = true;
+  $('#diag-editor').classList.toggle('is-pres', on);
+  const btn = $('#btn-pres');
+  btn.classList.toggle('is-active', on);
+  btn.setAttribute('aria-pressed', String(on));
+  $('#pres-ui').hidden = !on;
+  clearTimeout(presCursorTimer);
+  canvas.style.cursor = on ? 'default' : 'default';
+  if (on) presCursorWake();
+}
+
+function startPres() {
+  if (play?.pres) return;
+  stopPlay();
+  for (const s of shapes) { // bitmapy grzane z góry — w prezentacji nie ma czasu na doładowywanie
+    if (s.type === 'icon' && s.icon) tintedBmp(ICON_SRC(s.icon), pal().ink);
+    else if (s.type === 'image' && s.src) { bmpEntry(s.src); if (s.tint) tintedBmp(s.src, pal().ink); }
+  }
+  const steps = buildPresSteps();
+  if (!steps.length) { toast('Pusty diagram', 'Nie ma czego prezentować.', 'err'); return; }
+  if (editingId) commitText();
+  steps.push({ finale: true, ids: [] }); // ostatni slajd = cała mapa w pełnej kresce
+  play = { pres: true, steps, idx: -1, shown: new Map(), alph: new Map(shapes.map((s) => [s.id, 0])), over: false };
+  selectedId = null;
+  drag = null;
+  zoomBack = null;
+  fxPreview = null;
+  applyPresUI(true);
+  if (current) $('#pres-title').textContent = current.title;
+  resize(); // pasek narzędzi znika → kanwa urosła, kadr liczymy na nowym rozmiarze
+  flyCamera(camForRect(boundsOf(shapes), 1, 0.08)); // start: cała mapa jako duchy
+  updatePresUI();
+  cancelAnimationFrame(presRaf);
+  presRaf = requestAnimationFrame(presTick);
+}
+$('#btn-pres').addEventListener('click', () => (play?.pres ? stopPlay() : startPres()));
 
 /* ── panel „Animacja": przypisywanie efektu do zaznaczonego elementu + podgląd na żywo ── */
 let fxPreview = null; // { id, rec } — pojedynczy kształt animowany w edycji
