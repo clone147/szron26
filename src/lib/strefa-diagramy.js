@@ -824,7 +824,7 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 't' || e.key === 'T') setTool('text');
   else if (e.key === 'i' || e.key === 'I') { toggleKbPanel(false); toggleIconPanel(); }
   else if (e.key === 'g' || e.key === 'G') { toggleIconPanel(false); toggleKbPanel(false); toggleImgPanel(); }
-  else if (e.key === 'k' || e.key === 'K') toggleKbPanel();
+  else if (e.key === 'k' || e.key === 'K') { e.preventDefault(); toggleKbPanel(); } // preventDefault: „k” nie może wpaść do autofokusowanego filtra
   else if (e.key === 'p' || e.key === 'P') startPres();
   else if (e.key === 'Escape' && !iconPanel.hidden) toggleIconPanel(false);
   else if (e.key === 'Escape' && !imgPanel.hidden) toggleImgPanel(false);
