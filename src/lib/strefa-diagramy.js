@@ -84,6 +84,28 @@ const ICONS = [
 ];
 const ICON_SRC = (k) => `/img/doodle/${k}.${ICONS.find((i) => i.k === k)?.ext || 'webp'}`;
 const bmpStore = new Map(); // src → { img, ready, tints: Map(kolor → canvas) }
+
+// Canvas rastruje SVG w rozmiarze zadeklarowanym w pliku (Koboyo: sam viewBox → ~300 px),
+// więc powiększona bitmapa mydli. Lekarstwo: przepisujemy węzeł <svg> na duży stały rozmiar
+// i ładujemy przez blob — wektor rastruje się raz, ostro, także w tincie i na zoomie.
+const SVG_RASTER = 2048; // długi bok rastra
+async function hiResSvgUrl(src) {
+  const r = await fetch(src, { signal: AbortSignal.timeout(12000) });
+  if (!r.ok) throw new Error(`${src} → ${r.status}`);
+  const text = await r.text();
+  const open = /<svg[^>]*>/i.exec(text)?.[0];
+  if (!open) throw new Error('brak <svg>');
+  const attr = (n) => { const m = new RegExp(`\\s${n}\\s*=\\s*["']?([\\d.eE+-]+)`, 'i').exec(open); return m ? parseFloat(m[1]) : 0; };
+  const vb = /viewBox\s*=\s*["']\s*[\d.eE+-]+[\s,]+[\d.eE+-]+[\s,]+([\d.eE+-]+)[\s,]+([\d.eE+-]+)/i.exec(open);
+  const w0 = vb ? parseFloat(vb[1]) : attr('width');
+  const h0 = vb ? parseFloat(vb[2]) : attr('height');
+  if (!(w0 > 0 && h0 > 0)) throw new Error('svg bez wymiarów');
+  const k = SVG_RASTER / Math.max(w0, h0);
+  const opened = open.replace(/\s(?:width|height)\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+    .replace(/<svg/i, `<svg width="${Math.round(w0 * k)}" height="${Math.round(h0 * k)}"`);
+  return URL.createObjectURL(new Blob([text.replace(open, opened)], { type: 'image/svg+xml' }));
+}
+
 function bmpEntry(src) {
   let e = bmpStore.get(src);
   if (!e) {
@@ -95,7 +117,9 @@ function bmpEntry(src) {
       if (!$('#diag-gallery').hidden) renderGallery();
     };
     img.onerror = () => { e.failed = true; };
-    img.src = src;
+    // SVG w wysokiej rozdzielczości; gdy fetch się nie uda (brak CORS itp.) — po staremu wprost
+    if (/\.svg(\?|#|$)/i.test(src)) hiResSvgUrl(src).then((u) => { img.src = u; }, () => { img.src = src; });
+    else img.src = src;
     bmpStore.set(src, e);
   }
   return e;
