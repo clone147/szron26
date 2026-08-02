@@ -822,11 +822,13 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'r' || e.key === 'R') setTool('rect');
   else if (e.key === 'a' || e.key === 'A') setTool('arrow');
   else if (e.key === 't' || e.key === 'T') setTool('text');
-  else if (e.key === 'i' || e.key === 'I') toggleIconPanel();
-  else if (e.key === 'g' || e.key === 'G') { toggleIconPanel(false); toggleImgPanel(); }
+  else if (e.key === 'i' || e.key === 'I') { toggleKbPanel(false); toggleIconPanel(); }
+  else if (e.key === 'g' || e.key === 'G') { toggleIconPanel(false); toggleKbPanel(false); toggleImgPanel(); }
+  else if (e.key === 'k' || e.key === 'K') toggleKbPanel();
   else if (e.key === 'p' || e.key === 'P') startPres();
   else if (e.key === 'Escape' && !iconPanel.hidden) toggleIconPanel(false);
   else if (e.key === 'Escape' && !imgPanel.hidden) toggleImgPanel(false);
+  else if (e.key === 'Escape' && !kbPanel.hidden) toggleKbPanel(false);
 });
 
 function setTool(t) {
@@ -863,7 +865,7 @@ function insertIcon(k) {
   scheduleSave();
   render();
 }
-iconBtn.addEventListener('click', () => toggleIconPanel());
+iconBtn.addEventListener('click', () => { toggleKbPanel(false); toggleIconPanel(); });
 iconPanel.addEventListener('pointerdown', (e) => e.stopPropagation());
 iconPanel.addEventListener('click', (e) => {
   const b = e.target.closest('[data-icon]');
@@ -958,7 +960,7 @@ function toggleImgPanel(force) {
   imgBtn.setAttribute('aria-pressed', String(show));
   if (show) { if (!imgGrid._items?.length) showRecent(); imgInput.focus(); imgInput.select(); }
 }
-imgBtn.addEventListener('click', () => { toggleIconPanel(false); toggleImgPanel(); });
+imgBtn.addEventListener('click', () => { toggleIconPanel(false); toggleKbPanel(false); toggleImgPanel(); });
 imgPanel.addEventListener('pointerdown', (e) => e.stopPropagation());
 
 // kopia obrazka do bucketu strefy — dzięki temu diagram nie zależy od cudzego serwera
@@ -1020,6 +1022,96 @@ imgGrid.addEventListener('click', async (e) => {
     b.classList.remove('is-busy');
   }
 });
+
+/* ── panel „Koboyo": kopia wybranych rysunkowych ikon koboyo.com w naszym buckecie ──
+   Przeglądarka pokazuje od razu WSZYSTKIE ikony (miniatury dociągane leniwie), filtr zawęża.
+   Indeks: koboyo/index.json = [[slug, nazwa, słowa kluczowe, grupa], …]; plik: koboyo/<slug>.svg.
+   Czarny tusz → wstawiamy z tint, żeby edytor barwił je kolorem kreski jak własne doodle. */
+const kbPanel = $('#koboyo-panel');
+const kbBtn = $('#btn-koboyo');
+const kbInput = $('#kb-q');
+const kbGrid = $('#kb-grid');
+const kbNote = $('#kb-note');
+const KB_URL = (p) => sb.storage.from('strefa-diagramy').getPublicUrl(`koboyo/${p}`).data.publicUrl;
+let kbIndex = null;   // wpisy z index.json (null = jeszcze nie pobrany)
+let kbGroup = 'all';
+
+async function kbLoad() {
+  if (kbIndex) return kbIndex;
+  kbNote.textContent = 'Wczytuję bibliotekę…';
+  try {
+    const r = await fetch(KB_URL('index.json'), { signal: AbortSignal.timeout(15000) });
+    if (!r.ok) throw new Error(`index.json → ${r.status}`);
+    kbIndex = await r.json();
+  } catch (err) {
+    console.error('[diagramy] indeks Koboyo:', err);
+    kbNote.textContent = 'Nie udało się wczytać biblioteki — spróbuj otworzyć panel ponownie.';
+    return null;
+  }
+  $('#kb-tabs').innerHTML = ['all', ...new Set(kbIndex.map((e) => e[3]))].map((g) => `
+    <button class="diag-imgtab${g === kbGroup ? ' is-active' : ''}" type="button" data-group="${esc(g)}">${g === 'all' ? 'Wszystkie' : esc(g)}</button>`).join('');
+  return kbIndex;
+}
+
+function kbPaint() {
+  if (!kbIndex) return;
+  const words = kbInput.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const list = kbIndex.filter(([slug, name, kw, group]) => (kbGroup === 'all' || group === kbGroup)
+    && words.every((w) => slug.includes(w) || name.toLowerCase().includes(w) || kw.includes(w)));
+  kbGrid.innerHTML = list.map(([slug, name]) => `
+    <button class="diag-imgres" type="button" data-slug="${esc(slug)}" data-name="${esc(name)}" title="${esc(name)}">
+      <img src="${esc(KB_URL(slug + '.svg'))}" alt="" loading="lazy" draggable="false">
+      <span>${esc(name)}</span>
+    </button>`).join('');
+  kbGrid.scrollTop = 0;
+  kbNote.textContent = list.length
+    ? `${list.length} ${kbGroup === 'all' ? 'ikon w bibliotece' : 'ikon w grupie'} · klik wstawia (barwiona tuszem)`
+    : 'Nic nie pasuje — spróbuj krótszej frazy (indeks jest po angielsku).';
+}
+
+let kbTimer = null;
+kbInput.addEventListener('input', () => { clearTimeout(kbTimer); kbTimer = setTimeout(kbPaint, 180); });
+kbInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { toggleKbPanel(false); canvas.focus(); } });
+
+$('#kb-tabs').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-group]');
+  if (!b) return;
+  kbGroup = b.dataset.group;
+  $('#kb-tabs').querySelectorAll('.diag-imgtab').forEach((x) => x.classList.toggle('is-active', x === b));
+  kbPaint();
+});
+
+kbGrid.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-slug]');
+  if (!b) return;
+  b.classList.add('is-busy');
+  try {
+    if (!(await insertImage(KB_URL(b.dataset.slug + '.svg'), b.dataset.name, true))) throw new Error(`nie wczytała się: ${b.dataset.slug}`);
+    toggleKbPanel(false);
+  } catch (err) {
+    console.error('[diagramy] wstawianie ikony Koboyo:', err);
+    toast('Nie udało się wstawić', 'Ikona nie chciała się wczytać — spróbuj innej.', 'err');
+  } finally {
+    b.classList.remove('is-busy');
+  }
+});
+
+function toggleKbPanel(force) {
+  const show = force ?? kbPanel.hidden;
+  if (show && (locked || play)) return;
+  kbPanel.hidden = !show;
+  kbBtn.classList.toggle('is-active', show);
+  kbBtn.setAttribute('aria-pressed', String(show));
+  if (show) {
+    toggleIconPanel(false);
+    toggleImgPanel(false);
+    if (!kbIndex) kbLoad().then((ok) => { if (ok) kbPaint(); });
+    kbInput.focus();
+    kbInput.select();
+  }
+}
+kbBtn.addEventListener('click', () => toggleKbPanel());
+kbPanel.addEventListener('pointerdown', (e) => e.stopPropagation());
 
 // „Wklej adres": obrazek prosto z URL-a (bez kopii w buckecie — adres zostaje cudzy)
 $('#img-url').addEventListener('click', async () => {
@@ -1282,8 +1374,10 @@ function applyPlayUI(on) {
   document.querySelectorAll('.diag-tool[data-tool]').forEach((b) => { b.disabled = on || locked; });
   iconBtn.disabled = on || locked;
   imgBtn.disabled = on || locked;
+  kbBtn.disabled = on || locked;
   if (on) toggleImgPanel(false);
   if (on) toggleIconPanel(false);
+  if (on) toggleKbPanel(false);
   $('#btn-rename').disabled = on || locked;
   $('#btn-delete').disabled = on || locked;
   if (on) setTool('select');
@@ -1919,8 +2013,10 @@ function applyLock() {
   document.querySelectorAll('.diag-tool[data-tool]').forEach((b) => { b.disabled = locked; });
   iconBtn.disabled = locked;
   imgBtn.disabled = locked;
+  kbBtn.disabled = locked;
   if (locked) toggleImgPanel(false);
   if (locked) toggleIconPanel(false);
+  if (locked) toggleKbPanel(false);
   $('#btn-rename').disabled = locked;
   $('#btn-delete').disabled = locked;
   if (locked) {
