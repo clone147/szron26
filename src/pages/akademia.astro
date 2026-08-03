@@ -17,7 +17,7 @@ import { akademia } from '../data/akademia.mjs';
     <div class="container">
       <SectHead eyebrow="Wszystkie szkolenia" title={`${akademia.length} ścieżek — od pierwszej instalacji po model na własnym serwerze.`} small />
       <img class="hero-img rv" src="/img/sub/akademia-szkolenie.webp" alt="Tomek prowadzi szkolenie przed dużym ekranem z terminalem, uczestnicy z laptopami" width="1380" height="768" loading="lazy" />
-      <div class="link-cards rv">
+      <div class="link-cards link-cards--num rv">
         {akademia.map((a) => (
           <a class="link-card" href={`/${a.slug}`}>
             <h3>{a.title}</h3>

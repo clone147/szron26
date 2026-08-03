@@ -3,12 +3,12 @@ import Bare from '../../layouts/Bare.astro';
 import '../../styles/main.css';
 import '../../styles/strefa.css';
 ---
-<Bare title="Reset hasła — Strefa SZRON">
+<Bare title="Reset hasła — SZRON">
   <div class="strefa-login">
     <div class="strefa-login__box">
       <div class="strefa-login__brand">
         <img src="/img/logo-dark.svg" alt="SZRON" />
-        <p>Strefa zamknięta</p>
+        <p>Konto SZRON</p>
       </div>
       <div class="strefa-login__card">
         <h1>Reset hasła</h1>
@@ -42,7 +42,7 @@ import '../../styles/strefa.css';
       const { error } = await sendPasswordReset(email);
       if (error) { show(error, false); btn.disabled = false; btn.textContent = 'Wyślij link resetujący'; return; }
       // Jednolity komunikat — nie ujawniamy, które adresy mają dostęp.
-      show('Jeśli to konto ma dostęp do strefy, wysłaliśmy na nie link do resetu hasła. Sprawdź skrzynkę (i spam).', true);
+      show('Jeśli ten adres ma konto SZRON, wysłaliśmy na niego link do resetu hasła. Sprawdź skrzynkę (i spam).', true);
       btn.textContent = 'Wysłano';
     });
   </script>

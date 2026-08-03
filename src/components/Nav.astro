@@ -80,28 +80,32 @@ const buildTag = `${buildSha} · ${buildTime}`;
           </button>
           <div class="nav-auth__panel" id="nav-auth-panel" role="dialog" aria-label="Logowanie do strefy zamkniętej">
             <div class="nav-auth__signed" id="nav-auth-signed" hidden>
-              <h3>Twoje konto</h3>
-              <p class="nav-auth__hint nav-auth__who" id="nav-auth-who"></p>
+              <p class="nav-auth__eyebrow">Twoje konto</p>
+              <p class="nav-auth__who" id="nav-auth-who"></p>
               <p class="nav-auth__hint" id="nav-auth-scope"></p>
-              <a class="nav-auth__open" id="nav-auth-panel-link" href="/strefa" hidden>Otwórz panel Strefy →</a>
-              <button class="nav-auth__submit" type="button" id="na-logout">Wyloguj</button>
+              <nav class="nav-auth__links" aria-label="Konto">
+                <a id="nav-auth-panel-link" href="/strefa" hidden>Otwórz panel Strefy →</a>
+                <a id="nav-auth-akademia-link" href="/akademia" hidden>Przejdź do Akademii →</a>
+                <a href="/strefa/auth/reset">Zmień hasło</a>
+              </nav>
+              <button class="nav-auth__ghost" type="button" id="na-logout">Wyloguj</button>
             </div>
             <div id="nav-auth-anon">
-            <h3>Strefa zamknięta</h3>
-            <p class="nav-auth__hint">Zaloguj się loginem lub przez Google.</p>
+            <p class="nav-auth__eyebrow">Strefa zamknięta</p>
+            <h3>Zaloguj się</h3>
+            <p class="nav-auth__hint">Zespół SZRON i klienci Akademii.</p>
             <div class="nav-auth__msg" id="nav-auth-msg" hidden></div>
             <form id="nav-auth-form">
               <input class="nav-auth__input" type="email" id="na-email" placeholder="E-mail" autocomplete="username" required />
               <input class="nav-auth__input" type="password" id="na-pass" placeholder="Hasło" autocomplete="current-password" required />
               <button class="nav-auth__submit" type="submit" id="na-login">Zaloguj</button>
             </form>
-            <a class="nav-auth__open" href="/strefa/reset">Nie pamiętasz hasła?</a>
+            <a class="nav-auth__aux" href="/strefa/reset">Nie pamiętasz hasła? Ustaw nowe</a>
             <div class="nav-auth__or"><span>albo</span></div>
             <button class="nav-auth__google" type="button" id="na-google">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z"/></svg>
               Zaloguj przez Google
             </button>
-            <a class="nav-auth__open" href="/strefa">Otwórz panel →</a>
             </div>
           </div>
         </li>
@@ -172,15 +176,22 @@ const buildTag = `${buildSha} · ${buildTime}`;
     display: none; flex-direction: column; gap: var(--space-sm);
   }
   .nav-auth.is-open .nav-auth__panel { display: flex; }
-  .nav-auth__panel h3 { font-family: var(--font-display); font-weight: 600; font-size: 1rem; margin: 0; color: var(--color-text-inv); }
+  .nav-auth__panel h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; margin: 0; color: var(--color-text-inv); }
+  .nav-auth__eyebrow {
+    margin: 0; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--color-accent);
+  }
   .nav-auth__hint { color: var(--color-text-inv-3); font-size: 0.8rem; margin: 0 0 0.2rem; }
+  .nav-auth__who { margin: 0; font-weight: 600; font-size: 0.95rem; color: var(--color-text-inv); word-break: break-all; }
   .nav-auth__panel form { display: flex; flex-direction: column; gap: var(--space-sm); margin: 0; }
-  .nav-auth__input {
+  /* #id w selektorze: globalne `form input` (jasne tło) nie może wygrać z ciemnym panelem */
+  #nav-auth-panel .nav-auth__input {
     background: var(--color-ink); color: var(--color-text-inv); border: 1px solid var(--color-line-dark);
     border-radius: var(--radius-btn); padding: 0.5rem 0.65rem; font: inherit; font-size: 0.9rem; width: 100%;
   }
-  .nav-auth__input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-soft); }
-  .nav-auth__input::placeholder { color: var(--color-text-inv-3); }
+  #nav-auth-panel .nav-auth__input:focus,
+  #nav-auth-panel .nav-auth__input:focus-visible { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-accent-soft); }
+  #nav-auth-panel .nav-auth__input::placeholder { color: var(--color-text-inv-3); }
   .nav-auth__submit {
     background: var(--color-accent); color: var(--color-ink); border: 0; border-radius: var(--radius-btn);
     padding: 0.55rem; font: inherit; font-weight: 600; cursor: pointer; width: 100%;
@@ -196,8 +207,26 @@ const buildTag = `${buildSha} · ${buildTime}`;
   }
   .nav-auth__google:hover:not(:disabled) { opacity: 0.9; }
   .nav-auth__google svg { width: 16px; height: 16px; }
-  .nav-auth__open { text-align: center; font-size: 0.8rem; color: var(--color-text-inv-3); text-decoration: none; }
-  .nav-auth__open:hover { color: var(--color-accent); }
+  /* linki w panelu — bez wersalików nawigacji, spokojna hierarchia */
+  .nav-auth__links { display: flex; flex-direction: column; gap: 0.45rem; padding-block: 0.15rem; }
+  .nav-auth__links a {
+    font-size: 0.86rem; text-decoration: none; color: var(--color-text-inv-2);
+    text-transform: none; letter-spacing: normal;
+  }
+  .nav-auth__links a:hover { color: var(--color-accent); }
+  .nav-auth__links a[id] { color: var(--color-text-inv); font-weight: 600; }
+  .nav-auth__links a[id]:hover { color: var(--color-accent); }
+  .nav-auth__aux {
+    text-align: center; font-size: 0.8rem; color: var(--color-text-inv-3); text-decoration: none;
+    text-transform: none; letter-spacing: normal;
+  }
+  .nav-auth__aux:hover { color: var(--color-accent); }
+  .nav-auth__ghost {
+    background: transparent; color: var(--color-text-inv-2); border: 1px solid var(--color-line-dark);
+    border-radius: var(--radius-btn); padding: 0.5rem; font: inherit; font-size: 0.88rem; cursor: pointer; width: 100%;
+    transition: color var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out);
+  }
+  .nav-auth__ghost:hover { color: var(--color-text-inv); border-color: var(--color-text-inv-3); }
   .nav-auth__msg { font-size: 0.82rem; padding: 0.45rem 0.6rem; border-radius: var(--radius-btn); background: oklch(60% 0.2 25 / 0.16); color: oklch(80% 0.14 25); border: 1px solid oklch(60% 0.2 25 / 0.35); }
   @media (max-width: 980px) { .nav-auth { display: none; } }
 </style>
@@ -245,6 +274,7 @@ const buildTag = `${buildSha} · ${buildTime}`;
           document.getElementById('nav-auth-who').textContent = user.email;
           const team = isAllowed(user.email);
           document.getElementById('nav-auth-panel-link').hidden = !team;
+          document.getElementById('nav-auth-akademia-link').hidden = team;
           document.getElementById('nav-auth-scope').textContent = team
             ? 'Konto zespołu SZRON — masz dostęp do Strefy.'
             : 'Masz dostęp do pełnych treści Akademii i pobierania skilli.';

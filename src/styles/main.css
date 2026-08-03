@@ -1071,8 +1071,24 @@ form [name="bot-field"], form label:has([name="bot-field"]), p.hidden, .hidden-f
 .callout strong { color: var(--color-text); }
 .callout p { font-size: var(--text-s); color: var(--color-text-2); }
 
+/* zdjęcie-przerywnik pod nagłówkiem sekcji (wspólne dla podstron) — bez tej reguły
+   fotografia klei się do treści poniżej i ma ostre rogi obce reszcie strony */
+.hero-img {
+  display: block; width: 100%; height: auto;
+  border-radius: var(--radius-card);
+  margin-bottom: var(--space-2xl);
+}
+
 /* spis Akademii / kart-linków */
 .link-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: var(--space-xs); }
+/* wariant numerowany (spis szkoleń Akademii) — numeracja 01/, 02/ jak sekcje strony */
+.link-cards--num { counter-reset: lc; gap: var(--space-sm); }
+.link-cards--num .link-card { counter-increment: lc; }
+.link-cards--num .link-card::before {
+  content: counter(lc, decimal-leading-zero) "/";
+  color: var(--color-accent); font-weight: 600;
+  font-size: var(--text-caption); letter-spacing: 0.1em;
+}
 .link-card {
   display: flex; flex-direction: column; gap: var(--space-xs);
   padding: clamp(1.25rem, 2.2vw, 1.75rem); border-radius: var(--radius-card);

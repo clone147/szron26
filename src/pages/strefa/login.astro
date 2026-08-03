@@ -67,9 +67,11 @@ import '../../styles/strefa.css';
       btn.disabled = true; msg.hidden = true;
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      const { error } = await signInPassword(email, password);
+      const { error, team } = await signInPassword(email, password);
       if (error) { showErr(error); btn.disabled = false; return; }
-      window.location.replace(safeNext);
+      // Klient Akademii nie ma wstępu do strefy — bez tego rozgałęzienia wpadał
+      // w pętlę logowanie → /strefa → z powrotem na logowanie.
+      window.location.replace(team ? safeNext : '/akademia');
     });
   </script>
 </Bare>
