@@ -20,7 +20,7 @@ function buildGateBox() {
           <button type="submit" class="btn" data-agate-login>Zaloguj</button>
         </form>
         <p class="agate__status" data-agate-status role="status"></p>
-        <p class="agate__aux"><a href="/strefa/reset">Nie pamiętasz hasła? Ustaw nowe</a></p>
+        <p class="agate__aux">Hasło zmienisz po zalogowaniu — w menu „Strefa” u góry strony.</p>
       </div>
     </div>`;
   return box;

@@ -42,14 +42,6 @@ export function isAllowed(email) {
   return !!email && ALLOWLIST.includes(String(email).toLowerCase());
 }
 
-// Domeny klientów Akademii — konta e-mail/hasło zakładane przez nas.
-// Reset hasła działa dla zespołu ORAZ tych domen (projekt Supabase jest współdzielony
-// z innymi aplikacjami — nie wysyłamy resetów do cudzych kont).
-export const CLIENT_DOMAINS = ['rg.com.pl'];
-export function isClientEmail(email) {
-  const e = String(email || '').toLowerCase();
-  return CLIENT_DOMAINS.some((d) => e.endsWith('@' + d));
-}
 
 export async function getSessionUser() {
   const { data } = await getClient().auth.getSession();
@@ -100,12 +92,12 @@ export async function signOut() {
   await getClient().auth.signOut();
 }
 
-// Reset hasła — wyślij link e-mail. Gate'owane do zespołu + domen klientów Akademii
-// (wspólny projekt Supabase — nie wysyłamy resetów do kont innych aplikacji).
-// Komunikat w UI jednolity, żeby nie zdradzać, które adresy mają konto.
+// Reset hasła — wyślij link e-mail. TYLKO zespół (allowlista): klienci zmieniają hasło
+// bez maili na /strefa/haslo (decyzja 2026-08-03), a wspólny projekt Supabase ma konta
+// innych aplikacji, do których nie wolno nam mailować. Komunikat w UI jednolity.
 export async function sendPasswordReset(email) {
   const e = String(email).trim().toLowerCase();
-  if (!isAllowed(e) && !isClientEmail(e)) return { error: null, gated: true };
+  if (!isAllowed(e)) return { error: null, gated: true };
   const redirectTo = `${window.location.origin}/strefa/auth/reset`;
   const { error } = await getClient().auth.resetPasswordForEmail(e, { redirectTo });
   return { error: error ? error.message : null };

@@ -110,6 +110,7 @@ h1, h2, h3, h4 {
 .strefa-login__card { background: var(--color-ink-2); border: 1px solid var(--color-line-dark); border-radius: var(--radius-card); padding: var(--space-xl); }
 .strefa-login__card h1 { font-family: var(--font-display); font-weight: 600; font-size: 1.4rem; margin: 0 0 var(--space-lg); }
 .strefa-login form { display: flex; flex-direction: column; gap: var(--space-md); }
+.strefa-login form[hidden] { display: none; } /* display:flex nadpisywał atrybut hidden — stany strony pokazywały się naraz */
 .strefa-msg { font-size: var(--text-s); padding: .6rem .75rem; border-radius: var(--radius-btn); }
 .strefa-msg--err { background: color-mix(in oklch, oklch(60% 0.2 25) 18%, transparent); color: oklch(80% 0.14 25); border: 1px solid color-mix(in oklch, oklch(60% 0.2 25) 35%, transparent); }
 .strefa-login__back { display: block; text-align: center; margin-top: var(--space-lg); color: var(--color-text-inv-3); font-size: var(--text-caption); }

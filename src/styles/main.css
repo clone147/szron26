@@ -996,7 +996,10 @@ h1, h2, h3, h4 {
 form .field, form > div:has(> label) { display: flex; flex-direction: column; gap: var(--space-2xs); }
 form label { font-size: var(--text-caption); font-weight: 600; letter-spacing: 0.04em; }
 form { display: grid; gap: var(--space-lg); max-width: 42rem; }
-form input:not([type="hidden"]):not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+/* :not(.strefa-input itd.) — reguła jest dla formularzy marketingowych (Netlify);
+   wysoka specyficzność :not([type=…])×4 wygrywała z klasami komponentów (ciemne
+   inputy strefy/nav/bramki Akademii renderowały się na biało) */
+form input:not([type="hidden"]):not([type="range"]):not([type="checkbox"]):not([type="radio"]):not(.strefa-input):not(.nav-auth__input):not(.agate__input),
 form select,
 form textarea {
   font: inherit; width: 100%;

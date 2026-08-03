@@ -70,8 +70,8 @@ import '../../styles/strefa.css';
       const { error, team } = await signInPassword(email, password);
       if (error) { showErr(error); btn.disabled = false; return; }
       // Klient Akademii nie ma wstępu do strefy — bez tego rozgałęzienia wpadał
-      // w pętlę logowanie → /strefa → z powrotem na logowanie.
-      window.location.replace(team ? safeNext : '/akademia');
+      // w pętlę logowanie → /strefa → z powrotem na logowanie. Wyjątek: zmiana hasła.
+      window.location.replace(team || safeNext === '/strefa/haslo' ? safeNext : '/akademia');
     });
   </script>
 </Bare>

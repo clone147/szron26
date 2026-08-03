@@ -1,0 +1,87 @@
+---
+import Bare from '../../layouts/Bare.astro';
+import '../../styles/main.css';
+import '../../styles/strefa.css';
+---
+<Bare title="Zmiana hasła — SZRON">
+  <div class="strefa-login">
+    <div class="strefa-login__box">
+      <div class="strefa-login__brand">
+        <img src="/img/logo-dark.svg" alt="SZRON" />
+        <p>Konto SZRON</p>
+      </div>
+
+      <div class="strefa-login__card">
+        <div id="state-loading">
+          <h1>Zmiana hasła</h1>
+          <p style="color:var(--color-text-inv-3);font-size:var(--text-s);margin:0">Sprawdzam sesję…</p>
+        </div>
+
+        <form id="pass-form" hidden>
+          <h1 style="margin-bottom:var(--space-xs)">Zmiana hasła</h1>
+          <p id="who" style="color:var(--color-text-inv-3);font-size:var(--text-caption);margin:0 0 var(--space-lg);word-break:break-all"></p>
+          <div id="msg" hidden></div>
+          <div class="strefa-field">
+            <label for="cur">Obecne hasło</label>
+            <input class="strefa-input" type="password" id="cur" autocomplete="current-password" required />
+          </div>
+          <div class="strefa-field" style="margin-top:var(--space-md)">
+            <label for="pass">Nowe hasło</label>
+            <input class="strefa-input" type="password" id="pass" autocomplete="new-password" minlength="6" required />
+          </div>
+          <div class="strefa-field" style="margin-top:var(--space-md)">
+            <label for="pass2">Powtórz nowe hasło</label>
+            <input class="strefa-input" type="password" id="pass2" autocomplete="new-password" minlength="6" required />
+          </div>
+          <button type="submit" class="strefa-btn strefa-btn--accent" id="btn-save" style="width:100%;padding:.65rem;margin-top:var(--space-md)">Zmień hasło</button>
+        </form>
+
+        <div id="state-anon" hidden>
+          <h1>Zmiana hasła</h1>
+          <p style="color:var(--color-text-inv-2);font-size:var(--text-s);margin:0 0 var(--space-lg)">Najpierw się zaloguj — hasło zmienisz od razu po zalogowaniu.</p>
+          <a class="strefa-btn strefa-btn--accent" href="/strefa/login?next=/strefa/haslo" style="width:100%;padding:.65rem">Przejdź do logowania</a>
+        </div>
+      </div>
+
+      <a class="strefa-login__back" id="back-link" href="/akademia">← Powrót</a>
+    </div>
+  </div>
+
+  <script>
+    import { getSessionUser, signInPassword, updatePassword, isAllowed } from '../../lib/supabase.js';
+
+    const form = document.getElementById('pass-form');
+    const msg = document.getElementById('msg');
+    const showErr = (t) => { msg.hidden = false; msg.className = 'strefa-msg strefa-msg--err'; msg.textContent = t; };
+
+    let user = null;
+    (async () => {
+      user = await getSessionUser();
+      document.getElementById('state-loading').hidden = true;
+      if (!user) { document.getElementById('state-anon').hidden = false; return; }
+      document.getElementById('who').textContent = user.email;
+      document.getElementById('back-link').href = isAllowed(user.email) ? '/strefa' : '/akademia';
+      form.hidden = false;
+      document.getElementById('cur').focus();
+    })();
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.hidden = true;
+      const cur = document.getElementById('cur').value;
+      const p1 = document.getElementById('pass').value;
+      const p2 = document.getElementById('pass2').value;
+      if (p1.length < 6) return showErr('Nowe hasło musi mieć min. 6 znaków.');
+      if (p1 !== p2) return showErr('Nowe hasła nie są takie same.');
+      const btn = document.getElementById('btn-save');
+      btn.disabled = true; btn.textContent = 'Zapisuję…';
+      // potwierdzenie tożsamości bez maila: ponowne logowanie obecnym hasłem
+      const { error: authErr } = await signInPassword(user.email, cur);
+      if (authErr) { showErr('Obecne hasło się nie zgadza.'); btn.disabled = false; btn.textContent = 'Zmień hasło'; return; }
+      const { error } = await updatePassword(p1);
+      if (error) { showErr(error); btn.disabled = false; btn.textContent = 'Zmień hasło'; return; }
+      btn.textContent = 'Zmieniono ✓';
+      window.location.replace(isAllowed(user.email) ? '/strefa' : '/akademia');
+    });
+  </script>
+</Bare>
