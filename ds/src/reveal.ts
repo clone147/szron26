@@ -2,7 +2,8 @@
  * Runtime animacji tekstu — wierny port public/js/main.js strony szron.tech:
  * auto-tagowanie wszystkich tekstowych „liści" (rv + data-scramble), reveal
  * przy wejściu na viewport z replay po pełnym wyjściu, scramble (dekodowanie
- * losowych liter o zbliżonej szerokości) z twardą blokadą wysokości.
+ * z losowych symboli w kolorze akcentu, styl monako.ai; per słowo — ukryty
+ * prawdziwy tekst scr-m steruje layoutem, CSS scr-* w main.css strony).
  *
  * Adaptacje pod DS (reszta 1:1 ze stroną):
  * - `html.rv-armed` — do czasu uzbrojenia CSS trzyma treść widoczną, więc
@@ -36,67 +37,75 @@ function tag(root: ParentNode): void {
   });
 }
 
-const KEEP = /[\s\/·.,–—:;?!()&+%]/;
-/* losowa litera o zbliżonej szerokości i tej samej wielkości — żeby słowa
-   nie zmieniały szerokości w trakcie animacji i tekst się nie przełamywał */
-const SETS: Record<string, string> = {
-  narrow: 'ijltfr',
-  wide: 'mw',
-  regular: 'abcdenoshkuvyz',
-  digit: '0123456789',
-};
+const CHARS = '!<>-_\\/[]{}—=+*^?#________';
+const CYCLE = 30; // co ile ms dud losuje nowy symbol (i jedyny takt zapisu DOM)
 
-function randLike(ch: string): string {
-  const lower = ch.toLowerCase();
-  let set: string;
-  if (/[0-9]/.test(ch)) set = SETS.digit;
-  else if (SETS.narrow.indexOf(lower) !== -1) set = SETS.narrow;
-  else if (SETS.wide.indexOf(lower) !== -1) set = SETS.wide;
-  else set = SETS.regular;
-  const out = set[(Math.random() * set.length) | 0];
-  return ch === ch.toUpperCase() && ch !== lower ? out.toUpperCase() : out;
-}
+const esc = (s: string): string =>
+  s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
+
+interface ScrItem { node: Text; wrap: HTMLElement; left: number }
+interface ScrWord { el: HTMLElement; v: HTMLElement; item: ScrItem; chars: { ch: string; start: number; end: number }[] }
 
 function scramble(el: HTMLElement & { __scrambling?: boolean }): void {
   if (el.__scrambling) return;
   el.__scrambling = true;
-  const nodes: { node: Text; orig: string }[] = [];
-  let len = 0;
+  let words: ScrWord[] = []; // aktywne słowa wszystkich text-node'ów elementu
   (function walk(n: Node) {
     for (const c of Array.from(n.childNodes)) {
       if (c.nodeType === Node.TEXT_NODE && c.textContent && c.textContent.trim()) {
-        nodes.push({ node: c as Text, orig: c.textContent });
-        len += c.textContent.length;
-      } else if (c.nodeType === Node.ELEMENT_NODE) {
-        // ikony/dekoracje (⤢, +, strzałki) nie są tekstem — nie losujemy ich
-        if ((c as Element).getAttribute('aria-hidden') === 'true') continue;
-        walk(c);
+        /* DOM budowany RAZ, per SŁOWO: ukryty PRAWDZIWY tekst (scr-m) steruje
+           layoutem — kerning, letter-spacing i text-wrap:balance identyczne
+           jak w finale, więc nic nie drga ani się nie kurczy. Losowane symbole
+           żyją na warstwie absolutnej (scr-v) nad słowem. Elementy custom
+           scr-* — szerokie selektory strony (".x span") ich nie łapią. */
+        const toks = c.textContent.split(/(\s+)/);
+        const wrap = document.createElement('scr-t');
+        wrap.innerHTML = toks
+          .map((t) => (!t || /\s/.test(t) ? esc(t) : '<scr-w><scr-m>' + esc(t) + '</scr-m><scr-v></scr-v></scr-w>'))
+          .join('');
+        c.parentNode!.replaceChild(wrap, c);
+        const item: ScrItem = { node: c as Text, wrap, left: 0 };
+        const solid = toks.filter((t) => t && !/\s/.test(t));
+        wrap.querySelectorAll('scr-w').forEach((w, j) => {
+          item.left++;
+          words.push({
+            el: w as HTMLElement, v: w.lastChild as HTMLElement, item,
+            chars: solid[j].split('').map((ch) => {
+              const start = Math.random() * 350;
+              return { ch, start, end: start + 120 + Math.random() * 450 };
+            }),
+          });
+        });
+      } else if (c.nodeType === Node.ELEMENT_NODE && (c as Element).getAttribute('aria-hidden') !== 'true') {
+        walk(c); // ikony/dekoracje (strzałki, +) nie są tekstem — nie losujemy ich
       }
     }
   })(el);
-  if (!nodes.length) { el.__scrambling = false; return; }
-  // twarda blokada wysokości + overflow na czas animacji — losowe litery mają
-  // inne szerokości, więc bez tego zmienia się liczba linii i wszystko
-  // poniżej się trzęsie (minHeight nie wystarcza, gdy tekst łamie się SZERZEJ)
-  el.style.height = el.offsetHeight + 'px';
-  el.style.overflow = 'hidden';
-  let frame = 0;
-  const total = Math.max(24, Math.min(56, Math.round(len * 0.6)));
-  const tick = () => {
-    if (document.hidden) frame = total - 1; // ukryta karta: dokończ natychmiast
-    frame++;
-    const progress = frame / total;
-    for (const item of nodes) {
-      const original = item.orig;
-      let out = '';
-      for (let i = 0; i < original.length; i++) {
-        const ch = original[i];
-        out += KEEP.test(ch) || i < original.length * progress ? ch : randLike(ch);
-      }
-      item.node.textContent = frame < total ? out : original;
+  if (!words.length) { el.__scrambling = false; return; }
+  const t0 = performance.now();
+  let last = -CYCLE;
+  const tick = (now: number) => {
+    if (now - last >= CYCLE) { // zapis DOM tylko w takcie losowania, nie 60 fps
+      last = now;
+      const elapsed = document.hidden ? 1e9 : now - t0; // ukryta karta: dokończ natychmiast
+      words = words.filter((w) => {
+        let html = '';
+        let done = 0;
+        for (const q of w.chars) {
+          if (elapsed >= q.end) { html += esc(q.ch); done++; }
+          else if (elapsed >= q.start) html += '<scr-d>' + esc(CHARS[(Math.random() * CHARS.length) | 0]) + '</scr-d>';
+          else html += '<scr-h>' + esc(q.ch) + '</scr-h>';
+        }
+        if (done < w.chars.length) { w.v.innerHTML = html; return true; }
+        /* słowo gotowe: odsłoń prawdziwy tekst; gdy cały text-node skończony —
+           wraca oryginał (czysty DOM, identyczny layout) */
+        w.el.className = 'done';
+        if (!--w.item.left) w.item.wrap.parentNode!.replaceChild(w.item.node, w.item.wrap);
+        return false;
+      });
     }
-    if (frame < total) requestAnimationFrame(tick);
-    else { el.style.height = ''; el.style.overflow = ''; el.__scrambling = false; }
+    if (words.length) requestAnimationFrame(tick);
+    else el.__scrambling = false;
   };
   requestAnimationFrame(tick);
 }

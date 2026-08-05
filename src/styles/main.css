@@ -1213,20 +1213,17 @@ form [name="bot-field"], form label:has([name="bot-field"]), p.hidden, .hidden-f
 /* nagłówki .ws: rv + data-scramble dokłada JS (main.js) */
 
 /* ── scramble (styl monako.ai) ───────────────────────── */
-/* komórka: niewidoczny znak docelowy (::before) nadaje szerokość,
-   losowany symbol leży absolutnie na środku — tekst się nie przełamuje.
-   Elementy custom (scr-*) zamiast spanów: szerokie selektory strony
-   (np. ".case-card__stats span") nie mogą przestawić im display */
-scr-t { display: inline; }
-scr-w { display: inline-block; white-space: nowrap; }
-scr-c { position: relative; display: inline-block; white-space: pre; vertical-align: baseline; }
-scr-c::before { content: attr(data-m); visibility: hidden; }
-scr-v {
-  position: absolute; top: 0; left: 50%;
-  min-width: 100%; line-height: inherit; text-align: center;
-  transform: translateX(-50%);
-}
-scr-v.scramble-dud { color: var(--color-accent); opacity: 0.85; }
+/* per słowo: ukryty prawdziwy tekst (scr-m) steruje layoutem (kerning,
+   letter-spacing, text-wrap:balance — identycznie jak finał), losowane
+   symbole leżą na warstwie absolutnej (scr-v) nad słowem. Elementy custom
+   (scr-*) zamiast spanów: szerokie selektory strony (np. ".x span")
+   nie mogą przestawić im display */
+scr-w { position: relative; }
+scr-m, scr-h { visibility: hidden; }
+scr-w.done scr-m { visibility: visible; }
+scr-v { position: absolute; top: 0; left: 0; white-space: pre; }
+scr-w.done scr-v { display: none; }
+scr-d { color: var(--color-accent); opacity: 0.85; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

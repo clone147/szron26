@@ -12,8 +12,9 @@
 - Fonty: build-css kopiuje woff2 z `public/fonts` do `ds/styles/fonts/` (gitignored) i przepisuje
   `url(/fonts/…)` → `./fonts/…` — pliki spoza `ds/` nie przechodzą przez bound cssEntry.
 - Animacje tekstu: runtime `ds/src/reveal.ts` = wierny port public/js/main.js (auto-tagowanie
-  wszystkich tekstowych liści rv+data-scramble poza <nav>, IO z replay, scramble z blokadą
-  wysokości, identyczne SETS/KEEP). Startuje od załadowania jak na stronie; wyłącza się przy
+  wszystkich tekstowych liści rv+data-scramble poza <nav>, IO z replay, scramble w stylu
+  monako.ai: identyczny CHARS/CYCLE, komórki scr-* — ich CSS płynie z main.css strony przez
+  build-css do compiled.css). Startuje od załadowania jak na stronie; wyłącza się przy
   `navigator.webdriver` (headless capture) i prefers-reduced-motion — wtedy CSS
   `html:not(.rv-armed) .rv` trzyma treść widoczną, stąd stabilny render check.
   Po zmianie main.js zsynchronizować port.

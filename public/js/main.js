@@ -58,101 +58,76 @@
   });
 
   /* ── scramble (dekodowanie znaków, styl monako.ai) ─── */
-  /* działa na text-node'ach (każdy dostaje tymczasowy <span>, po animacji
+  /* działa na text-node'ach (każdy dostaje tymczasowy wrapper, po animacji
      wraca oryginalny node — zagnieżdżone elementy przeżywają bez zmian).
      Każdy znak ma własny losowy start/koniec, losuje SYMBOLE z zestawu,
-     a wylosowany znak („dud") świeci kolorem akcentu. Szerokość stabilizują
-     komórki: niewidoczny znak docelowy (::before) nadaje wymiar, symbol jest
-     pozycjonowany absolutnie i wycentrowany — zero przełamań tekstu. */
+     a wylosowany znak („dud") świeci kolorem akcentu. */
   var CHARS = "!<>-_\\/[]{}—=+*^?#________";
-  var CYCLE = 30;      // co ile ms dud losuje nowy symbol
+  var CYCLE = 30; // co ile ms dud losuje nowy symbol (i jedyny takt zapisu DOM)
   var esc = function (s) {
-    return String(s).replace(/[&<>"]/g, function (c) {
+    return s.replace(/[&<>"]/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
     });
-  };
-  /* elementy custom (scr-c/scr-v/scr-w) zamiast <span> — szerokie selektory
-     strony w stylu ".case-card__stats span { display:block }" nie mogą łapać
-     wstrzykiwanych wrapperów animacji (litera-per-wiersz) */
-  var cell = function (measure, inner, dud) {
-    return '<scr-c data-m="' + esc(measure) + '">' +
-      "<scr-v" + (dud ? ' class="scramble-dud"' : "") + ">" +
-      inner + "</scr-v></scr-c>";
   };
   var scramble = function (el) {
     if (el.__scrambling) return;
     el.__scrambling = true;
-    var nodes = [];
+    var words = [];   // aktywne słowa wszystkich text-node'ów elementu
     (function walk(n) {
       Array.prototype.slice.call(n.childNodes).forEach(function (c) {
         if (c.nodeType === Node.TEXT_NODE && c.textContent.trim()) {
-          nodes.push({ node: c, orig: c.textContent });
-        } else if (c.nodeType === Node.ELEMENT_NODE) {
-          /* ikony/dekoracje (⤢, +, strzałki) nie są tekstem — nie losujemy ich */
-          if (c.getAttribute("aria-hidden") === "true") return;
-          walk(c);
+          /* DOM budowany RAZ, per SŁOWO: ukryty PRAWDZIWY tekst (scr-m)
+             steruje layoutem — kerning, letter-spacing i text-wrap:balance
+             identyczne jak w finale, więc nic nie drga ani się nie kurczy.
+             Losowane symbole żyją na warstwie absolutnej (scr-v) nad słowem.
+             Elementy custom scr-* — szerokie selektory strony (".x span")
+             ich nie łapią. */
+          var toks = c.textContent.split(/(\s+)/);
+          var wrap = document.createElement("scr-t");
+          wrap.innerHTML = toks.map(function (t) {
+            return !t || /\s/.test(t) ? esc(t)
+              : "<scr-w><scr-m>" + esc(t) + "</scr-m><scr-v></scr-v></scr-w>";
+          }).join("");
+          c.parentNode.replaceChild(wrap, c);
+          var item = { node: c, wrap: wrap, left: 0 };
+          var solid = toks.filter(function (t) { return t && !/\s/.test(t); });
+          Array.prototype.forEach.call(wrap.querySelectorAll("scr-w"), function (w, j) {
+            item.left++;
+            words.push({
+              el: w, v: w.lastChild, item: item,
+              chars: solid[j].split("").map(function (ch) {
+                var start = Math.random() * 350;
+                return { ch: ch, start: start, end: start + 120 + Math.random() * 450 };
+              }),
+            });
+          });
+        } else if (c.nodeType === Node.ELEMENT_NODE && c.getAttribute("aria-hidden") !== "true") {
+          walk(c); /* ikony/dekoracje (strzałki, +) nie są tekstem — nie losujemy ich */
         }
       });
     })(el);
-    if (!nodes.length) { el.__scrambling = false; return; }
-    nodes.forEach(function (item) {
-      item.queue = [];
-      for (var i = 0; i < item.orig.length; i++) {
-        var start = Math.random() * 350;
-        item.queue.push({
-          ch: item.orig[i],
-          start: start,
-          end: start + 120 + Math.random() * 450,
-          sym: null,
-          nextAt: 0,
+    if (!words.length) { el.__scrambling = false; return; }
+    var t0 = performance.now(), last = -CYCLE;
+    var tick = function (now) {
+      if (now - last >= CYCLE) { // zapis DOM tylko w takcie losowania, nie 60 fps
+        last = now;
+        var elapsed = document.hidden ? 1e9 : now - t0; // ukryta karta: dokończ natychmiast
+        words = words.filter(function (w) {
+          var html = "", done = 0;
+          w.chars.forEach(function (q) {
+            if (elapsed >= q.end) { html += esc(q.ch); done++; }
+            else if (elapsed >= q.start) html += "<scr-d>" + esc(CHARS[(Math.random() * CHARS.length) | 0]) + "</scr-d>";
+            else html += "<scr-h>" + esc(q.ch) + "</scr-h>";
+          });
+          if (done < w.chars.length) { w.v.innerHTML = html; return true; }
+          /* słowo gotowe: odsłoń prawdziwy tekst; gdy cały text-node skończony —
+             wraca oryginał (czysty DOM, identyczny layout) */
+          w.el.className = "done";
+          if (!--w.item.left) w.item.wrap.parentNode.replaceChild(w.item.node, w.item.wrap);
+          return false;
         });
       }
-      /* text-node → tymczasowy wrapper, żeby dudy mogły dostać kolor */
-      item.span = document.createElement("scr-t");
-      item.node.parentNode.replaceChild(item.span, item.node);
-      item.done = false;
-    });
-    var t0 = performance.now();
-    var tick = function (now) {
-      var elapsed = document.hidden ? 1e9 : now - t0; // ukryta karta: dokończ natychmiast
-      var pending = false;
-      nodes.forEach(function (item) {
-        if (item.done) return;
-        var html = "";
-        var word = false;   // grupowanie komórek w <scr-w> (nowrap)
-        var resolved = 0;
-        item.queue.forEach(function (q) {
-          if (/\s/.test(q.ch)) {
-            if (word) { html += "</scr-w>"; word = false; }
-            resolved++;
-            html += q.ch;
-            return;
-          }
-          if (!word) { html += "<scr-w>"; word = true; }
-          if (elapsed >= q.end) {
-            resolved++;
-            html += cell(q.ch, esc(q.ch), false);
-          } else if (elapsed >= q.start) {
-            if (!q.sym || elapsed >= q.nextAt) {
-              q.sym = CHARS[(Math.random() * CHARS.length) | 0];
-              q.nextAt = elapsed + CYCLE;
-            }
-            html += cell(q.ch, esc(q.sym), true);
-          } else {
-            html += cell(q.ch, "&nbsp;", false);
-          }
-        });
-        if (word) html += "</scr-w>";
-        if (resolved === item.queue.length) {
-          /* gotowe: przywróć oryginalny text-node — DOM wraca do stanu sprzed animacji */
-          item.span.parentNode.replaceChild(item.node, item.span);
-          item.done = true;
-        } else {
-          item.span.innerHTML = html;
-          pending = true;
-        }
-      });
-      if (pending) requestAnimationFrame(tick);
+      if (words.length) requestAnimationFrame(tick);
       else el.__scrambling = false;
     };
     requestAnimationFrame(tick);
