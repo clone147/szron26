@@ -1214,16 +1214,19 @@ form [name="bot-field"], form label:has([name="bot-field"]), p.hidden, .hidden-f
 
 /* ── scramble (styl monako.ai) ───────────────────────── */
 /* komórka: niewidoczny znak docelowy (::before) nadaje szerokość,
-   losowany symbol leży absolutnie na środku — tekst się nie przełamuje */
-.scramble-word { display: inline-block; white-space: nowrap; }
-.scramble-cell { position: relative; display: inline-block; white-space: pre; vertical-align: baseline; }
-.scramble-cell::before { content: attr(data-m); visibility: hidden; }
-.scramble-cell__visual {
+   losowany symbol leży absolutnie na środku — tekst się nie przełamuje.
+   Elementy custom (scr-*) zamiast spanów: szerokie selektory strony
+   (np. ".case-card__stats span") nie mogą przestawić im display */
+scr-t { display: inline; }
+scr-w { display: inline-block; white-space: nowrap; }
+scr-c { position: relative; display: inline-block; white-space: pre; vertical-align: baseline; }
+scr-c::before { content: attr(data-m); visibility: hidden; }
+scr-v {
   position: absolute; top: 0; left: 50%;
   min-width: 100%; line-height: inherit; text-align: center;
   transform: translateX(-50%);
 }
-.scramble-dud { color: var(--color-accent); opacity: 0.85; }
+scr-v.scramble-dud { color: var(--color-accent); opacity: 0.85; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

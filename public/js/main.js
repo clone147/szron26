@@ -71,10 +71,13 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
     });
   };
+  /* elementy custom (scr-c/scr-v/scr-w) zamiast <span> — szerokie selektory
+     strony w stylu ".case-card__stats span { display:block }" nie mogą łapać
+     wstrzykiwanych wrapperów animacji (litera-per-wiersz) */
   var cell = function (measure, inner, dud) {
-    return '<span class="scramble-cell" data-m="' + esc(measure) + '">' +
-      '<span class="scramble-cell__visual' + (dud ? " scramble-dud" : "") + '">' +
-      inner + "</span></span>";
+    return '<scr-c data-m="' + esc(measure) + '">' +
+      "<scr-v" + (dud ? ' class="scramble-dud"' : "") + ">" +
+      inner + "</scr-v></scr-c>";
   };
   var scramble = function (el) {
     if (el.__scrambling) return;
@@ -104,8 +107,8 @@
           nextAt: 0,
         });
       }
-      /* text-node → tymczasowy span, żeby dudy mogły dostać kolor */
-      item.span = document.createElement("span");
+      /* text-node → tymczasowy wrapper, żeby dudy mogły dostać kolor */
+      item.span = document.createElement("scr-t");
       item.node.parentNode.replaceChild(item.span, item.node);
       item.done = false;
     });
@@ -116,16 +119,16 @@
       nodes.forEach(function (item) {
         if (item.done) return;
         var html = "";
-        var word = false;   // grupowanie komórek w .scramble-word (nowrap)
+        var word = false;   // grupowanie komórek w <scr-w> (nowrap)
         var resolved = 0;
         item.queue.forEach(function (q) {
           if (/\s/.test(q.ch)) {
-            if (word) { html += "</span>"; word = false; }
+            if (word) { html += "</scr-w>"; word = false; }
             resolved++;
             html += q.ch;
             return;
           }
-          if (!word) { html += '<span class="scramble-word">'; word = true; }
+          if (!word) { html += "<scr-w>"; word = true; }
           if (elapsed >= q.end) {
             resolved++;
             html += cell(q.ch, esc(q.ch), false);
@@ -139,7 +142,7 @@
             html += cell(q.ch, "&nbsp;", false);
           }
         });
-        if (word) html += "</span>";
+        if (word) html += "</scr-w>";
         if (resolved === item.queue.length) {
           /* gotowe: przywróć oryginalny text-node — DOM wraca do stanu sprzed animacji */
           item.span.parentNode.replaceChild(item.node, item.span);
