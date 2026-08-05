@@ -1212,6 +1212,19 @@ form [name="bot-field"], form label:has([name="bot-field"]), p.hidden, .hidden-f
 
 /* nagłówki .ws: rv + data-scramble dokłada JS (main.js) */
 
+/* ── scramble (styl monako.ai) ───────────────────────── */
+/* komórka: niewidoczny znak docelowy (::before) nadaje szerokość,
+   losowany symbol leży absolutnie na środku — tekst się nie przełamuje */
+.scramble-word { display: inline-block; white-space: nowrap; }
+.scramble-cell { position: relative; display: inline-block; white-space: pre; vertical-align: baseline; }
+.scramble-cell::before { content: attr(data-m); visibility: hidden; }
+.scramble-cell__visual {
+  position: absolute; top: 0; left: 50%;
+  min-width: 100%; line-height: inherit; text-align: center;
+  transform: translateX(-50%);
+}
+.scramble-dud { color: var(--color-accent); opacity: 0.85; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .rv { opacity: 1; transform: none; transition: opacity 0.15s linear; }

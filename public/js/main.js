@@ -57,38 +57,33 @@
     el.setAttribute("data-scramble", "");
   });
 
-  /* ── scramble (dekodowanie liter) ──────────────────── */
-  /* działa na text-node'ach, więc nie niszczy zagnieżdżonych elementów
-     (np. <small> w dt); czas skaluje się z długością tekstu */
-  var KEEP = /[\s\/·.,–—:;?!()&+%]/;
-  /* losowa litera o zbliżonej szerokości i tej samej wielkości — żeby słowa
-     nie zmieniały szerokości w trakcie animacji i tekst się nie przełamywał */
-  var SETS = {
-    narrow: "ijltfr",
-    wide: "mw",
-    regular: "abcdenoshkuvyz",
-    digit: "0123456789",
+  /* ── scramble (dekodowanie znaków, styl monako.ai) ─── */
+  /* działa na text-node'ach (każdy dostaje tymczasowy <span>, po animacji
+     wraca oryginalny node — zagnieżdżone elementy przeżywają bez zmian).
+     Każdy znak ma własny losowy start/koniec, losuje SYMBOLE z zestawu,
+     a wylosowany znak („dud") świeci kolorem akcentu. Szerokość stabilizują
+     komórki: niewidoczny znak docelowy (::before) nadaje wymiar, symbol jest
+     pozycjonowany absolutnie i wycentrowany — zero przełamań tekstu. */
+  var CHARS = "!<>-_\\/[]{}—=+*^?#________";
+  var CYCLE = 30;      // co ile ms dud losuje nowy symbol
+  var esc = function (s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
   };
-  var randLike = function (ch) {
-    var lower = ch.toLowerCase();
-    var set;
-    if (/[0-9]/.test(ch)) set = SETS.digit;
-    else if (SETS.narrow.indexOf(lower) !== -1) set = SETS.narrow;
-    else if (SETS.wide.indexOf(lower) !== -1) set = SETS.wide;
-    else set = SETS.regular;
-    var out = set[(Math.random() * set.length) | 0];
-    return ch === ch.toUpperCase() && ch !== lower ? out.toUpperCase() : out;
+  var cell = function (measure, inner, dud) {
+    return '<span class="scramble-cell" data-m="' + esc(measure) + '">' +
+      '<span class="scramble-cell__visual' + (dud ? " scramble-dud" : "") + '">' +
+      inner + "</span></span>";
   };
   var scramble = function (el) {
     if (el.__scrambling) return;
     el.__scrambling = true;
     var nodes = [];
-    var len = 0;
     (function walk(n) {
       Array.prototype.slice.call(n.childNodes).forEach(function (c) {
         if (c.nodeType === Node.TEXT_NODE && c.textContent.trim()) {
           nodes.push({ node: c, orig: c.textContent });
-          len += c.textContent.length;
         } else if (c.nodeType === Node.ELEMENT_NODE) {
           /* ikony/dekoracje (⤢, +, strzałki) nie są tekstem — nie losujemy ich */
           if (c.getAttribute("aria-hidden") === "true") return;
@@ -97,32 +92,65 @@
       });
     })(el);
     if (!nodes.length) { el.__scrambling = false; return; }
-    // twarda blokada wysokości + overflow na czas animacji — losowe litery mają
-    // inne szerokości, więc bez tego zmienia się liczba linii i wszystko
-    // poniżej się trzęsie (minHeight nie wystarcza, gdy tekst łamie się SZERZEJ)
-    el.style.height = el.offsetHeight + "px";
-    el.style.overflow = "hidden";
-    var frame = 0;
-    var total = Math.max(24, Math.min(56, Math.round(len * 0.6)));
-    var tick = function () {
-      if (document.hidden) frame = total - 1; // ukryta karta: dokończ natychmiast
-      frame++;
-      var progress = frame / total;
+    nodes.forEach(function (item) {
+      item.queue = [];
+      for (var i = 0; i < item.orig.length; i++) {
+        var start = Math.random() * 350;
+        item.queue.push({
+          ch: item.orig[i],
+          start: start,
+          end: start + 120 + Math.random() * 450,
+          sym: null,
+          nextAt: 0,
+        });
+      }
+      /* text-node → tymczasowy span, żeby dudy mogły dostać kolor */
+      item.span = document.createElement("span");
+      item.node.parentNode.replaceChild(item.span, item.node);
+      item.done = false;
+    });
+    var t0 = performance.now();
+    var tick = function (now) {
+      var elapsed = document.hidden ? 1e9 : now - t0; // ukryta karta: dokończ natychmiast
+      var pending = false;
       nodes.forEach(function (item) {
-        var original = item.orig;
-        var out = "";
-        for (var i = 0; i < original.length; i++) {
-          var ch = original[i];
-          if (KEEP.test(ch) || i < original.length * progress) {
-            out += ch;
-          } else {
-            out += randLike(ch);
+        if (item.done) return;
+        var html = "";
+        var word = false;   // grupowanie komórek w .scramble-word (nowrap)
+        var resolved = 0;
+        item.queue.forEach(function (q) {
+          if (/\s/.test(q.ch)) {
+            if (word) { html += "</span>"; word = false; }
+            resolved++;
+            html += q.ch;
+            return;
           }
+          if (!word) { html += '<span class="scramble-word">'; word = true; }
+          if (elapsed >= q.end) {
+            resolved++;
+            html += cell(q.ch, esc(q.ch), false);
+          } else if (elapsed >= q.start) {
+            if (!q.sym || elapsed >= q.nextAt) {
+              q.sym = CHARS[(Math.random() * CHARS.length) | 0];
+              q.nextAt = elapsed + CYCLE;
+            }
+            html += cell(q.ch, esc(q.sym), true);
+          } else {
+            html += cell(q.ch, "&nbsp;", false);
+          }
+        });
+        if (word) html += "</span>";
+        if (resolved === item.queue.length) {
+          /* gotowe: przywróć oryginalny text-node — DOM wraca do stanu sprzed animacji */
+          item.span.parentNode.replaceChild(item.node, item.span);
+          item.done = true;
+        } else {
+          item.span.innerHTML = html;
+          pending = true;
         }
-        item.node.textContent = frame < total ? out : original;
       });
-      if (frame < total) requestAnimationFrame(tick);
-      else { el.style.height = ""; el.style.overflow = ""; el.__scrambling = false; }
+      if (pending) requestAnimationFrame(tick);
+      else el.__scrambling = false;
     };
     requestAnimationFrame(tick);
   };
