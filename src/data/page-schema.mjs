@@ -18,6 +18,7 @@ const SERVICES = {
   'transformacja-ai-dla-programistow': 'Transformacja AI dla programistów',
   'augmentacja-pracownikow': 'Augmentacja zespołu AI',
   'ai-dla-dev-teamow': 'AI dla zespołów software',
+  'ai-dla-dzialu-handlowego': 'AI dla działu handlowego',
   'ai-dla-embedded': 'AI dla embedded',
   'ai-dla-przemyslu': 'Modernizacja systemów przemysłowych',
   'ai-sektor-regulowany': 'AI dla sektora regulowanego',

@@ -1,0 +1,197 @@
+---
+import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+// FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html)
+const faq = [
+  { q: 'Czy handlowcy muszą być techniczni?', a: 'Nie. Pracujemy na narzędziach, które obsługuje się jak zwykły czat: wgrywacie dokumenty, zadajecie pytania po polsku, dostajecie odpowiedź z przypisem do źródła. Zero kodu, zero konfiguracji IT. Jeśli ktoś umie wysłać maila z załącznikiem, poradzi sobie na warsztacie.' },
+  { q: 'Co z poufnością ofert i cenników?', a: 'Ustalamy to na starcie: które materiały wolno wgrywać, a które nie (dane osobowe klientów, dokumenty pod NDA). Pracujemy na planach biznesowych narzędzi, w których dane nie trenują modeli, i zostawiamy zespołowi prostą regułę „co wolno, czego nie” na piśmie.' },
+  { q: 'Czym to się różni od kursu z promptów?', a: 'Kurs z promptów kończy się listą trików, które tydzień później nikt nie pamięta. My pracujemy na Waszych realnych materiałach — ofertach, przetargach, notatkach ze spotkań — i kończymy 30-dniowym planem wdrożenia z przeglądem na końcu. Miarą nie jest zadowolenie z warsztatu, tylko to, czy zespół używa AI w realnej sprzedaży miesiąc później.' },
+  { q: 'Czy AI nie zmyśli czegoś w ofercie dla klienta?', a: 'To pierwsza rzecz, którą pokazujemy na szkoleniu: model generuje, a nie „wie”. Dlatego uczymy pracy na własnych źródłach z przypisami do fragmentu — każdą liczbę klika się do oryginalnego dokumentu. Zasada „weryfikuj każdą liczbę w źródle” jest częścią szablonów, które zostają w zespole.' },
+];
+---
+<Interior
+  title="AI dla działu handlowego — szkolenie i wdrożenie | SZRON"
+  description="Szkolimy zespoły sprzedaży z pracy z AI: przygotowanie do spotkań, analiza przetargów i umów, wspólna baza wiedzy zespołu. Warsztat na Waszych materiałach + plan na 30 dni."
+  eyebrow="Dla działów handlowych · szkolenie i wdrożenie"
+  heading="AI nie sprzedaje za Was. Oddaje Wam godziny na sprzedawanie."
+  lead="Handlowiec spędza ok. 65% czasu poza samą sprzedażą: rozpoznanie klienta, notatki, oferty, raporty. Tę warstwę zdejmuje AI — a my uczymy Wasz zespół, jak to robić na realnych materiałach: ofertach, przetargach i notatkach ze spotkań. Tak samo, jak wdrażamy AI w zespołach programistów."
+  headingSmall
+>
+  <!-- proof -->
+  <ProofStrip items={[
+    ['65%', 'czasu handlowca to praca poza rozmową z klientem'],
+    ['15 min zamiast 1,5 h', 'przygotowanie do spotkania na materiałach klienta'],
+    ['2 dni → 30 min', 'analiza dokumentacji przetargowej z tabelą wymagań'],
+  ]} />
+
+  <!-- 01 gdzie AI pomaga -->
+  <section class="sect" aria-labelledby="gdzie">
+    <div class="container">
+      <SectHead eyebrow="01 / Zakres · Gdzie AI realnie pomaga w sprzedaży" title="Reguła kciuka: czytanie lub pisanie → kandydat do AI." id="gdzie" small />
+      <div class="grid-cards">
+        <article class="card-tile rv">
+          <p class="eyebrow">a</p>
+          <h3>Rozpoznanie klienta</h3>
+          <p>Kim jest, co ostatnio ogłosił, kto decyduje. Raport roczny, strona WWW i notatki z poprzednich rozmów w jednym miejscu — z odpowiedziami na pytania po polsku.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.05s">
+          <p class="eyebrow">b</p>
+          <h3>Przygotowanie do spotkania</h3>
+          <p>Hipotezy wartości, pytania otwierające, lista ryzyk i obiekcji — z realnych wyzwań klienta, nie z ogólników.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.1s">
+          <p class="eyebrow">c</p>
+          <h3>Korespondencja i oferty</h3>
+          <p>Wiadomość po spotkaniu, oferta, odpowiedź na obiekcję — w tonie firmy, na bazie Waszych materiałów.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.15s">
+          <p class="eyebrow">d</p>
+          <h3>Analiza dokumentów</h3>
+          <p>Umowy, SIWZ, OPZ, dokumentacja przetargowa. Kryteria oceny, terminy, wymagania wykluczające i kary umowne — w tabeli, z przypisem do strony.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.2s">
+          <p class="eyebrow">e</p>
+          <h3>Raportowanie i CRM</h3>
+          <p>Notatka głosowa albo nagranie ze spotkania → gotowy wpis w CRM. Koniec z piątkowym „nadganianiem systemu”.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 jak wygląda praca (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="jak">
+    <div class="container">
+      <SectHead eyebrow="02 / Warsztat pracy · Własne źródła zamiast zgadywania" title="Uczymy pracy na Waszych dokumentach — z przypisem do każdego fragmentu." id="jak" />
+      <dl class="def-rows rv">
+        <div>
+          <dt>Asystent ogólny<small>maile, oferty, strategia</small></dt>
+          <dd>ChatGPT, Claude czy Gemini do pisania i burzy mózgów — z jasną świadomością ryzyka: model generuje, nie „wie”. Uczymy, kiedy mu ufać, a kiedy nie.</dd>
+        </div>
+        <div>
+          <dt>Analityk dokumentów<small>tylko Wasze materiały, przypis do źródła</small></dt>
+          <dd>Narzędzia typu notebook (NotebookLM i podobne): wgrywacie PDF-y, umowy, strony WWW, nagrania — model odpowiada wyłącznie w granicach źródeł, a każdą odpowiedź klika się do oryginalnego fragmentu. Setki stron w minuty.</dd>
+        </div>
+        <div>
+          <dt>Podsumowanie audio<small>prywatny podcast z dokumentów</small></dt>
+          <dd>Komplet dokumentacji przetargowej jako ~15-minutowa rozmowa dwóch prowadzących, po polsku. 80 stron słuchasz w drodze do klienta.</dd>
+        </div>
+        <div>
+          <dt>Higiena pracy<small>jeden notatnik = jeden klient albo projekt</small></dt>
+          <dd>„Klient ALFA — oferta 2026”, „Przetarg PKP — dokumentacja”, „Baza wiedzy — oferta i cenniki”. Węższy zestaw źródeł = trafniejsza odpowiedź. To nawyki, które zostają w zespole.</dd>
+        </div>
+        <div>
+          <dt>Szablony promptów działu<small>rola · kontekst · zadanie · format</small></dt>
+          <dd>Na warsztacie budujemy razem szablony pod Waszą sprzedaż — od pytań diagnostycznych po tabele obiekcji. Zostają u Was jako wspólny standard.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 03 przykłady -->
+  <section class="sect" aria-labelledby="przyklady">
+    <div class="container">
+      <SectHead eyebrow="03 / Przykłady · Z warsztatów, nie z folderu" title="Trzy scenariusze, które przerabiamy na realnych materiałach." id="przyklady" small />
+      <table class="results-table rv">
+        <thead><tr><th scope="col">Scenariusz</th><th scope="col">Dotychczas</th><th scope="col">Z AI</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Przygotowanie do spotkania</td>
+            <td>1,5 godziny czytania raportu, strony WWW i starych notatek.</td>
+            <td><strong>15 minut: 5 pytań otwierających, 3 hipotezy wartości, lista ryzyk.</strong></td>
+          </tr>
+          <tr>
+            <td>Przetarg / zapytanie ofertowe</td>
+            <td>2 dni czytania 500 stron dokumentacji.</td>
+            <td><strong>30 minut z gotową tabelą wymagań — z numerem punktu i stroną.</strong></td>
+          </tr>
+          <tr>
+            <td>Nowy handlowiec w zespole</td>
+            <td>Miesiące zanim przestanie mówić „zapytam i wrócę do Pana”.</td>
+            <td><strong>Wspólna baza wiedzy: odpowiedź w telefonie, z przypisem, od pierwszego tygodnia.</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 04 plan 30 dni -->
+  <section class="sect" aria-labelledby="plan" style="padding-top:0">
+    <div class="container">
+      <SectHead eyebrow="04 / Wdrożenie · Minimalny plan na 30 dni" title="Warsztat to początek. Miarą jest to, co dzieje się miesiąc później." id="plan" />
+      <div class="steps">
+        <article class="step rv">
+          <p class="eyebrow">Tydzień 1</p>
+          <h3>Jeden notatnik na osobę</h3>
+          <p>Każdy handlowiec zakłada notatnik dla swojego kluczowego klienta — na materiałach, które i tak ma na dysku.</p>
+        </article>
+        <article class="step rv" style="--rv-d:.08s">
+          <p class="eyebrow">Tydzień 2</p>
+          <h3>Użycie w realnej sprzedaży</h3>
+          <p>Przygotowanie do prawdziwego spotkania z AI — nie ćwiczenie na sucho.</p>
+        </article>
+        <article class="step rv" style="--rv-d:.16s">
+          <p class="eyebrow">Tydzień 3</p>
+          <h3>Wspólna baza wiedzy</h3>
+          <p>Notatnik zespołu: oferta, cenniki, pytania i odpowiedzi techniczne, standardowe zapisy umowne, materiały konkurencji.</p>
+        </article>
+        <article class="step rv" style="--rv-d:.24s">
+          <p class="eyebrow">Tydzień 4</p>
+          <h3>Przegląd i wskaźniki</h3>
+          <p>Co zostaje, co wyrzucamy. Uczciwie: bez sztucznego „AI wszędzie”.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 kto prowadzi (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="kto">
+    <div class="container">
+      <SectHead eyebrow="05 / Kto prowadzi · Praktyk sprzedaży, nie trener slajdów" title="Prowadzi Tomek Wojciechowski — człowiek, który sam sprzedawał." id="kto" />
+      <div class="prose rv">
+        <p>Zanim powstał SZRON, Tomek przez wiele lat wspierał sprzedaż w Eveo — od ofert i przetargów po rozmowy z klientami B2B. Zna pracę handlowca od środka: wie, że problemem nie jest brak chęci, tylko godziny znikające w dokumentach, notatkach i CRM. Dziś łączy to doświadczenie z trzema latami pracy z LLM-ami w produkcji — tymi samymi metodami, którymi wdrażamy AI w zespołach programistów.</p>
+        <p>Szkolenie prowadzone jest tak jak nasze warsztaty dla dev teamów: na żywo, na Waszych materiałach, z zadaniami warsztatowymi zamiast wykładu. Ostatni taki warsztat dla działu handlowego poprowadziliśmy w sierpniu 2026.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 dokąd dalej -->
+  <section class="sect" aria-labelledby="dalej">
+    <div class="container">
+      <SectHead eyebrow="06 / Dokąd dalej · Powiązane" title="Gdzie zajrzeć po szczegóły." id="dalej" small />
+      <div class="link-cards rv">
+        <a class="link-card" href="/ai-dla-dev-teamow">
+          <h3>AI dla zespołów software</h3>
+          <p>Ta sama filozofia wdrożenia — u programistów. Jeśli macie i dział IT, i dział handlowy, oba mogą ruszyć równolegle.</p>
+        </a>
+        <a class="link-card" href="/akademia">
+          <h3>Akademia</h3>
+          <p>Szkolenia i materiały o codziennej pracy z AI — od podstaw po pełny workflow agentowy.</p>
+        </a>
+        <a class="link-card" href="/o-nas">
+          <h3>Zespół</h3>
+          <p>Kim jesteśmy i dlaczego każdy projekt prowadzimy osobiście — od diagnozy do przekazania.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 FAQ -->
+  <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
+    <div class="container">
+      <SectHead eyebrow="07 / FAQ · Pytania działów handlowych" title="Pytania, które padają przed startem." id="faq-title" small />
+      <Faq items={faq} />
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="Zobaczcie to na własnych ofertach i przetargach."
+    text="30 minut rozmowy. Powiemy, gdzie AI odda Waszemu zespołowi handlowemu najwięcej godzin — i jak wygląda warsztat z planem na 30 dni."
+    btnLabel="Umów rozmowę"
+  />
+</Interior>
