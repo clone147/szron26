@@ -52,7 +52,7 @@ import CtaBand from '../components/CtaBand.astro';
       <SectHead eyebrow="02 / Ścieżki · Trzy razem, nie po kolei" title="Trzy ścieżki, które idą jednocześnie." id="sciezki" />
 
       <article class="card-tile rv">
-        <p class="eyebrow">Ścieżka 01 · Trening z AI</p>
+        <p class="eyebrow">Ścieżka 01</p>
         <h3>Trening z AI</h3>
         <p>Uczymy Wasz zespół, jak realnie pracować z AI. Zamiast szkolenia z promptów dostajecie codzienne ramy pracy: agent AI jako daily driver, AGENTS.md jako konstytucja zespołu, MCP servery podpięte wprost do Waszej bazy danych (MS SQL, MySQL, IBM DB2, Postgres, Oracle).</p>
         <ul>
@@ -61,31 +61,34 @@ import CtaBand from '../components/CtaBand.astro';
           <li>Wskaźniki produktywności od pierwszego tygodnia (DEVLens — wykresy z repozytoriów Git i SVN)</li>
           <li>Każdy programista pracuje samodzielnie po kilku spotkaniach</li>
         </ul>
+        <p><strong>Efekt dla zarządu:</strong> ci sami ludzie dostarczają 2–4 razy szybciej — mierzone, nie deklarowane.</p>
         <p><strong>Prowadzi:</strong> Tomek Wojciechowski</p>
       </article>
 
       <article class="card-tile rv" style="--rv-d:.1s">
-        <p class="eyebrow">Ścieżka 02 · Agentowe programowanie</p>
+        <p class="eyebrow">Ścieżka 02</p>
         <h3>Agentowe programowanie</h3>
-        <p>Wprowadzamy zespół w pracę z agentami na Waszej obecnej aplikacji. Bez ryzyka modernizacji, bez przerzucania na nową technologię. Pierwsze realne dostawy w drugim tygodniu.</p>
+        <p>Wprowadzamy zespół w pracę z agentami na Waszej obecnej aplikacji. Bez ryzyka modernizacji, bez przerzucania na nową technologię.</p>
         <ul>
           <li>Praca na Waszej istniejącej aplikacji</li>
           <li>Niski próg wejścia, szybki ROI</li>
           <li>Zero przerwy w rozwoju produktu</li>
         </ul>
+        <p><strong>Efekt dla zarządu:</strong> pierwsze realne dostawy już w drugim tygodniu programu.</p>
         <p><strong>Prowadzi:</strong> Tomek Wojciechowski</p>
       </article>
 
       <article class="card-tile rv" style="--rv-d:.2s">
-        <p class="eyebrow">Ścieżka 03 · Pilot modernizacji</p>
+        <p class="eyebrow">Ścieżka 03</p>
         <h3>Pilot modernizacji</h3>
-        <p>Zespół przenosi jeden moduł lub aplikację na nowoczesny stos, w którym AI obniża koszt rozwoju nawet o 60%. My doradzamy, pokazujemy wzorzec, a trudne fragmenty bierzemy na siebie. Pilot to dowód metody — po dwóch kwartałach zespół tym samym wzorcem obejmuje kolejne moduły.</p>
+        <p>Zespół przenosi jeden moduł lub aplikację na nowoczesny stos. My doradzamy, pokazujemy wzorzec, a trudne fragmenty bierzemy na siebie. Pilot to dowód metody — po dwóch kwartałach zespół tym samym wzorcem obejmuje kolejne moduły.</p>
         <dl class="def-rows">
           <div><dt>Platforma<small>Wybór formy dostawy</small></dt><dd>Desktop, web, SaaS — jedna aplikacja.</dd></div>
           <div><dt>Mobile<small>Z jednego kodu</small></dt><dd>Natywne iOS i Android, w tych samych dwóch kwartałach.</dd></div>
           <div><dt>Architektura<small>Stopniowo</small></dt><dd>Monolit → moduły, bez „big bang”.</dd></div>
           <div><dt>Dane i integracje<small>Bez zmian</small></dt><dd>Wasza baza zostaje (MS SQL, MySQL, PostgreSQL, DB2, Oracle), API działają jak wcześniej.</dd></div>
         </dl>
+        <p><strong>Efekt dla zarządu:</strong> w stosie z pilota koszt dalszego rozwoju spada nawet o 60%.</p>
         <p><strong>Prowadzi:</strong> Maciej Stopa (backend / mobile / frontend) + Tomek (architektura)</p>
       </article>
     </div>
@@ -96,7 +99,7 @@ import CtaBand from '../components/CtaBand.astro';
     <div class="container">
       <SectHead eyebrow="03 / Granice · Czego nie obiecujemy" title="Mówimy wprost, gdzie kończą się obietnice." id="granice" small />
       <dl class="def-rows rv">
-        <div><dt>Nie „identyczna kopia”<small>Pilot to okazja, nie przepisanie 1:1</small></dt><dd>Pilot to okazja, żeby naprawić to, co od lat irytowało użytkowników.</dd></div>
+        <div><dt>Nie „identyczna kopia”<small>Naprawiamy, nie kopiujemy</small></dt><dd>Nie przepisujemy starego systemu 1:1 — pilot to okazja, żeby naprawić to, co od lat irytowało użytkowników.</dd></div>
         <div><dt>Nie zaczynamy bez analizy<small>Najpierw diagnoza</small></dt><dd>Diagnoza mówi uczciwie, czy pilot ma sens i od którego modułu zacząć.</dd></div>
         <div><dt>Pod NDA<small>Wyniki publikujemy później</small></dt><dd>Pierwsze programy prowadzimy pod NDA. Konkretne wyniki i nazwy klientów zaczniemy publikować w drugiej połowie 2026 roku.</dd></div>
       </dl>
@@ -106,7 +109,7 @@ import CtaBand from '../components/CtaBand.astro';
   <!-- 04 proces -->
   <section class="sect" aria-labelledby="proces-title" style="padding-top:0">
     <div class="container">
-      <SectHead eyebrow="04 / Proces · Cztery kroki, dwa kwartały" title="Jak pracujemy. 3 miesiące. Stała opłata." id="proces-title" />
+      <SectHead eyebrow="04 / Proces · Cztery kroki, dwa kwartały" title="Od diagnozy do przekazania. Stała opłata." id="proces-title" />
       <div class="steps">
         <article class="step rv">
           <p class="eyebrow">01 · Tydzień 1</p>
@@ -130,38 +133,21 @@ import CtaBand from '../components/CtaBand.astro';
         </article>
       </div>
       <ProofStrip wrap={false} items={[
-        ['3 miesiące', 'razem'],
-        ['Stała opłata', 'bez ukrytych kosztów'],
+        ['DORA baseline', 'w pierwszym tygodniu'],
+        ['Pierwsze dostawy', 'w drugim tygodniu'],
         ['Bez przedłużania', 'zamknięty zakres'],
       ]} />
     </div>
   </section>
 
-  <!-- 05 co zyskujecie (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="korzysci">
+  <!-- 05 po programie (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="dalej">
     <div class="container">
-      <SectHead eyebrow="05 / Korzyści · Co zyskujecie" title="Zespół, który znacie. Tempo, którego nie znacie." id="korzysci" />
-      <div class="grid-cards">
-        <article class="card-tile rv">
-          <p class="eyebrow">01 / Tempo</p>
-          <h3>Zespół dostarcza 2–4 razy szybciej.</h3>
-          <p>To, co zajmowało 6 miesięcy, zespół dostarcza w 4 tygodnie. Wcześniejszy przychód, szybsza reakcja na konkurencję. Mierzone DORA metrics od pierwszego tygodnia, nie deklaracjami.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.1s">
-          <p class="eyebrow">02 / Ludzie</p>
-          <h3>Ci sami ludzie, nowe kompetencje.</h3>
-          <p>Nie zatrudniacie nowych ludzi i nie tracicie wiedzy o biznesie. Programiści, którzy pracują z AI, rzadziej odchodzą — a Wasza firma staje się pracodawcą, do którego ludzie sami wysyłają CV.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.2s">
-          <p class="eyebrow">03 / Koszt</p>
-          <h3>Niższy koszt rozwoju, z pilotem jako mnożnikiem.</h3>
-          <p>W stosie z pilota koszt dalszego rozwoju spada nawet o 60% — a wzorzec skaluje się na kolejne moduły. W ramach stałego doradztwa idziemy dalej: eliminujemy opłaty licencyjne za zamknięte technologie.</p>
-        </article>
-      </div>
+      <SectHead eyebrow="05 / Dalej · Po programie" title="Program się kończy. Tempo zostaje u Was." id="dalej" />
       <div class="after-note rv">
         <div>
-          <h3>A po dwóch kwartałach?</h3>
-          <p>Firmom, które chcą utrzymać tempo, prowadzimy stałą współpracę: doradztwo technologiczne dla zarządu i zewnętrzny dział R&D.</p>
+          <h3>Chcecie utrzymać tempo?</h3>
+          <p>Firmom po programie prowadzimy stałą współpracę: doradztwo technologiczne dla zarządu i zewnętrzny dział R&D — m.in. eliminujemy opłaty licencyjne za zamknięte technologie.</p>
         </div>
         <BtnArrow class="btn btn--dark" href="/doradztwo-technologiczne">Zobacz doradztwo</BtnArrow>
       </div>

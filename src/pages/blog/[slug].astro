@@ -12,6 +12,8 @@ export async function getStaticPaths() {
 const { post, posts } = Astro.props;
 const { Content } = await render(post);
 const iso = post.data.publishedAt.toISOString().slice(0, 10);
+const MIESIACE_PL = ['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
+const fmt = (d) => `${d.getDate()} ${MIESIACE_PL[d.getMonth()]} ${d.getFullYear()}`;
 const related = posts
   .filter((p) => p.id !== post.id)
   .sort((a, b) => (b.data.category === post.data.category ? 1 : 0) - (a.data.category === post.data.category ? 1 : 0))
@@ -29,9 +31,9 @@ const related = posts
   <!-- 01 treść wpisu -->
   <section class="sect" aria-label="Treść wpisu">
     <div class="container">
+      <p class="eyebrow rv" style="margin-bottom:var(--space-lg)">{post.data.author} · {fmt(post.data.publishedAt)}</p>
       <div class="prose rv">
         <Content />
-        <p><em>{post.data.author}</em></p>
       </div>
     </div>
   </section>
@@ -43,6 +45,7 @@ const related = posts
       <div class="link-cards rv">
         {related.map((p) => (
           <a class="link-card" href={`/blog/${p.id}`}>
+            <p class="eyebrow" style="margin-bottom:.5rem">{p.data.category} · {fmt(p.data.publishedAt)}</p>
             <h3>{p.data.title}</h3>
             <p>{p.data.excerpt}</p>
           </a>

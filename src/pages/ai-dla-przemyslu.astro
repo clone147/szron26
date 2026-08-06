@@ -46,11 +46,7 @@ import CtaBand from '../components/CtaBand.astro';
   <section class="sect sect--dark" aria-labelledby="case">
     <div class="container">
       <SectHead eyebrow="02 / Realizacja · Panel HMI w energetyce" title="Nowy moduł w istniejącym panelu HMI. Dwa tygodnie. Klient kontynuuje sam." id="case" />
-      <p class="rv">Operator infrastruktury energetycznej średniego napięcia potrzebował nowego modułu raportowania w panelu operatorskim Qt/QML, działającym na stanowiskach w stacjach rozdzielczych. Moduł odkładany od półtora roku. Od pierwszego szkicu interfejsu do podpisu odbioru — dwa tygodnie. Migrację Qt 5 → Qt 6 zrobiliśmy przy okazji.</p>
-      <figure class="quote-card rv">
-        <blockquote>Nie zbudowaliśmy „panelu raportów" — zbudowaliśmy wzorzec, który zespół powiela. Pierwszy widok zrobiliśmy razem. Drugi zrobili sami, po code review wewnątrz zespołu. Trzeci i czwarty — nie wiedzieliśmy nawet, że już powstały, dopóki nie zobaczyliśmy ich w raporcie po trzech miesiącach.</blockquote>
-        <figcaption><strong>Dlaczego to się udało</strong> — wniosek SZRON</figcaption>
-      </figure>
+      <p class="rv">Operator infrastruktury energetycznej średniego napięcia potrzebował nowego modułu raportowania w panelu operatorskim Qt/QML, działającym na stanowiskach w stacjach rozdzielczych — moduł był odkładany od półtora roku. Nie zbudowaliśmy „panelu raportów", tylko wzorzec: pierwszy widok zrobiliśmy razem z zespołem, kolejne klient dorobił już sam.</p>
       <ProofStrip wrap={false} items={[
         ['3–4× szybciej', '2 tygodnie zamiast 6–8 w wewnętrznym zespole'],
         ['3 widoki samodzielnie', 'dorobione przez zespół po naszym wyjściu'],
@@ -65,12 +61,12 @@ import CtaBand from '../components/CtaBand.astro';
   <!-- 03 co modernizujemy -->
   <section class="sect" aria-labelledby="zakres">
     <div class="container">
-      <SectHead eyebrow="03 / Zakres · Co modernizujemy i jak" title="Co modernizujemy i jak." id="zakres" small />
+      <SectHead eyebrow="03 / Zakres · Cztery obszary" title="Co modernizujemy i jak." id="zakres" small />
       <dl class="def-rows rv">
-        <div><dt>Panele HMI / SCADA<small>Qt 6 / QML, OPC UA</small></dt><dd>Migracja Qt 5 → Qt 6, wzorzec MVVM ze ścisłym rozdziałem logiki i widoku, integracja z istniejącą warstwą SCADA przez OPC UA. Eksport CSV, wizualizacja trendów.</dd></div>
-        <div><dt>Sterowniki urządzeń<small>Firmware embedded</small></dt><dd>Kod sterujący konkretnym urządzeniem, często pisany pod jeden projekt. Porządkujemy strukturę, dodajemy testy, wypinamy logikę z warstwy sprzętowej — żeby dało się go rozwijać.</dd></div>
-        <div><dt>Panele sterowania<small>Stanowiska operatorskie</small></dt><dd>Aplikacje desktopowe i ekrany dotykowe na liniach i w stacjach. Linux embedded, ekrany 19", praca na lokalnych stanowiskach — modernizacja bez wymiany sprzętu.</dd></div>
-        <div><dt>Monolit → moduły<small>Stopniowo, bez „big bang"</small></dt><dd>Nie przepisujemy całości naraz. Ustawiamy wzorzec na jednym module, zespół powiela go na kolejnych. Stary i nowy kod współistnieją, dopóki migracja nie zostanie domknięta.</dd></div>
+        <div><dt>Panele HMI / SCADA<small>Qt 6 / QML, OPC UA</small></dt><dd>Nowe widoki i raporty bez wymiany całego panelu — operatorzy pracują bez przerwy. Pod spodem: migracja Qt 5 → Qt 6, wzorzec MVVM z rozdziałem logiki i widoku, integracja z warstwą SCADA przez OPC UA, eksport CSV i trendy.</dd></div>
+        <div><dt>Sterowniki urządzeń<small>Firmware embedded</small></dt><dd>Sterownik, który znów da się rozwijać — bez strachu, że poprawka zatrzyma urządzenie. Porządkujemy strukturę, dodajemy testy, wypinamy logikę z warstwy sprzętowej.</dd></div>
+        <div><dt>Panele sterowania<small>Stanowiska operatorskie</small></dt><dd>Modernizacja bez wymiany sprzętu — te same stanowiska, nowy soft. Aplikacje desktopowe i ekrany dotykowe na liniach i w stacjach: Linux embedded, ekrany 19", praca lokalna.</dd></div>
+        <div><dt>Monolit → moduły<small>Stary i nowy kod równolegle</small></dt><dd>Zmiana bez zatrzymywania produkcji: stary system działa dalej, nowy moduł wchodzi obok i przejmuje ruch dopiero po testach i odbiorze. Wzorzec ustawiamy na jednym module, zespół powiela go na kolejnych.</dd></div>
       </dl>
     </div>
   </section>
@@ -79,11 +75,7 @@ import CtaBand from '../components/CtaBand.astro';
   <section class="sect sect--dark" aria-labelledby="ciaglosc">
     <div class="container">
       <SectHead eyebrow="04 / Ruch · Ciągłość i bezpieczeństwo" title="Modernizacja bez przerywania ruchu." id="ciaglosc" />
-      <div class="callout rv">
-        <p><strong>Zasada nadrzędna:</strong> system, który steruje produkcją, nie może zatrzymać się na czas migracji. Pracujemy tak, by w każdym momencie istniała działająca, sprawdzona wersja — a nowa wchodziła dopiero po testach na realnych danych.</p>
-      </div>
       <dl class="def-rows rv">
-        <div><dt>Dwa systemy równolegle<small>Bez „big bang"</small></dt><dd>Stary system działa dalej, nowy moduł wchodzi obok. Przełączamy dopiero, gdy nowy jest przetestowany i odebrany. Żadnej jednorazowej wymiany całości.</dd></div>
         <div><dt>Testy regresyjne na danych z produkcji<small>Realne dane z linii</small></dt><dd>Testy regresyjne na danych produkcyjnych — w case'ie HMI na danych z jednej stacji. Setup QML Tests i automatyczne screenshoty regresyjne dają feedback szybciej niż „kompiluj i kliknij".</dd></div>
         <div><dt>Baza bez zmian<small>Integracja, nie migracja danych</small></dt><dd>Wpinamy się w istniejącą warstwę SCADA i bazę (np. Postgres) bez ruszania schematu. Modernizujemy aplikację, nie ryzykujemy danymi produkcyjnymi.</dd></div>
         <div><dt>Modele on-prem dla wrażliwych<small>Kod nie opuszcza infrastruktury</small></dt><dd>Tam, gdzie kod i dane są wrażliwe, AI działa lokalnie (Ollama, llama.cpp) — nic nie trafia do chmury bez Waszej zgody. NDA podpisujemy przed startem.</dd></div>
@@ -94,12 +86,15 @@ import CtaBand from '../components/CtaBand.astro';
   <!-- 05 proof czasów dostarczania -->
   <section class="sect" aria-labelledby="czasy">
     <div class="container">
-      <SectHead eyebrow="05 / Tempo · Czasy dostarczania" title="Ile to trwa." id="czasy" small />
+      <SectHead eyebrow="05 / Tempo i model · Czasy i rozliczenie" title="Ile to trwa i jak się rozliczamy." id="czasy" small />
       <ProofStrip wrap={false} items={[
         ['30 minut', 'bezpłatna diagnoza Waszego systemu'],
         ['2 tygodnie', 'pilotażowy sprint — pierwszy zmodernizowany moduł'],
         ['1–3 miesiące', 'pełne wdrożenie, zależnie od skali stacku'],
       ]} />
+      <p class="rv" style="--rv-d:.1s; margin-top:var(--space-lg); max-width:60ch">
+        Rozliczenie: program kwartalny — stała opłata, zamknięty zakres. Konkretną kwotę dostajecie mailem w 48 godzin po diagnozie.
+      </p>
     </div>
   </section>
 

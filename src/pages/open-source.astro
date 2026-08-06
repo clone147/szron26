@@ -17,6 +17,7 @@ const tools = [
     ],
     install: 'git clone https://github.com/clone147/szron-db2-mcp',
     github: 'https://github.com/clone147/szron-db2-mcp',
+    related: { href: '/serwery-mcp', label: 'Serwery MCP w Akademii' },
   },
   {
     name: 'skill-imagegen',
@@ -65,6 +66,7 @@ const tools = [
     ],
     install: 'claude install-skill https://github.com/clone147/stm32f429-disco-skill',
     github: 'https://github.com/clone147/stm32f429-disco-skill',
+    related: { href: '/stm32-skill', label: 'Konfigurator skilla STM32' },
   },
   {
     name: 'chrome-tab-ungrouper',
@@ -127,7 +129,7 @@ const grouped = categories
                   <code>{t.install}</code>
                   <button type="button" class="install__btn" data-copy={t.install} aria-label={`Kopiuj komendę instalacji ${t.name}`}>Kopiuj</button>
                 </div>
-                <p class="tool-foot"><a href={t.github} target="_blank" rel="noopener noreferrer">Zobacz na GitHub →</a></p>
+                <p class="tool-foot"><a href={t.github} target="_blank" rel="noopener noreferrer">Zobacz na GitHub →</a>{t.related && <> · <a href={t.related.href}>{t.related.label} →</a></>}</p>
               </article>
             ))}
           </div>
@@ -140,11 +142,7 @@ const grouped = categories
   <section class="sect sect--dark" aria-labelledby="dlaczego">
     <div class="container">
       <SectHead eyebrow="02 / Dlaczego · Po co to robimy" title="Dlaczego open source?" id="dlaczego" />
-      <dl class="def-rows rv">
-        <div><dt>Sprawdzone w boju, nie w teorii<small>Powstaje przy pracy</small></dt><dd>Każde narzędzie powstało przy realnym projekcie wdrożeniowym. Za każdym stoi problem, na który sami trafiliśmy.</dd></div>
-        <div><dt>Feedback wart więcej niż kampania<small>Społeczność ponad marketing</small></dt><dd>Opinia developerów, którzy realnie używają narzędzia, jest cenniejsza niż reklamy. Budujemy razem z tymi, którzy z tego korzystają.</dd></div>
-        <div><dt>Polski AI tooling jest młody<small>Standard budujemy razem</small></dt><dd>Im więcej osób kontrybuuje, tym lepsze narzędzia powstają. Oddajemy społeczności to, co tworzymy przy projektach.</dd></div>
-      </dl>
+      <p class="sect-lead rv">Te narzędzia to produkt uboczny naszych wdrożeń — za każdym stoi problem, na który sami trafiliśmy u klienta. Publikujemy je na MIT, bo feedback developerów, którzy używają ich na co dzień, ulepsza je szybciej niż jakakolwiek kampania. A jeśli chcesz zobaczyć, jak pracujemy z AI na Waszym kodzie — zacznij od <a href="/coaching-sprint">coaching sprintu</a>.</p>
     </div>
   </section>
 

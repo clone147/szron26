@@ -7,7 +7,6 @@ import CtaBand from '../components/CtaBand.astro';
 
 // FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html)
 const faq = [
-  { q: 'Jak zmierzymy efekt?', a: 'DORA metrics jako baseline w tygodniu 1: czas od ticketu do PR, czas merge, bug escape rate, pokrycie testami. Mierzymy ponownie w tygodniu 12. Raport ROI dla zarządu — dashboard z twardymi liczbami.' },
   { q: 'Co z bezpieczeństwem naszych danych?', a: 'Wasz kod nie idzie do publicznych modeli. Dla branż regulowanych — Bedrock w AWS, dane w Waszej VPC. Dla obronności i wrażliwego embedded — lokalne modele (Ollama, vLLM) na Waszych serwerach. Audit log każdej interakcji z AI. NDA podpisujemy przed pierwszą rozmową.' },
   { q: 'Co jeśli zespół nie kupi tej zmiany?', a: 'Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny”. Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.' },
   { q: 'Czy stara aplikacja będzie działać w trakcie?', a: 'Tak. Pilot wchodzi obok: dwa systemy równolegle, moduł po module, testy regresyjne na danych z produkcji. Wasza baza danych zostaje bez zmian.' },
@@ -18,7 +17,7 @@ const faq = [
   description="Jak zmienia się codzienna praca programisty z agentem AI: plan mode, subagenci, MCP servery, AGENTS.md jako kontrakt. Efekt mierzony DORA i DEVLens."
   eyebrow="Dla zespołów software · codzienny workflow"
   heading="Tak wygląda dzień programisty, który prowadzi agenta."
-  lead="Najbardziej operacyjna z naszych stron. Pokazujemy, jak konkretnie zmienia się codzienna praca, jakich narzędzi używamy i jak mierzymy efekt od pierwszego tygodnia."
+  lead="Pokazujemy, jak konkretnie zmienia się codzienna praca z agentem, jakich narzędzi używamy i jak mierzymy efekt od pierwszego tygodnia. Czytasz jako członek zarządu? <a href='/transformacja-ai'>Wersja dla decydentów →</a>"
   heroImage="/img/sub/ai-dla-dev-teamow.webp"
   heroAlt="Sieć oszronionych węzłów połączonych pomarańczowymi liniami"
 >
@@ -99,7 +98,7 @@ const faq = [
         ['Tydzień 12', 'pomiar ponowny i raport ROI dla zarządu — dashboard z liczbami'],
       ]} />
       <p class="rv" style="--rv-d:.1s; margin-top:var(--space-lg); max-width:60ch">
-        Baseline zakładamy w tygodniu 1, mierzymy ponownie w tygodniu 12 — porównujemy te same wskaźniki, a nie wrażenia. To, co zajmowało 6 miesięcy, zespół dostarcza w 4 tygodnie; tempo rośnie 2–4 razy. Średnia po naszych projektach to 3–4 mergowane PR-y dziennie na programistę, każdy z testami.
+        To, co zajmowało 6 miesięcy, zespół dostarcza w 4 tygodnie; tempo rośnie 2–4 razy. Średnia po naszych projektach to 3–4 mergowane PR-y dziennie na programistę, każdy z testami.
       </p>
     </div>
   </section>
@@ -111,15 +110,15 @@ const faq = [
       <div class="link-cards rv">
         <a class="link-card" href="/metoda">
           <h3>Metoda</h3>
-          <p>Trzy ścieżki w dwóch kwartałach: trening AI, agentowe programowanie i pilot modernizacji. Jak prowadzimy zmianę krok po kroku.</p>
+          <p>Trzy ścieżki w dwóch kwartałach — jak prowadzimy zmianę krok po kroku.</p>
         </a>
         <a class="link-card" href="/akademia">
           <h3>Akademia</h3>
-          <p>Szkolenia i materiały o codziennej pracy z agentem — plan mode, subagenci, skille, MCP. Wiedza, na której opieramy workflow.</p>
+          <p>Szkolenia i materiały o codziennej pracy z agentem — plan mode, subagenci, skille, MCP.</p>
         </a>
         <a class="link-card" href="/case-studies">
           <h3>Case studies</h3>
-          <p>Efekty wdrożeń pokazane na danych z repozytoriów. Co zostaje po nas: działający system, samodzielny programista i powielalny wzorzec.</p>
+          <p>Efekty wdrożeń pokazane na danych z repozytoriów.</p>
         </a>
       </div>
     </div>

@@ -9,9 +9,9 @@ import BtnArrow from '../components/BtnArrow.astro';
 // FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html), stąd np. T&amp;M
 const faq = [
   { q: 'Co z bezpieczeństwem naszych danych?', a: 'Wasz kod nie idzie do publicznych modeli. Dla branż regulowanych — Bedrock w AWS, dane w Waszej VPC. Dla obronności i wrażliwego embedded — lokalne modele (Ollama, vLLM) na Waszych serwerach. Audit log każdej interakcji z AI. NDA podpisujemy przed pierwszą rozmową.' },
-  { q: 'Co jeśli zespół nie kupi tej zmiany?', a: 'Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny”. Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. Opór znika, gdy programiści widzą, że dostarczają szybciej. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.' },
+  { q: 'Co jeśli zespół nie kupi tej zmiany?', a: 'Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny”. Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.' },
   { q: 'Jak zmierzymy efekt?', a: 'DORA metrics jako baseline w tygodniu 1: czas od ticketu do PR, czas merge, bug escape rate, pokrycie testami. Mierzymy ponownie w tygodniu 12. Raport ROI dla zarządu — dashboard z twardymi liczbami.' },
-  { q: 'Rynek AI zmienia się co kwartał. Skąd pewność, że wybierzecie narzędzia, które się utrzymają?', a: 'Dobór technologii to nasz zawód od 25 lat — przeszliśmy zmiany platform od Delphi, przez C++ i mobile, po agentów, i widzieliśmy, które wybory firmy spłacały latami. Z agentami pracujemy w produkcji od premiery Claude Code, więc koszt prób i błędów ponieśliśmy u siebie, nie u klientów. A program kończymy tak, żeby zespół sam umiał ocenić i przyjąć kolejne narzędzie — przewaga zostaje u Was, nie w naszym cenniku.' },
+  { q: 'Rynek AI zmienia się co kwartał. Skąd pewność, że wybierzecie narzędzia, które się utrzymają?', a: 'Dobór technologii to nasz zawód od 25 lat — widzieliśmy, które wybory firmy spłacały latami. Koszt prób i błędów z agentami ponieśliśmy u siebie, nie u klientów. A program kończymy tak, żeby zespół sam umiał ocenić i przyjąć kolejne narzędzie — przewaga zostaje u Was, nie w naszym cenniku.' },
   { q: 'Ile to kosztuje?', a: 'Programy kwartalne nie są dla każdej firmy. Stała opłata kwartalna, zamknięty zakres, bez T&amp;M. Kwotę ustalamy po diagnozie i podajemy mailem w 48h.' },
   { q: 'Czy stara aplikacja będzie działać w trakcie pilota?', a: 'Tak. Pilot wchodzi obok: dwa systemy równolegle, moduł po module, testy regresyjne na danych z produkcji. Wasza baza danych zostaje bez zmian.' },
   { q: 'Czy to działa przy zespole 50+ osób?', a: 'Tak — falami. Nie szkolimy 50 osób naraz. Zaczynamy od jednego zespołu (5–10 osób) i pilota, wzorce zapisujemy w CLAUDE.md i standardach repo, a przeszkoleni programiści zostają championami kolejnych fal. Druga fala kosztuje mniej niż pierwsza, trzecia mniej niż druga.' },
@@ -25,7 +25,7 @@ const faq = [
   <div class="container">
     <p class="eyebrow rv" data-scramble>Dla zarządów dużych firm</p>
     <h1 class="hero__title ws" style="margin-top: var(--space-lg)">Wasz zespół IT. 2–4&nbsp;razy szybszy. W&nbsp;dwa kwartały.</h1>
-    <p class="hero__lead rv" style="--rv-d:.15s">Wdrażamy programowanie agentowe w zespołach IT dużych firm — na Waszym kodzie. Szkolimy zespół z AI, wprowadzamy agentów do codziennej pracy, a dowodem jest pilot: jeden moduł zmodernizowany do nowoczesnego stosu w ciągu dwóch kwartałów. Ci sami programiści, którzy znają Wasz biznes — tylko teraz dostarczają 2 do 4 razy szybciej.</p>
+    <p class="hero__lead rv" style="--rv-d:.15s">Wdrażamy programowanie agentowe w zespołach IT dużych firm — szkolenie i wdrożenie na Waszym kodzie. Dowodem jest pilot: jeden moduł zmodernizowany do nowoczesnego stosu, z wynikiem zmierzonym na produkcji.</p>
     <div class="hero__cta rv" style="--rv-d:.25s">
       <BtnArrow href="#kontakt">Umów 30-minutową rozmowę</BtnArrow>
       <a class="btn btn--ghost" href="#metoda">Zobacz, jak pracujemy</a>
@@ -37,7 +37,6 @@ const faq = [
         <p class="hero__panel-cap">szybsze dostarczanie po dwóch kwartałach — ci sami ludzie, ten sam kod, nowy sposób pracy</p>
       </div>
       <div class="hero__aside rv" style="--rv-d:.1s">
-        <p class="hero__aside-lead">Dwóch seniorów, 40+ lat łącznie w branży. Trzy lata z LLM-ami w produkcji. Mówimy wprost z zarządem i CTO, diagnozę prowadzi założyciel, kod piszemy razem z Waszym zespołem.</p>
         <p class="eyebrow">Pracujemy z firmami, których zespół IT liczy 30+ osób</p>
         <div class="hero__proof">
           <div><strong>40+ lat</strong> <span>łącznie (Tomek 25 · Maciej 18)</span></div>
@@ -131,7 +130,7 @@ const faq = [
             <p>zapowiadany horyzont w pełni autonomicznych agentów programistycznych</p>
           </article>
         </div>
-        <p class="now-note rv">Większość rynku zatrzymała się na autouzupełnianiu i czacie z AI. My uczymy zespoły programowania intencyjnego: programista zleca agentowi zadanie — intencję, kontekst, kryteria odbioru — i ocenia wynik. Pełną autonomię, którą zapowiadają producenci modeli, wykorzystają te zespoły, które już dziś są w tym biegłe. Kwartał treningu teraz jest wart więcej niż rok doganiania później.</p>
+        <p class="now-note rv">Większość rynku zatrzymała się na autouzupełnianiu i czacie z AI. My uczymy zespoły programowania intencyjnego: programista zleca agentowi zadanie — intencję, kontekst, kryteria odbioru — i ocenia wynik. Kwartał treningu teraz jest wart więcej niż rok doganiania później.</p>
         <div class="industries rv">
           <p class="eyebrow">Przewaga, która zostaje u Was</p>
           <div class="industries__grid">
@@ -141,11 +140,11 @@ const faq = [
             </article>
             <article>
               <h3>Trzy lata z agentami w produkcji</h3>
-              <p>Pracujemy z LLM-ami od premiery Claude Code. Ślepe uliczki mamy za sobą — Wasz zespół startuje z workflow, do którego rynek dopiero będzie dochodził.</p>
+              <p>Ślepe uliczki mamy za sobą — Wasz zespół startuje z workflow, do którego rynek dopiero będzie dochodził.</p>
             </article>
             <article>
               <h3>Narzędzia, których nie kupicie z półki</h3>
-              <p>DEVLens do pomiaru zespołów, własne serwery MCP (m.in. open-source do IBM DB2), szablony CLAUDE.md sprawdzone we wdrożeniach. Zostają u Was po programie.</p>
+              <p>DEVLens do pomiaru zespołów, własne integracje agentów z bazami danych (m.in. open-source do IBM DB2), szablony konfiguracji sprawdzone we wdrożeniach. Zostają u Was po programie.</p>
             </article>
             <article>
               <h3>Wzorce z Waszej branży, nie z prezentacji</h3>
@@ -161,7 +160,7 @@ const faq = [
   <section class="sect sect--dark" id="metoda" aria-labelledby="metoda-title">
     <div class="container">
       <SectHead eyebrow="03 / Metoda · Jak to robimy" title="Trening AI, programowanie agentowe i pilot modernizacji. W dwa kwartały." id="metoda-title" small>
-        <p class="sect-lead rv">Trzy ścieżki idą równolegle. Najpierw szkolimy Wasz zespół z AI — żeby każdy programista umiał prowadzić agenta w codziennej pracy. Potem wprowadzamy programowanie agentowe na Waszej obecnej aplikacji, bez ryzyka, na kodzie, który ludzie znają. Dowodem jest pilot: zespół modernizuje jeden moduł do stosu, w którym AI najmocniej obniża koszt rozwoju — i wypuszcza go też natywnie na iOS i Androida. Po dwóch kwartałach zespół ma nowy sposób pracy, zmierzony wynik i wzorzec, którym sam obejmuje resztę systemu.</p>
+        <p class="sect-lead rv">Trzy ścieżki idą równolegle, nie po kolei — zespół uczy się AI na aplikacji, którą zna, więc pilot startuje bez rozgrzewki. Na końcu zostaje nowy sposób pracy, zmierzony wynik i wzorzec, którym zespół sam obejmuje resztę systemu.</p>
       </SectHead>
       <div class="paths">
         <article class="path rv">
@@ -170,13 +169,7 @@ const faq = [
           </figure>
           <p class="eyebrow">Ścieżka 01</p>
           <h3>Trening z AI</h3>
-          <p>Uczymy Wasz zespół, jak realnie pracować z AI. Zamiast szkolenia z promptów dostajecie codzienne ramy pracy: agent AI jako daily driver, AGENTS.md jako konstytucja zespołu, MCP servery podpięte wprost do Waszej bazy danych (MS SQL, MySQL, IBM DB2, Postgres, Oracle).</p>
-          <ul role="list">
-            <li>Wspólne sesje na żywym kodzie</li>
-            <li>Pełny workflow agentowy: plan mode, subagenci, skille, MCP</li>
-            <li>Wskaźniki produktywności od pierwszego tygodnia (DEVLens — wykresy z repozytoriów Git i SVN)</li>
-            <li>Każdy programista pracuje samodzielnie po kilku spotkaniach</li>
-          </ul>
+          <p>Zespół uczy się prowadzić agenta AI w codziennej pracy — na Waszym żywym kodzie, nie na slajdach. Po kilku spotkaniach każdy programista pracuje samodzielnie, a postęp widać w liczbach od pierwszego tygodnia (DEVLens).</p>
           <p class="path__lead">Prowadzi: Tomek Wojciechowski</p>
         </article>
         <article class="path rv" style="--rv-d:.1s">
@@ -185,72 +178,37 @@ const faq = [
           </figure>
           <p class="eyebrow">Ścieżka 02</p>
           <h3>Agentowe programowanie</h3>
-          <p>Wprowadzamy zespół w pracę z agentami na Waszej obecnej aplikacji. Bez ryzyka modernizacji, bez przerzucania na nową technologię. Pierwsze realne dostawy w drugim tygodniu.</p>
-          <ul role="list">
-            <li>Praca na Waszej istniejącej aplikacji</li>
-            <li>Niski próg wejścia, szybki ROI</li>
-            <li>Zero przerwy w rozwoju produktu</li>
-          </ul>
+          <p>Agenci wchodzą do pracy na Waszej obecnej aplikacji — bez przerwy w rozwoju produktu i bez zmiany technologii. Pierwsze realne dostawy w drugim tygodniu.</p>
           <p class="path__lead">Prowadzi: Tomek Wojciechowski</p>
         </article>
         <article class="path path--wide rv">
           <p class="eyebrow">Ścieżka 03</p>
           <h3>Pilot modernizacji</h3>
-          <p>Zespół przenosi jeden moduł lub aplikację na nowoczesny stos, w którym AI obniża koszt rozwoju nawet o 60%. My doradzamy, pokazujemy wzorzec, a trudne fragmenty bierzemy na siebie. Pilot to dowód metody — po dwóch kwartałach zespół tym samym wzorcem obejmuje kolejne moduły.</p>
           <div class="path__cols">
-            <dl class="spec-rows">
-              <div><dt>Platforma</dt><dd>Desktop, web, SaaS — jedna aplikacja, wybór formy dostawy</dd></div>
-              <div><dt>Mobile</dt><dd>Natywne iOS i Android z jednego kodu, w tych samych dwóch kwartałach</dd></div>
-              <div><dt>Architektura</dt><dd>Monolit → moduły, stopniowo, bez „big bang”</dd></div>
-              <div><dt>Dane i integracje</dt><dd>Wasza baza zostaje bez zmian (MS SQL, MySQL, PostgreSQL, DB2, Oracle), API działają jak wcześniej</dd></div>
-            </dl>
-            <div class="path-aside">
-              <figure class="ph ph--dark" style="--ph-ar: 16/9">
-                <img src="/img/path-03.webp" alt="Stara hala przemysłowa przechodząca w nowoczesną szklaną dobudowę o zmierzchu" loading="lazy" onerror="this.remove()">
-              </figure>
-              <article>
-                <h4>Czego nie obiecujemy</h4>
-                <ul role="list">
-                  <li>Nie obiecujemy „identycznej kopii”. Pilot to okazja, żeby naprawić to, co od lat irytowało użytkowników.</li>
-                  <li>Nie zaczynamy bez analizy. Diagnoza mówi uczciwie, czy pilot ma sens i od którego modułu zacząć.</li>
-                </ul>
-              </article>
-              <article>
-                <h4>Pod NDA</h4>
-                <p>Pierwsze programy prowadzimy pod NDA. Konkretne wyniki i nazwy klientów zaczniemy publikować w drugiej połowie 2026 roku.</p>
-              </article>
-            </div>
+            <p style="color: var(--color-text-inv-2)">Zespół przenosi jeden moduł na nowoczesny stos, w którym AI obniża koszt rozwoju nawet o 60% — razem z natywnymi aplikacjami iOS i Android w tym samym programie. Stara aplikacja działa przez cały czas, Wasza baza danych zostaje bez zmian. Pierwsze programy prowadzimy pod NDA — konkretne wyniki i nazwy klientów zaczniemy publikować w drugiej połowie 2026 roku.</p>
+            <figure class="ph ph--dark" style="--ph-ar: 16/9">
+              <img src="/img/path-03.webp" alt="Stara hala przemysłowa przechodząca w nowoczesną szklaną dobudowę o zmierzchu" loading="lazy" onerror="this.remove()">
+            </figure>
           </div>
           <p class="path__lead">Prowadzi: Maciej Stopa (backend/mobile/frontend) + Tomek (architektura)</p>
         </article>
       </div>
       <div class="statement">
         <h3 class="ws">Zespół, który znacie. Tempo, którego nie znacie.</h3>
-        <p class="rv">Bez wymiany ludzi. Bez utraty wiedzy o biznesie. W 3 miesiące, za stałą opłatę.</p>
+        <p class="rv">Bez wymiany ludzi. Bez utraty wiedzy o biznesie. W 3 miesiące, za stałą opłatę. <a href="/metoda">Pełna metoda →</a></p>
       </div>
     </div>
   </section>
 
-  <!-- ── 04 CO ROBIMY INACZEJ ───────────────────────── -->
-  <section class="sect" id="inaczej" aria-labelledby="inaczej-title">
+  <!-- ── 04 KORZYŚCI ────────────────────────────────── -->
+  <section class="sect" id="korzysci" aria-labelledby="korzysci-title">
     <div class="container">
-      <SectHead eyebrow="04 / Co robimy inaczej · Szkolenie a wdrożenie" title="Samo szkolenie to za mało. Bez wdrożenia w codzienną pracę zostajecie z certyfikatami i starym tempem." id="inaczej-title" small />
-      <div class="twocol">
-        <p class="rv">Trzy ścieżki idą równolegle, nie po kolei. Zespół uczy się AI na własnej aplikacji — w stosie, który zna. Kiedy startuje pilot modernizacji, programiści już wiedzą, jak prowadzić agenta. Nowy sposób pracy od pierwszego dnia jest ich sposobem, nie naszym.</p>
-        <p class="rv" style="--rv-d:.1s">Cały program trwa 3 miesiące, nie rok. Stara aplikacja działa bez przerwy, pilot wchodzi obok, mobile razem z webem. Bez „big bang” i bez ryzyka, że wszystko padnie w jeden weekend.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── 05 KORZYŚCI ────────────────────────────────── -->
-  <section class="sect" id="korzysci" aria-labelledby="korzysci-title" style="padding-top: 0">
-    <div class="container">
-      <SectHead eyebrow="05 / Korzyści" title="Co zyskujecie" id="korzysci-title" />
+      <SectHead eyebrow="04 / Korzyści" title="Co zyskujecie" id="korzysci-title" />
       <div class="benefits">
         <article class="benefit rv">
           <p class="eyebrow">01 / Tempo</p>
-          <h3>Zespół dostarcza 2–4 razy szybciej.</h3>
-          <p>To, co zajmowało 6 miesięcy, zespół dostarcza w 4 tygodnie. Wcześniejszy przychód, szybsza reakcja na konkurencję. Mierzone DORA metrics od pierwszego tygodnia, nie deklaracjami.</p>
+          <h3>To, co zajmowało 6 miesięcy — w 4 tygodnie.</h3>
+          <p>Wcześniejszy przychód, szybsza reakcja na konkurencję. Mierzone DORA metrics od pierwszego tygodnia, nie deklaracjami.</p>
         </article>
         <article class="benefit rv" style="--rv-d:.1s">
           <p class="eyebrow">02 / Ludzie</p>
@@ -266,12 +224,12 @@ const faq = [
     </div>
   </section>
 
-  <!-- ── 06 CASE STUDY ──────────────────────────────── -->
+  <!-- ── 05 CASE STUDY ──────────────────────────────── -->
   <section class="sect" id="case-study" aria-labelledby="case-title" style="padding-top: 0">
     <div class="container">
       <div class="case-card rv">
         <div>
-          <p class="eyebrow" data-scramble>06 / Case study · RegioBus Systems</p>
+          <p class="eyebrow" data-scramble>05 / Case study · RegioBus Systems</p>
           <h2 id="case-title">Sześć miesięcy planu. Cztery tygodnie do produktu.</h2>
           <figure>
             <blockquote>Zaplanowaliśmy 6 miesięcy na nowy system. Po czterech tygodniach mieliśmy działający produkt. Z czterech programistów zostawiliśmy jednego, z asystentem AI.</blockquote>
@@ -304,10 +262,10 @@ const faq = [
     </div>
   </section>
 
-  <!-- ── 07 WYNIKI ──────────────────────────────────── -->
+  <!-- ── 06 WYNIKI ──────────────────────────────────── -->
   <section class="sect" id="wyniki" aria-labelledby="wyniki-title" style="padding-top: 0">
     <div class="container">
-      <SectHead eyebrow="07 / Wyniki · Pozostałe projekty" title="Skrócenie czasu dostarczania w trzech różnych branżach." id="wyniki-title" small />
+      <SectHead eyebrow="06 / Wyniki · Pozostałe projekty" title="Skrócenie czasu dostarczania w trzech różnych branżach." id="wyniki-title" small />
       <table class="results-table rv">
         <thead>
           <tr>
@@ -337,10 +295,10 @@ const faq = [
     </div>
   </section>
 
-  <!-- ── 08 PROCES ──────────────────────────────────── -->
+  <!-- ── 07 PROCES ──────────────────────────────────── -->
   <section class="sect" id="proces" aria-labelledby="proces-title" style="padding-top: 0">
     <div class="container">
-      <SectHead eyebrow="08 / Proces · Cztery kroki, dwa kwartały" title="Jak pracujemy. 3 miesiące. Stała opłata." id="proces-title" />
+      <SectHead eyebrow="07 / Proces · Cztery kroki, dwa kwartały" title="Jak pracujemy. 3 miesiące. Stała opłata." id="proces-title" />
       <div class="steps">
         <article class="step rv">
           <p class="eyebrow">01 · Tydzień 1</p>
@@ -385,10 +343,10 @@ const faq = [
     </div>
   </section>
 
-  <!-- ── 09 ZESPÓŁ ──────────────────────────────────── -->
+  <!-- ── 08 ZESPÓŁ ──────────────────────────────────── -->
   <section class="sect" id="zespol" aria-labelledby="zespol-title" style="padding-top: 0">
     <div class="container">
-      <SectHead eyebrow="09 / Zespół · Dwa nazwiska, jeden numer telefonu" title="Ci sami dwaj ludzie prowadzą diagnozę, wdrożenie i przekazanie." id="zespol-title" small>
+      <SectHead eyebrow="08 / Zespół · Dwa nazwiska, jeden numer telefonu" title="Ci sami dwaj ludzie prowadzą diagnozę, wdrożenie i przekazanie." id="zespol-title" small>
         <p class="sect-lead rv">Bez account managerów. Bez wymiany konsultantów co kwartał. Wszystko, co robimy u Was, robi jeden z nas — i każdy wie, co robi drugi.</p>
       </SectHead>
       <div class="team">
@@ -420,10 +378,10 @@ const faq = [
     </div>
   </section>
 
-  <!-- ── 10 FAQ ─────────────────────────────────────── -->
+  <!-- ── 09 FAQ ─────────────────────────────────────── -->
   <section class="sect" id="faq" aria-labelledby="faq-title" style="padding-top: 0">
     <div class="container">
-      <SectHead eyebrow="10 / FAQ · Pytania zarządu" title="Pytania, które zwykle padają na pierwszym spotkaniu." id="faq-title" small />
+      <SectHead eyebrow="09 / FAQ · Pytania zarządu" title="Pytania, które zwykle padają na pierwszym spotkaniu." id="faq-title" small />
       <Faq items={faq} />
       <div class="faq-cta rv">
         <p>Pełne odpowiedzi — z uwzględnieniem Waszego stacku, branży i compliance — na pierwszej, 30-minutowej rozmowie diagnostycznej.</p>
@@ -439,7 +397,7 @@ const faq = [
         <div>
           <p class="eyebrow rv" data-scramble>Kontakt</p>
           <h2 class="sect-title sect-title--s ws" id="kontakt-title" style="margin-top: var(--space-lg)">30 minut. Pokażemy, gdzie Wasz zespół IT traci tempo.</h2>
-          <p class="sect-lead rv">W dwóch kwartałach dzieją się trzy rzeczy: szkolimy Wasz zespół z AI, wprowadzamy programowanie agentowe na obecnej aplikacji, a pilot modernizacji potwierdza wynik na produkcji. Po dwóch kwartałach zespół dostarcza 2–4 razy szybciej i sam obejmuje wzorcem resztę systemu.</p>
+          <p class="sect-lead rv">Po dwóch kwartałach Wasz zespół dostarcza 2–4 razy szybciej i sam obejmuje wzorcem resztę systemu.</p>
           <div class="contact__note rv">
             <p class="eyebrow">Pracujemy z firmami, których zespół IT liczy 30+ osób</p>
             <p>Rozmowę prowadzi Tomek. W ciągu 48h dostajecie wycenę zatwierdzoną przez nas obu — bo to my będziemy ten projekt robić. Bez oferty handlowej. Konkretne liczby, które wykorzystacie niezależnie od dalszej decyzji.</p>

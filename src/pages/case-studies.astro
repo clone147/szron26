@@ -23,7 +23,7 @@ import CtaBand from '../components/CtaBand.astro';
   <!-- 01 lista realizacji -->
   <section class="sect" aria-labelledby="realizacje">
     <div class="container">
-      <SectHead eyebrow="01 / Case studies · Mierzalne efekty" title="Sześć miesięcy planu. Cztery tygodnie do produktu." id="realizacje" />
+      <SectHead eyebrow="01 / Case studies · Mierzalne efekty" title="Trzy branże. Trzy piloty. Trzy działające produkty." id="realizacje" />
       <div class="link-cards rv">
         <a class="link-card" href="/case-studies/regiobus">
           <figure class="ph" style="--ph-ar: 16/9">
@@ -31,8 +31,8 @@ import CtaBand from '../components/CtaBand.astro';
           </figure>
           <p class="eyebrow">01 · Transport — backend + mobile</p>
           <h3>System biletowy NFC — RegioBus Systems</h3>
-          <p>Zaplanowany na 6 miesięcy. Po czterech tygodniach zespół klienta miał działający produkt. Czterech programistów zastąpił jeden z asystentem AI — bez utraty tempa rozwoju.</p>
-          <p>Java / Spring Boot · Kotlin (Android NFC) · PostgreSQL · Claude Code + custom MCP. Lead operacyjny: Maciej Stopa, z Tomkiem (AI workflow). Czas: 6 mc → 4 tyg. Zespół: 3 z 4 osób uwolnione, 0 odejść. Roczne oszczędności: setki tys. PLN.</p>
+          <p>Zaplanowany na 6 miesięcy. Po czterech tygodniach zespół klienta miał działający produkt. Czterech programistów zastąpił jeden z asystentem AI — 0 odejść, oszczędności liczone w setkach tysięcy złotych rocznie.</p>
+          <p>Java / Spring Boot · Kotlin (Android NFC) · PostgreSQL · Claude Code + custom MCP. Lead operacyjny: Maciej Stopa, z Tomkiem (AI workflow).</p>
           <span class="link-card__more">Czytaj case →</span>
         </a>
         <a class="link-card" href="/case-studies/stm32">
@@ -42,7 +42,7 @@ import CtaBand from '../components/CtaBand.astro';
           <p class="eyebrow">02 · Embedded — hardware / IoT</p>
           <h3>Sterownik urządzenia przemysłowego — firmware STM32</h3>
           <p>Nowy moduł komunikacji do istniejącego sterownika. Wcześniej takie zlecenia trwały u nich około dwóch miesięcy. Tym razem ich inżynierowie zamknęli go w dwa tygodnie — z testami HIL i dokumentacją, my obok.</p>
-          <p>STM32 · ARM Cortex-M4 · C / C++17 · FreeRTOS · Modbus RTU + CANopen. Lead operacyjny: Tomek Wojciechowski, z Maćkiem (CI dla firmware). Czas: 2 mc → 2 tyg. Zespół po wdrożeniu: 3 inżynierów z AI w workflow. Pokrycie testami: unit + HIL.</p>
+          <p>STM32 · ARM Cortex-M4 · C / C++17 · FreeRTOS · Modbus RTU + CANopen. Lead operacyjny: Tomek Wojciechowski, z Maćkiem (CI dla firmware).</p>
           <span class="link-card__more">Czytaj case →</span>
         </a>
         <a class="link-card" href="/case-studies/hmi">
@@ -52,7 +52,7 @@ import CtaBand from '../components/CtaBand.astro';
           <p class="eyebrow">03 · Energetyka — HMI / SCADA</p>
           <h3>Panel sterowania w energetyce — Qt / QML</h3>
           <p>Nowy moduł raportowania dla istniejącego panelu operatorskiego. Dwa tygodnie od projektu UI do podpisu odbioru. Zespół po stronie klienta przejął kod i samodzielnie dorabia kolejne widoki.</p>
-          <p>Qt 6 / QML · C++17 · Linux embedded · OPC UA. Lead operacyjny: Maciej Stopa, z Tomkiem (CLAUDE.md dla QML). Czas: nowy moduł → 2 tyg. Transfer wiedzy: pełny, z dokumentacją. Status: klient rozwija samodzielnie.</p>
+          <p>Qt 6 / QML · C++17 · Linux embedded · OPC UA. Lead operacyjny: Maciej Stopa, z Tomkiem (CLAUDE.md dla QML).</p>
           <span class="link-card__more">Czytaj case →</span>
         </a>
       </div>
@@ -63,10 +63,8 @@ import CtaBand from '../components/CtaBand.astro';
   <section class="sect sect--dark" aria-labelledby="wzorzec">
     <div class="container">
       <SectHead eyebrow="02 / Co łączy te projekty · Wzorzec wdrożenia" title="Każdy projekt prowadzony tak, żeby zespół klienta był po nim samodzielny." id="wzorzec" />
-      <div class="steps">
-        <article class="step rv"><p class="eyebrow">i · Tydzień 1</p><h3>Diagnoza, nie audyt</h3><p>Bez kwestionariuszy i spotkań z każdym zespołem. Czytamy kod, obserwujemy deploymenty, pytamy programistów. Konkretna lista 3 wąskich gardeł na koniec tygodnia. Prowadzi Tomek — Maciej dołącza na warstwę kodu, jeśli temat tego wymaga.</p></article>
-        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">ii · Tygodnie 3–10</p><h3>Trzy ścieżki równolegle</h3><p>Trening z AI na żywym kodzie (Tomek), agentowe programowanie i modernizacja backendu/mobile (Maciej). Każdy commit to lekcja — jak prowadzić AI, jak czytać sugestie, jak nie wpaść w pułapkę „magic prompt”. Bez sztucznych warsztatów.</p></article>
-        <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">iii · Tygodnie 11–12</p><h3>Wyjście bez uzależnienia</h3><p>CLAUDE.md ze standardami zespołu, dokumentacja modułów, lista kolejnych usprawnień. Zostajemy na 30-dniowy support w trybie „call when needed”, ale celem jest, żeby nie był potrzebny.</p></article>
+      <div class="prose rv">
+        <p>Każdy pilot przebiega tak samo: tydzień diagnozy na żywym kodzie, potem trzy ścieżki równolegle — trening z AI, agentowe programowanie i modernizacja — a na koniec wyjście z dokumentacją, standardami w CLAUDE.md i 30-dniowym supportem „call when needed”. Krok po kroku opisujemy to w <a href="/metoda">naszej metodzie →</a></p>
       </div>
     </div>
   </section>

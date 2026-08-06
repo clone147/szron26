@@ -9,7 +9,7 @@ import CtaBand from '../components/CtaBand.astro';
 const faq = [
   { q: 'Czy musimy najpierw przejść dwa kwartały transformacji?', a: 'Nie. Doradztwo działa też samodzielnie — zaczynamy wtedy od pomiaru DEVLens i przeglądu technologii. Kwartał transformacji można dołożyć później, jeśli z danych wyjdzie, że ma sens.' },
   { q: 'Jak zmierzycie, że doradztwo działa?', a: 'Tak jak wszystko u nas — w danych. DEVLens pokazuje produktywność zespołu w czasie, a roadmapa ma mierzalne punkty kontrolne: koszty licencji, czas dostarczania, liczba technologii w użyciu.' },
-  { q: 'Czym to się różni od zatrudnienia CTO albo architekta?', a: 'Nie zastępujemy Waszych ludzi — dajemy zarządowi niezależny głos z zewnątrz, bez polityki etatu i bez własnego interesu w wyborze technologii. A gdy trzeba, siadamy do kodu razem z zespołem.' },
+  { q: 'Czym to się różni od zatrudnienia CTO albo architekta?', a: 'Nie zastępujemy Waszych ludzi — dajemy zarządowi niezależny głos z zewnątrz, bez własnego interesu w wyborze technologii. A gdy trzeba, siadamy do kodu razem z zespołem.' },
 ];
 ---
 <Interior
@@ -17,7 +17,7 @@ const faq = [
   description="Stała współpraca z SZRON: jedna roadmapa technologiczna, decyzje oparte na pomiarach DEVLens, niezależny głos. Po dwóch kwartałach transformacji lub niezależnie."
   eyebrow="Stała współpraca · po dwóch kwartałach lub niezależnie"
   heading="Doradca technologiczny zarządu. Zewnętrzny dział R&D."
-  lead="Kwartał transformacji kończy się samodzielnym zespołem. Ale technologia nie przestaje przyspieszać — a większość zarządów nie ma przy sobie nikogo, kto patrzy na nią z zewnątrz i bez własnego interesu. Stała współpraca z SZRON to jedna roadmapa technologiczna, decyzje oparte na pomiarach i prawdy powiedziane wprost."
+  lead="Większość zarządów nie ma przy sobie nikogo, kto patrzy na technologię z zewnątrz i bez własnego interesu. Stała współpraca z SZRON to jedna roadmapa technologiczna, decyzje oparte na pomiarach i prawdy powiedziane wprost."
   heroImage="/img/sub/doradztwo.webp"
   heroAlt="Świetlista ścieżka obwodów wijąca się przez pole szronu"
 >
@@ -47,7 +47,7 @@ const faq = [
         <article class="card-tile rv" style="--rv-d:.2s">
           <p class="eyebrow">c</p>
           <h3>Zarząd zna stan IT z opinii, nie z pomiarów.</h3>
-          <p>A niektórych prawd pracownik etatowy po prostu nie powie.</p>
+          <p>Budżety i terminy opierają się na relacjach, nie na danych z repozytoriów.</p>
         </article>
       </div>
     </div>
@@ -59,9 +59,9 @@ const faq = [
       <SectHead eyebrow="02 / Zakres · Co dostajecie" title="Zewnętrzny dział R&D. Bez kosztów etatów, bez polityki." id="zakres" />
       <dl class="def-rows rv">
         <div><dt>Roadmapa technologiczna<small>Jeden plan zamiast osobnych tematów</small></dt><dd>Kwartalne przeglądy: modernizacja, AI, bezpieczeństwo, licencje i sprzęt spięte w jeden kierunek z priorytetami i budżetem.</dd></div>
-        <div><dt>Pomiar produktywności<small>DEVLens — dane, nie opinie</small></dt><dd>Wykresy produktywności zespołu wprost z repozytoriów Git i SVN. Zarząd widzi efekt każdej decyzji technologicznej w danych.</dd></div>
+        <div><dt>Pomiar produktywności<small>DEVLens — dane, nie opinie</small></dt><dd>Wykresy produktywności zespołu wprost z repozytoriów Git i SVN — zobacz <a href="/devlens">DEVLens</a>. Zarząd widzi efekt każdej decyzji technologicznej w danych.</dd></div>
         <div><dt>Niezależny głos<small>Prawdy, których etat nie powie</small></dt><dd>Ocena pomysłów, dostawców i wycen bez własnego interesu. Mówimy także te rzeczy, których zarząd nie usłyszy od własnego zespołu.</dd></div>
-        <div><dt>Eliminacja opłat licencyjnych<small>Mniejszy rachunek co roku</small></dt><dd>Tam, gdzie to bezpieczne, zastępujemy płatne technologie otwartymi — np. komercyjną bazę danych PostgreSQL-em. Równoległa baza-mirror dojrzewa obok produkcji, przejście następuje bez przerwy w działaniu.</dd></div>
+        <div><dt>Eliminacja opłat licencyjnych<small>Mniejszy rachunek co roku</small></dt><dd>Tam, gdzie to bezpieczne, zastępujemy płatne technologie otwartymi — np. komercyjną bazę danych PostgreSQL-em — a przejście odbywa się bez przerwy w działaniu. Skala: rezygnacja z licencji Keil na rzecz GCC zostawia w budżecie ~113 tys. zł co 3 lata w 5-osobowym zespole (<a href="/keil-vs-gcc">pełny rachunek</a>).</dd></div>
         <div><dt>AI on-premise<small>Dane chronione zostają u Was</small></dt><dd>Dla obronności, energetyki i medycyny: projekt i wdrożenie lokalnego modelu AI na Waszych serwerach. Dziś to inwestycja rzędu 100 tys. PLN — i ceny szybko spadają.</dd></div>
       </dl>
     </div>

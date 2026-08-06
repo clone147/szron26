@@ -5,9 +5,35 @@ import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
 import BtnArrow from '../components/BtnArrow.astro';
 import RelatedCards from '../components/RelatedCards.astro';
+
+// Znaczniki relatywne („dziś”, „za X tygodni”) liczone przy każdym buildzie
+// względem stałych dat CRA — daty absolutne pozostają w treści bez zmian.
+const CRA_DATES = ['2024-12-10', '2026-06-11', '2026-09-11', '2027-12-11'].map((d) => new Date(d).getTime());
+const CRA_X = [80, 280, 420, 660]; // pozycje tych dat na osi czasu (SVG)
+const now = new Date();
+const nowT = now.getTime();
+const pad = (n: number) => String(n).padStart(2, '0');
+const todayLabel = `${pad(now.getDate())}.${pad(now.getMonth() + 1)}.${now.getFullYear()}`;
+const weeksLeft = Math.ceil((CRA_DATES[2] - nowT) / (7 * 24 * 3600 * 1000));
+const tygodnie = (n: number) =>
+  n === 1 ? 'tydzień' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'tygodnie' : 'tygodni';
+const leadTermin =
+  weeksLeft > 0
+    ? `wypada za ${weeksLeft === 1 ? 'tydzień' : `${weeksLeft} ${tygodnie(weeksLeft)}`}`
+    : 'już minął — obowiązek raportowania obowiązuje';
+const svgCountdown = weeksLeft > 0 ? `za ~${weeksLeft} tyg.` : '(już obowiązuje)';
+// pozycja znacznika „dziś” — interpolacja liniowa między sąsiednimi datami osi
+let nowX = CRA_X[0];
+if (nowT >= CRA_DATES[3]) nowX = CRA_X[3];
+else
+  for (let i = 0; i < 3; i++)
+    if (nowT >= CRA_DATES[i] && nowT < CRA_DATES[i + 1]) {
+      nowX = Math.round(CRA_X[i] + ((nowT - CRA_DATES[i]) / (CRA_DATES[i + 1] - CRA_DATES[i])) * (CRA_X[i + 1] - CRA_X[i]));
+      break;
+    }
 ---
 <Interior
-  updated="2026-07-17"
+  updated="2026-08-07"
   title="CRA nie został przesunięty — terminy 2026/2027 dla producentów embedded | SZRON"
   description="W czerwcu 2026 UE przesunęła terminy AI Act — i wiele firm uznało, że „cyberrozporządzenie” też poczeka. Nie. Cyber Resilience Act idzie zgodnie z planem: raportowanie podatności i incydentów od 11 września 2026, pełne wymogi (SBOM, CE, secure by design) od 11 grudnia 2027. Sprawdzamy, co to znaczy dla producentów elektroniki."
   ogDescription="AI Act przesunięto, CRA — nie. Od 11 września 2026 każdy producent urządzeń z software'em musi raportować exploitowane podatności w 24h. Także dla produktów już na rynku. Harmonogram, klasy produktów i lista pierwszych kroków."
@@ -15,7 +41,7 @@ import RelatedCards from '../components/RelatedCards.astro';
   eyebrow="Embedded · Regulacje UE"
   heading="Pół branży embedded świętuje przesunięcie terminu, którego nikt nie przesunął."
   headingSmall
-  lead="Po czerwcowych zmianach w unijnych przepisach po firmach produkujących elektronikę krąży plotka, że „cyberrozporządzenie poczeka”. Nie poczeka — a pierwszy twardy termin <strong>Cyber Resilience Act</strong> wypada za niecałe osiem tygodni i obejmie także urządzenia, które sprzedaliście lata temu. Niżej: skąd wzięła się plotka warta do 15 mln euro kary, co dokładnie startuje we wrześniu — a na końcu lista ośmiu kroków, z których przed wrześniem musicie domknąć tylko trzy. Jeden z tych trzech pomija prawie każdy producent."
+  lead={`Po czerwcowych zmianach w unijnych przepisach po firmach produkujących elektronikę krąży plotka, że „cyberrozporządzenie poczeka”. Nie poczeka — pierwszy twardy termin <strong>Cyber Resilience Act</strong> ${leadTermin} i obejmuje także urządzenia sprzedane lata temu. Niżej: skąd wzięła się plotka i osiem kroków, z których przed wrześniem musicie domknąć tylko trzy.`}
   heroImage="/img/sub/cra-terminy.webp"
   heroAlt="Płytka PCB z oznaczeniem CE obok flagi UE; nad nią holograficzna oś czasu z dwoma terminami"
 >
@@ -31,7 +57,7 @@ import RelatedCards from '../components/RelatedCards.astro';
       <SectHead eyebrow="01 / Scenariusz · Bliska przyszłość" title="Wtorek, 15 września 2026, godzina 9:40." id="scenariusz" small />
       <div class="prose rv">
         <p>Dzwoni klient. Ktoś opublikował w sieci gotowy exploit na sterownik, który sprzedaliście mu w 2023 roku — i według CERT-u podatność jest od kilku dni aktywnie wykorzystywana. Produkt jest w okresie wsparcia, więc od czterech dni biegnie Wam <strong>ustawowy zegar: 24 godziny na wstępne zgłoszenie do ENISA</strong>. Tylko że nikt w firmie nie wie, że taki obowiązek w ogóle istnieje — bo na naradzie w lipcu ktoś rzucił, że „te unijne cyberprzepisy przecież przesunęli”.</p>
-        <p>Jeśli w Waszej firmie ktokolwiek powiedział ostatnio zdanie podobne do tego z narady — ta strona jest dokładnie dla Was. Bo coś faktycznie przesunięto. Tylko nie to, co myślicie.</p>
+        <p>Jeśli podobne zdanie padło ostatnio i na Waszej naradzie — czytajcie dalej. Coś faktycznie przesunięto. Tylko nie to, co myślicie.</p>
       </div>
     </div>
   </section>
@@ -82,15 +108,15 @@ import RelatedCards from '../components/RelatedCards.astro';
           <text class="cra-t cra-t--date" x="280" y="100" text-anchor="middle">11.06.2026</text>
           <text class="cra-t" x="280" y="152" text-anchor="middle">jednostki notyfikowane</text>
           <text class="cra-t" x="280" y="170" text-anchor="middle">(już obowiązuje)</text>
-          <!-- dziś -->
-          <line x1="330" y1="55" x2="330" y2="138" stroke="var(--cra-now)" stroke-width="1.5" stroke-dasharray="4 4"/>
-          <text class="cra-t cra-t--now" x="330" y="42" text-anchor="middle">dziś · 17.07.2026</text>
+          <!-- dziś — pozycja i data liczone przy buildzie -->
+          <line x1={nowX} y1="55" x2={nowX} y2="138" stroke="var(--cra-now)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <text class="cra-t cra-t--now" x={nowX} y="42" text-anchor="middle">{`dziś · ${todayLabel}`}</text>
           <!-- 09.2026 -->
           <circle cx="420" cy="125" r="9" fill="var(--cra-hot)"/>
           <circle class="cra-halo" cx="420" cy="125" r="14" fill="none" stroke="var(--cra-hot)" stroke-width="1.5"/>
           <text class="cra-t cra-t--date cra-t--hot" x="420" y="94" text-anchor="middle">11.09.2026</text>
           <text class="cra-t cra-t--hot" x="420" y="152" text-anchor="middle">raportowanie 24h/72h</text>
-          <text class="cra-t" x="420" y="170" text-anchor="middle">za ~8 tygodni</text>
+          <text class="cra-t" x="420" y="170" text-anchor="middle">{svgCountdown}</text>
           <!-- 12.2027 -->
           <circle cx="660" cy="125" r="7" fill="var(--cra-future)"/>
           <text class="cra-t cra-t--date" x="660" y="100" text-anchor="middle">11.12.2027</text>
@@ -153,7 +179,7 @@ import RelatedCards from '../components/RelatedCards.astro';
       <SectHead eyebrow="06 / Plan · Od czego zacząć" title="Osiem kroków — tylko trzy pierwsze przed wrześniem." id="kroki" small />
       <img class="hero-img rv" src="/img/sub/cra-terminy-sbom.webp" alt="Rack modułów elektroniki przemysłowej obok laptopa z wizualizacją grafu zależności oprogramowania (SBOM) i teczką dokumentacji technicznej" width="1380" height="776" loading="lazy" />
       <div class="prose prose--inv rv">
-        <p class="cra-lede">Obiecana lista. Do 11 września wystarczy dowieźć punkty 1–3 — reszta to przygotowanie do grudnia 2027, rozłożone na spokojne kwartały zamiast paniki w ostatnim roku, gdy audytorzy i jednostki notyfikowane będą oblegani.</p>
+        <p class="cra-lede">Obiecana lista: punkty 1–3 przed wrześniem, punkty 4–8 to przygotowanie do grudnia 2027.</p>
         <ol class="cra-list">
           <li><strong>Inwentaryzacja produktów w okresie wsparcia.</strong> Lista wszystkiego, co sprzedaliście i wciąż wspieracie — to te produkty od września podlegają raportowaniu.</li>
           <li><strong>Procedura 24h/72h.</strong> Kto decyduje, że zdarzenie jest zgłaszalne, kto zgłasza, gotowe szablony zgłoszeń. Rejestracja w platformie ENISA, gdy otworzy się dla Waszej kategorii.</li>

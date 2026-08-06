@@ -9,15 +9,15 @@ import ShotGallery from '../components/ShotGallery.astro';
 // FAQ — numeracja 01…NN generowana w <Faq />
 const faq = [
   { q: 'Czy AI zastąpi moich programistów?', a: 'Nie. AI to narzędzie, które wzmacnia programistów, a nie ich zastępuje. Najlepsi devowie z AI są jeszcze lepsi. Słabi nadal będą słabi — AI nie da im umiejętności, których nie mają.' },
-  { q: 'Jak długo trwa szkolenie zespołu?', a: 'Podstawowe szkolenie to 1–2 dni. Pełna augmentacja z transferem wiedzy zajmuje 1–3 miesiące, w zależności od wielkości zespołu.' },
+  { q: 'Jak długo trwa szkolenie zespołu?', a: 'Podstawowe szkolenie to 1–2 dni. Pełna transformacja z transferem wiedzy zajmuje 1–3 miesiące, w zależności od wielkości zespołu.' },
   { q: 'Czy dane naszego kodu są bezpieczne?', a: 'Możemy pracować z lokalnymi modelami (LM Studio, Llama), które nie wysyłają kodu na zewnątrz. Dla enterprise oferujemy rozwiązania self-hosted.' },
-  { q: 'Ile to kosztuje?', a: 'Szczegóły finansowe omawiamy indywidualnie podczas pierwszej rozmowy. Zaczynamy od 3-miesięcznego zobowiązania, w którym udowadniamy wartość na twardych danych.' },
+  { q: 'Ile to kosztuje?', a: 'Programy kwartalne — stała opłata i zamknięty zakres ustalone przed startem. Po rozmowie diagnostycznej dostajecie kwotę mailem w 48 godzin, a po kwartale twarde dane, żeby zdecydować o kontynuacji.' },
 ];
 ---
 <Interior
   title="AI dla programistów — 3x szybsze projekty IT | SZRON"
   description="Wdrożenie agentów AI (Opus, Sonnet) w zespołach dev: Claude Code, MCP Tools, Cursor, Copilot. Uczymy efektywnej pracy z agentami i mierzymy produktywność."
-  eyebrow="Dla CTO i tech leadów · zobowiązanie kwartalne"
+  eyebrow="Dla CTO i tech leadów · program kwartalny"
   heading="3x szybsze projekty IT."
   lead="Wasi programiści mogą kodować 55–80% szybciej. Uczymy ich korzystać z AI tak, żeby sami to kontynuowali — od analizy zespołu, przez dobór narzędzi i warsztaty, po pomiar produktywności przed i po."
   heroImage="/img/sub/transformacja-ai-dla-programistow-orchestrator.webp"
@@ -58,7 +58,14 @@ const faq = [
         </article>
       </div>
       <div class="prose rv" style="margin-top:var(--space-2xl)">
-        <p>Jest jednak haczyk — badania adopcji z 2026 nazywają go paradoksem produktywności AI: 84% programistów używa AI, licencje kupili prawie wszyscy, a delivery stoi w miejscu. Czemu? Bo tylko 29% devów ufa temu, co AI wypluwa, i bez treningu oszczędność kończy się na 3,6 godziny tygodniowo. Pomaga dopiero zmiana sposobu pracy — licencja wpięta w stary proces daje stare wyniki. Przeprojektowujemy workflow zespołu — od definicji zadań po review — tak, żeby agenci robili robotę, a devowie ją prowadzili. Firmy, które to zrobiły, wyciągają ROI 2,5–3,5×, górny kwartyl 4–6×. Dokładnie od tego zaczynamy.</p>
+        <p>Jest jednak haczyk — badania adopcji z 2026 nazywają go paradoksem produktywności AI:</p>
+        <ul>
+          <li><strong>84%</strong> programistów używa AI, licencje kupili prawie wszyscy — a delivery stoi w miejscu.</li>
+          <li>Tylko <strong>29%</strong> devów ufa temu, co AI wypluwa.</li>
+          <li>Bez treningu oszczędność kończy się na <strong>3,6 godziny</strong> tygodniowo.</li>
+          <li>Firmy, które zmieniły sposób pracy, wyciągają <strong>ROI 2,5–3,5×</strong> — górny kwartyl 4–6×.</li>
+        </ul>
+        <p>Licencja wpięta w stary proces daje stare wyniki. Dlatego zaczynamy od przeprojektowania workflow zespołu — od definicji zadań po review — tak, żeby agenci robili robotę, a devowie ją prowadzili.</p>
       </div>
     </div>
   </section>
@@ -68,12 +75,12 @@ const faq = [
     <div class="container">
       <SectHead eyebrow="02 / Narzędzia · Co wdrażamy" title="Narzędzia dobrane do Waszego stacku i potrzeb zespołu." id="narzedzia" />
       <table class="results-table rv">
-        <thead><tr><th scope="col">Narzędzie</th><th scope="col">Rola</th><th scope="col">Wzrost</th></tr></thead>
+        <thead><tr><th scope="col">Narzędzie</th><th scope="col">Do czego</th></tr></thead>
         <tbody>
-          <tr><td>Claude Opus / Sonnet</td><td>Agenci AI do kodu produkcyjnego</td><td><strong>3x</strong></td></tr>
-          <tr><td>Claude Code</td><td>Interfejs do uruchamiania agentów</td><td><strong>3x</strong></td></tr>
-          <tr><td>MCP Tools</td><td>Integracje agentów z systemami</td><td><strong>2x</strong></td></tr>
-          <tr><td>Cursor / Copilot</td><td>Narzędzia pomocnicze w IDE</td><td><strong>55–70%</strong></td></tr>
+          <tr><td>Claude Opus / Sonnet</td><td>Modele do kodu produkcyjnego — nowe funkcje, refactoring, debugowanie złożonych problemów</td></tr>
+          <tr><td>Claude Code</td><td>Agent w terminalu: plan mode, subagenci, praca na całym repozytorium</td></tr>
+          <tr><td>MCP Tools</td><td>Integracje agenta z Waszymi systemami — baza danych, przeglądarka, testy E2E, Figma</td></tr>
+          <tr><td>Cursor / Copilot</td><td>Wsparcie w IDE: autouzupełnianie i szybkie edycje w trakcie pisania</td></tr>
         </tbody>
       </table>
     </div>
@@ -105,10 +112,9 @@ const faq = [
       <SectHead eyebrow="04 / Dlaczego SZRON · Co nas wyróżnia" title="Transfer wiedzy, nie uzależnienie." id="dlaczego" />
       <dl class="def-rows rv">
         <div><dt>Transfer wiedzy, nie uzależnienie<small>Niezależni po 1–3 miesiącach</small></dt><dd>Po 1–3 miesiącach Wasz zespół pewnie pracuje z AI. Wracamy co kwartał z aktualizacją narzędzi i strategii.</dd></div>
-        <div><dt>Praktyczne doświadczenie<small>25+ lat w branży tech</small></dt><dd>Wdrażaliśmy AI, gdy inni dopiero słyszeli o ChatGPT.</dd></div>
-        <div><dt>Context Engineering<small>Prompt engineering to za mało</small></dt><dd>Uczymy zaawansowanych technik — liczy się kontekst, nie pojedynczy prompt.</dd></div>
-        <div><dt>Mierzalne wyniki<small>ROI na twardych danych</small></dt><dd>Pokazujemy ROI i mierzymy produktywność przed i po wdrożeniu.</dd></div>
+        <div><dt>Praktyczne doświadczenie<small>25 lat w IT · 40+ łącznie</small></dt><dd>Tomek — 25 lat w IT (w tym embedded: STM32, C++, Qt), Maciej — 18. Efekty wdrożeń pokazujemy na pomiarach z DevLens, nie na deklaracjach.</dd></div>
       </dl>
+      <p class="rv" style="margin-top:var(--space-lg);color:var(--color-text-2);font-size:var(--text-s,.875rem)">Wysyłasz to zarządowi? Wersja dla decydentów: <a href="/transformacja-ai">transformacja AI dla firm</a>.</p>
     </div>
   </section>
 

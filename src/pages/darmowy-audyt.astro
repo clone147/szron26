@@ -9,7 +9,7 @@ import BtnArrow from '../components/BtnArrow.astro';
   description="Bezpłatna rozmowa o tym, jak AI może pomóc Waszemu zespołowi dev. Analiza narzędzi i procesów, wskazanie szans, konkretne rekomendacje na piśmie. Bez pitchu."
   eyebrow="Bezpłatna rozmowa · zespoły dev"
   heading="Pogadajmy, jak AI może pomóc Waszemu zespołowi."
-  lead="Patrzymy na Wasze narzędzia, procesy i stack — i mówimy wprost, gdzie widzimy potencjał, a gdzie nie. Dostajesz konkretne rekomendacje, które możecie wdrożyć od razu. Nawet jeśli nie z nami."
+  lead="Patrzymy na Wasze narzędzia, procesy i stack — i mówimy wprost, gdzie widzimy potencjał, a gdzie nie. Dostajecie konkretne rekomendacje, które możecie wdrożyć od razu. Nawet jeśli nie z nami."
   heroImage="/img/sub/darmowy-audyt.webp"
   heroAlt="Dwoje inżynierów w sali spotkań omawia diagram architektury systemu na dużym ekranie"
 >
@@ -23,9 +23,7 @@ import BtnArrow from '../components/BtnArrow.astro';
   <!-- 01 o czym porozmawiamy (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="zakres">
     <div class="container">
-      <SectHead eyebrow="01 / Zakres · O czym porozmawiamy" title="Cztery tematy. Na koniec notatka z krokami." id="zakres">
-        <p class="sect-lead rv">Przejdziemy przez cztery tematy. Na koniec dostaniesz notatkę z konkretnymi krokami do wdrożenia.</p>
-      </SectHead>
+      <SectHead eyebrow="01 / Zakres · O czym porozmawiamy" title="Cztery tematy. Na koniec notatka z krokami." id="zakres" />
       <dl class="def-rows rv">
         <div><dt>Jak pracujecie i co Was spowalnia<small>Narzędzia, procesy, typowy dzień</small></dt><dd>Pytamy o Wasze narzędzia, procesy i typowy dzień pracy. Szukamy miejsc, gdzie tracicie czas na rzeczy, które AI zrobi szybciej.</dd></div>
         <div><dt>Gdzie AI da widoczny efekt<small>Nie wszędzie</small></dt><dd>Wskazujemy dwa, trzy miejsca, gdzie naprawdę warto zacząć — i mówimy dlaczego.</dd></div>
@@ -35,35 +33,22 @@ import BtnArrow from '../components/BtnArrow.astro';
     </div>
   </section>
 
-  <!-- 02 dlaczego my -->
-  <section class="sect" aria-labelledby="dlaczego">
+  <!-- dlaczego my (ProofStrip) -->
+  <section class="sect" aria-label="Dlaczego my">
     <div class="container">
-      <SectHead eyebrow="02 / Dlaczego my · Z czym przychodzimy" title="Praktyka na Waszym repo." id="dlaczego" small />
-      <div class="grid-cards">
-        <article class="card-tile rv">
-          <p class="eyebrow">a</p>
-          <h3>Robimy to od dawna</h3>
-          <p>Embedded, mobile, enterprise — widzieliśmy sporo stacków. Wiemy, co się sprawdza w praktyce, nie tylko w teorii.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.08s">
-          <p class="eyebrow">b</p>
-          <h3>Pracujemy na Waszym kodzie</h3>
-          <p>Bierzemy Wasze repo, Wasze taski i na nich pokazujemy, co AI zmienia.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.16s">
-          <p class="eyebrow">c</p>
-          <h3>Różnicę widać od pierwszego dnia</h3>
-          <p>Mierzymy przed i po. Nie obiecujemy cudów — ale konkretne wyniki widzisz od razu.</p>
-        </article>
-      </div>
+      <ProofStrip wrap={false} items={[
+        ['Na Waszym kodzie', 'Wasze repo i taski, nie slajdy'],
+        ['Pomiar przed i po', 'różnicę widać od pierwszego dnia'],
+        ['40+ lat praktyki', 'embedded, mobile, enterprise'],
+      ]} />
     </div>
   </section>
 
-  <!-- 03 formularz (ciemna) -->
+  <!-- 02 formularz (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="formularz">
     <div class="container">
-      <SectHead eyebrow="03 / Zgłoszenie · Umów się na rozmowę" title="Zostaw kontakt — odezwiemy się w ciągu 24h." id="formularz">
-        <p class="sect-lead rv">Na nic się nie zapisujesz. Po prostu pogadamy i ustalimy termin.</p>
+      <SectHead eyebrow="02 / Zgłoszenie · Umów się na rozmowę" title="Zostaw kontakt — odezwiemy się w ciągu 24h." id="formularz">
+        <p class="sect-lead rv">Na nic się nie zapisujecie. Po prostu pogadamy i ustalimy termin.</p>
       </SectHead>
       <form name="darmowy-audyt" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="prose rv">
         <input type="hidden" name="form-name" value="darmowy-audyt" />
@@ -79,6 +64,16 @@ import BtnArrow from '../components/BtnArrow.astro';
         <p>
           <label for="company">Firma</label><br />
           <input type="text" id="company" name="company" placeholder="Nazwa firmy" />
+        </p>
+        <p>
+          <label for="role">Rola w firmie</label><br />
+          <select id="role" name="role">
+            <option value="">Wybierz…</option>
+            <option value="Zarząd / CTO">Zarząd / CTO</option>
+            <option value="Lider zespołu">Lider zespołu</option>
+            <option value="Programista">Programista</option>
+            <option value="Inna">Inna</option>
+          </select>
         </p>
         <p>
           <label for="teamSize">Rozmiar zespołu</label><br />

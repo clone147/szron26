@@ -7,26 +7,25 @@ import CtaBand from '../components/CtaBand.astro';
 
 // FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html)
 const faq = [
-  { q: 'Jakie narzędzia AI wdrażacie?', a: 'Cursor IDE, Claude Code CLI, GitHub Copilot, Gemini CLI, Windsurf, Aider, MCP Tools (Supabase, Figma, ChromeDevTools, Playwright), lokalne modele AI oraz firmowy chatbot z pamięcią między agentami. Do tego pełna konfiguracja: reguły projektu, własne umiejętności, integracje MCP. Zakres dobieramy do waszego stacku — np. React/TypeScript to Copilot, Cursor i MCP Supabase, embedded C++ to Claude Code z integracją Keil, mobile React Native to cały zestaw.' },
-  { q: 'Jak działa Context Engineering w praktyce?', a: 'To personalizacja agentów AI przez pliki konfiguracyjne w Markdown w repozytorium. Plik zawiera Git workflow, konwencje nazewnictwa i praktyki bezpieczeństwa, definiuje własne narzędzia (MCP Supabase do bazy, Playwright do testów), a agent czyta ten kontekst przy każdym uruchomieniu. Efekt: agent nie pyta o oczywiste, działa zgodnie z konwencjami zespołu i używa właściwych narzędzi.' },
-  { q: 'Czy AI działa z moim stackiem (PHP, C++, React, embedded)?', a: 'Tak — AI działa z każdym stackiem. Przykłady: migracja PHP 5.6 do 8.2 z Copilotem w 2 tygodnie; C++ embedded (STM32 + Keil) z Claude Code i Rust, drukarka RS232 w 1,5 dnia; React Native z Cursor i Copilotem; legacy Qt/QML z Gemini CLI; Python i Pandas z Claude Code, system raportowania w tydzień. Wymóg: repozytorium Git i README z instrukcją setupu.' },
-  { q: 'Jak wygląda model współpracy?', a: 'Zaczynamy od zobowiązania kwartalnego — 3 miesiące diagnozy, setupu narzędzi i coachingu na waszych taskach. Po kwartale mamy twarde dane. Potem przechodzimy na model miesięczny: review, aktualizacja narzędzi, wsparcie ad-hoc. Szczegóły finansowe omawiamy indywidualnie.' },
-  { q: 'Jak wygląda droga od pierwszego kontaktu do startu?', a: 'Discovery call (poznajemy biznes, use case\'y, zespół i stack), dobór pakietu, oferta z timeline\'em i szacunkiem zwrotu, umowa, a potem kickoff w pierwszym tygodniu: analiza workflow, mapowanie zadań, dobór narzędzi. Zwykle 2–3 tygodnie od kontaktu do szkolenia, w trybie pilnym szybciej.' },
+  { q: 'Jakie narzędzia AI wdrażacie?', a: 'Zestaw dobieramy do Waszego stacku: asystenci w edytorze, agenci pracujący samodzielnie i integracje z Waszymi systemami. Pełną listę narzędzi z zastosowaniami znajdziecie na <a href="/transformacja-ai-dla-programistow">stronie dla CTO i tech leadów</a>.' },
+  { q: 'Czy AI działa z moim stackiem (PHP, C++, React, embedded)?', a: 'Tak — AI działa z każdym stackiem. Przykłady: migracja PHP 5.6 do 8.2 w 2 tygodnie, komunikacja z drukarką RS232 na STM32 w 1,5 dnia, system raportowania w Pythonie w tydzień. Wymóg: repozytorium Git i README z instrukcją setupu.' },
+  { q: 'Jak wygląda model współpracy?', a: 'Programy kwartalne — stała opłata i zamknięty zakres ustalone przed startem. Po rozmowie diagnostycznej dostajecie kwotę mailem w 48 godzin. Po kwartale macie twarde dane, żeby zdecydować o kontynuacji.' },
+  { q: 'Jak wygląda droga od pierwszego kontaktu do startu?', a: 'Rozmowa diagnostyczna (poznajemy biznes, use case\'y, zespół i stack), oferta z timeline\'em, umowa, a potem kickoff w pierwszym tygodniu: analiza workflow, mapowanie zadań, dobór narzędzi. Zwykle 2–3 tygodnie od kontaktu do szkolenia, w trybie pilnym szybciej.' },
 ];
 ---
 <Interior
-  title="Transformacja AI dla zespołów dev | SZRON"
-  description="Transformacja AI dla zespołów dev: Cursor, Claude Code, Copilot, Codex, Gemini CLI i MCP Tools w setupie pod wasz stack. Audyt, strategia, transfer wiedzy."
-  eyebrow="Zobowiązanie kwartalne · potem model miesięczny"
-  heading="Transformacja AI dla Waszego zespołu."
-  lead="Siadamy do kodu razem z waszymi devami, dobieramy narzędzia i uczymy ich pracować z AI na co dzień. Cztery kroki, w których budujemy umiejętności u waszych ludzi — nie zawsze idzie gładko, ale zawsze idziemy do przodu."
+  title="Transformacja AI — zespół 2–4× szybszy w dwa kwartały | SZRON"
+  description="Kwartalny program transformacji AI dla firm z własnym zespołem IT: zespół 2–4× szybszy w dwa kwartały, pomiar przed i po, stała opłata i zamknięty zakres."
+  eyebrow="Program kwartalny · stała opłata, zamknięty zakres"
+  heading="Zespół 2–4× szybszy w dwa kwartały."
+  lead="Program dla firm z własnym zespołem IT: dobieramy narzędzia, uczymy Waszych programistów na ich codziennych zadaniach i mierzymy efekt. Bez wymiany ludzi i bez zatrzymywania roadmapy."
   heroImage="/img/sub/transformacja-ai.webp"
   heroAlt="Pęknięty lód przechodzący w świecącą kratę kryształów"
 >
   <!-- proof -->
   <ProofStrip items={[
     ['Na waszym repo', 'efekty od pierwszego dnia'],
-    ['Setup pod wasz stack', 'Cursor, Claude Code, Copilot, MCP Tools'],
+    ['Pomiar przed i po', 'baseline w pierwszym tygodniu'],
     ['Niezależni po 30 dniach', 'zespół przejmuje stery'],
   ]} />
 
@@ -41,9 +40,9 @@ const faq = [
           <figcaption><strong>The New York Times</strong> — maj 2025</figcaption>
         </figure>
         <article class="card-tile rv" style="--rv-d:.1s">
-          <p class="eyebrow">Z doświadczenia</p>
-          <h3>Liczby trzymane konserwatywnie.</h3>
-          <p>McKinsey mówi o kilkuset procentach zwrotu, NYT o jednym devie za kilkuosobowy zespół. Wolimy pozytywnie zaskoczyć niż obiecać za dużo — dlatego pokazujemy ostrożne szacunki.</p>
+          <p class="eyebrow">Jak to sprawdzicie</p>
+          <h3>Decyzja na danych, nie na wrażeniach.</h3>
+          <p>Baseline w pierwszym tygodniu, te same wskaźniki po dwóch kwartałach. O kontynuacji decydujecie, widząc liczby z własnego zespołu.</p>
         </article>
       </div>
     </div>
@@ -54,7 +53,7 @@ const faq = [
     <div class="container">
       <SectHead eyebrow="02 / Proces · Jak wygląda transformacja AI" title="Cztery kroki. Każdy buduje umiejętności u Waszych ludzi." id="proces" />
       <div class="steps">
-        <article class="step rv"><p class="eyebrow">01 · Audyt</p><h3>Audyt technologiczny</h3><p>Przychodzimy, patrzymy jak działacie, rozmawiamy z ludźmi. Szukamy miejsc, gdzie tracicie czas i pieniądze, co da się zautomatyzować od zaraz i gdzie AI da największy efekt.</p></article>
+        <article class="step rv"><p class="eyebrow">01 · Audyt</p><h3>Audyt technologiczny</h3><p>Zaczynamy od <a href="/darmowy-audyt">bezpłatnego audytu</a>: przychodzimy, patrzymy jak działacie, rozmawiamy z ludźmi. Szukamy miejsc, gdzie tracicie czas i pieniądze i gdzie AI da największy efekt.</p></article>
         <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Strategia</p><h3>Strategia AI</h3><p>Razem ustalamy, co robimy najpierw, co potem, a co pomijamy. Konkretny plan z kolejnością, projekty z najszybszym zwrotem i przeprowadzenie zespołu przez zmianę. Nie każdy proces potrzebuje AI — mówimy to wprost.</p></article>
         <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Optymalizacja</p><h3>Optymalizacja procesów</h3><p>Wchodzimy w wasze workflow i szukamy miejsc, gdzie AI skróci robotę. Dopasowanie do procesów, wpięcie w istniejące systemy, przyspieszenie codziennej pracy i ciągłe mierzenie.</p></article>
         <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Transfer</p><h3>Zespół przejmuje stery</h3><p>Uczymy waszych ludzi tak, żeby po miesiącu pewnie pracowali z AI na co dzień. Wyłaniamy liderów AI, pracujemy na waszym kodzie, zostawiamy dokumentację. A wracamy co kwartał z nowymi narzędziami.</p></article>
@@ -62,30 +61,29 @@ const faq = [
     </div>
   </section>
 
-  <!-- 03 narzędzia dev -->
+  <!-- 03 setup pod stack -->
   <section class="sect" aria-labelledby="narzedzia">
     <div class="container">
-      <SectHead eyebrow="03 / Setup · Transformacja zespołów deweloperskich" title="Agent AI jako drugi mózg programisty. Context Engineering zamiast prompt engineeringu." id="narzedzia" />
+      <SectHead eyebrow="03 / Setup · Pod Wasz stack" title="Każdy zespół dostaje setup pod swoją technologię — i konkretny efekt." id="narzedzia" />
       <dl class="def-rows rv">
-        <div><dt>GitHub Copilot i Cursor IDE<small>Kodowanie wspierane AI</small></dt><dd>AI w VSCode i Cursor — znacząco szybsze pisanie kodu na co dzień.</dd></div>
-        <div><dt>Claude Code i Gemini CLI<small>Agenci AI w terminalu</small></dt><dd>Pełna autonomia w refactoringu i debugowaniu z poziomu wiersza poleceń.</dd></div>
-        <div><dt>MCP Tools<small>Integracje agentów z systemami</small></dt><dd>ChromeDevTools (wydajność), Playwright (testy), Supabase (baza), Figma (UI) — wpięte w pracę agenta.</dd></div>
-        <div><dt>Wsparcie stacku<small>Legacy i nowoczesny</small></dt><dd>React, React Native, TypeScript, PHP (legacy do 8.2), C++ embedded, Qt/QML.</dd></div>
-        <div><dt>Markdown Configuration<small>Personalizacja agentów AI</small></dt><dd>Nowa dyscyplina wypierająca prompt engineering: agent czyta kontekst projektu przy każdym uruchomieniu i działa zgodnie z konwencjami zespołu.</dd></div>
-        <div><dt>Self-Improving Loops<small>Agent uczy się z błędów</small></dt><dd>Agent sam sprawdza, poprawia i iteruje. Git workflow z AI (commit po zmianie, rollback, quality gates) i integracja CI/CD spinają całość w jedną pętlę.</dd></div>
+        <div><dt>Backend i frontend<small>API, bazy danych, interfejsy</small></dt><dd>Agenci przejmują refactoring, testy i przegląd kodu — programista prowadzi pracę, zamiast wykonywać ją ręcznie.</dd></div>
+        <div><dt>Mobile<small>iOS i Android</small></dt><dd>Jedna baza kodu na obie platformy i automatyzacja publikacji w sklepach.</dd></div>
+        <div><dt>Embedded<small>C/C++, urządzenia przemysłowe</small></dt><dd>Agent pracuje także ze starszymi środowiskami — sterowniki i komunikacja z urządzeniami powstają w dniach, nie tygodniach.</dd></div>
+        <div><dt>Legacy<small>PHP, Qt, stare monolity</small></dt><dd>Modernizacja bez zatrzymywania rozwoju — stary system działa, nowy kod wchodzi obok.</dd></div>
       </dl>
+      <p class="rv" style="margin-top:var(--space-lg);color:var(--color-text-2);font-size:var(--text-s,.875rem)">Pełna lista narzędzi i konfiguracji — na stronie <a href="/transformacja-ai-dla-programistow">dla CTO i tech leadów</a>.</p>
     </div>
   </section>
 
-  <!-- 04 korzyści wg skali -->
-  <section class="sect" aria-labelledby="korzysci" style="padding-top:0">
+  <!-- 04 korzyści wg skali (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="korzysci">
     <div class="container">
       <SectHead eyebrow="04 / Skala · Korzyści wg wielkości zespołu" title="Inne podejście dla 2–5 devów, inne dla 5+ devów." id="korzysci" small />
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">Mały zespół · 2–5 devów</p>
           <h3>Szybkie efekty na waszym repo</h3>
-          <p>Pracujemy na waszym repozytorium — efekty widać od pierwszego dnia. Szybkie wdrożenie narzędzi AI (Cursor, Claude Code, Copilot, Codex, Gemini CLI, Windsurf, Aider), a zespół przejmuje stery po zakończeniu programu.</p>
+          <p>Pracujemy na waszym repozytorium — efekty widać od pierwszego dnia, a umiejętności po programie zostają u Waszych ludzi.</p>
         </article>
         <article class="card-tile rv" style="--rv-d:.1s">
           <p class="eyebrow">Duży zespół · 5+ devów</p>
@@ -96,62 +94,44 @@ const faq = [
     </div>
   </section>
 
-  <!-- 05 zastosowania wg zespołów (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="zespoly">
-    <div class="container">
-      <SectHead eyebrow="05 / Zastosowania · Co wdrażamy w różnych zespołach" title="Każdy zespół ma inny stack i inne wyzwania." id="zespoly" />
-      <dl class="def-rows rv">
-        <div><dt>Backend Team</dt><dd>Claude Code CLI do refactoringu, MCP Tools do baz danych, automatyczne testy i quality gates, Context Engineering dla API.</dd></div>
-        <div><dt>Frontend Team</dt><dd>Cursor IDE z agentem AI, Copilot do komponentów, MCP Figma do pixel-perfect, Playwright do testów E2E.</dd></div>
-        <div><dt>Mobile Team</dt><dd>React Native z AI, development cross-platform, automatyzacja App Store i Google Play, profilowanie wydajności z AI.</dd></div>
-        <div><dt>Embedded Team</dt><dd>Claude Code do C/C++, Rust z asystentem AI, komunikacja RS232/USB, integracja z toolchainami.</dd></div>
-      </dl>
-    </div>
-  </section>
-
-  <!-- 06 ROI / wpływ na biznes -->
+  <!-- 05 ROI / wpływ na biznes -->
   <section class="sect" aria-labelledby="roi">
     <div class="container">
-      <SectHead eyebrow="06 / Zwrot · Wpływ na biznes" title="Podajemy konserwatywne szacunki. Rzeczywiste wyniki często są lepsze." id="roi" small />
+      <SectHead eyebrow="05 / Zwrot · Wpływ na biznes" title="Podajemy konserwatywne szacunki. Rzeczywiste wyniki często są lepsze." id="roi" small />
       <table class="results-table rv">
         <thead><tr><th scope="col">Obszar</th><th scope="col">Efekt</th></tr></thead>
         <tbody>
-          <tr><td>Okres zwrotu inwestycji</td><td><strong>typowo kilka miesięcy, zwykle 4–8</strong></td></tr>
-          <tr><td>Koszt vs własny zespół AI</td><td><strong>do 80% taniej — ułamek kosztu budowy zespołu</strong></td></tr>
-          <tr><td>Zwiększenie przychodów</td><td><strong>+35–55% dzięki personalizacji AI i optymalizacji cen</strong></td></tr>
-          <tr><td>Redukcja kosztów</td><td><strong>-30–50% przez automatyzację powtarzalnych procesów</strong></td></tr>
-          <tr><td>Eliminacja błędów</td><td><strong>-70–80% błędów ludzkich w procesach</strong></td></tr>
+          <tr><td>Tempo pracy zespołu</td><td><strong>+266% po wdrożeniu (pomiar DevLens)</strong></td></tr>
           <tr><td>Przyspieszenie rozwoju</td><td><strong>3x szybsze projekty (NYT 2025)</strong></td></tr>
+          <tr><td>Okres zwrotu inwestycji</td><td><strong>typowo kilka miesięcy, zwykle 4–8</strong></td></tr>
         </tbody>
       </table>
       <ProofStrip wrap={false} items={[
         ['60–80%', 'szybsze kodowanie (GitHub 2024)'],
-        ['55,8%', 'szybciej (badanie GitHub)'],
         ['ROI 150–300%', 'wg McKinsey Digital'],
       ]} />
+      <p class="rv" style="margin-top:var(--space-lg);color:var(--color-text-2);font-size:var(--text-s,.875rem)">Tempo pracy mierzymy naszą platformą <a href="/devlens">DevLens</a> — dane z realnego wdrożenia, zanonimizowane.</p>
     </div>
   </section>
 
-  <!-- 07 Self-Improving Loops (ciemna) -->
+  <!-- 06 Self-Improving Loops (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="loops">
     <div class="container">
-      <SectHead eyebrow="07 / Pętla · Self-Improving Loops" title="Agent, który sam sprawdza, poprawia i iteruje — aż kod działa." id="loops" />
-      <div class="steps">
-        <article class="step rv"><p class="eyebrow">01 · Sprawdza</p><h3>Uruchamia i weryfikuje</h3><p>Agent uruchamia kod i testy, weryfikuje działanie z MCP Tools (ChromeDevTools, Playwright).</p></article>
-        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Poprawia</p><h3>Automatycznie</h3><p>Naprawia błędy, optymalizuje wydajność, refaktoruje kod — bez interwencji człowieka.</p></article>
-        <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Powtarza</p><h3>Aż działa</h3><p>Iteruje dopóki nie osiągnie celu i wszystkie testy nie przejdą. Podwojone tempo pracy to dopiero początek.</p></article>
+      <SectHead eyebrow="06 / Pętla · Self-Improving Loops" title="Agent, który sam sprawdza, poprawia i iteruje — aż kod działa." id="loops" />
+      <div class="prose rv">
+        <p>Agent uruchamia kod i testy, naprawia błędy i iteruje bez udziału człowieka, aż osiągnie cel. Pełną mechanikę pętli — krok po kroku, z przykładami — opisujemy w Akademii: <a href="/petle">Self-Improving Loops</a>.</p>
       </div>
       <dl class="def-rows rv">
-        <div><dt>Optymalizacja JavaScript<small>„Ten mechanizm działa wolno. Spraw, żeby przyspieszył."</small></dt><dd>5x przyspieszenie w 3 minuty, z ChromeDevTools MCP i profilowaniem.</dd></div>
-        <div><dt>Drukarka RS232 (embedded)<small>„Potrzebujemy komunikacji z drukarką przez RS232."</small></dt><dd>1,5 dnia zamiast miesiąca, na Rust + STM32 z toolchainem Keil.</dd></div>
+        <div><dt>Optymalizacja JavaScript<small>„Ten mechanizm działa wolno. Spraw, żeby przyspieszył."</small></dt><dd>5x przyspieszenie w 3 minuty, z profilowaniem wydajności w przeglądarce.</dd></div>
+        <div><dt>Drukarka RS232 (embedded)<small>„Potrzebujemy komunikacji z drukarką przez RS232."</small></dt><dd>1,5 dnia zamiast miesiąca, na Rust + STM32.</dd></div>
       </dl>
     </div>
   </section>
 
-  <!-- 08 FAQ -->
+  <!-- 07 FAQ -->
   <section class="sect" aria-labelledby="faq-title">
     <div class="container">
-      <SectHead eyebrow="08 / FAQ · Czego się spodziewać" title="Pytania o transformację AI." id="faq-title" small />
+      <SectHead eyebrow="07 / FAQ · Czego się spodziewać" title="Pytania o transformację AI." id="faq-title" small />
       <Faq items={faq} />
     </div>
   </section>
@@ -160,7 +140,7 @@ const faq = [
   <CtaBand
     eyebrow="Kontakt"
     heading="Sprawdź bez ryzyka. Zacznij od rozmowy."
-    text="Powiemy wprost, co jest realne dla waszej firmy, a co to tylko hype. Dostaniecie konkretny plan i szacunek zwrotu. NDA przed startem, szczegóły finansowe omawiamy indywidualnie."
+    text="Powiemy wprost, co jest realne dla waszej firmy, a co to tylko hype. Po rozmowie dostaniecie konkretny plan i kwotę mailem w 48 godzin. NDA przed startem."
     btnLabel="Umów bezpłatną konsultację"
   />
 </Interior>

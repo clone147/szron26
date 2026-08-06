@@ -10,6 +10,8 @@ const posts = (await getCollection('blog')).sort(
 );
 const MIESIACE_PL = ['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
 const fmt = (d) => `${d.getDate()} ${MIESIACE_PL[d.getMonth()]} ${d.getFullYear()}`;
+const cats = [...new Set(posts.map((p) => p.data.category))];
+const plural = (n, one, few, many) => (n === 1 ? one : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? few : many);
 ---
 <Interior
   title="Blog — AI dla programistów | SZRON"
@@ -20,9 +22,9 @@ const fmt = (d) => `${d.getDate()} ${MIESIACE_PL[d.getMonth()]} ${d.getFullYear(
 >
   <!-- proof -->
   <ProofStrip items={[
-    ['Z okopów', 'narzędzia, które realnie testujemy'],
-    ['Konkret, nie ogólniki', 'techniki, które działają u nas i u klientów'],
-    ['Bez marketingu', 'piszemy to, co sami chcielibyśmy czytać'],
+    [`${posts.length} ${plural(posts.length, 'wpis', 'wpisy', 'wpisów')}`, 'porównania narzędzi i wnioski z wdrożeń'],
+    [`${cats.length} ${plural(cats.length, 'kategoria', 'kategorie', 'kategorii')}`, cats.join(' · ')],
+    [fmt(posts[0].data.publishedAt), 'ostatnia publikacja'],
   ]} />
 
   <!-- 01 wpisy -->

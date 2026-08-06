@@ -9,16 +9,21 @@ import CtaBand from '../../components/CtaBand.astro';
   description="Nowy moduł komunikacji Modbus RTU + CANopen do sterownika STM32. Trzej inżynierowie zamknęli go w dwa tygodnie zamiast 6–8, z testami HIL i dokumentacją."
   eyebrow="Case studies › Sterownik STM32 · Embedded · Hardware / IoT · 2026"
   heading="Dwa miesiące pracy. Dwa tygodnie do odbioru."
-  lead="Producent urządzeń automatyki przemysłowej potrzebował nowego modułu komunikacji do istniejącego sterownika STM32. Wcześniej takie projekty zajmowały w ich zespole około dwóch miesięcy — łącznie z testami i odbiorem. Tym razem trzej inżynierowie klienta zamknęli moduł w dwa tygodnie, z testami HIL. My prowadziliśmy, kod pisali oni i dalszy rozwój też wzięli na siebie. Skala pilota: tak wygląda pierwszy kwartał przy zespole 3–4 osób. Przy 30+ pracujemy falami, zespół po zespole."
+  lead="Producent urządzeń automatyki przemysłowej potrzebował nowego modułu komunikacji do istniejącego sterownika STM32. Wcześniej takie projekty zajmowały w ich zespole około dwóch miesięcy — łącznie z testami i odbiorem. Tym razem trzej inżynierowie klienta zamknęli moduł w dwa tygodnie, z testami HIL. My prowadziliśmy, kod pisali oni i dalszy rozwój też wzięli na siebie."
   heroImage="/img/sub/cs-stm32.webp"
   heroAlt="Makro oszronionej płytki STM32 ze świecącymi pomarańczowo ścieżkami"
 >
   <!-- proof -->
-  <ProofStrip items={[
-    ['2 mc → 2 tyg', 'czas dostarczenia'],
-    ['3 inż. z AI', 'zespół po wdrożeniu'],
-    ['unit + HIL', 'pokrycie testami'],
-  ]} />
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <ProofStrip wrap={false} items={[
+        ['2 mc → 2 tyg', 'czas dostarczenia'],
+        ['3 inż. z AI', 'zespół po wdrożeniu'],
+        ['unit + HIL', 'pokrycie testami'],
+      ]} />
+      <p class="rv" style="margin-top:var(--space-sm); font-size:var(--text-caption); color:var(--color-text-2)">Skala pilota: tak wygląda pierwszy kwartał przy zespole 3–4 osób. Przy 30+ pracujemy falami, zespół po zespole.</p>
+    </div>
+  </section>
 
   <!-- 01 kontekst -->
   <section class="sect" aria-labelledby="kontekst">
@@ -47,7 +52,7 @@ import CtaBand from '../../components/CtaBand.astro';
     <div class="container">
       <SectHead eyebrow="03 / Problem · Co naprawdę bolało" title="Problem nie był techniczny — był pojemnościowy." id="bol" small />
       <div class="prose rv">
-        <p>Zespół znał stos. Znał sterownik. Znał protokoły. Problem nie był techniczny — problem był pojemnościowy.</p>
+        <p>Zespół znał stos. Znał sterownik. Znał protokoły.</p>
         <ul>
           <li><strong>Zbyt długi cykl iteracji.</strong> Każda zmiana w firmware = kompilacja + flashowanie + ręczne testy na ławce. Brak setupu CI dla firmware-u. Pętla feedbacku trwała 20–40 minut.</li>
           <li><strong>Wąskie gardło testów HIL.</strong> Jedna ławka testowa, dzielona przez trzech inżynierów.</li>
@@ -93,17 +98,15 @@ import CtaBand from '../../components/CtaBand.astro';
   <!-- 06 wynik (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="wynik">
     <div class="container">
-      <SectHead eyebrow="06 / Wynik · Mierzony w iteracjach" title="Mierzony w iteracjach, nie w deklaracjach." id="wynik" />
+      <SectHead eyebrow="06 / Wynik" title="Mierzony w iteracjach, nie w deklaracjach." id="wynik" />
       <ProofStrip wrap={false} items={[
         ['3–4× szybciej', '2 tygodnie zamiast 6–8 tygodni inżyniera'],
         ['30 → 4 min', 'pętla feedback na CI host (20 → 12 min na HIL)'],
-        ['3 z 3 inżynierów', 'używa Claude Code w dzień 14 — sprawdzone w commitach'],
+        ['3 z 3 inżynierów', 'używa Claude Code w dzień 14'],
       ]} />
       <dl class="def-rows rv">
-        <div><dt>Czas dostarczenia<small>2 tygodnie zamiast 6–8</small></dt><dd>Moduł zamknięty w dwa tygodnie zamiast 6–8 tygodni inżyniera (3–4× szybciej).</dd></div>
-        <div><dt>Czas pętli feedback<small>CI host i HIL</small></dt><dd>30 min → 4 min na CI host. 20 min → 12 min na HIL.</dd></div>
         <div><dt>Pokrycie testami<small>protokoły</small></dt><dd>Warstwy protokołów 92% unit + 100% scenariuszy HIL. Wcześniej w tym repo testy istniały głównie „smoke".</dd></div>
-        <div><dt>Adopcja AI w zespole<small>mierzona w commitach</small></dt><dd>3 z 3 inżynierów używa Claude Code w dzień 14. Nie sprawdzaliśmy „zadowolenia", sprawdzaliśmy commity — wszyscy trzej pushowali z AI workflow w drugim tygodniu.</dd></div>
+        <div><dt>Adopcja AI w zespole<small>mierzona w commitach</small></dt><dd>Nie sprawdzaliśmy „zadowolenia", sprawdzaliśmy commity — wszyscy trzej inżynierowie pushowali z AI workflow już w drugim tygodniu.</dd></div>
       </dl>
       <figure class="quote-card rv">
         <blockquote>Myślałem, że AI to nie dla nas — siedzimy bliżej krzemu niż chmury. Po dwóch tygodniach mam jednoznaczne zdanie: nie generuje za nas firmware-u, ale ratuje cały kontekst dookoła. Testy, dokumentacja rejestrów, sklejanie parserów. Tam, gdzie zwykle ginęliśmy.</blockquote>
@@ -139,6 +142,8 @@ import CtaBand from '../../components/CtaBand.astro';
         <article class="card-tile rv" style="--rv-d:.3s"><p class="eyebrow">04</p><h3>Zespół, który przekonał się sam</h3><p>Najmocniejszy efekt: dwóch seniorów, którzy szli w projekt z założeniem „to nie dla nas", po dwóch tygodniach prowadzi AI workflow dla młodszego kolegi.</p></article>
       </div>
       <div class="link-cards rv" style="margin-top:var(--space-xl)">
+        <a class="link-card" href="/warsztat-embedded"><h3>Warsztat embedded</h3><p>Jednodniowy warsztat Claude Code dla zespołów embedded — na Waszym sprzęcie, bez dotykania firmowego repo</p></a>
+        <a class="link-card" href="/stm32-skill"><h3>Skill STM32 dla Claude Code</h3><p>Agent, który buduje, wgrywa i weryfikuje firmware — do skonfigurowania pod własną płytkę</p></a>
         <a class="link-card" href="/case-studies/hmi"><h3>Następny case →</h3><p>Panel sterowania Qt/QML w energetyce</p></a>
         <a class="link-card" href="/case-studies"><h3>Wszystkie case studies</h3><p>Trzy piloty w trzech branżach</p></a>
       </div>

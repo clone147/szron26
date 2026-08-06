@@ -25,7 +25,7 @@ import CtaBand from '../components/CtaBand.astro';
   <!-- 01 manifest -->
   <section class="sect" aria-labelledby="manifest">
     <div class="container">
-      <SectHead eyebrow="01 / Manifest · Trzy zasady, na których pracujemy" title="Jeśli czegoś z tych trzech nie da się dotrzymać, nie bierzemy projektu." id="manifest" small />
+      <SectHead eyebrow="01 / Manifest · Zasady, na których pracujemy" title="Cztery zasady. Jeśli którejś nie da się dotrzymać, nie bierzemy projektu." id="manifest" small />
       <img class="hero-img rv" src="/img/sub/o-nas-zespol.webp?v=2" alt="Dwóch inżynierów pracujących razem przy laptopach w nasłonecznionym biurze" width="1380" height="768" loading="lazy" />
       <div class="grid-cards">
         <article class="card-tile rv">
@@ -42,6 +42,11 @@ import CtaBand from '../components/CtaBand.astro';
           <p class="eyebrow">iii</p>
           <h3>Rozmawiamy z zarządem, ale piszemy z zespołem.</h3>
           <p>Diagnoza i decyzje strategiczne idą przez Tomka, CTO i zarząd klienta. Kod produkcyjny piszą programiści klienta — Maciej obok: doradza, pokazuje na przykładach i wchodzi tam, gdzie sami by utknęli. To samo dotyczy AI workflow — uczymy przez wspólny commit.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.3s">
+          <p class="eyebrow">iv</p>
+          <h3>Bierzemy tylko to, co zrobimy sami.</h3>
+          <p>Każdy projekt ma dwóch właścicieli — strategia i kod — a decyzje architektoniczne podejmujemy razem. Nie powiększamy zespołu pod projekt: jeśli nie mamy pojemności, mówimy to wprost już w pierwszym mailu.</p>
         </article>
       </div>
     </div>
@@ -111,40 +116,10 @@ import CtaBand from '../components/CtaBand.astro';
     </div>
   </section>
 
-  <!-- 03 razem -->
-  <section class="sect" aria-labelledby="razem">
+  <!-- 03 warsztat -->
+  <section class="sect" aria-labelledby="warsztat">
     <div class="container">
-      <SectHead eyebrow="03 / Razem · Co nas trzyma w jednym zespole" title="Dwie specjalizacje, jedna kultura pracy." id="razem" small />
-      <p class="rv" style="max-width:60ch">Pracujemy w tej dwójce świadomie, a nie jako dwóch freelancerów pod wspólną domeną. Trzy zasady, które trzymają nas razem:</p>
-      <dl class="def-rows rv">
-        <div><dt>Każdy projekt ma dwóch właścicieli<small>Strategia + kod, zawsze razem</small></dt><dd>Tomek — strategia i AI workflow. Maciej — backend, frontend i mobile. Oba obszary muszą się spotkać na każdym projekcie. Brak jednego oznacza, że projektu nie bierzemy.</dd></div>
-        <div><dt>Code review we dwóch, decyzje we dwóch<small>Dwa spojrzenia w cenie jednego</small></dt><dd>Każdą architektoniczną decyzję podejmujemy razem. Każdy poważny PR widzi nas obu. Klient dostaje dwa spojrzenia w cenie jednego.</dd></div>
-        <div><dt>Bierzemy tylko to, co zrobimy sami<small>Pojemność, nie obietnice</small></dt><dd>Nie powiększamy zespołu pod projekt. Jeśli nie mamy pojemności — czekacie albo mówimy to wprost już w pierwszym mailu. Nigdy nie podpisujemy projektu, którego nie zrobimy własnymi rękami.</dd></div>
-      </dl>
-    </div>
-  </section>
-
-  <!-- cytaty -->
-  <section class="sect" aria-labelledby="cytaty" style="padding-top:0">
-    <div class="container">
-      <SectHead eyebrow="Słowem · Jak myślimy o pracy" title="Krótko, jak mówimy to klientom." id="cytaty" small />
-      <div class="grid-cards">
-        <figure class="quote-card rv">
-          <blockquote>„Wiem, gdzie projekty się sypią — z każdej z tych stron osobno: programisty, lidera, doradcy zarządu, CTO i klienta zewnętrznych dostawców.”</blockquote>
-          <figcaption class="quote-by"><img class="quote-by__img" src="/img/team/tomek.webp" width="44" height="44" alt="" loading="lazy" decoding="async" /><span><strong>Tomek Wojciechowski</strong> — założyciel, AI workflow i strategia</span></figcaption>
-        </figure>
-        <figure class="quote-card rv" style="--rv-d:.1s">
-          <blockquote>„Przepisywanie bez przepisywania: aplikacja musi nadal działać w produkcji, podczas gdy pod spodem wymieniamy fundament. To rzemiosło, nie sztuka.”</blockquote>
-          <figcaption class="quote-by"><img class="quote-by__img" src="/img/team/maciej.webp" width="44" height="44" alt="" loading="lazy" decoding="async" /><span><strong>Maciej Stopa</strong> — backend &amp; mobile lead</span></figcaption>
-        </figure>
-      </div>
-    </div>
-  </section>
-
-  <!-- 04 warsztat (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="warsztat">
-    <div class="container">
-      <SectHead eyebrow="04 / Warsztat · Czym pracujemy dziś" title="Stos, którego używamy codziennie." id="warsztat" />
+      <SectHead eyebrow="03 / Warsztat · Czym pracujemy dziś" title="Stos, którego używamy codziennie." id="warsztat" small />
       <dl class="def-rows rv">
         <div><dt>AI workflow<small>obaj</small></dt><dd>Claude Code jako daily driver · MCP servery pisane pod projekt · CLAUDE.md jako żywy kontrakt · agenci do testów i review · prompt-jako-kod w repo.</dd></div>
         <div><dt>Backend / frontend / mobile<small>Maciej</small></dt><dd>Java 21, Kotlin, Swift · Spring Boot 3, Spring Data JPA · React + TypeScript, React Native, natywne iOS/Android · Qt 6 / QML, C++17 (HMI i panele operatorskie) · PostgreSQL 16, MS SQL, MySQL, Oracle, DB2 · AWS ECS, terraform.</dd></div>

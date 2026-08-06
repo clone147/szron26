@@ -17,14 +17,14 @@ import RelatedCards from '../components/RelatedCards.astro';
   eyebrow="Embedded · Benchmark na sprzęcie"
   heading="Kompilator za 7 565 zł rocznie właśnie przegrał z darmowym. Na prawdziwym sprzęcie, w każdym teście."
   headingSmall
-  lead="Ten sam kod źródłowy — panel LED 64×64, FreeRTOS + CycloneTCP — zbudowany pięcioma wariantami toolchaina i zmierzony licznikiem cykli bezpośrednio na STM32F429. Wynik przeczy temu, za co branża płaci od dwudziestu lat. Niżej: pełne pomiary bez skrótów, winowajca ukryty w trzech funkcjach biblioteki, których nikt nie podejrzewa — a na końcu odpowiedź na pytanie, kto właściwie wykonał cały ten eksperyment — bo nie człowiek."
+  lead="Ten sam kod źródłowy — panel LED 64×64, FreeRTOS + CycloneTCP — zbudowany pięcioma wariantami toolchaina i zmierzony licznikiem cykli bezpośrednio na STM32F429. Cały eksperyment, od kodu przez kompilacje po pomiar i weryfikację na fizycznym panelu, wykonał agent AI."
   heroImage="/img/sub/keil-vs-gcc.webp"
   heroAlt="Płytka STM32 połączona z matrycą LED 64×64 wyświetlającą wykres słupkowy porównania wydajności"
 >
   <ProofStrip items={[
     ['3,75× szybciej', 'GCC tuned: 51 ms vs 194 ms Keila (cały benchmark)'],
     ['2,4× mniejszy firmware', '220 kB vs 537 kB ROM — ta sama funkcjonalność'],
-    ['0 zł licencji', 'Keil MDK Professional kosztuje 7 565 zł netto rocznie za stanowisko'],
+    ['0 zł licencji', '~113 tys. zł zostaje w budżecie 5-os. zespołu przez 3 lata'],
   ]} />
 
   <!-- 01 przekonanie -->
@@ -32,8 +32,7 @@ import RelatedCards from '../components/RelatedCards.astro';
     <div class="container">
       <SectHead eyebrow="01 / Punkt wyjścia · Znajome zdanie" title="„Na produkcję bierzemy komercyjny toolchain. Open source to ryzyko.”" id="przekonanie" small />
       <div class="prose rv">
-        <p>Jeśli to zdanie padło kiedyś na naradzie w Waszej firmie — ta strona jest dokładnie dla Was. Płaci się za nie dwa razy: raz w licencjach (7 565 zł netto rocznie za stanowisko Keil MDK Professional), drugi raz w przekonaniu, że w zamian dostaje się szybszy i mniejszy firmware. Pierwszą pozycję widać na fakturze. Drugą postanowiliśmy po prostu <strong>zmierzyć</strong> — nie na syntetycznym benchmarku z ulotki, tylko na kompletnym, produkcyjnym firmware z RTOS-em i stosem sieciowym, wgranym na prawdziwą płytkę.</p>
-        <p>Zmierzyliśmy pięć wariantów. I w danych wyszło coś, czego się nie spodziewaliśmy — wąskie gardło, które siedzi w miejscu, do którego prawie nikt nie zagląda. Ale po kolei.</p>
+        <p>Za to zdanie płaci się dwa razy: raz w licencjach (7 565 zł netto rocznie za stanowisko Keil MDK Professional), drugi raz w przekonaniu, że w zamian dostaje się szybszy i mniejszy firmware. Pierwszą pozycję widać na fakturze. Drugą postanowiliśmy po prostu <strong>zmierzyć</strong> — nie na syntetycznym benchmarku z ulotki, tylko na kompletnym, produkcyjnym firmware z RTOS-em i stosem sieciowym, wgranym na prawdziwą płytkę.</p>
       </div>
     </div>
   </section>
@@ -216,16 +215,16 @@ import RelatedCards from '../components/RelatedCards.astro';
   <!-- 07 artykuł: agent -->
   <section class="sect sect--dark" aria-labelledby="agent">
     <div class="container">
-      <SectHead eyebrow="07 / Puenta · Obiecana odpowiedź" title="Cały eksperyment wykonał agent AI — na prawdziwym sprzęcie." id="agent" small />
+      <SectHead eyebrow="07 / Puenta · Za kulisami" title="Cały eksperyment wykonał agent AI — na prawdziwym sprzęcie." id="agent" small />
       <img class="hero-img rv" src="/img/sub/keil-vs-gcc-film.webp" alt="Laptop z terminalem agenta AI obok matrycy LED 64×64 wyświetlającej padający śnieg" width="1380" height="768" loading="lazy" />
       <div class="prose prose--inv rv">
-        <p class="bm-lede">Cały eksperyment — dopisanie benchmarku do firmware, pięć kompilacji dwoma toolchainami, flashowanie, pomiary na sprzęcie i weryfikacja obrazu na fizycznym panelu LED — wykonał agent AI, sterując narzędziami z linii poleceń.</p>
+        <p class="bm-lede">Dopisanie benchmarku do firmware, pięć kompilacji dwoma toolchainami, flashowanie, pomiary na sprzęcie i weryfikacja obrazu na fizycznym panelu LED — agent zrobił to wszystko sam, sterując narzędziami z linii poleceń.</p>
         <h2>Keil z agentem: szybciej niż człowiek z Keilem</h2>
         <p>Agentowe programowanie embedded działa też na komercyjnym stacku. Keil ma CLI (<code>UV4.exe -r</code>), STM32CubeProgrammer flashuje i czyta SWO z konsoli — agent w pętli edytuje kod, buduje, wgrywa i czyta logi ITM szybciej, niż człowiek zdąży przeklikać się przez µVision. Każda iteracja „zmiana → build → flash → dowód w SWO” zamykała się w ~2 minuty, a numer buildu w banerze startowym dawał twardy dowód, że na płytce działa właściwy firmware.</p>
         <h2>Ale prawdziwa dźwignia to open source</h2>
         <p>Keil w tej pętli pozostaje wąskim gardłem: zamknięty kompilator bez wglądu w biblioteki, licencja per stanowisko, tylko Windows. Agent może go obsługiwać, ale nie może z nim <em>współpracować</em>. Z narzędziami open-source pętla domyka się w całości:</p>
         <ul>
-          <li><strong>arm-none-eabi-gcc</strong> — kompilator, którego flagi, biblioteki i wygenerowany kod agent może inspekcjonować i stroić; efekt: firmware 3,75× szybszy i 2,4× mniejszy od Keila;</li>
+          <li><strong>arm-none-eabi-gcc</strong> — kompilator, którego flagi, biblioteki i wygenerowany kod agent może inspekcjonować i stroić — tak powstał zwycięski wariant „tuned”;</li>
           <li><strong>newlib / newlib-nano</strong> — gdy <code>memcpy</code> okazał się bajtowy, agent to <em>zobaczył</em> w źródle i napisał zamiennik, zamiast zgadywać, co robi czarna skrzynka;</li>
           <li><strong>GNU make + skrypty shell</strong> — build deterministyczny i tekstowy, idealny interfejs dla agenta (i dla CI);</li>
           <li><strong>OpenOCD + st-flash + GDB</strong> — flashowanie i pełny debug source-level bez licencji, na Windows, Linuksie i macOS;</li>
@@ -235,13 +234,12 @@ import RelatedCards from '../components/RelatedCards.astro';
         </ul>
         <blockquote class="bm-quote">Zamknięte IDE ogranicza agenta do roli klikacza. Otwarty toolchain robi z niego inżyniera: może przeczytać źródło biblioteki, zmierzyć skutek na sprzęcie i poprawić wynik — w jednej, samodzielnej pętli.</blockquote>
         <h2>Co z tego wynika: trzy oszczędności naraz</h2>
-        <p>Agent z dowolnym toolchainem CLI wygrywa z ręcznym klikaniem w IDE, a z open source dostaje pełną dźwignię. W programowaniu mikrokontrolerów przekłada się to wprost na budżet projektu:</p>
         <ul>
           <li><strong>Czas inżyniera — najdroższa pozycja każdego projektu firmware.</strong> Agent domyka pętlę „zmiana → build → flash → dowód na sprzęcie” w ~2 minuty i powtarza ją bez znużenia. Inżynier przestaje czekać i klikać, a zaczyna decydować — ta sama liczba etatów domyka więcej tematów w tygodniu, a eksperymenty odkładane „na kiedyś” (jak ten benchmark) po prostu się dzieją.</li>
-          <li><strong>Licencje: 0 zł.</strong> Cała pętla — kompilator, debug, flashowanie — działa na open source. Zamiast 7 565 zł netto rocznie za stanowisko: w 5-osobowym zespole ~113 tys. zł zostaje w budżecie co 3 lata (<a href="#koszty">rachunek wyżej</a>).</li>
+          <li><strong>Licencje: 0 zł.</strong> Cała pętla — kompilator, debug, flashowanie — działa na open source. W 5-osobowym zespole to ~113 tys. zł zostające w budżecie co 3 lata (<a href="#koszty">rachunek wyżej</a>).</li>
           <li><strong>Zapas na sprzęcie.</strong> Firmware 2,4× mniejszy i 3,75× szybszy to nowe funkcje bez przesiadki na droższy mikrokontroler — a przy większych seriach często tańszy układ w BOM.</li>
         </ul>
-        <p>Do startu nie potrzeba nic, czego już nie macie: toolchain jest darmowy, a płytka leży na biurku. Dokładnie takie pętle wdrażamy w zespołach embedded — na Waszym kodzie i Waszym sprzęcie, z pomiarem zamiast obietnic.</p>
+        <p>Do startu nie potrzeba nic, czego już nie macie: toolchain jest darmowy, płytka leży na biurku — a jak wdrażamy takie pętle w zespołach, opisujemy na stronie <a href="/ai-dla-embedded">AI dla embedded</a>.</p>
         <div class="contact__cta">
           <BtnArrow href="/umow-rozmowe">Umów 30 minut — policzymy Wasz przypadek</BtnArrow>
           <a class="btn btn--ghost" href="/darmowy-audyt">Darmowy audyt</a>

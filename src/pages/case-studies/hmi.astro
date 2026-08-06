@@ -9,16 +9,21 @@ import CtaBand from '../../components/CtaBand.astro';
   description="Nowy moduł raportowania w panelu Qt/QML dla operatora energetycznego. Dwa tygodnie do odbioru, wzorzec MVVM, a zespół dorobił trzy kolejne widoki sam."
   eyebrow="Case studies › Panel HMI w energetyce · Energetyka · HMI / SCADA · 2026"
   heading="Nowy moduł. Dwa tygodnie. Klient kontynuuje sam."
-  lead="Operator infrastruktury energetycznej potrzebował nowego modułu raportowania w istniejącym panelu operatorskim Qt/QML. Od pierwszego szkicu interfejsu do podpisu odbioru — dwa tygodnie. Najistotniejszy efekt: zespół po stronie klienta przejął kod i bez naszego udziału dorobił już trzy kolejne widoki. Skala pilota: tak wygląda pierwszy kwartał przy zespole 3–4 osób. Przy 30+ pracujemy falami, zespół po zespole."
+  lead="Operator infrastruktury energetycznej potrzebował nowego modułu raportowania w istniejącym panelu operatorskim Qt/QML. Od pierwszego szkicu interfejsu do podpisu odbioru — dwa tygodnie. Najistotniejszy efekt: zespół po stronie klienta przejął kod i bez naszego udziału dorobił już trzy kolejne widoki."
   heroImage="/img/sub/cs-hmi.webp"
   heroAlt="Oszroniony przemysłowy panel HMI ze światłem interfejsu pod lodem"
 >
   <!-- proof -->
-  <ProofStrip items={[
-    ['nowy moduł → 2 tyg', 'czas dostarczenia'],
-    ['Pełny + dokumentacja', 'transfer wiedzy'],
-    ['Klient rozwija sam', 'status po 3 mc · Qt 6 · QML · C++17'],
-  ]} />
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <ProofStrip wrap={false} items={[
+        ['nowy moduł → 2 tyg', 'czas dostarczenia'],
+        ['Pełny + dokumentacja', 'transfer wiedzy'],
+        ['Klient rozwija sam', 'status po 3 mc · Qt 6 · QML · C++17'],
+      ]} />
+      <p class="rv" style="margin-top:var(--space-sm); font-size:var(--text-caption); color:var(--color-text-2)">Skala pilota: tak wygląda pierwszy kwartał przy zespole 3–4 osób. Przy 30+ pracujemy falami, zespół po zespole.</p>
+    </div>
+  </section>
 
   <!-- 01 kontekst -->
   <section class="sect" aria-labelledby="kontekst">
@@ -37,7 +42,7 @@ import CtaBand from '../../components/CtaBand.astro';
       <SectHead eyebrow="02 / Kto to prowadził" title="Dwie osoby, 12 dni do odbioru, klient dorabia kolejne widoki sam." id="kto" />
       <dl class="def-rows rv">
         <div><dt>Maciej Stopa<small>Lead operacyjny</small></dt><dd>Migracja Qt 5 → Qt 6, wzorzec MVVM z separacją logiki i widoku, ViewModel w C++17 (Catch2, dependency injection), integracja z OPC UA przez open62541.</dd></div>
-        <div><dt>Tomek Wojciechowski<small>AI workflow dopasowany do QML</small></dt><dd>QML jest słabo wspierany przez modele językowe out-of-the-box — Tomek napisał CLAUDE.md z listą anti-patternów (240 linii), których AI domyślnie nie zna. Do tego setup QML Tests i screenshotów regresyjnych.</dd></div>
+        <div><dt>Tomek Wojciechowski<small>AI workflow dopasowany do QML</small></dt><dd>QML jest słabo wspierany przez modele językowe out-of-the-box — Tomek napisał CLAUDE.md z listą anti-patternów, których AI domyślnie nie zna. Do tego setup QML Tests i screenshotów regresyjnych.</dd></div>
       </dl>
     </div>
   </section>
@@ -66,7 +71,7 @@ import CtaBand from '../../components/CtaBand.astro';
         <ul>
           <li><strong>Migracja Qt 5 → Qt 6 jako warunek wstępny.</strong> Nie chcieliśmy budować nowego modułu w starym frameworku. Migracja zajęła 3 dni, wykonana wspólnie z zespołem klienta — ze szczegółowym opisem każdej różnicy w CLAUDE.md.</li>
           <li><strong>Wzorzec MVVM z separacją logiki/widoku.</strong> ViewModel w C++17 (testowalny w Catch2), View w QML (deklaratywny, bez logiki biznesowej). Jeden konkretny przykład, który zespół potem powiela.</li>
-          <li><strong>CLAUDE.md dla QML.</strong> Lista anti-patternów (kiedy nie używać Connections, jak nie tworzyć cykli w property bindings, kiedy preferować deklaratywne nad imperatywne). To, czego AI nie wiedziało domyślnie.</li>
+          <li><strong>CLAUDE.md dla QML — 240 linii.</strong> Lista anti-patternów (kiedy nie używać Connections, jak nie tworzyć cykli w property bindings, kiedy preferować deklaratywne nad imperatywne). To, czego AI nie wiedziało domyślnie.</li>
           <li><strong>Test bench dla QML.</strong> Setup QML Tests + automatyczne screenshoty regresyjne — żeby zespół miał feedback szybciej niż „kompiluj i kliknij".</li>
         </ul>
       </div>
@@ -94,18 +99,15 @@ import CtaBand from '../../components/CtaBand.astro';
   <!-- 06 wynik (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="wynik">
     <div class="container">
-      <SectHead eyebrow="06 / Wynik · Najlepszy widać po 3 miesiącach" title="Najlepszy efekt widać dopiero po trzech miesiącach." id="wynik" />
+      <SectHead eyebrow="06 / Wynik" title="Najlepszy efekt widać dopiero po trzech miesiącach." id="wynik" />
       <ProofStrip wrap={false} items={[
         ['3–4× szybciej', '2 tygodnie zamiast 6–8 w zespole'],
-        ['3 widoki samodzielnie', 'dorobione przez zespół po naszym wyjściu'],
-        ['0% → 41%', 'pokrycie testami QML'],
+        ['3 widoki samodzielnie', 'po naszym wyjściu — kontakt: jedno pytanie o property binding'],
+        ['0% → 41%', 'pokrycie testami QML — pierwsze testy frontendowe u klienta'],
       ]} />
       <dl class="def-rows rv">
-        <div><dt>Czas dostarczenia<small>2 tygodnie</small></dt><dd>2 tygodnie zamiast szacowanych 6–8 tygodni w wewnętrznym zespole (3–4× szybciej).</dd></div>
-        <div><dt>Trzy kolejne widoki<small>bez naszego udziału</small></dt><dd>Dorobione przez zespół samodzielnie w 3 miesiące po naszym wyjściu. Zero kontaktu z SZRON-em poza jednym pytaniem o property binding.</dd></div>
         <div><dt>Migracja Qt 5 → Qt 6<small>„w gratisie"</small></dt><dd>Zrobiona przy okazji. Wcześniej leżała półtora roku.</dd></div>
         <div><dt>Czas code review<small>z tygodni na dni</small></dt><dd>Z tygodni na 1–2 dni. Dzięki wspólnemu wzorcowi i checkliście w CLAUDE.md zespół wie, czego szukać.</dd></div>
-        <div><dt>Pokrycie testami QML<small>pierwsze testy frontendowe</small></dt><dd>Z 0% do 41%. Pierwszy zespół w organizacji klienta, który ma testy frontendowe.</dd></div>
       </dl>
       <figure class="quote-card rv">
         <blockquote>Najfajniejsze nie było to, że dostaliśmy działający moduł. Najfajniejsze jest to, że trzy miesiące później dorobiliśmy trzy kolejne — same, bez SZRON-u. I wiemy, że nie powstaną gorsze.</blockquote>
@@ -125,7 +127,7 @@ import CtaBand from '../../components/CtaBand.astro';
         <div><dt>Komunikacja<small>OPC UA + CSV</small></dt><dd>OPC UA (open62541), CSV export, integracja z istniejącą bazą Postgres przez warstwę SCADA.</dd></div>
         <div><dt>Platforma<small>Linux embedded</small></dt><dd>Linux embedded (Yocto custom), x86-64, ekrany dotykowe 19".</dd></div>
         <div><dt>Testy<small>Catch2 + QML Tests</small></dt><dd>Catch2 dla C++ ViewModel-i, QML Tests + screenshoty regresyjne.</dd></div>
-        <div><dt>AI workflow<small>Claude Code</small></dt><dd>Claude Code z CLAUDE.md (240 linii — głównie reguły dla QML i wzorca MVVM).</dd></div>
+        <div><dt>AI workflow<small>Claude Code</small></dt><dd>Claude Code z CLAUDE.md — głównie reguły dla QML i wzorca MVVM.</dd></div>
       </dl>
     </div>
   </section>

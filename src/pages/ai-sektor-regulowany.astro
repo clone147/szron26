@@ -8,11 +8,10 @@ import CtaBand from '../components/CtaBand.astro';
 
 // FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html), stąd np. R&D
 const faq = [
-  { q: 'Czy dane i kod naprawdę nie opuszczają naszej infrastruktury?', a: 'Tak. Przy wariancie on-premise używamy modeli lokalnych — przez Ollama lub vLLM — uruchamianych na Waszych serwerach lub stacjach roboczych. Żadne dane nie trafiają do zewnętrznych API ani publicznych modeli. Przy wariancie VPC inferencja odbywa się w prywatnym VPC w AWS, bez wyjścia do publicznego internetu.' },
+  { q: 'Czy dane i kod naprawdę nie opuszczają naszej infrastruktury?', a: 'Tak. Przy wariancie on-premise używamy modeli lokalnych — serwowanych przez Ollama lub vLLM na Waszych serwerach lub stacjach roboczych, dobranych do zadania i dostępnego sprzętu; w wariancie air-gapped działają bez żadnego połączenia z internetem. Przy wariancie VPC przetwarzanie odbywa się w prywatnym VPC w AWS, bez wyjścia do publicznego internetu. Żadne dane nie trafiają do zewnętrznych API ani publicznych modeli.' },
   { q: 'Jak spełniacie wymogi AI Act, NIS2 i RODO?', a: 'Przed startem ustalamy ramy regulacyjne Waszej branży i dobieramy architekturę tak, żeby się w nich mieściła — od wariantu air-gapped po audit log każdej interakcji z AI. Kontrolujemy, co trafia do promptu i gdzie fizycznie jest przetwarzane.' },
   { q: 'Czy podpisujecie NDA i umowę o poufności?', a: 'Zawsze. NDA podpisujemy przed pierwszą rozmową techniczną. Mamy doświadczenie z NDA w sektorze obronnym, finansowym i R&D.' },
-  { q: 'Kto ma dostęp do naszego kodu?', a: 'Tylko nasza dwójka i Wasz zespół. Pracujemy bezpośrednio, nikt z zewnątrz nie dotyka Waszego kodu. Za nami 25 lat wytwarzania oprogramowania.' },
-  { q: 'Jakich modeli AI używacie w środowiskach offline?', a: 'Modele lokalne serwowane przez Ollama lub vLLM, dobrane do zadania i dostępnego hardware. Konfigurujemy je w pełni wewnątrz Waszej infrastruktury, w wariancie air-gapped — bez połączenia z internetem.' },
+  { q: 'Kto ma dostęp do naszego kodu?', a: 'Tylko nasza dwójka i Wasz zespół. Pracujemy bezpośrednio, nikt z zewnątrz nie dotyka Waszego kodu.' },
 ];
 ---
 <Interior
@@ -33,9 +32,9 @@ const faq = [
       </SectHead>
       <img class="hero-img rv" src="/img/sub/ai-sektor-regulowany-audyt.webp" alt="Maciej w serwerowni on-premise przegląda dokumentację compliance na tablecie" width="1380" height="768" loading="lazy" />
       <dl class="def-rows rv">
-        <div><dt>AI Act<small>Rozporządzenie UE o sztucznej inteligencji</small></dt><dd>Klasyfikuje systemy AI według ryzyka i nakłada obowiązki na tych, którzy je tworzą i wdrażają. Dla wytwarzania software oznacza dokumentowanie, jak i gdzie AI uczestniczy w powstawaniu kodu, oraz kontrolę nad danymi, które do modelu trafiają.</dd></div>
-        <div><dt>NIS2<small>Dyrektywa o cyberbezpieczeństwie</small></dt><dd>Podnosi wymagania bezpieczeństwa dla podmiotów kluczowych i ważnych — w tym dla łańcucha dostaw oprogramowania. Narzędzia AI w procesie developmentu muszą mieścić się w Waszych politykach bezpieczeństwa i zarządzania ryzykiem, a nie omijać je bocznym kanałem.</dd></div>
-        <div><dt>RODO<small>Ochrona danych osobowych</small></dt><dd>Dane osobowe nie mogą wyciekać do zewnętrznych modeli ani opuszczać kontrolowanego środowiska bez podstawy prawnej. Przy pracy z AI oznacza to ścisłą kontrolę nad tym, co trafia do promptu i gdzie fizycznie jest przetwarzane.</dd></div>
+        <div><dt>AI Act<small>Rozporządzenie UE o sztucznej inteligencji</small></dt><dd>Dla wytwarzania software wynika z niego jedno: dokumentujecie, jak i gdzie AI uczestniczy w powstawaniu kodu, i kontrolujecie, jakie dane trafiają do modelu.</dd></div>
+        <div><dt>NIS2<small>Dyrektywa o cyberbezpieczeństwie</small></dt><dd>Narzędzia AI w procesie developmentu muszą mieścić się w Waszych politykach bezpieczeństwa i zarządzania ryzykiem — także w łańcuchu dostaw oprogramowania — a nie omijać ich bocznym kanałem.</dd></div>
+        <div><dt>RODO<small>Ochrona danych osobowych</small></dt><dd>Dane osobowe nie mogą trafić do zewnętrznych modeli bez podstawy prawnej — przy pracy z AI oznacza to ścisłą kontrolę nad tym, co trafia do promptu i gdzie fizycznie jest przetwarzane.</dd></div>
       </dl>
       <p class="rv" style="--rv-d:.12s; margin-top:var(--space-lg)">
         <BtnArrow class="btn btn--dark" href="/ai-act-compliance">Szczegóły AI Act</BtnArrow>
@@ -43,28 +42,19 @@ const faq = [
     </div>
   </section>
 
-  <!-- 02 architektura (ciemna) -->
+  <!-- 02 architektura + warianty wdrożenia (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="architektura">
     <div class="container">
       <SectHead eyebrow="02 / Architektura · Gdzie fizycznie są dane" title="Architektura, która nie wypuszcza danych." id="architektura">
-        <p class="rv" style="--rv-d:.06s">Bezpieczeństwo to decyzja architektoniczna. Pokazujemy ją wprost, warstwa po warstwie, zanim napiszemy pierwszą linię kodu.</p>
+        <p class="rv" style="--rv-d:.06s">Bezpieczeństwo to decyzja architektoniczna. Pokazujemy ją wprost, zanim napiszemy pierwszą linię kodu — dwie zasady i dwa warianty wdrożenia.</p>
       </SectHead>
       <dl class="def-rows rv">
-        <div><dt>Kod nie idzie do publicznych modeli<small>Zasada zerowego wycieku</small></dt><dd>Żaden fragment Waszego kodu ani danych nie trafia do publicznych API modeli. Punktem wyjścia jest pytanie, gdzie fizycznie odbywa się każda inferencja — a nie wygoda dostawcy.</dd></div>
-        <div><dt>Bedrock w prywatnym VPC<small>AWS pod Waszą kontrolą</small></dt><dd>Tam, gdzie chmura jest dopuszczalna, używamy Amazon Bedrock w prywatnym VPC w AWS. Ruch nie wychodzi do publicznego internetu, a dane pozostają w Waszym koncie i regionie.</dd></div>
-        <div><dt>Modele lokalne na Waszych serwerach<small>Ollama, vLLM</small></dt><dd>Tam, gdzie chmura odpada, stawiamy modele lokalnie — przez Ollama lub vLLM — na Waszych serwerach lub stacjach roboczych. Inferencja dzieje się w pełni wewnątrz Waszej infrastruktury.</dd></div>
-        <div><dt>Wariant air-gapped<small>Środowisko bez sieci zewnętrznej</small></dt><dd>Dla najwyższych wymagań pracujemy w środowisku air-gapped — odciętym od sieci zewnętrznej. Modele i narzędzia działają offline, bez jakiegokolwiek połączenia z internetem.</dd></div>
+        <div><dt>Kod nie idzie do publicznych modeli<small>Zasada zerowego wycieku</small></dt><dd>Żaden fragment Waszego kodu ani danych nie trafia do publicznych API modeli. Punktem wyjścia jest pytanie, gdzie fizycznie odbywa się inferencja — czyli gdzie model przetwarza Wasze dane — a nie wygoda dostawcy.</dd></div>
         <div><dt>Audit log każdej interakcji<small>Pełna ścieżka dowodowa</small></dt><dd>Każda interakcja z AI zostaje zapisana w audit logu. Macie pełną ścieżkę dowodową tego, co i kiedy trafiło do modelu oraz co zostało wygenerowane — gotową pod wymogi regulatora i audyt.</dd></div>
       </dl>
-    </div>
-  </section>
-
-  <!-- 03 vpc vs on-prem -->
-  <section class="sect" aria-labelledby="warianty">
-    <div class="container">
-      <SectHead eyebrow="03 / Wybór · Dwa modele wdrożenia" title="Kiedy VPC, a kiedy on-premise." id="warianty" small>
-        <p class="rv" style="--rv-d:.06s">Nie ma jednego dobrego wariantu; liczy się ten, który mieści się w Waszych ograniczeniach. O wyborze decyduje bezpieczeństwo, nie wygoda.</p>
-      </SectHead>
+      <div class="prose rv" style="margin-top:var(--space-xl)">
+        <p>Kiedy VPC, a kiedy on-premise? Nie ma jednego dobrego wariantu — liczy się ten, który mieści się w Waszych ograniczeniach. O wyborze decyduje bezpieczeństwo, nie wygoda.</p>
+      </div>
       <table class="results-table rv">
         <thead><tr><th scope="col">Kryterium</th><th scope="col">Bedrock w VPC</th><th scope="col">On-premise · air-gapped</th></tr></thead>
         <tbody>
@@ -78,22 +68,22 @@ const faq = [
     </div>
   </section>
 
-  <!-- 04 zaufanie -->
-  <section class="sect" aria-labelledby="zaufanie" style="padding-top:0">
+  <!-- 03 zaufanie -->
+  <section class="sect" aria-labelledby="zaufanie">
     <div class="container">
-      <SectHead eyebrow="04 / Zaufanie · Na czym je budujemy" title="Zaufanie zaczyna się przed pierwszą rozmową." id="zaufanie" small />
+      <SectHead eyebrow="03 / Zaufanie · Na czym je budujemy" title="Zaufanie zaczyna się przed pierwszą rozmową." id="zaufanie" small />
       <ProofStrip wrap={false} items={[
-        ['NDA przed rozmową', 'podpisujemy je przed pierwszą rozmową techniczną'],
+        ['NDA przed rozmową', 'podpisane m.in. w sektorze obronnym, finansowym i R&D'],
         ['25 lat', 'doświadczenia w wytwarzaniu oprogramowania'],
         ['Kod zostaje u Was', 'nikt z zewnątrz go nie dotyka'],
       ]} />
     </div>
   </section>
 
-  <!-- 05 FAQ bezpieczeństwa -->
+  <!-- 04 FAQ bezpieczeństwa -->
   <section class="sect sect--dark" aria-labelledby="faq-title">
     <div class="container">
-      <SectHead eyebrow="05 / FAQ · Pytania o bezpieczeństwo" title="Pytania o bezpieczeństwo, które padają najczęściej." id="faq-title" small />
+      <SectHead eyebrow="04 / FAQ · Pytania o bezpieczeństwo" title="Pytania o bezpieczeństwo, które padają najczęściej." id="faq-title" small />
       <Faq items={faq} />
     </div>
   </section>

@@ -20,7 +20,7 @@ import CtaBand from '../components/CtaBand.astro';
       <SectHead eyebrow="01 / Kontekst · Ograniczenia, nie życzenia" title="Dlaczego embedded to inna gra." id="inna-gra" />
       <img class="hero-img rv" src="/img/sub/ai-dla-embedded-warsztat.webp" alt="Tomek przy stanowisku elektronicznym z płytką STM32 i oscyloskopem, obok laptop z terminalem AI" width="1380" height="768" loading="lazy" />
       <div class="prose rv">
-        <p>Większość narzędzi AI projektowano pod web i backend — repozytorium, internet pod ręką, szybki cykl build-run. W embedded żadne z tych założeń nie obowiązuje na ślepo. Zanim zaczniemy mówić, „co AI robi”, trzeba uczciwie nazwać, w czym pracujemy.</p>
+        <p>Większość narzędzi AI projektowano pod web i backend — repozytorium, internet pod ręką, szybki cykl build-run; w embedded żadne z tych założeń nie obowiązuje na ślepo.</p>
       </div>
       <dl class="def-rows rv">
         <div><dt>Toolchainy<small>Keil, STM32CubeIDE, arm-none-eabi</small></dt><dd>Kompilacja, flashowanie i debug przez sprzętowy programator. Pętla feedbacku liczona w minutach, nie w sekundach — AI nie „uruchomi” za Was kodu, dopóki nie zbudujecie szybszego cyklu (host-testy, mocki HAL).</dd></div>
@@ -40,9 +40,6 @@ import CtaBand from '../components/CtaBand.astro';
         <p>To, co AI realnie przyspiesza, to cała warstwa <em>dookoła</em> tego twardego rdzenia. Testy unit na hoście z mockami HAL. Parsery protokołów — Modbus, CANopen, ramki CAN bus, telemetria OBD-II. Dokumentacja rejestrów i mapy pamięci. Kod CRUD-owy na strukturach konfiguracyjnych, serializacja, walidacja danych z magistrali. Skrypty symulujące master/slave, żeby nie blokować ławki na każdą zmianę.</p>
         <p>W typowym projekcie embedded to właśnie ta warstwa pochłania <strong>około 70% czasu projektu</strong>, a nie kod w przerwaniach. Jeśli AI zdejmuje większość tej pracy, inżynier zostaje z czasem na to, co faktycznie wymaga jego głowy.</p>
       </div>
-      <div class="callout rv">
-        <p><strong>Najkrócej:</strong> AI w embedded to nie generowanie firmware'u od zera — to przyspieszenie wszystkiego, co nie jest „magicznym” kodem hardware'owym: testy, parsery protokołów, dokumentacja rejestrów, kod CRUD-owy na strukturach. Tam jest 70% czasu projektu, nie w ISR-ach.</p>
-      </div>
     </div>
   </section>
 
@@ -51,13 +48,8 @@ import CtaBand from '../components/CtaBand.astro';
     <div class="container">
       <SectHead eyebrow="03 / Dowód · Sterownik STM32 w produkcji" title="Jak to wyglądało na realnym module STM32." id="case" small />
       <div class="prose rv">
-        <p>Producent automatyki przemysłowej potrzebował nowego modułu komunikacji Modbus RTU + CANopen do sterownika STM32, który jest w produkcji od 2019 roku. Wycena wewnętrzna: 6–8 tygodni inżyniera plus 2 tygodnie testów HIL. Problem nie był techniczny — zespół znał stos i protokoły. Problem był pojemnościowy: cykl build/flash/test trwał 20–40 minut, jedna ławka HIL na trzech ludzi, a senior od warstwy CAN szedł na urlop w środku terminu.</p>
-        <p>Najpierw rozwiązaliśmy cykl iteracji — CI z arm-none-eabi, host-testy z mockami HAL, symulatory Modbus i CANopen w Pythonie. Dopiero potem zespół siadł do kodu modułu. Trzej inżynierowie klienta zamknęli go w dwa tygodnie, z testami HIL. My prowadziliśmy, kod pisali oni.</p>
+        <p>Producent automatyki przemysłowej potrzebował nowego modułu komunikacji Modbus RTU + CANopen do sterownika STM32, który jest w produkcji od 2019 roku. Wycena wewnętrzna: 6–8 tygodni inżyniera plus 2 tygodnie testów HIL. Najpierw rozwiązaliśmy cykl iteracji — CI z arm-none-eabi, host-testy z mockami HAL, symulatory protokołów w Pythonie — a dopiero potem trzej inżynierowie klienta zamknęli moduł w dwa tygodnie. My prowadziliśmy, kod pisali oni.</p>
       </div>
-      <figure class="quote-card rv">
-        <blockquote>Myślałem, że AI to nie dla nas — siedzimy bliżej krzemu niż chmury. Po dwóch tygodniach mam jednoznaczne zdanie: nie generuje za nas firmware'u, ale ratuje cały kontekst dookoła. Testy, dokumentacja rejestrów, sklejanie parserów. Tam, gdzie zwykle ginęliśmy.</blockquote>
-        <figcaption><strong>Inżynier R&amp;D embedded</strong> — producent automatyki przemysłowej (NDA)</figcaption>
-      </figure>
       <ProofStrip wrap={false} items={[
         ['2 mc → 2 tyg', 'czas dostarczenia modułu (3–4× szybciej)'],
         ['30 → 4 min', 'pętla feedback na CI host (20 → 12 min na HIL)'],
@@ -89,7 +81,7 @@ import CtaBand from '../components/CtaBand.astro';
       <SectHead eyebrow="05 / Safety · MISRA i zgodność" title="AI, które pilnuje MISRA C — nie omija jej." id="misra" small />
       <div class="prose rv">
         <p>Dla przemysłu, energetyki, kolei i systemów sygnalizacji zgodność z MISRA C to nie formalność, tylko warunek wejścia. Zbudowaliśmy workflow, w którym agent sprawdza kod — wygenerowany i ludzki — pod kątem reguł MISRA jeszcze przed review. To zamienia AI z ryzyka certyfikacyjnego w dodatkową linię obrony.</p>
-        <p>Ten workflow, razem z regułami CLAUDE.md pod STM32/Zephyr/Qt i serwerem MCP do datasheetów, przekazujemy zespołom na jednodniowym warsztacie — na Waszym sprzęcie, bez dotykania Waszego repo.</p>
+        <p>Ten workflow, razem z regułami CLAUDE.md pod STM32/Zephyr/Qt i serwerem MCP do datasheetów, przekazujemy zespołom na jednodniowym warsztacie — na Waszym sprzęcie, bez dotykania Waszego repo. Dla zatwierdzającego budżet: 7 500 zł netto za grupę do 10 osób, z dofinansowaniem KFS/BUR dla MŚP realnie od ~1 500 zł.</p>
         <div class="callout"><p><strong>Zobacz przykład:</strong> nasz open-source'owy <a href="/stm32-skill">skill STM32 dla Claude Code</a> — kompletny workflow build/flash/debug, który skonfigurujecie pod własną płytkę i pobierzecie.</p></div>
       </div>
       <p class="rv" style="margin-top:var(--space-lg)">

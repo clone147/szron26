@@ -20,82 +20,42 @@ const faq = [
   description="Platforma analityczna dla zarządu: wydajność zespołów dev, Bus Factor i wskaźniki strategiczne z repozytoriów GitHub lub GitLab. Dane zostają u Was."
   eyebrow="DevLens Pro · audytor procesów deweloperskich"
   heading="Zarząd pyta liczbami. DevLens odpowiada danymi."
-  lead="Ile kosztuje ten zespół? Kto jest przeciążony? Co się stanie, jak ktoś odejdzie? DevLens odpowiada liczbami, nie przeczuciami. Jeden widok na wszystkie projekty, Bus Factor i pomiar wprost z repozytoriów — a dane zostają w Waszej przeglądarce."
+  lead="Ile kosztuje ten zespół? Kto jest przeciążony? Co się stanie, jak ktoś odejdzie? DevLens liczy odpowiedzi wprost z Waszych repozytoriów GitHub lub GitLab — zamiast przeczuć i ankiet."
   heroImage="/img/sub/devlens.webp"
   heroAlt="Dashboard wykresów wyrzeźbiony z lodu z pomarańczowymi liniami danych"
 >
   <!-- proof -->
   <ProofStrip items={[
-    ['Multi-Repo', 'agregacja GitHub lub GitLab'],
+    ['+266% tempa pracy', 'pomiar z realnego wdrożenia'],
     ['Bus Factor', 'wskaźnik ryzyka ciągłości'],
-    ['100% lokalnie', 'dane nie opuszczają przeglądarki'],
+    ['1–2 dni', 'wdrożenie — bez instalacji serwerów'],
   ]} />
 
-  <!-- 01 funkcjonalności (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="funkcje">
+  <!-- 01 funkcje i korzyści (scalone) -->
+  <section class="sect" aria-labelledby="funkcje">
     <div class="container">
-      <SectHead eyebrow="01 / Funkcjonalności · Dla zarządu, nie dla programistów" title="Surowe dane z kodu przetłumaczone na KPI i decyzje." id="funkcje" />
-      <dl class="def-rows rv">
-        <div><dt>Strategiczne wskaźniki biznesowe<small>Dane z GitHuba w języku zarządu</small></dt><dd>Liczba zmian i tempo prac zespołu, wzorce wydajności poszczególnych programistów, analiza rotacji kodu (code churn) oraz trendy historyczne z identyfikacją sezonowości.</dd></div>
-        <div><dt>Identyfikacja ryzyk operacyjnych<small>Bus Factor — większość firm nie zna tej liczby</small></dt><dd>Bus Factor pokazuje, ile kluczowych osób musi odejść, by projekt stanął. Do tego wskaźniki stagnacji projektów, dywersyfikacja wiedzy w zespole i analiza zależności między projektami.</dd></div>
-        <div><dt>Przejrzysty wgląd w efektywność<small>Wszystkie projekty w jednym miejscu</small></dt><dd>Agregacja danych z repozytoriów GitHub lub GitLab, dashboardy dla kadry zarządzającej, raporty wykonawcze gotowe do prezentacji i eksport danych do analizy offline.</dd></div>
-        <div><dt>Bezpieczeństwo i prywatność<small>Wasze dane nigdy nie opuszczają przeglądarki</small></dt><dd>Tokeny dostępu trzymane tylko w przeglądarce użytkownika, zero wysyłania danych do zewnętrznych serwerów, pełna kontrola nad danymi analitycznymi i zgodność z politykami korporacyjnymi od pierwszego dnia.</dd></div>
-      </dl>
+      <SectHead eyebrow="01 / Funkcje i korzyści · Dla zarządu, nie dla programistów" title="Surowe dane z kodu przetłumaczone na KPI i decyzje." id="funkcje" />
       <ShotGallery items={[
         { src: '/img/devlens/01-dashboard.webp', alt: 'Panel zespołu DevLens: 24,2 tys. zmian, 45 programistów, wykres produktywności zespołu z trendem +124%', caption: 'Panel zespołu — produktywność, ryzyko i aktywność 45 programistów w jednym widoku.' },
+        { src: '/img/devlens/08-ryzyko-ciaglosci.webp', alt: 'Analiza ryzyka i ciągłości wiedzy: poziom ryzyka 3/10, koncentracja wiedzy, gotowość sukcesji, podsumowanie dla zarządu', caption: 'Analiza ryzyka i ciągłości wiedzy — Bus Factor rozbity na czynniki, z podsumowaniem dla zarządu.' },
         { src: '/img/devlens/06-aktywnosc-tygodniowa.webp', alt: 'Wykres aktywności tygodniowej top 10 programistów na przestrzeni roku', caption: 'Aktywność tygodniowa — kto pracuje regularnie, a kto zrywami. Top 5/10/20 lub cały zespół.' },
+        { src: '/img/devlens/10-technologie-profile.webp', alt: 'Profile specjalizacji programistów: obszary pracy, kluczowe technologie i unikalna wiedza każdej osoby', caption: 'Profile specjalizacji — czym zajmuje się każdy programista i czyja wiedza jest unikalna.' },
         { src: '/img/devlens/09-projekty-breakdown.webp', alt: 'Profil programisty: kamienie milowe, rozkład zaangażowania w projekty i ostatnie zmiany w kodzie', caption: 'Profil programisty — kamienie milowe, rozkład pracy między projektami i ostatnie zmiany.' },
       ]} />
+      <dl class="def-rows rv" style="margin-top:var(--space-2xl)">
+        <div><dt>Tempo i trend zespołu<small>Czy inwestycja w programistów się zwraca</small></dt><dd>24,2 tys. zmian i 45 programistów w jednym widoku, trend produktywności policzony z historii repozytoriów (na zrzucie: +124%). Zarząd czyta wynik, nie kod.</dd></div>
+        <div><dt>Ryzyko ciągłości<small>Bus Factor — większość firm nie zna tej liczby</small></dt><dd>Ile kluczowych osób musi odejść, żeby projekt stanął. DevLens rozbija ryzyko na koncentrację wiedzy i gotowość sukcesji (na zrzucie: poziom 3/10) i wskazuje projekty zależne od jednej głowy.</dd></div>
+        <div><dt>Efekt wdrożenia AI<small>Pomiar przed/po, nie wrażenia</small></dt><dd>Porównanie tempa pracy przed i po dacie wdrożenia narzędzi AI — w realnym wdrożeniu pomiar pokazał średnio +266% tempa pracy zespołu.</dd></div>
+        <div><dt>Przeciążenia i unikalna wiedza<small>Kogo odciążyć, kogo dublować</small></dt><dd>Aktywność tygodniowa pokazuje, kto pracuje ponad miarę, a profile specjalizacji — które kompetencje istnieją w firmie w jednym egzemplarzu.</dd></div>
+        <div><dt>Raporty w języku zarządu<small>Wszystkie projekty w jednym miejscu</small></dt><dd>Dowolna liczba repozytoriów zagregowana w dashboardy dla kadry zarządzającej i raporty wykonawcze — bez tłumaczenia z technicznego.</dd></div>
+      </dl>
     </div>
   </section>
 
-  <!-- 02 korzyści biznesowe -->
-  <section class="sect" aria-labelledby="korzysci">
-    <div class="container">
-      <SectHead eyebrow="02 / Korzyści biznesowe · Konkretne decyzje" title="Konkretne liczby dla konkretnych decyzji." id="korzysci" small />
-      <div class="grid-cards">
-        <article class="card-tile rv">
-          <p class="eyebrow">01 / Transparentność procesów</p>
-          <h3>Widzicie, co robi zespół</h3>
-          <p>Bez czytania kodu. Raporty w języku zarządu.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.06s">
-          <p class="eyebrow">02 / Zarządzanie ryzykiem</p>
-          <h3>Punkty awarii zawczasu</h3>
-          <p>Identyfikacja krytycznych zależności i pojedynczych punktów awarii, zanim staną się problemem.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.12s">
-          <p class="eyebrow">03 / Optymalizacja kosztów</p>
-          <h3>Decyzje na danych</h3>
-          <p>Nie na przeczuciach. Ile kosztuje feature? Kto jest wolny?</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.18s">
-          <p class="eyebrow">04 / Compliance i audyt</p>
-          <h3>Historia do audytów</h3>
-          <p>Historyczne dane i trendy dostępne do audytów — pełna dokumentacja procesów rozwoju.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.24s">
-          <p class="eyebrow">05 / Strategiczne planowanie</p>
-          <h3>Decyzje o rozwoju</h3>
-          <p>Analiza trendów wspierająca decyzje o rozwoju zespołów i inwestycjach w technologie.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.3s">
-          <p class="eyebrow">06 / Optymalizacja zespołów</p>
-          <h3>Kto wymaga wsparcia</h3>
-          <p>Identyfikacja przeciążonych członków zespołu i obszarów wymagających wsparcia.</p>
-        </article>
-      </div>
-      <ShotGallery cols={2} items={[
-        { src: '/img/devlens/08-ryzyko-ciaglosci.webp', alt: 'Analiza ryzyka i ciągłości wiedzy: poziom ryzyka 3/10, koncentracja wiedzy, gotowość sukcesji, podsumowanie dla zarządu', caption: 'Analiza ryzyka i ciągłości wiedzy — Bus Factor rozbity na czynniki, z podsumowaniem dla zarządu.' },
-        { src: '/img/devlens/10-technologie-profile.webp', alt: 'Profile specjalizacji programistów: obszary pracy, kluczowe technologie i unikalna wiedza każdej osoby', caption: 'Profile specjalizacji — czym zajmuje się każdy programista i czyja wiedza jest unikalna.' },
-      ]} />
-    </div>
-  </section>
-
-  <!-- 03 integracja AI (ciemna) -->
+  <!-- 02 integracja AI (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="ai">
     <div class="container">
-      <SectHead eyebrow="03 / Integracja z AI · Opcjonalnie" title="AI generuje podsumowania wykonawcze i rekomendacje." id="ai">
+      <SectHead eyebrow="02 / Integracja z AI · Opcjonalnie" title="AI generuje podsumowania wykonawcze i rekomendacje." id="ai">
         <p class="sect-lead rv">Integrację włączacie opcjonalnie. Do zewnętrznego API trafiają wtedy wyłącznie zagregowane statystyki, nigdy kod.</p>
       </SectHead>
       <div class="grid-cards">
@@ -118,17 +78,13 @@ const faq = [
       <ShotGallery cols={1} items={[
         { src: '/img/devlens/07-prompty-ai.webp', alt: 'Widok Analiza AI: lista promptów wysłanych do agenta Claude Code pogrupowana w sesje i projekty', caption: 'Analiza AI — jak zespół realnie korzysta z agentów: prompty, sesje i projekty w jednym widoku.' },
       ]} />
-      <figure class="quote-card rv" style="margin-top:var(--space-2xl)">
-        <blockquote>„Włączasz AI i dostajesz gotowe podsumowanie tygodnia lub kwartału. W języku, który rozumie zarząd — bez tłumaczenia z technicznego.”</blockquote>
-        <figcaption><strong>DevLens Pro</strong> — integracja z AI</figcaption>
-      </figure>
     </div>
   </section>
 
-  <!-- 04 dla kogo -->
+  <!-- 03 dla kogo -->
   <section class="sect" aria-labelledby="dlakogo">
     <div class="container">
-      <SectHead eyebrow="04 / Dla kogo · Role w zarządzie" title="CEO, CTO, CFO, PM — każdy dostaje odpowiedź na swoje pytanie." id="dlakogo" small />
+      <SectHead eyebrow="03 / Dla kogo · Role w zarządzie" title="CEO, CTO, CFO, PM — każdy dostaje odpowiedź na swoje pytanie." id="dlakogo" small />
       <dl class="def-rows rv">
         <div><dt>CEO / Zarząd<small>Czy inwestycja w zespół się zwraca?</small></dt><dd>DevLens pokazuje tempo dostarczania funkcji, trendy wydajności i zwrot z inwestycji w programistów.</dd></div>
         <div><dt>CTO / Dyrektor IT<small>Gdzie są wąskie gardła i ryzyka?</small></dt><dd>Bus Factor, analiza zależności między projektami, wskaźniki stagnacji — wszystko w jednym miejscu.</dd></div>
@@ -138,22 +94,22 @@ const faq = [
     </div>
   </section>
 
-  <!-- 05 bezpieczeństwo (ciemna) -->
+  <!-- 04 bezpieczeństwo (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="bezp">
     <div class="container">
-      <SectHead eyebrow="05 / Bezpieczeństwo · Korporacyjne" title="Dane wrażliwe zostają wyłącznie w przeglądarce." id="bezp">
+      <SectHead eyebrow="04 / Bezpieczeństwo · Korporacyjne" title="Dane wrażliwe zostają wyłącznie w przeglądarce." id="bezp">
         <p class="sect-lead rv">Tokeny dostępu i dane analityczne zostają w przeglądarce użytkownika. Na nasze serwery nie trafia nic.</p>
       </SectHead>
       <div class="grid-cards">
         <article class="card-tile rv">
           <p class="eyebrow">01 / Lokalne przetwarzanie</p>
           <h3>Zero serwerów zewnętrznych</h3>
-          <p>Zero wysyłania danych do zewnętrznych serwerów — wszystko w Waszej przeglądarce.</p>
+          <p>Cała analityka liczona lokalnie — do zweryfikowania audytem kodu.</p>
         </article>
         <article class="card-tile rv" style="--rv-d:.08s">
           <p class="eyebrow">02 / Compliance RODO</p>
-          <h3>Zgodność od pierwszego dnia</h3>
-          <p>Pełna kontrola nad danymi — zgodność z regulacjami od pierwszego dnia.</p>
+          <h3>RODO i self-hosting</h3>
+          <p>Dane pod Waszą kontrolą — zgodność z RODO, w wariancie enterprise self-hosting.</p>
         </article>
         <article class="card-tile rv" style="--rv-d:.16s">
           <p class="eyebrow">03 / Eksport danych</p>
@@ -164,10 +120,10 @@ const faq = [
     </div>
   </section>
 
-  <!-- 06 FAQ -->
+  <!-- 05 FAQ -->
   <section class="sect" aria-labelledby="faq-title">
     <div class="container">
-      <SectHead eyebrow="06 / FAQ · Pytania o DevLens Pro" title="Najczęstsze pytania o platformę analityczną dla zarządu." id="faq-title" small />
+      <SectHead eyebrow="05 / FAQ · Pytania o DevLens Pro" title="Najczęstsze pytania o platformę analityczną dla zarządu." id="faq-title" small />
       <Faq items={faq} />
     </div>
   </section>
@@ -175,8 +131,8 @@ const faq = [
   <!-- kontakt CTA -->
   <CtaBand
     eyebrow="Kontakt"
-    heading="Zobaczcie te liczby na własnych repozytoriach."
-    text="Co robi zespół? Czy inwestycja się zwraca? Kto jest niezastąpiony? Umówmy demo platformy dostosowane do Waszej organizacji — dane zostają u Was."
-    btnLabel="Zarezerwuj demo platformy"
+    heading="Zobaczcie DevLens na swoich danych."
+    text="Zamiast prezentacji o funkcjach — pilot na Waszych repozytoriach: pierwszy raport z Waszego kodu i 30 minut rozmowy o tym, co z niego wynika."
+    btnLabel="Umów pilot DevLens"
   />
 </Interior>

@@ -9,23 +9,28 @@ import CtaBand from '../../components/CtaBand.astro';
   description="Nowy system biletowy NFC dla RegioBus Systems. Planowany na 6 miesięcy, gotowy po 4 tygodniach. Z 4 programistów został jeden z asystentem AI — 0 odejść."
   eyebrow="Case studies › RegioBus Systems · Transport · Backend + mobile · 2026"
   heading="Sześć miesięcy planu. Cztery tygodnie do produktu."
-  lead="RegioBus Systems planował nowy system biletowy NFC na sześć miesięcy. Po czterech tygodniach mieli działający produkt w produkcji. Z czterech programistów dedykowanych do utrzymania starego systemu zostawili jednego — z asystentem AI, z większą prędkością niż dotychczasowy zespół. Skala pilota: tak wygląda pierwszy kwartał, gdy zespół ma 4 osoby. Przy 30+ pracujemy falami, zespół po zespole."
+  lead="RegioBus Systems planował nowy system biletowy NFC na sześć miesięcy. Po czterech tygodniach mieli działający produkt w produkcji. Z czterech programistów dedykowanych do utrzymania starego systemu zostawili jednego — z asystentem AI, z większą prędkością niż dotychczasowy zespół."
   heroImage="/img/sub/cs-regiobus.webp"
   heroAlt="Miejski autobus nocą za oszronioną szybą, światło walidatora NFC"
 >
   <!-- proof -->
-  <ProofStrip items={[
-    ['6 mc → 4 tyg', 'czas dostarczenia'],
-    ['3 z 4 osób uwolnione', '0 odejść · Java · Kotlin · NFC'],
-    ['setki tys. PLN', 'roczne oszczędności'],
-  ]} />
+  <section class="sect" style="padding-bottom:0">
+    <div class="container">
+      <ProofStrip wrap={false} items={[
+        ['6 mc → 4 tyg', 'czas dostarczenia'],
+        ['3 z 4 osób uwolnione', '0 odejść · Java · Kotlin · NFC'],
+        ['setki tys. PLN', 'roczne oszczędności'],
+      ]} />
+      <p class="rv" style="margin-top:var(--space-sm); font-size:var(--text-caption); color:var(--color-text-2)">Skala pilota: tak wygląda pierwszy kwartał, gdy zespół ma 4 osoby. Przy 30+ pracujemy falami, zespół po zespole.</p>
+    </div>
+  </section>
 
   <!-- 01 kontekst -->
   <section class="sect" aria-labelledby="kontekst">
     <div class="container">
       <SectHead eyebrow="01 / Kontekst klienta" title="Monolit z 2008 roku, czteroosobowa drużyna i plan na pół roku." id="kontekst" small />
       <div class="prose rv">
-        <p>RegioBus Systems obsługuje regionalne linie autobusowe na południu Polski — dziesiątki tysięcy pasażerów dziennie, kilkaset pojazdów, ponad dwadzieścia lat na rynku. System biletowy, na którym jeżdżą, powstał w 2008 roku jako monolit napisany w Javie 6, z mobilną aplikacją w starym Androidzie z 2014. Wszystko utrzymywała czteroosobowa drużyna: dwóch starszych deweloperów, którzy znali kod na pamięć, i dwóch młodszych, którzy uczyli się pojmować, dlaczego nic nie ma testów.</p>
+        <p>RegioBus Systems obsługuje regionalne linie autobusowe na południu Polski — dziesiątki tysięcy pasażerów dziennie, kilkaset pojazdów, ponad dwadzieścia lat na rynku. System biletowy, na którym jeżdżą, powstał w 2008 roku jako monolit napisany w Javie 6, z mobilną aplikacją w starym Androidzie z 2014. Wszystko utrzymywała czteroosobowa drużyna: dwóch starszych deweloperów, którzy znali kod na pamięć, i dwóch młodszych, którzy dopiero odkrywali, dlaczego nic tu nie ma testów.</p>
         <p>Każda zmiana w kodzie zajmowała tygodnie — nie dlatego, że była trudna, ale dlatego, że nikt nie chciał ryzykować dotknięcia części, której nie rozumiał. Plan zarządu był ambitny: nowy system biletowy NFC, integracja z infrastrukturą operatorów płatności, otwarcie API dla aplikacji partnerskich. Czas: sześć miesięcy. Wycena od trzech zewnętrznych dostawców: 1.4–2.1 mln PLN.</p>
       </div>
     </div>
@@ -96,17 +101,14 @@ import CtaBand from '../../components/CtaBand.astro';
   <!-- 06 wynik (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="wynik">
     <div class="container">
-      <SectHead eyebrow="06 / Wynik · W liczbach i w kulturze" title="W liczbach i w kulturze." id="wynik" />
+      <SectHead eyebrow="06 / Wynik" title="W liczbach i w kulturze." id="wynik" />
       <ProofStrip wrap={false} items={[
         ['~6× szybciej', '4 tygodnie zamiast 6 miesięcy do produktu'],
         ['0 odejść', 'z 4 osób została 1 z AI, 3 przesunięto'],
         ['7% → 68%', 'pokrycie testami (unit + integration)'],
       ]} />
       <dl class="def-rows rv">
-        <div><dt>Czas do produktu<small>4 tygodnie</small></dt><dd>4 tygodnie zamiast 6 miesięcy (ok. 6× szybciej).</dd></div>
-        <div><dt>Zespół utrzymaniowy<small>z 4 osób — 1 z AI</small></dt><dd>Z 4 osób przy starym systemie została 1 z asystentem AI. Pozostałych trzech przesunięto do nowych inicjatyw — zachowali pracę, dostali nowe wyzwania. 0 odejść z firmy.</dd></div>
-        <div><dt>Roczne oszczędności<small>setki tysięcy złotych</small></dt><dd>Głównie na zmniejszeniu kosztu utrzymania i wcześniejszych przychodach z nowego systemu.</dd></div>
-        <div><dt>Pokrycie testami<small>7% → 68%</small></dt><dd>Z 7% do 68% (unit + integration). Każdy nowy moduł pisany z testami.</dd></div>
+        <div><dt>Pokrycie testami<small>7% → 68%</small></dt><dd>Każdy nowy moduł pisany z testami — unit i integration.</dd></div>
         <div><dt>Wskaźnik change-rate<small>3 dni zamiast 14</small></dt><dd>Średnia zmiana wdrażana w 3 dni zamiast 14.</dd></div>
       </dl>
       <figure class="quote-card rv">
