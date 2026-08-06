@@ -86,7 +86,7 @@ node ~/.claude/play.js ~/.claude/finish.wav</code></pre>
         </ul>
         <p>Pasek odświeża się sam podczas pracy. Chcesz go zmienić albo usunąć — wywołaj <code>/statusline</code> jeszcze raz i powiedz, co poprawić (albo <code>/statusline clear</code>).</p>
         <div class="callout">
-          <p><strong>Aktualizacja:</strong> wcześniej polecaliśmy zewnętrzny instalator (<code>npx @chongdashu/cc-statusline@latest init</code>). Dziś jest to zbędne — wbudowana komenda <code>/statusline</code> robi to samo bez dokładania zależności do projektu.</p>
+          <p><strong>Wskazówka:</strong> pasek konfigurujesz w całości wbudowaną komendą — zewnętrzne instalatory status line to zbędna zależność.</p>
         </div>
       </div>
     </div>
@@ -137,7 +137,7 @@ JWT, refresh tokenami i rate limitingiem dla REST API.</code></pre>
           </tbody>
         </table>
         <div class="callout">
-          <p><strong>Aktualizacja:</strong> dla obecnych modeli (Opus 4.8 / 4.7) model „fraza → stały budżet tokenów" jest przestarzały. Dawne <code>think</code> / <code>megathink</code> / <code>ultrathink</code> mapowały na sztywne progi (~4K / 10K / 32K) — dziś te liczby są nieaktualne. Głębokość ustawiasz komendą <code>/effort</code>: <code>low</code>, <code>medium</code>, <code>high</code> (domyślny dla Opus 4.8, też w Claude Code), <code>xhigh</code> na długie zadania agentowe i <code>max</code> na realnie graniczne problemy. Wybrany poziom trzyma się między turami. Na górze menu jest jeszcze <code>ultracode</code> — to nie osobny poziom modelu, tylko <code>xhigh</code> plus zgoda na to, żeby agent sam rozpisywał zadanie na wiele równoległych podagentów. Słowo <code>ultrathink</code> w prompcie to z kolei jednorazowy zastrzyk na jedną odpowiedź. Głębsze myślenie rezerwuj na trudne decyzje: architekturę, duży refactoring, niejasne błędy.</p>
+          <p><strong>Wskazówka:</strong> <code>high</code> to poziom domyślny dla Opus 4.8, <code>xhigh</code> rezerwuj na długie zadania agentowe, <code>max</code> na realnie graniczne problemy, a <code>ultracode</code> to <code>xhigh</code> plus zgoda na rozpisanie zadania na wiele równoległych podagentów. Głębsze myślenie zostaw na trudne decyzje: architekturę, duży refactoring, niejasne błędy.</p>
         </div>
       </div>
     </div>
@@ -149,13 +149,7 @@ JWT, refresh tokenami i rate limitingiem dla REST API.</code></pre>
       <div class="prose rv">
         <p class="eyebrow" data-scramble>06 / Prompty · Feedback loop</p>
         <h2 id="prompty">Optymalizacja promptów — ucz się wprost od agenta.</h2>
-        <p>Krótszy, precyzyjny prompt to mniej tokenów i celniejsza odpowiedź. Cztery zasady, które robią największą różnicę:</p>
-        <ul>
-          <li><strong>Precyzja</strong> — odwołuj się do tras i ścieżek (np. <code>/trainings</code>), nie do nazw tabel czy szczegółów implementacji.</li>
-          <li><strong>Zwięzłość</strong> — usuń zbędne słowa; agent rozumie kontekst, gramatyka może ucierpieć.</li>
-          <li><strong>Kontekst</strong> — podaj tylko istotne tło, nie całą historię projektu; reszta jest w CLAUDE.md.</li>
-          <li><strong>Konkretność</strong> — „dodaj przełącznik trybu ciemnego" zamiast „zrób coś z motywem".</li>
-        </ul>
+        <p>Zamiast ogólników jedna zasada z praktyki: odwołuj się do tras i ścieżek (np. <code>/trainings</code>), nie do nazw tabel czy szczegółów implementacji — resztę tła agent i tak ma w <code>CLAUDE.md</code>.</p>
         <h3>Przed i po</h3>
         <pre><code>ZLE: "Hej, moglbys mi pomoc zeby w aplikacji byla funkcja
       wysylania maili do uzytkownikow z tabeli szron_training_participants"

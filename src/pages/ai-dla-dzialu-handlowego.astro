@@ -18,7 +18,7 @@ const faq = [
   description="Szkolimy zespoły sprzedaży z pracy z AI: przygotowanie do spotkań, analiza przetargów i umów, wspólna baza wiedzy zespołu. Warsztat na Waszych materiałach + plan na 30 dni."
   eyebrow="Dla działów handlowych · szkolenie i wdrożenie"
   heading="AI nie sprzedaje za Was. Oddaje Wam godziny na sprzedawanie."
-  lead="Handlowiec spędza ok. 65% czasu poza samą sprzedażą: rozpoznanie klienta, notatki, oferty, raporty. Tę warstwę zdejmuje AI — a my uczymy Wasz zespół, jak to robić na realnych materiałach: ofertach, przetargach i notatkach ze spotkań. Tak samo, jak wdrażamy AI w zespołach programistów."
+  lead="Handlowiec spędza ok. 65% czasu poza samą sprzedażą: rozpoznanie klienta, notatki, oferty, raporty. Tę warstwę zdejmuje AI — a my uczymy Wasz zespół, jak to robić na realnych materiałach: ofertach, przetargach i notatkach ze spotkań."
   headingSmall
 >
   <!-- proof -->
@@ -66,28 +66,11 @@ const faq = [
   <section class="sect sect--dark" aria-labelledby="jak">
     <div class="container">
       <SectHead eyebrow="02 / Warsztat pracy · Własne źródła zamiast zgadywania" title="Uczymy pracy na Waszych dokumentach — z przypisem do każdego fragmentu." id="jak" />
-      <dl class="def-rows rv">
-        <div>
-          <dt>Asystent ogólny<small>maile, oferty, strategia</small></dt>
-          <dd>ChatGPT, Claude czy Gemini do pisania i burzy mózgów — z jasną świadomością ryzyka: model generuje, nie „wie”. Uczymy, kiedy mu ufać, a kiedy nie.</dd>
-        </div>
-        <div>
-          <dt>Analityk dokumentów<small>tylko Wasze materiały, przypis do źródła</small></dt>
-          <dd>Narzędzia typu notebook (NotebookLM i podobne): wgrywacie PDF-y, umowy, strony WWW, nagrania — model odpowiada wyłącznie w granicach źródeł, a każdą odpowiedź klika się do oryginalnego fragmentu. Setki stron w minuty.</dd>
-        </div>
-        <div>
-          <dt>Podsumowanie audio<small>prywatny podcast z dokumentów</small></dt>
-          <dd>Komplet dokumentacji przetargowej jako ~15-minutowa rozmowa dwóch prowadzących, po polsku. 80 stron słuchasz w drodze do klienta.</dd>
-        </div>
-        <div>
-          <dt>Higiena pracy<small>jeden notatnik = jeden klient albo projekt</small></dt>
-          <dd>„Klient ALFA — oferta 2026”, „Przetarg PKP — dokumentacja”, „Baza wiedzy — oferta i cenniki”. Węższy zestaw źródeł = trafniejsza odpowiedź. To nawyki, które zostają w zespole.</dd>
-        </div>
-        <div>
-          <dt>Szablony promptów działu<small>rola · kontekst · zadanie · format</small></dt>
-          <dd>Na warsztacie budujemy razem szablony pod Waszą sprzedaż — od pytań diagnostycznych po tabele obiekcji. Zostają u Was jako wspólny standard.</dd>
-        </div>
-      </dl>
+      <div class="prose rv">
+        <p>Zespół wychodzi z warsztatu z kompletnym sposobem pracy: dwa tryby (asystent ogólny do pisania i analityk dokumentów, który odpowiada wyłącznie w granicach Waszych materiałów — z przypisem klikalnym do fragmentu), higiena notatników i wspólne szablony promptów w schemacie rola · kontekst · zadanie · format.</p>
+        <div class="callout"><p><strong>Przykład:</strong> komplet dokumentacji przetargowej jako ~15-minutowa rozmowa dwóch prowadzących, po polsku — 80 stron słuchasz w drodze do klienta.</p></div>
+        <p><a href="/ai-dla-handlowcow">Pełny warsztat w Akademii →</a></p>
+      </div>
     </div>
   </section>
 
@@ -122,27 +105,10 @@ const faq = [
   <section class="sect" aria-labelledby="plan" style="padding-top:0">
     <div class="container">
       <SectHead eyebrow="04 / Wdrożenie · Minimalny plan na 30 dni" title="Warsztat to początek. Miarą jest to, co dzieje się miesiąc później." id="plan" />
-      <div class="steps">
-        <article class="step rv">
-          <p class="eyebrow">Tydzień 1</p>
-          <h3>Jeden notatnik na osobę</h3>
-          <p>Każdy handlowiec zakłada notatnik dla swojego kluczowego klienta — na materiałach, które i tak ma na dysku.</p>
-        </article>
-        <article class="step rv" style="--rv-d:.08s">
-          <p class="eyebrow">Tydzień 2</p>
-          <h3>Użycie w realnej sprzedaży</h3>
-          <p>Przygotowanie do prawdziwego spotkania z AI — nie ćwiczenie na sucho.</p>
-        </article>
-        <article class="step rv" style="--rv-d:.16s">
-          <p class="eyebrow">Tydzień 3</p>
-          <h3>Wspólna baza wiedzy</h3>
-          <p>Notatnik zespołu: oferta, cenniki, pytania i odpowiedzi techniczne, standardowe zapisy umowne, materiały konkurencji.</p>
-        </article>
-        <article class="step rv" style="--rv-d:.24s">
-          <p class="eyebrow">Tydzień 4</p>
-          <h3>Przegląd i wskaźniki</h3>
-          <p>Co zostaje, co wyrzucamy. Uczciwie: bez sztucznego „AI wszędzie”.</p>
-        </article>
+      <div class="prose rv">
+        <p>Po warsztacie zespół dostaje plan na 30 dni: od pierwszego notatnika klienta w tygodniu pierwszym, przez użycie AI przy realnym spotkaniu, po przegląd ze wskaźnikami na koniec. Co tydzień jeden konkretny krok — bez rewolucji, na materiałach, które zespół i tak ma pod ręką.</p>
+        <div class="callout"><p><strong>Przykład z tygodnia trzeciego:</strong> wspólna baza wiedzy zespołu — oferta, cenniki, odpowiedzi techniczne — z której nowy handlowiec odpowiada klientowi od ręki, z przypisem do źródła.</p></div>
+        <p><a href="/ai-dla-handlowcow">Pełny warsztat w Akademii →</a></p>
       </div>
     </div>
   </section>
@@ -153,7 +119,7 @@ const faq = [
       <SectHead eyebrow="05 / Kto prowadzi · Praktyk sprzedaży, nie trener slajdów" title="Prowadzi Tomek Wojciechowski — człowiek, który sam sprzedawał." id="kto" />
       <div class="prose rv">
         <p>Zanim powstał SZRON, Tomek przez wiele lat wspierał sprzedaż w Eveo — od ofert i przetargów po rozmowy z klientami B2B. Zna pracę handlowca od środka: wie, że problemem nie jest brak chęci, tylko godziny znikające w dokumentach, notatkach i CRM. Dziś łączy to doświadczenie z trzema latami pracy z LLM-ami w produkcji — tymi samymi metodami, którymi wdrażamy AI w zespołach programistów.</p>
-        <p>Szkolenie prowadzone jest tak jak nasze warsztaty dla dev teamów: na żywo, na Waszych materiałach, z zadaniami warsztatowymi zamiast wykładu. Ostatni taki warsztat dla działu handlowego poprowadziliśmy w sierpniu 2026.</p>
+        <p>Szkolenie prowadzimy na żywo, na Waszych materiałach, z zadaniami warsztatowymi zamiast wykładu. Ostatni taki warsztat dla działu handlowego poprowadziliśmy w sierpniu 2026.</p>
       </div>
     </div>
   </section>
@@ -171,9 +137,9 @@ const faq = [
           <h3>Akademia</h3>
           <p>Szkolenia i materiały o codziennej pracy z AI — od podstaw po pełny workflow agentowy.</p>
         </a>
-        <a class="link-card" href="/o-nas">
-          <h3>Zespół</h3>
-          <p>Kim jesteśmy i dlaczego każdy projekt prowadzimy osobiście — od diagnozy do przekazania.</p>
+        <a class="link-card" href="/darmowy-audyt">
+          <h3>Darmowy audyt</h3>
+          <p>Sprawdźcie na własnych procesach, gdzie AI da Waszej firmie najwięcej — bez zobowiązań.</p>
         </a>
       </div>
     </div>

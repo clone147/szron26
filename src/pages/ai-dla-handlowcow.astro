@@ -1,0 +1,167 @@
+---
+import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import CtaBand from '../components/CtaBand.astro';
+import RelatedCards from '../components/RelatedCards.astro';
+---
+<Interior
+  title="AI dla handlowców — warsztat pracy krok po kroku | Akademia SZRON"
+  description="AI w dziale handlowym w praktyce: szablon promptu rola · kontekst · zadanie · format, higiena notatników źródłowych i plan wdrożenia na 30 dni. Szkolenie krok po kroku dla handlowców."
+  eyebrow="Akademia · AI dla handlowców"
+  updated="2026-08-07"
+  heading="AI dla handlowców: warsztat pracy, który zostaje w zespole."
+  lead="To nie jest lista trików. To metoda pracy: jeden schemat promptu, porządek w notatnikach źródłowych i plan wdrożenia, który sprawdza się miesiąc później. Wszystko na materiałach, które handlowiec i tak ma na dysku — ofertach, przetargach, notatkach ze spotkań."
+  headingSmall
+>
+  <!-- proof -->
+  <ProofStrip items={[
+    ['rola · kontekst · zadanie · format', 'jeden schemat na każdy prompt'],
+    ['1 notatnik = 1 klient', 'węższe źródła, trafniejsze odpowiedzi'],
+    ['30 dni', 'od pierwszego notatnika do przeglądu ze wskaźnikami'],
+  ]} />
+
+  <!-- 01 fundament -->
+  <section class="sect" aria-labelledby="fundament">
+    <div class="container">
+      <SectHead eyebrow="01 / Fundament · Anatomia dobrego promptu" title="Cztery elementy: rola, kontekst, zadanie, format." id="fundament" small />
+      <div class="prose rv">
+        <p>Reguła kciuka: jeśli zadanie polega na czytaniu lub pisaniu — jest kandydatem do AI. Rozpoznanie klienta, analiza dokumentów, korespondencja, wpisy do CRM. Problem w tym, że większość ludzi pisze do modelu tak, jak do wyszukiwarki: jedno zdanie, zero kontekstu — i dostaje ogólniki, które potwierdzają, że „AI nie działa”.</p>
+        <p>Działa. Ale trzeba mu powiedzieć cztery rzeczy — zawsze te same:</p>
+      </div>
+      <dl class="def-rows rv">
+        <div>
+          <dt>Rola<small>kim model ma być</small></dt>
+          <dd>„Jesteś doradcą sprzedaży B2B”, „jesteś analitykiem ofert przetargowych”. Rola ustawia perspektywę i słownik odpowiedzi — ta sama treść zapytana „na sucho” i z rolą daje zupełnie inny wynik.</dd>
+        </div>
+        <div>
+          <dt>Kontekst<small>na czym ma pracować</small></dt>
+          <dd>Wklejone materiały: fragmenty raportu, notatki z rozmów, treść strony klienta. Bez kontekstu model zgaduje z ogólnej wiedzy. Z kontekstem — pracuje na Waszych danych.</dd>
+        </div>
+        <div>
+          <dt>Zadanie<small>co konkretnie ma zrobić</small></dt>
+          <dd>Z liczbami i granicami: „5 pytań otwierających, 3 hipotezy wartości, lista obiekcji”. Zadanie „przygotuj mnie do spotkania” bez konkretów kończy się wypracowaniem, którego nikt nie przeczyta.</dd>
+        </div>
+        <div>
+          <dt>Format<small>jak ma wyglądać wynik</small></dt>
+          <dd>Tabela, lista, sekcje z nagłówkami, maksymalna długość. Format decyduje, czy wynik wkleisz od razu do maila albo CRM — czy będziesz go pół godziny przerabiać.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 02 pierwszy szablon (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="szablon">
+    <div class="container">
+      <SectHead eyebrow="02 / Pierwszy szablon · Przygotowanie do spotkania" title="Skopiuj, wklej materiały klienta, odpal." id="szablon" />
+      <div class="prose rv">
+        <p>Najlepsze pierwsze zastosowanie: przygotowanie do realnego spotkania. Masz materiały (raport, strona WWW, stare notatki), masz termin — i masz szablon:</p>
+        <pre><code>Rola: Jesteś doświadczonym doradcą sprzedaży B2B w branży
+[branża klienta].
+
+Kontekst: Poniżej wklejam materiały o kliencie — fragmenty
+raportu rocznego, treść strony WWW i moje notatki
+z poprzednich rozmów:
+[wklej materiały]
+
+Zadanie: Przygotuj mnie do spotkania handlowego:
+5 pytań otwierających, 3 hipotezy wartości i listę
+prawdopodobnych obiekcji z propozycją odpowiedzi na każdą.
+
+Format: Trzy sekcje z nagłówkami. Przy każdej hipotezie
+i obiekcji dopisz, na którym fragmencie materiałów
+ją opierasz.</code></pre>
+        <div class="callout"><p><strong>Zasada bezpieczeństwa:</strong> model generuje, a nie „wie”. Ostatnia linia formatu — „dopisz, na czym to opierasz” — jest w szablonie celowo: zmusza model do pokazania źródła, a Ciebie do zerknięcia w nie przed spotkaniem. Każdą liczbę, która idzie do klienta, weryfikujesz w oryginalnym dokumencie.</p></div>
+        <p>Ten jeden szablon wystarczy na pierwszy tydzień. Dalej: drugi tryb pracy — analityk dokumentów z przypisami do źródła, higiena notatników i plan wdrożenia tydzień po tygodniu.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 pełny warsztat -->
+  <section class="sect" aria-labelledby="warsztat">
+    <div class="container">
+      <SectHead eyebrow="03 / Pełny warsztat · Narzędzia i higiena pracy" title="Dwa tryby pracy i porządek, który robi różnicę." id="warsztat" small />
+      <dl class="def-rows rv">
+        <div>
+          <dt>Asystent ogólny<small>maile, oferty, burza mózgów</small></dt>
+          <dd>ChatGPT, Claude czy Gemini do pisania i myślenia na głos: wiadomość po spotkaniu, odpowiedź na obiekcję, szkic oferty w tonie firmy. Szybki i elastyczny — ale odpowiada z ogólnej wiedzy, więc wszystko, co ma trafić do klienta, przechodzi przez Twoją weryfikację.</dd>
+        </div>
+        <div>
+          <dt>Analityk dokumentów<small>tylko Twoje źródła, przypis do fragmentu</small></dt>
+          <dd>Narzędzia typu notebook (NotebookLM i podobne): wgrywasz PDF-y, umowy, strony WWW, nagrania — model odpowiada wyłącznie w granicach wgranych źródeł, a każdą odpowiedź klikasz do oryginalnego fragmentu. To tryb do umów, SIWZ i dokumentacji przetargowej: setki stron przestają być barierą.</dd>
+        </div>
+        <div>
+          <dt>Podsumowanie audio<small>dokumenty jako prywatny podcast</small></dt>
+          <dd>Z wgranych źródeł notebook generuje kilkunastominutową rozmowę dwóch prowadzących, po polsku. Komplet dokumentacji przesłuchasz w drodze do klienta — a szczegóły doczytasz już z mapą całości w głowie.</dd>
+        </div>
+        <div>
+          <dt>Higiena notatników<small>jeden notatnik = jeden klient albo projekt</small></dt>
+          <dd>„Klient ALFA — oferta 2026”, „Przetarg PKP — dokumentacja”, „Baza wiedzy — oferta i cenniki”. Węższy zestaw źródeł to trafniejsze odpowiedzi — notatnik-śmietnik ze wszystkim naraz miesza konteksty i podpowiada cenniki nie tego klienta. Nazwa mówi, co jest w środku; stare wersje dokumentów wylatują.</dd>
+        </div>
+        <div>
+          <dt>Szablony działu<small>wspólny standard zamiast prywatnych trików</small></dt>
+          <dd>Każdy powtarzalny scenariusz — przygotowanie do spotkania, analiza przetargu, follow-up, wpis do CRM z notatki głosowej — dostaje szablon w tym samym czteroelementowym schemacie, zapisany tam, gdzie zespół trzyma wspólne materiały. Nowa osoba dostaje je pierwszego dnia.</dd>
+        </div>
+      </dl>
+      <div class="prose rv">
+        <p>Szablon do pracy w notebooku wygląda tak (rolę i kontekst ustawiają już wgrane źródła, więc ciężar przenosi się na zadanie i format):</p>
+        <pre><code>Zadanie: Wypisz z dokumentacji wszystkie wymagania wobec
+wykonawcy: kryteria oceny ofert, terminy, wymagania
+wykluczające i kary umowne.
+
+Format: Tabela — wymaganie | numer punktu i strona
+w dokumencie | termin, jeśli dotyczy. Na końcu osobna
+lista pozycji, których nie znalazłeś w źródłach.</code></pre>
+        <div class="callout"><p><strong>Dlaczego ostatnie zdanie:</strong> lista „czego nie znalazłem” wymusza uczciwość — model przyznaje się do luk, zamiast je wypełniać zgadywaniem. W dokumentach przetargowych to różnica między narzędziem a ryzykiem.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 plan 30 dni (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="plan">
+    <div class="container">
+      <SectHead eyebrow="04 / Wdrożenie · Plan na 30 dni" title="Tydzień po tygodniu — aż AI stanie się nawykiem, nie ciekawostką." id="plan" />
+      <div class="steps">
+        <article class="step rv">
+          <p class="eyebrow">Tydzień 1</p>
+          <h3>Jeden notatnik na osobę</h3>
+          <p>Każdy zakłada notatnik dla swojego kluczowego klienta — na materiałach, które i tak ma na dysku, nazwany według zasady z sekcji 03. Cel tygodnia: zadać temu notatnikowi 10 pytań i kliknąć każdy przypis do źródła.</p>
+        </article>
+        <article class="step rv" style="--rv-d:.08s">
+          <p class="eyebrow">Tydzień 2</p>
+          <h3>Użycie w realnej sprzedaży</h3>
+          <p>Przygotowanie do prawdziwego spotkania szablonem z sekcji 02 — nie ćwiczenie na sucho. Po spotkaniu krótka notatka: co z przygotowania zagrało, które pytanie otworzyło rozmowę, co model przekombinował.</p>
+        </article>
+        <article class="step rv" style="--rv-d:.16s">
+          <p class="eyebrow">Tydzień 3</p>
+          <h3>Wspólna baza wiedzy</h3>
+          <p>Notatnik zespołu: aktualna oferta, cenniki, pytania i odpowiedzi techniczne, standardowe zapisy umowne, materiały konkurencji. Jedna osoba odpowiada za porządek w źródłach — inaczej baza umiera w trzy tygodnie.</p>
+        </article>
+        <article class="step rv" style="--rv-d:.24s">
+          <p class="eyebrow">Tydzień 4</p>
+          <h3>Przegląd i wskaźniki</h3>
+          <p>Co zostaje, co wylatuje — uczciwie, bez sztucznego „AI wszędzie”. Wskaźniki proste: ile trwa przygotowanie do spotkania, ile notatników jest realnie w użyciu, które szablony poszły w ruch. Miarą wdrożenia jest to, czego zespół używa miesiąc później.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- powiązane -->
+  <RelatedCards
+    items={[
+      { href: '/ai-dla-dzialu-handlowego', title: 'Szkolenie dla działu handlowego', desc: 'Warsztat na żywo na Waszych ofertach i przetargach — z wdrożeniem.' },
+      { href: '/tips-and-tricks', title: 'Tips &amp; Tricks', desc: 'Praktyki i wzorce, które realnie przyspieszają pracę z AI.' },
+      { href: '/webinar-ai-dla-ceo', title: 'Webinar: AI dla CEO', desc: 'Perspektywa zarządu: co AI zmienia w firmie i od czego zacząć.' },
+    ]}
+    eyebrow="Powiązane"
+    title="Dalej w Akademii."
+    padTop={false}
+  />
+
+  <!-- CTA -->
+  <CtaBand
+    heading="Chcecie przejść ten warsztat z prowadzącym?"
+    text="To samodzielna wersja szkolenia. Na żywo pracujemy na Waszych ofertach i przetargach, budujemy szablony pod Waszą sprzedaż i zostawiamy zespół z gotowym planem wdrożenia. 30 minut rozmowy wystarczy, żeby sprawdzić, czy ma to u Was sens."
+    padTop={false}
+  />
+</Interior>

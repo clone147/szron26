@@ -29,7 +29,7 @@ const related = akademia.filter((a) => ['lm-studio', 'claude-code-bezpieczenstwo
     <div class="container">
       <SectHead eyebrow="01 / Wprowadzenie · Dlaczego llama-server" title="Prawdziwa współbieżność, nie obsługa po kolei." id="dlaczego" small />
       <div class="prose rv">
-        <p>Na rynku istnieje wiele narzędzi do uruchamiania lokalnych modeli językowych. Jeśli jednak zależy Ci na maksymalnej wydajności, elastyczności i — co najważniejsze — prawdziwej współbieżności, odpowiedź jest jedna: llama-server z projektu llama.cpp.</p>
+        <p>Do wygodnej pracy z modelami na własnej stacji wystarczy GUI takie jak <a href="/lm-studio">LM Studio</a> — llama-server to kolejny poziom: serwer produkcyjny dla całego zespołu.</p>
         <div class="callout">
           <p><strong>Kluczowa przewaga — continuous batching:</strong> w przeciwieństwie do serwerów przetwarzających zapytania sekwencyjnie (jedno po drugim), llama-server obsługuje wiele zapytań jednocześnie i równolegle. Pozwala to w pełni wysycić moc GPU i obsłużyć wielu użytkowników lub procesów naraz.</p>
         </div>

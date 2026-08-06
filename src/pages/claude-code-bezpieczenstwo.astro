@@ -99,7 +99,7 @@ import RelatedCards from '../components/RelatedCards.astro';
       <div class="prose rv">
         <p class="eyebrow" data-scramble>03 / Warstwa 1b · Sandbox mode</p>
         <h2 id="sandbox">Izolacja OS-level — obejmuje też subprocesy.</h2>
-        <p>Sandbox to najsilniejsza praktyczna ochrona dla komend powłoki: izoluje narzędzie <code>Bash</code> na poziomie systemu operacyjnego, łącznie z procesami potomnymi. W testach Anthropic zredukował liczbę monitów o ok. 84%. Działa natywnie na macOS, Linux i WSL2 — na macOS poprzez systemowy framework Seatbelt, więc nie instalujesz żadnych zależności. Natywny Windows nie jest obsługiwany.</p>
+        <p>Sandbox to najsilniejsza praktyczna ochrona dla komend powłoki: izoluje narzędzie <code>Bash</code> na poziomie systemu operacyjnego, łącznie z procesami potomnymi. W testach Anthropic zredukował liczbę monitów o ok. 84%. Działa natywnie na macOS, Linux i WSL2 — bez instalowania jakichkolwiek zależności na macOS. Natywny Windows nie jest obsługiwany.</p>
         <table>
           <thead><tr><th scope="col">System</th><th scope="col">Technologia</th><th scope="col">Status</th></tr></thead>
           <tbody>
@@ -122,19 +122,24 @@ import RelatedCards from '../components/RelatedCards.astro';
   &#125;
 &#125;</code></pre>
         <div class="callout">
-          <p><strong>Twarde wymuszenie:</strong> <code>failIfUnavailable: true</code> sprawia, że Claude Code w ogóle nie wystartuje, gdy sandbox jest niedostępny — zamiast cicho przejść w tryb bez izolacji. Sandboxowane komendy <code>Bash</code> domyślnie dziedziczą zmienne środowiskowe rodzica, łącznie z poświadczeniami w <code>env</code> — kasujesz je przed każdą komendą blokiem <code>sandbox.credentials</code> (patrz niżej) albo globalnie zmienną <code>CLAUDE_CODE_SUBPROCESS_ENV_SCRUB</code>, która strippuje poświadczenia Anthropic i providerów chmurowych ze wszystkich subprocesów.</p>
+          <p><strong>Granice izolacji:</strong> sandbox dotyczy tylko narzędzia <code>Bash</code> — Read, Write, Edit i WebFetch są poza nim (rządzi nimi <code>permissions.deny</code>). Domyślnie pozwala też <strong>czytać cały komputer</strong>, łącznie z poświadczeniami AWS i kluczami SSH — izolacja ogranicza zapis i sieć, ale nie odczyt — a komendy dziedziczą zmienne środowiskowe rodzica razem z sekretami w <code>env</code>. Dlatego dwie flagi z konfiguracji powyżej są obowiązkowe: <code>allowUnsandboxedCommands: false</code>, inaczej agent może sam wyłączyć sandbox, gdy komenda zawiedzie, oraz <code>failIfUnavailable: true</code>, dzięki której Claude Code w ogóle nie wystartuje, gdy sandbox jest niedostępny — zamiast cicho przejść w tryb bez izolacji. Na natywnym Windows używaj WSL2 (<code>sudo apt-get install bubblewrap socat</code>) albo Dockera.</p>
         </div>
+        <h3>Blokada poświadczeń — <code>sandbox.credentials</code></h3>
+        <p>Nie ma wbudowanej listy blokad odczytu, więc ścieżki z sekretami blokujesz jawnie. Od wersji 2.1.187 służy do tego dedykowany blok <code>sandbox.credentials</code>: w <code>files</code> wpisujesz ścieżki do zablokowania odczytu, w <code>envVars</code> — zmienne do skasowania, każdy wpis z <code>"mode": "deny"</code>. Wpisy z różnych zakresów się sumują, a jedyny dozwolony tryb to <code>deny</code> — żaden zakres nie poluzuje blokady. To czytelniejsze niż rozrzucanie blokad po <code>filesystem.denyRead</code> czy regułach <code>Read</code> w <code>permissions.deny</code>:</p>
+        <pre><code>&#123;
+  "sandbox": &#123;
+    "credentials": &#123;
+      "files": [
+        &#123; "path": "~/.aws/credentials", "mode": "deny" &#125;,
+        &#123; "path": "~/.ssh", "mode": "deny" &#125;
+      ],
+      "envVars": [&#123; "name": "GITHUB_TOKEN", "mode": "deny" &#125;]
+    &#125;
+  &#125;
+&#125;</code></pre>
+        <p>Zmienne środowiskowe możesz też strippować globalnie — <code>CLAUDE_CODE_SUBPROCESS_ENV_SCRUB</code> usuwa poświadczenia Anthropic i providerów chmurowych ze wszystkich subprocesów.</p>
         <div class="callout">
-          <p><strong>Aktualizacja:</strong> od wersji 2.1.187 sandbox ma dedykowany blok <code>sandbox.credentials</code>: w <code>files</code> wpisujesz ścieżki do zablokowania odczytu, w <code>envVars</code> — zmienne do skasowania, każdy wpis z <code>"mode": "deny"</code>. To czytelniejsze niż mieszanie reguł w <code>filesystem.denyRead</code>: <code>&#123; "credentials": &#123; "files": [&#123; "path": "~/.aws/credentials", "mode": "deny" &#125;, &#123; "path": "~/.ssh", "mode": "deny" &#125;], "envVars": [&#123; "name": "GITHUB_TOKEN", "mode": "deny" &#125;] &#125; &#125;</code>. Wpisy z różnych zakresów się sumują, a jedyny dozwolony tryb to <code>deny</code> — żaden zakres nie poluzuje blokady.</p>
-        </div>
-        <div class="callout">
-          <p><strong>Ograniczenia:</strong> sandbox dotyczy tylko narzędzia <code>Bash</code> — Read, Write, Edit i WebFetch są poza nim (rządzi nimi <code>permissions.deny</code>). Ustaw <code>allowUnsandboxedCommands: false</code>, inaczej agent może sam wyłączyć sandbox, gdy komenda zawiedzie. Na natywnym Windows używaj WSL2 (<code>sudo apt-get install bubblewrap socat</code>) albo Dockera.</p>
-        </div>
-        <div class="callout">
-          <p><strong>Aktualizacja:</strong> sandbox to warstwa, nie szczelna granica. CVE-2026-55607 (załatany w 2.1.163) pokazał ucieczkę przez pomylenie ścieżek git worktree — worktree nazwany <code>.git</code> pozwalał wykonać kod poza Seatbeltem, i działało nawet w trybie read-only. Wniosek się nie zmienia: trzymaj Claude Code zaktualizowany i nie traktuj sandboxa jako jedynej linii obrony. Przy repozytoriach z niezaufaną treścią dorzuć izolację na poziomie kontenera albo VM.</p>
-        </div>
-        <div class="callout">
-          <p><strong>Domyślnie sandbox pozwala CZYTAĆ cały komputer</strong> — w tym <code>~/.aws/credentials</code> i <code>~/.ssh/</code>. Izolacja ogranicza zapis i sieć, ale nie odczyt. Nie ma wbudowanej listy blokad, więc te ścieżki musisz zablokować jawnie: najprościej przez <code>sandbox.credentials</code>, ewentualnie przez <code>sandbox.filesystem.denyRead</code> albo reguły <code>Read</code> w <code>permissions.deny</code>.</p>
+          <p><strong>Warstwa, nie szczelna granica:</strong> CVE-2026-55607 (załatany w 2.1.163) pokazał ucieczkę przez pomylenie ścieżek git worktree — worktree nazwany <code>.git</code> pozwalał wykonać kod poza Seatbeltem, i działało nawet w trybie read-only. Trzymaj Claude Code zaktualizowany i nie traktuj sandboxa jako jedynej linii obrony — przy repozytoriach z niezaufaną treścią dorzuć izolację na poziomie kontenera albo VM.</p>
         </div>
       </div>
     </div>
@@ -180,18 +185,18 @@ chmod +x .claude/hooks/detect-secrets.sh</code></pre>
     </div>
   </section>
 
-  <!-- 05 CLAUDE.md i .env.example -->
-  <section class="sect" aria-labelledby="miekkie">
+  <!-- 05 warstwy miękkie + audit + checklista -->
+  <section class="sect" aria-labelledby="checklist">
     <div class="container">
       <div class="prose rv">
-        <p class="eyebrow" data-scramble>05 / Warstwy 3 i 4 · Warstwy miękkie</p>
-        <h2 id="miekkie">CLAUDE.md i .env.example — uzupełniają, nie zastępują.</h2>
-        <p>Instrukcje w <code>CLAUDE.md</code> to warstwa miękka — agent może je zignorować, więc nie traktuj ich jak zabezpieczenia. Mimo to warto je dodać jako pierwszą linię świadomości:</p>
+        <p class="eyebrow" data-scramble>05 / Wdrożenie · Warstwy miękkie i checklista</p>
+        <h2 id="checklist">Warstwy miękkie, self-audit i checklista projektu.</h2>
+        <p>Instrukcje w <code>CLAUDE.md</code> to warstwa miękka — agent może je zignorować, więc traktuj je jako pierwszą linię świadomości, nie zabezpieczenie:</p>
         <pre><code>## Bezpieczenstwo — sekrety i hasla
 - NIGDY nie umieszczaj hasel, tokenow i kluczy w kodzie
 - Uzywaj zmiennych srodowiskowych: process.env.SECRET_KEY
 - Nie czytaj pliku .env, nie echo-uj sekretow na konsole</code></pre>
-        <p>Plik <code>.env</code> z prawdziwymi sekretami <strong>nigdy</strong> nie trafia do repozytorium. Zamiast niego commituj <code>.env.example</code> z taką samą strukturą, ale z placeholderami:</p>
+        <p>Plik <code>.env</code> z prawdziwymi sekretami <strong>nigdy</strong> nie trafia do repozytorium — commitujesz wersję przykładową z placeholderami:</p>
         <pre><code># .env.example — commituj do repo
 DATABASE_URL=postgresql://user:password@localhost/mydb
 STRIPE_SECRET_KEY=sk_live_your_key_here
@@ -202,17 +207,7 @@ GITHUB_TOKEN=ghp_your_token_here
 .env.local
 *.pem
 *.key</code></pre>
-        <p>Nawet jeśli agent odczyta <code>.env.example</code>, prawdziwe sekrety nie wyciekną.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 06 audit + checklist (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="checklist">
-    <div class="container">
-      <div class="prose rv">
-        <p class="eyebrow" data-scramble>06 / Wdrożenie · Audit i checklista</p>
-        <h2 id="checklist">Self-audit prompt i checklista nowego projektu.</h2>
+        <h3>Self-audit prompt</h3>
         <p>Wklej ten prompt, gdy chcesz sprawdzić projekt pod kątem bezpieczeństwa:</p>
         <pre><code>Zrob audyt bezpieczenstwa tego projektu. Znajdz i zgłos:
 1. Zahardkodowane hasla, klucze API, tokeny w kodzie
@@ -227,8 +222,8 @@ Dla kazdego znaleziska: plik, numer linii, waga, rekomendacja.
 NIE wypisuj prawdziwych wartosci sekretow — tylko wskaz ich obecnosc.</code></pre>
         <h3>Checklista — nowy projekt z Claude Code</h3>
         <ul>
-          <li><code>.claude/settings.json</code> z deny rules — dodaj <code>ping</code> i <code>nslookup</code> (CVE-2025-55284).</li>
-          <li>Sandbox z <code>allowUnsandboxedCommands: false</code> (Linux/WSL2); na natywnym Windows: deny rules + hooki.</li>
+          <li><code>.claude/settings.json</code> z deny rules — łącznie z komendami DNS z sekcji 02 (CVE-2025-55284).</li>
+          <li>Sandbox włączony, z obiema flagami wymuszenia z sekcji 03; na natywnym Windows: deny rules + hooki.</li>
           <li>Hook <code>detect-secrets</code> zainstalowany i wykonywalny.</li>
           <li><code>.env</code> w <code>.gitignore</code>, a w repo tylko <code>.env.example</code> z placeholderami.</li>
           <li>Sprawdź historię: <code>git log --all --full-history -- .env</code></li>

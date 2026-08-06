@@ -22,18 +22,17 @@ import RelatedCards from '../components/RelatedCards.astro';
     ['Checklista = pamięć', '[ ] → [x] jako stan między iteracjami'],
   ]} />
 
-  <!-- 01 dwie pętle -->
+  <!-- 01 dwie pętle (jawna) -->
   <section class="sect" aria-labelledby="dwie">
     <div class="container">
-      <SectHead eyebrow="01 / Dwie pętle · Kiedy której" title="Dwie pętle, dwa zastosowania." id="dwie" small />
+      <SectHead eyebrow="01 / Dwie pętle · Czym są i dlaczego działają" title="Dwie pętle, dwa zastosowania." id="dwie" small />
       <div class="prose rv">
+        <p>Pojedynczy prompt kończy się, gdy agent uzna, że skończył. Pętla kończy się, gdy warunek jest spełniony — to cała różnica i cały powód, dla którego pętle działają.</p>
         <h2>/goal — pętla do celu</h2>
-        <p><code>/goal</code> uruchamia agenta w trybie zadaniowym: dostaje cel i pracuje w kółko, aż go osiągnie. Po każdej turze warunek końcowy ocenia <em>osobny</em> model — mały i szybki (domyślnie Haiku) — i zwraca tak/nie wraz z uzasadnieniem. To celowe: agent, który wykonuje pracę, nie ocenia jej sam. Idealny do zadań, które da się rozbić na listę kroków o jasnym warunku zakończenia: „zrób wszystko z listy", „napraw, aż testy przechodzą", „uzupełnij brakujące pliki".</p>
-        <div class="callout"><p><strong>Sedno:</strong> definiujesz <em>cel</em> i <em>warunek osiągnięcia celu</em>, nie pojedynczą czynność. Ocenę spełnienia warunku robi po każdej turze odrębny mały, szybki model (domyślnie Haiku) — zwraca tak/nie z uzasadnieniem, żeby model nie był sędzią we własnej sprawie. <code>/goal</code> wymaga Claude Code w wersji v2.1.139 lub nowszej; działa też nieinteraktywnie (<code>claude -p "/goal …"</code>) i przeżywa <code>--resume</code> sesji.</p></div>
+        <p><code>/goal</code> uruchamia agenta w trybie zadaniowym: dostaje cel i pracuje w kółko, aż go osiągnie. Idealny do zadań, które da się rozbić na listę kroków o jasnym warunku zakończenia: „zrób wszystko z listy", „napraw, aż testy przechodzą", „uzupełnij brakujące pliki".</p>
+        <div class="callout"><p><strong>Sedno:</strong> definiujesz <em>cel</em> i <em>warunek osiągnięcia celu</em>, nie pojedynczą czynność. Spełnienie warunku ocenia po każdej turze osobny mały, szybki model (domyślnie Haiku) i zwraca tak/nie z uzasadnieniem. Agent, który wykonuje pracę, nie ocenia jej sam.</p></div>
         <h2>/loop — powtarzanie co interwał</h2>
-        <p><code>/loop 5m sprawdź status builda</code> powtarza to samo polecenie co zadany czas (tu: co 5 minut). Sprawdza się przy monitorowaniu i pracy reaktywnej: „co minutę sprawdź status builda", „co 5 minut zerknij na nowe zgłoszenia", „pilnuj kolejki, aż się opróżni". Pętla działa na cronie, dopóki jej nie zatrzymasz (klawisz <code>Esc</code> kasuje najbliższe wybudzenie) albo dopóki nie minie 7 dni.</p>
-        <div class="callout"><p><strong>Aktualizacja:</strong> interwał jest opcjonalny. <code>/loop &lt;prompt&gt;</code> bez czasu sam dobiera odstęp (od 1 minuty do 1 godziny) — krótszy, gdy coś się dzieje, dłuższy, gdy cisza — a po wykonaniu zadania potrafi sam zakończyć pętlę. Samo <code>/loop</code> bez argumentów odpala wbudowany prompt utrzymaniowy (albo Twój plik <code>.claude/loop.md</code>): dociąga niedokończoną robotę, pilnuje PR-a bieżącej gałęzi i sprząta kod.</p></div>
-        <div class="callout"><p><strong>Wymagania:</strong> <code>/loop</code> stoi na cronie, więc stały interwał ma granularność 1 minuty (sekundy zaokrąglają się w górę). Zadania są przypięte do sesji: wygasają po 7 dniach, maksymalnie 50 na sesję. Wymaga Claude Code w wersji v2.1.72 lub nowszej.</p></div>
+        <p><code>/loop 5m sprawdź status builda</code> powtarza to samo polecenie co zadany czas — tu co 5 minut. Sprawdza się przy monitorowaniu i pracy reaktywnej: „zerkaj na nowe zgłoszenia", „pilnuj kolejki, aż się opróżni". Bez podanego interwału pętla sama dobiera tempo — częściej, gdy coś się dzieje, rzadziej, gdy cisza. Działa, dopóki jej nie zatrzymasz albo nie wygaśnie.</p>
         <ul>
           <li><strong>/goal</strong> — gdy znasz <em>cel</em>, ale nie wiesz, ile kroków zajmie. Kończy się sam.</li>
           <li><strong>/loop &lt;czas&gt;</strong> — gdy chcesz <em>cyklicznie</em> coś sprawdzać lub dorzucać po kawałku w równych odstępach.</li>
@@ -42,10 +41,69 @@ import RelatedCards from '../components/RelatedCards.astro';
     </div>
   </section>
 
-  <!-- 02 wzorzec checklisty (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="checklista">
+  <!-- 02 filozofia loopów (ciemna, jawna) -->
+  <section class="sect sect--dark" aria-labelledby="filozofia">
     <div class="container">
-      <SectHead eyebrow="02 / Wzorzec · Checklista jako pamięć" title="Plik z checkboxami, który agent sam odhacza." id="checklista" />
+      <SectHead eyebrow="02 / Filozofia · Praca to pisanie pętli" title="Nie promptujesz. Piszesz pętle." id="filozofia">
+        <p class="sect-lead rv">Boris Cherny, twórca Claude Code, ujął to wprost: „I don't prompt Claude anymore. I have loops that are running. My job is to write loops." Ewolucja wygląda tak: najpierw kod z autouzupełnianiem, potem promptowanie kilku agentów równolegle, na końcu pętle, które promptują same. Anatomia dobrej pętli to kontekst + cel + definicja sukcesu — agent iteruje i sam ocenia wyniki, aż przejdą test.</p>
+      </SectHead>
+      <dl class="def-rows rv">
+        <div><dt>Builder / tester / reviewer<small>Trzech agentów zamiast jednego</small></dt><dd>Sesja, która sama pisze, testuje i recenzuje własny kod, to student oceniający swój egzamin. Rozdziel role na osobnych agentów — weryfikacja przez odrębnego recenzenta wyraźnie podnosi jakość pierwszego podejścia.</dd></div>
+        <div><dt>Każ mu udowodnić<small>Definition of done w pętli</small></dt><dd>Plan → zmiana → testy → podsumowanie, co padło → poprawka. Agent nie raportuje „zrobione" — pokazuje zielone testy. Dokładnie dlatego warunek w /goal piszesz tak, żeby dało się go zweryfikować z transkryptu.</dd></div>
+        <div><dt>Kontekst to RAM<small>Strefa głupienia zaczyna się wcześniej, niż myślisz</small></dt><dd>Okna kontekstu mają po 1M tokenów, ale realna jakość degraduje się już około 250 tysięcy. CLAUDE.md poniżej 300 linii, /clear między zadaniami, a po dwóch nieudanych próbach — /clear zamiast trzeciej.</dd></div>
+        <div><dt>Zakładaj najgorsze<small>Bezpieczeństwo pętli</small></dt><dd>Agent zrobi wszystko, co może przeczytać lub dotknąć. Zakazy w promptach nie wystarczą — agent potrafi napisać skrypt, który je obejdzie. Uprawnienia ustawiaj na poziomie systemu: hooki, sandbox, sekrety w vaultach zamiast w plikach.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 03 zapowiedź części praktycznej (jawna) -->
+  <section class="sect" aria-labelledby="dalej">
+    <div class="container">
+      <SectHead eyebrow="03 / Dalej · Część praktyczna" title="Dalej: gotowe wzorce do wdrożenia." id="dalej" small />
+      <div class="grid-cards">
+        <article class="card-tile rv">
+          <p class="eyebrow">Konfiguracja</p>
+          <h3>Parametry i zasady obu komend</h3>
+          <p>Wymagane wersje i limity, twardy limit tur, przerywanie i wznawianie — plus cztery zasady, żeby pętla nie zwariowała.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.1s">
+          <p class="eyebrow">Wzorzec</p>
+          <h3>Checklista TODO.md, którą agent sam odhacza</h3>
+          <p>Plik z checkboxami jako plan, pamięć i warunek końca w jednym — z gotowym promptem do skopiowania i wyjaśnieniem, dlaczego ewaluator go „widzi".</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.2s">
+          <p class="eyebrow">Pętle samodoskonalące</p>
+          <h3>Agent, który sam sprawdza i poprawia</h3>
+          <p>Mechanika w trzech krokach i dwa wdrożenia z projektów: optymalizacja JavaScriptu i komunikacja z drukarką w embedded.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 konfiguracja i zasady (ciemna, za bramką) -->
+  <section class="sect sect--dark" aria-labelledby="praktyki">
+    <div class="container">
+      <SectHead eyebrow="04 / Konfiguracja · Parametry i zasady" title="Zanim puścisz agenta samego." id="praktyki" />
+      <div class="prose rv">
+        <h2>/goal w szczegółach</h2>
+        <div class="callout"><p><strong>Wymagania i sterowanie:</strong> <code>/goal</code> wymaga Claude Code w wersji v2.1.139 lub nowszej; działa też nieinteraktywnie (<code>claude -p "/goal …"</code>) i przeżywa <code>--resume</code> sesji. <code>/goal clear</code> przerywa bieżący cel, a samo <code>/goal</code> bez argumentu pokazuje status — liczbę tur, zużyte tokeny i uzasadnienie ostatniej oceny.</p></div>
+        <h2>/loop w szczegółach</h2>
+        <div class="callout"><p><strong>Interwał jest opcjonalny:</strong> <code>/loop &lt;prompt&gt;</code> bez czasu sam dobiera odstęp (od 1 minuty do 1 godziny), a po wykonaniu zadania potrafi sam zakończyć pętlę. Samo <code>/loop</code> bez argumentów odpala wbudowany prompt utrzymaniowy (albo Twój plik <code>.claude/loop.md</code>): dociąga niedokończoną robotę, pilnuje PR-a bieżącej gałęzi i sprząta kod.</p></div>
+        <div class="callout"><p><strong>Wymagania:</strong> <code>/loop</code> stoi na cronie, więc stały interwał ma granularność 1 minuty (sekundy zaokrąglają się w górę). Zadania są przypięte do sesji: wygasają po 7 dniach, maksymalnie 50 na sesję. Klawisz <code>Esc</code> kasuje najbliższe wybudzenie. Wymaga Claude Code w wersji v2.1.72 lub nowszej.</p></div>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Jasny warunek końca<small>Bez tego pętla się nie zatrzyma</small></dt><dd>Zawsze podaj mierzalny warunek osiągnięcia celu — „wszystkie checkboxy [x]", „testy zielone", „brak plików bez nagłówka". Inaczej agent będzie kręcił się w nieskończoność. Dorzuć też twardy limit: oficjalnie wystarczy dopisać do warunku <code>or stop after 20 turns</code>. Cały warunek może mieć do 4000 znaków.</dd></div>
+        <div><dt>Małe, atomowe zadania<small>Jedno zadanie = jeden checkbox</small></dt><dd>Rozbij cel na kroki, które da się wykonać i odhaczyć pojedynczo. Łatwiej wznowić po przerwie i widać realny postęp.</dd></div>
+        <div><dt>Checklista to stan<small>Plik przeżywa restart</small></dt><dd>Trzymanie postępu w pliku (a nie w pamięci sesji) sprawia, że pętlę można przerwać i wznowić — agent czyta, co już odhaczone, i rusza dalej.</dd></div>
+        <div><dt>/loop do monitoringu, /goal do roboty<small>Dobierz pętlę do zadania</small></dt><dd>Powtarzalne sprawdzanie stanu → <code>/loop</code>. Doprowadzenie zadania do końca → <code>/goal</code>. Można je łączyć: <code>/loop</code> pilnuje, a po wykryciu zmiany odpala pracę.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 05 wzorzec checklisty (za bramką) -->
+  <section class="sect" aria-labelledby="checklista">
+    <div class="container">
+      <SectHead eyebrow="05 / Wzorzec · Checklista jako pamięć" title="Plik z checkboxami, który agent sam odhacza." id="checklista" />
       <div class="prose rv">
         <p>Najprostszy sposób, żeby pętla wiedziała, co już zrobiła, a co zostało — to plik z listą zadań i checkboxami. Agent po każdym wykonanym zadaniu zamienia <code>[ ]</code> na <code>[x]</code>. Plik jest jednocześnie planem, pamięcią i warunkiem zakończenia: cel osiągnięty, gdy wszystkie pozycje są zaznaczone.</p>
         <p>Przykładowy <code>TODO.md</code>:</p>
@@ -66,31 +124,24 @@ tym wypisie wszystkie checkboxy są zaznaczone [x]</code></pre>
     </div>
   </section>
 
-  <!-- 03 dobre praktyki -->
-  <section class="sect" aria-labelledby="praktyki">
+  <!-- 06 pętle samodoskonalące (ciemna, za bramką) -->
+  <section class="sect sect--dark" aria-labelledby="loops">
     <div class="container">
-      <SectHead eyebrow="03 / Praktyka · Żeby pętla nie zwariowała" title="Kilka zasad, zanim puścisz agenta samego." id="praktyki" small />
-      <dl class="def-rows rv">
-        <div><dt>Jasny warunek końca<small>Bez tego pętla się nie zatrzyma</small></dt><dd>Zawsze podaj mierzalny warunek osiągnięcia celu — „wszystkie checkboxy [x]", „testy zielone", „brak plików bez nagłówka". Inaczej agent będzie kręcił się w nieskończoność. Dorzuć też twardy limit: oficjalnie wystarczy dopisać do warunku <code>or stop after 20 turns</code>. Cały warunek może mieć do 4000 znaków. <code>/goal clear</code> przerywa bieżący cel, a samo <code>/goal</code> bez argumentu pokazuje status — liczbę tur, zużyte tokeny i uzasadnienie ostatniej oceny.</dd></div>
-        <div><dt>Małe, atomowe zadania<small>Jedno zadanie = jeden checkbox</small></dt><dd>Rozbij cel na kroki, które da się wykonać i odhaczyć pojedynczo. Łatwiej wznowić po przerwie i widać realny postęp.</dd></div>
-        <div><dt>Checklista to stan<small>Plik przeżywa restart</small></dt><dd>Trzymanie postępu w pliku (a nie w pamięci sesji) sprawia, że pętlę można przerwać i wznowić — agent czyta, co już odhaczone, i rusza dalej.</dd></div>
-        <div><dt>/loop do monitoringu, /goal do roboty<small>Dobierz pętlę do zadania</small></dt><dd>Powtarzalne sprawdzanie stanu → <code>/loop</code>. Doprowadzenie zadania do końca → <code>/goal</code>. Można je łączyć: <code>/loop</code> pilnuje, a po wykryciu zmiany odpala pracę.</dd></div>
-      </dl>
-    </div>
-  </section>
-
-  <!-- 04 filozofia loopów (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="filozofia">
-    <div class="container">
-      <SectHead eyebrow="04 / Filozofia · Praca to pisanie pętli" title="Nie promptujesz. Piszesz pętle." id="filozofia">
-        <p class="sect-lead rv">Boris Cherny, twórca Claude Code, ujął to wprost: „I don't prompt Claude anymore. I have loops that are running. My job is to write loops." Ewolucja wygląda tak: najpierw kod z autouzupełnianiem, potem promptowanie kilku agentów równolegle, na końcu pętle, które promptują same. Anatomia dobrej pętli to kontekst + cel + definicja sukcesu — agent iteruje i sam ocenia wyniki, aż przejdą test.</p>
+      <SectHead eyebrow="06 / Pętle samodoskonalące · Agent uczy się z błędów" title="Sprawdza, poprawia, iteruje — aż kod działa." id="loops">
+        <p class="sect-lead rv">Ten sam wzorzec w wersji, którą wdrażamy w zespołach jako pętle samodoskonalące (Self-Improving Loops): agent nie oddaje kodu po pierwszym podejściu, tylko sam go uruchamia, czyta wyniki i poprawia. <code>/goal</code> plus checklista z poprzedniej sekcji to jego gotowa implementacja.</p>
       </SectHead>
+      <div class="steps">
+        <article class="step rv"><p class="eyebrow">01 · Sprawdza</p><h3>Uruchamia i weryfikuje</h3><p>Agent uruchamia kod i testy, weryfikuje działanie narzędziami MCP (ChromeDevTools, Playwright).</p></article>
+        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Poprawia</p><h3>Automatycznie</h3><p>Naprawia błędy, optymalizuje wydajność, refaktoruje kod — bez interwencji człowieka.</p></article>
+        <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Powtarza</p><h3>Aż działa</h3><p>Iteruje, dopóki nie osiągnie celu i wszystkie testy nie przejdą.</p></article>
+      </div>
       <dl class="def-rows rv">
-        <div><dt>Builder / tester / reviewer<small>Trzech agentów zamiast jednego</small></dt><dd>Sesja, która sama pisze, testuje i recenzuje własny kod, to student oceniający swój egzamin. Rozdziel role na osobnych agentów — weryfikacja przez odrębnego recenzenta wyraźnie podnosi jakość pierwszego podejścia.</dd></div>
-        <div><dt>Każ mu udowodnić<small>Definition of done w pętli</small></dt><dd>Plan → zmiana → testy → podsumowanie, co padło → poprawka. Agent nie raportuje „zrobione" — pokazuje zielone testy. Dokładnie dlatego warunek w /goal piszesz tak, żeby dało się go zweryfikować z transkryptu.</dd></div>
-        <div><dt>Kontekst to RAM<small>Strefa głupienia zaczyna się wcześniej, niż myślisz</small></dt><dd>Okna kontekstu mają po 1M tokenów, ale realna jakość degraduje się już około 250 tysięcy. CLAUDE.md poniżej 300 linii, /clear między zadaniami, a po dwóch nieudanych próbach — /clear zamiast trzeciej.</dd></div>
-        <div><dt>Zakładaj najgorsze<small>Bezpieczeństwo pętli</small></dt><dd>Agent zrobi wszystko, co może przeczytać lub dotknąć. Zakazy w promptach nie wystarczą — agent potrafi napisać skrypt, który je obejdzie. Uprawnienia ustawiaj na poziomie systemu: hooki, sandbox, sekrety w vaultach zamiast w plikach.</dd></div>
+        <div><dt>Optymalizacja JavaScript<small>„Ten mechanizm działa wolno. Spraw, żeby przyspieszył."</small></dt><dd>5× przyspieszenie w 3 minuty — z profilowaniem przez ChromeDevTools MCP.</dd></div>
+        <div><dt>Drukarka RS232 (embedded)<small>„Potrzebujemy komunikacji z drukarką przez RS232."</small></dt><dd>1,5 dnia zamiast miesiąca — Rust + STM32 z toolchainem Keil.</dd></div>
       </dl>
+      <div class="prose rv">
+        <p>Jak wdrażamy ten wzorzec w całych zespołach — na stronie <a href="/transformacja-ai">transformacji AI</a>.</p>
+      </div>
     </div>
   </section>
 

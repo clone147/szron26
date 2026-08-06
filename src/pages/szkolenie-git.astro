@@ -22,10 +22,10 @@ import RelatedCards from '../components/RelatedCards.astro';
     ['Konflikty i PR-y', 'scalanie zmian i opisy zmian z kontekstu'],
   ]} />
 
-  <!-- 01 treść techniczna -->
+  <!-- 01 wprowadzenie: po co agent w git workflow + auto-commity -->
   <section class="sect" aria-labelledby="intro">
     <div class="container">
-      <SectHead eyebrow="01 / Workflow · Git z agentem" title="Jak Claude Code ogarnia Git za Ciebie." id="intro" small />
+      <SectHead eyebrow="01 / Wprowadzenie · Git z agentem" title="Jak Claude Code ogarnia Git za Ciebie." id="intro" small />
 
       <div class="prose rv">
         <p>Claude Code potrafi zarządzać całym przepływem kontroli wersji: tworzyć commity, sprzątać historię, rozwiązywać konflikty, przygotowywać Pull Requesty i znajdować commit, który wprowadził błąd. Najczęściej wystarczy mówić naturalnie, na przykład „posprzątaj commity" albo „zrób porządek przed code review".</p>
@@ -41,7 +41,16 @@ claude "dodaj system autoryzacji i zacommituj kazda czesc osobno"
 # - pisze sensowne komunikaty commitow
 # - dzieli prace na logiczne commity</code></pre>
         <div class="callout"><p><strong>Wskazówka:</strong> Claude automatycznie wykrywa konwencję commitów w projekcie (np. Conventional Commits czy commity z emoji) na podstawie historii i jej przestrzega. Konwencje możesz też opisać wprost w pliku CLAUDE.md.</p></div>
+      </div>
+    </div>
+  </section>
 
+  <!-- 02 codzienny workflow (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="workflow">
+    <div class="container">
+      <SectHead eyebrow="02 / Workflow · Codzienna praca" title="Historia, konflikty, Pull Requesty — dzień z agentem." id="workflow" />
+
+      <div class="prose rv">
         <h2>Przegląd i naprawa historii</h2>
         <p>Agent analizuje historię commitów i porządkuje ją — łączy powiązane commity, poprawia opisy, reorganizuje zmiany.</p>
         <pre><code># Scalenie powiazanych commitow
@@ -60,30 +69,18 @@ git merge main
 claude "rozwiaz konflikty w plikach i zachowaj najlepsze rozwiazania z obu wersji"</code></pre>
         <div class="callout"><p><strong>Wskazówka:</strong> Możesz wskazać priorytet, np. „zachowaj zmiany z gałęzi feature". Agent uwzględni go przy łączeniu.</p></div>
 
-        <h2>Operacje zaawansowane</h2>
-        <h3>Tworzenie Pull Requestów</h3>
+        <h2>Tworzenie Pull Requestów</h2>
         <p>Claude analizuje commity i generuje opis PR z listą zmian, informacją o testach i breaking changes.</p>
         <pre><code>claude "stworz PR z opisem zmian"</code></pre>
+        <p>Opis PR to dopiero początek — pełną recenzją diffu i automatycznym review na GitHubie zajmujemy się w sekcji 03.</p>
 
-        <h3>Recenzja kodu komendą /code-review</h3>
-        <p>Wbudowana komenda <code>/code-review</code> recenzuje diff prosto w terminalu — szuka bugów oraz miejsc do poprawy pod kątem reuse, uproszczenia i wydajności. Domyślnie bierze commity Twojej gałęzi wyprzedzające upstream plus to, czego jeszcze nie zacommitowałeś. Jako cel możesz podać ścieżkę, numer PR, nazwę gałęzi albo zakres refów (np. <code>main...feature</code>). Flaga <code>--comment</code> publikuje uwagi jako komentarze inline na PR, a <code>--fix</code> od razu nanosi proponowane poprawki.</p>
-        <div class="callout"><p><strong>Aktualizacja:</strong> Niższy poziom effort daje mniej, ale pewniejszych uwag; <code>high</code> i <code>max</code> idą szerzej i mogą zwrócić więcej niepewnych. Bez podanego effort review bierze ten z bieżącej sesji. Potrzebujesz głębszego przeglądu? <code>/code-review ultra --fix</code> odpala ultrareview w chmurze i nanosi poprawki w drzewie roboczym, gdy tylko wyniki wrócą do sesji.</p></div>
-        <pre><code># Recenzja zakresu refow
-claude /code-review main...feature
-
-# Recenzja PR z komentarzami inline
-claude /code-review 1234 --comment
-
-# Recenzja i automatyczne naniesienie poprawek
-claude /code-review --fix</code></pre>
-
-        <h3>Git bisect — szukanie commita z błędem</h3>
+        <h2>Git bisect — szukanie commita z błędem</h2>
         <p>Agent pomaga przeszukać historię, by znaleźć commit, który wprowadził regresję.</p>
         <pre><code># Szukanie blednego commita
 git bisect start
 claude "pomoz mi znalezc commit, ktory wprowadzil blad w autoryzacji"</code></pre>
 
-        <h3>Szybkie operacje w naturalnym języku</h3>
+        <h2>Szybkie operacje w naturalnym języku</h2>
         <ul>
           <li>„sprawdź, czy nie zepsułem historii" — weryfikacja czystości commitów.</li>
           <li>„cofnij zmiany, które psują testy" — znalezienie i cofnięcie problematycznych commitów.</li>
@@ -91,7 +88,7 @@ claude "pomoz mi znalezc commit, ktory wprowadzil blad w autoryzacji"</code></pr
           <li>„zrób porządek przed code review" — kompleksowe czyszczenie gałęzi.</li>
         </ul>
 
-        <h3>Przykład pełnej sesji</h3>
+        <p>Te same zwroty składają się w dłuższy cykl pracy — od inicjalizacji projektu po przygotowanie gałęzi do scalenia:</p>
         <pre><code># Start projektu
 claude "zainicjuj nowy projekt Node.js z Express, skonfiguruj Git i zrob pierwszy commit"
 
@@ -111,6 +108,27 @@ claude "sprawdz, czy galaz jest gotowa do scalenia, wyczysc historie jesli trzeb
           <li><strong>Claude i git hooks.</strong> Agent potrafi tworzyć i edytować git hooks: automatyczne formatowanie, testy przed commitem, sprawdzanie konwencji.</li>
           <li><strong>Claude w CI przez GitHub Actions.</strong> Action <code>anthropics/claude-code-action@v1</code> odpala Claude w pipeline przy każdym PR — naturalne przedłużenie automatyzacji gałęzi na poziom CI.</li>
         </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 review: /code-review + GitHub -->
+  <section class="sect" aria-labelledby="review">
+    <div class="container">
+      <SectHead eyebrow="03 / Review · Terminal i GitHub" title="Recenzja kodu: /code-review i automatyczny review PR." id="review" small />
+
+      <div class="prose rv">
+        <h2>Recenzja kodu komendą /code-review</h2>
+        <p>Wbudowana komenda <code>/code-review</code> recenzuje diff prosto w terminalu — szuka bugów oraz miejsc do poprawy pod kątem reuse, uproszczenia i wydajności. Domyślnie bierze commity Twojej gałęzi wyprzedzające upstream plus to, czego jeszcze nie zacommitowałeś. Jako cel możesz podać ścieżkę, numer PR, nazwę gałęzi albo zakres refów (np. <code>main...feature</code>). Flaga <code>--comment</code> publikuje uwagi jako komentarze inline na PR, a <code>--fix</code> od razu nanosi proponowane poprawki.</p>
+        <div class="callout"><p><strong>Aktualizacja:</strong> Niższy poziom effort daje mniej, ale pewniejszych uwag; <code>high</code> i <code>max</code> idą szerzej i mogą zwrócić więcej niepewnych. Bez podanego effort review bierze ten z bieżącej sesji. Potrzebujesz głębszego przeglądu? <code>/code-review ultra --fix</code> odpala ultrareview w chmurze i nanosi poprawki w drzewie roboczym, gdy tylko wyniki wrócą do sesji.</p></div>
+        <pre><code># Recenzja zakresu refow
+claude /code-review main...feature
+
+# Recenzja PR z komentarzami inline
+claude /code-review 1234 --comment
+
+# Recenzja i automatyczne naniesienie poprawek
+claude /code-review --fix</code></pre>
 
         <h2>Integracja z GitHub</h2>
         <p>Claude Code potrafi pracować bezpośrednio na GitHubie, nie tylko w terminalu. Komenda <code>/install-github-app</code> instaluje GitHub App i konfiguruje sekret w repozytorium. Od tego momentu wystarczy oznaczyć <code>@claude</code> w komentarzu pod PR-em lub issue — agent przeanalizuje wątek, utworzy PR, zaimplementuje zmiany i naprawi zgłoszone bugi.</p>
@@ -125,14 +143,14 @@ claude /install-github-app</code></pre>
     </div>
   </section>
 
-  <!-- 02 powiązane szkolenia (ciemna) -->
+  <!-- 04 powiązane szkolenia (ciemna) -->
   <RelatedCards
     items={[
     { href: '/claude-code', title: 'Claude Code', desc: 'Instalacja, poziomy myślenia, workflow agentowy od podstaw.' },
     { href: '/serwery-mcp', title: 'Serwery MCP', desc: 'Chrome DevTools MCP i ekosystem serwerów MCP w codziennej pracy.' },
     { href: '/tips-and-tricks', title: 'Tips &amp; Tricks', desc: 'Praktyki, skróty i wzorce, które realnie przyspieszają pracę z AI.' },
   ]}
-    eyebrow="02 / Akademia · Czytaj dalej"
+    eyebrow="04 / Akademia · Czytaj dalej"
     title="Powiązane szkolenia."
     dark
   />

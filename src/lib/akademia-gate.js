@@ -27,9 +27,10 @@ function buildGateBox() {
 }
 
 export async function initGate() {
-  // CTA sprzedażowe (CtaBand) i „Powiązane szkolenia" muszą być widoczne także
-  // dla anonimowych — bramka chowa wyłącznie sekcje treści szkolenia.
-  const sections = [...document.querySelectorAll('.page-body--interior section.sect')]
+  // Bramka chowa wyłącznie sekcje TREŚCI szkolenia (mają aria-labelledby).
+  // Poza mechaniką zostają: ProofStrip (bez aria-labelledby), CtaBand (.cta-band)
+  // i „Powiązane szkolenia" (powiazane) — widoczne także dla anonimowych.
+  const sections = [...document.querySelectorAll('.page-body--interior section.sect[aria-labelledby]')]
     .filter((s) => !s.classList.contains('cta-band') && s.getAttribute('aria-labelledby') !== 'powiazane');
   if (sections.length < 2) return;
 

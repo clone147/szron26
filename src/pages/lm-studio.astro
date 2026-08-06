@@ -32,7 +32,7 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
         <p>LM Studio to darmowa aplikacja na macOS, Windows i Linux, która umożliwia uruchamianie zaawansowanych modeli językowych AI bezpośrednio na Twoim komputerze. Instalator waży około 400 MB i pobierasz go z <code>lmstudio.ai</code>.</p>
         <ul>
           <li><strong>Prywatność first</strong> — zero zbierania danych, wszystkie obliczenia lokalnie, brak wymogu internetu, zgodność z RODO.</li>
-          <li><strong>Kluczowe możliwości</strong> — ponad 1000 pre-konfigurowanych modeli, Model Context Protocol (MCP), API zgodne z OpenAI na <code>localhost:1234</code>, kontrola wielu GPU i zarządzanie pamięcią VRAM.</li>
+          <li><strong>Kluczowe możliwości</strong> — ponad 1000 pre-konfigurowanych modeli, Model Context Protocol (MCP), API zgodne z OpenAI, kontrola wielu GPU i zarządzanie pamięcią VRAM.</li>
           <li><strong>Dla developerów</strong> — REST API oraz SDK TypeScript/Python, wbudowany RAG dla dokumentów, długie okna kontekstu. Biblioteki <code>lmstudio-js</code> i <code>lmstudio-python</code> na licencji MIT.</li>
           <li><strong>Korzyści biznesowe</strong> — brak vendor lock-in, pełna kontrola i customizacja, działa na sprzęcie konsumenckim (16 GB RAM oraz 4 GB+ VRAM).</li>
         </ul>
@@ -40,7 +40,7 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
           <p><strong>Nowości 2026:</strong> OAuth dla serwerów MCP, tensor parallelism (rozkładanie modelu na wiele GPU), aplikacja mobilna oraz natywne użycie modeli LM Studio w Claude Code.</p>
         </div>
         <div class="callout">
-          <p><strong>W skrócie:</strong> LM Studio demokratyzuje dostęp do LLM i sprawdza się w branżach z wymogami prywatności — dane nie opuszczają komputera, a istniejące narzędzia podłączasz przez API zgodne z OpenAI.</p>
+          <p><strong>W skrócie:</strong> LM Studio demokratyzuje dostęp do LLM i sprawdza się w branżach z wymogami prywatności — dane nie opuszczają komputera, a istniejące narzędzia podłączasz przez zgodne API.</p>
         </div>
       </div>
     </div>
@@ -57,7 +57,7 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
           <li><strong>Rozmiar instalatora:</strong> około 400 MB.</li>
           <li><strong>Wymagania rekomendowane:</strong> 16 GB RAM oraz 4 GB+ VRAM.</li>
           <li><strong>Po instalacji:</strong> wybierz model z wbudowanej biblioteki, pobierz go i uruchom lokalnie.</li>
-          <li><strong>API:</strong> serwer udostępnia endpoint zgodny z OpenAI na <code>localhost:1234</code>.</li>
+          <li><strong>API:</strong> wbudowany serwer udostępnia endpoint zgodny z OpenAI — jak go ustawić dla całego zespołu, pokazujemy w sekcji 05.</li>
         </ul>
       </div>
     </div>
@@ -68,7 +68,7 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
     <div class="container">
       <SectHead eyebrow="03 / Model · GLM (kodowanie)" title="Linia GLM-5 — aktualni mistrzowie kodowania." id="glm" small />
       <div class="prose rv">
-        <p>GLM 4.6 (open-weight model od Zhipu AI) został wydany 30 września 2025, oferuje kontekst 200K tokenów i wynik 82,8% na LiveCodeBench. GLM 4.7 (22 grudnia 2025) osiągał 84,9% na LiveCodeBench. Oba zostały już przewyższone przez <strong>linię GLM-5</strong> (m.in. GLM-5.2) — to obecnie wiodący open-weight do kodowania, na licencji MIT, z kontekstem rozszerzonym do 1M tokenów.</p>
+        <p>Stan obecny: <strong>linia GLM-5</strong> (open-weight od Zhipu AI, m.in. GLM-5.2) to wiodące modele do kodowania — licencja MIT, kontekst do 1M tokenów. Starsze GLM 4.6 i 4.7 wciąż działają, ale przy nowym wdrożeniu nie ma powodu po nie sięgać.</p>
         <div class="callout">
           <p><strong>Kompatybilność:</strong> modele GLM są obecnie szeroko wspierane w LM Studio. Alternatywy: <code>vLLM</code>, <code>SGLang</code> lub API z <code>docs.z.ai</code>. Model ma też natywną integrację w Claude Code.</p>
         </div>
@@ -79,11 +79,11 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
   <!-- 04 MiniMax (ciemna) -->
   <section class="sect sect--dark" aria-labelledby="minimax">
     <div class="container">
-      <SectHead eyebrow="04 / Model · MiniMax (agenty)" title="Od MiniMax M2 do M3 — mistrzowie agentów." id="minimax" />
+      <SectHead eyebrow="04 / Model · MiniMax (agenty)" title="MiniMax M2 i M3 — mistrzowie zadań agentowych." id="minimax" />
       <div class="prose rv">
-        <p>MiniMax M2 wyszedł 27 października 2025. To architektura MoE: <strong>230B parametrów total, 10B aktywnych</strong>, na licencji MIT, w czołówce rankingu Artificial Analysis. Koszt rzędu $0.30/$1.20 za milion tokenów to ułamek ceny modeli komercyjnych. Linia rozwinęła się szybko: M2.1 (22 grudnia 2025), M2.5 (luty 2026), a potem M2.7 (18 marca 2026). Najnowszy w rodzinie jest jednak <strong>MiniMax M3</strong> z 1 czerwca 2026 — to już osobny krok, nie kolejny punkt w linii M2.</p>
+        <p>Stan obecny linii to dwa punkty odniesienia. <strong>MiniMax M2</strong>: architektura MoE — <strong>230B parametrów total, 10B aktywnych</strong> — licencja MIT, czołówka rankingu Artificial Analysis, a koszt rzędu $0.30/$1.20 za milion tokenów to ułamek ceny modeli komercyjnych. Najnowszy w rodzinie jest <strong>MiniMax M3</strong> — osobny krok, nie kolejny punkt linii M2.</p>
         <div class="callout">
-          <p><strong>MiniMax M3 (czerwiec 2026):</strong> MoE ~428B / ~22B aktywnych, mechanizm rzadkiej uwagi MSA, kontekst do 1M tokenów i natywna multimodalność (tekst, obraz, wideo). Cennik API to $0.60/$2.40 za milion tokenów, wagi są otwarte na licencji minimax-community.</p>
+          <p><strong>MiniMax M3:</strong> MoE ~428B / ~22B aktywnych, mechanizm rzadkiej uwagi MSA, kontekst do 1M tokenów i natywna multimodalność (tekst, obraz, wideo). Cennik API to $0.60/$2.40 za milion tokenów, wagi są otwarte na licencji minimax-community.</p>
         </div>
         <div class="callout">
           <p><strong>Status LM Studio:</strong> M2 ma natywne wsparcie od wersji 0.3.31 (MLX na Macu, GGUF na PC, łącznie z parsowaniem wywołań narzędzi). Dla M3 obsługa w llama.cpp jest na razie wstępna (build z PR), więc na lokalne uruchomienie poza <code>vLLM</code> i <code>SGLang</code> trzeba poczekać na stabilny build. Dla starszych wersji LM Studio te dwa silniki pozostają alternatywą.</p>
@@ -92,16 +92,26 @@ const related = akademia.filter((a) => ['llama-server', 'claude-code-bezpieczens
     </div>
   </section>
 
-  <!-- 05 podsumowanie -->
-  <section class="sect" aria-labelledby="podsumowanie">
+  <!-- 05 zespół / serwer -->
+  <section class="sect" aria-labelledby="zespol">
     <div class="container">
-      <SectHead eyebrow="05 / Podsumowanie · Wnioski" title="Co wybrać i do czego." id="podsumowanie" small />
+      <SectHead eyebrow="05 / Zespół · Serwer w praktyce" title="Jeden komputer z GPU, cały zespół z dostępem do modelu." id="zespol" small />
       <div class="prose rv">
+        <p>Wbudowany serwer LM Studio zachowuje się jak API OpenAI — narzędzia, które już macie (SDK OpenAI, edytory i agenty z obsługą własnego endpointu), podłączacie, zmieniając wyłącznie adres bazowy na <code>http://localhost:1234/v1</code>. Klucz API może być dowolnym ciągiem znaków, serwer go nie weryfikuje.</p>
         <ul>
-          <li><strong>LM Studio</strong> — demokratyzuje dostęp do LLM, idealne dla branż z wymogami prywatności; API zgodne z OpenAI na <code>localhost:1234</code>.</li>
-          <li><strong>Linia GLM-5</strong> — aktualny lider kodowania open-weight (przewyższa GLM 4.7), licencja MIT, kontekst do 1M tokenów.</li>
-          <li><strong>MiniMax M2 / M3</strong> — mistrz zadań agentowych; M2 (MoE 230B/10B) działa lokalnie w LM Studio od 0.3.31+, M3 (MoE ~428B, 1M kontekstu, multimodal) to najnowszy krok linii. Ułamek ceny modeli komercyjnych.</li>
+          <li><strong>Start serwera</strong> — zakładka Developer → Start Server, albo z terminala: <code>lms server start</code> (narzędzie <code>lms</code> instaluje się razem z aplikacją).</li>
+          <li><strong>Dostęp dla zespołu</strong> — włączcie „Serve on Local Network": serwer nasłuchuje wtedy na adresie IP komputera w sieci lokalnej, nie tylko na localhost. Jedna maszyna z mocnym GPU obsłuży kilka osób.</li>
+          <li><strong>Endpointy</strong> — <code>/v1/chat/completions</code>, <code>/v1/completions</code>, <code>/v1/embeddings</code> i <code>/v1/models</code>; do tego ładowanie modelu na żądanie (JIT) przy pierwszym zapytaniu.</li>
         </ul>
+        <p>Trzy ustawienia, które przy ładowaniu modelu robią największą różnicę:</p>
+        <ul>
+          <li><strong>Długość kontekstu</strong> — domyślna bywa niższa niż maksimum modelu; podnoście ją świadomie, bo dłuższy kontekst zajmuje więcej pamięci.</li>
+          <li><strong>GPU offload</strong> — suwak decyduje, ile warstw modelu trafia na kartę graficzną; gdy model nie mieści się w VRAM, część warstw zostaje na CPU kosztem szybkości.</li>
+          <li><strong>Format modelu</strong> — GGUF (silnik llama.cpp) działa wszędzie, MLX jest szybszy na Macach z Apple Silicon; niższa kwantyzacja to mniejszy plik i mniejsze wymagania, ale też niższa precyzja.</li>
+        </ul>
+        <div class="callout">
+          <p><strong>LM Studio czy llama-server?</strong> LM Studio bierzcie, gdy model ma stać na komputerze z aplikacją i być pod ręką dla zespołu; czysty serwer bez GUI na stałej infrastrukturze to temat szkolenia <a href="/llama-server">llama-server</a>.</p>
+        </div>
       </div>
     </div>
   </section>

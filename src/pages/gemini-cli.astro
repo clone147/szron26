@@ -9,44 +9,35 @@ const related = akademia.filter((a) => ['codex-cli', 'claude-code', 'serwery-mcp
 ---
 <Interior
   title="Gemini CLI — instalacja i komendy | Akademia SZRON"
-  description="Przewodnik po Gemini CLI: instalacja przez npm, logowanie kontem Google, darmowe limity, komendy slash, kontekst plików, MCP i tryb shell. Aktualne komendy."
+  description="Gemini CLI po zmianach z czerwca 2026: instalacja przez npm, autoryzacja kluczem API i kontem Code Assist, komendy slash, tryb shell, migracja na Antigravity CLI."
   eyebrow="Akademia · Narzędzia agentowe"
-  updated="2026-06-29"
+  updated="2026-08-07"
   heading="Gemini CLI — model Google w terminalu."
-  lead="Open-source narzędzie wiersza poleceń, które przenosi modele Gemini wprost do terminala: do 1M tokenów kontekstu, wbudowane wyszukiwanie Google i obsługa Model Context Protocol. Poniżej instalacja, autoryzacja i komendy, których używamy na co dzień."
+  lead="Open-source narzędzie wiersza poleceń, które przenosi modele Gemini wprost do terminala: do 1M tokenów kontekstu, wbudowane wyszukiwanie Google i obsługa Model Context Protocol. Od czerwca 2026 to narzędzie dla kluczy API i kont firmowych — poniżej aktualna autoryzacja, komendy i ścieżka dla kont indywidualnych."
   heroImage="/img/sub/gemini-cli.webp"
   heroAlt="Laptop z agentem CLI w terminalu, niebiesko-fioletowe akcenty światła"
 >
   <!-- proof -->
   <ProofStrip items={[
     ['1M tokenów', 'kontekstu w modelu Gemini'],
-    ['Darmowy start', 'onboarding indywidualny przez Antigravity CLI'],
+    ['Antigravity CLI', 'ścieżka dla kont indywidualnych'],
     ['MCP i shell', 'rozszerzasz o własne narzędzia'],
   ]} />
-
-  <!-- aktualizacja -->
-  <section class="sect" style="padding-top:0;padding-bottom:0">
-    <div class="container">
-      <div class="callout rv">
-        <p><strong>Aktualizacja:</strong> 18.06.2026 Gemini CLI przestał obsługiwać użytkowników indywidualnych (darmowych) oraz plany Google AI Pro i Ultra. Następcą dla tych odbiorców jest Antigravity CLI (napisany w Go, binarka <code>agy</code>) — instalujesz go jedną komendą: <code>curl -fsSL https://antigravity.google/cli/install.sh | bash</code> (na Windows odpowiednikiem jest skrypt PowerShell). Dostęp do Gemini CLI zachowują konta Code Assist Standard/Enterprise oraz płatne klucze API.</p>
-      </div>
-    </div>
-  </section>
 
   <!-- 01 czym jest -->
   <section class="sect" aria-labelledby="czym">
     <div class="container">
       <SectHead eyebrow="01 / Wprowadzenie · Czym jest" title="Asystent AI od Google bez wychodzenia z terminala." id="czym" small />
       <div class="prose rv">
-        <p>Gemini CLI to open-source narzędzie wiersza poleceń, które daje dostęp do modeli Gemini bezpośrednio w terminalu. Oferuje do 1M tokenów kontekstu, wbudowane narzędzia (m.in. wyszukiwarkę Google) oraz obsługę Model Context Protocol (MCP). Sprawdza się u osób, które pracują głównie w terminalu i chcą szybkiego dostępu do AI bez przełączania się między aplikacjami.</p>
+        <p>Gemini CLI to open-source narzędzie wiersza poleceń, które daje dostęp do modeli Gemini bezpośrednio w terminalu — z wbudowanymi narzędziami (m.in. wyszukiwarką Google) i obsługą Model Context Protocol (MCP). Sprawdza się u osób, które pracują głównie w terminalu i chcą szybkiego dostępu do AI bez przełączania się między aplikacjami. Dziś korzystają z niego posiadacze płatnych kluczy API oraz konta Gemini Code Assist Standard/Enterprise; wcześniej wystarczyło darmowe konto Google, ale ten wariant wygasł 18.06.2026, a kontom indywidualnym Google wskazuje następcę — Antigravity CLI (opisujemy go niżej).</p>
         <ul>
-          <li><strong>Tryb Auto (domyślny)</strong> — CLI samo dobiera model z rodziny Gemini 3 lub 2.5 zależnie od złożoności zadania. Flagowy model to Gemini 3 Pro; Gemini 2.5 Pro pozostaje dostępnym wariantem (1M tokenów kontekstu).</li>
+          <li><strong>Tryb Auto (domyślny)</strong> — CLI samo dobiera model z rodziny Gemini 3 lub 2.5 zależnie od złożoności zadania. Flagowy model to Gemini 3 Pro.</li>
           <li><strong>Google Search</strong> — wbudowana integracja z wyszukiwarką.</li>
           <li><strong>MCP</strong> — rozszerzanie o własne narzędzia i serwery.</li>
-          <li><strong>Szybkie odpowiedzi</strong> — interaktywny tryb czatu wprost z terminala.</li>
+          <li><strong>Tryb shell</strong> — komendy systemowe wprost z sesji czatu.</li>
         </ul>
         <div class="callout">
-          <p><strong>Szybki start:</strong> zainstaluj Node.js 20+, uruchom <code>npm install -g @google/gemini-cli</code>, a następnie polecenie <code>gemini</code> i zaloguj się kontem Google.</p>
+          <p><strong>Szybki start:</strong> mając Node.js (sekcja 02), uruchom <code>npm install -g @google/gemini-cli</code>, ustaw klucz z Google AI Studio w zmiennej <code>GEMINI_API_KEY</code> i odpal polecenie <code>gemini</code>.</p>
         </div>
       </div>
     </div>
@@ -62,7 +53,7 @@ const related = akademia.filter((a) => ['codex-cli', 'claude-code', 'serwery-mcp
           <li><strong>Node.js 20+</strong> — wymagana nowsza wersja, starsze nie zadziałają.</li>
           <li><strong>npm</strong> lub <strong>npx</strong> (instalowane razem z Node.js).</li>
           <li><strong>System:</strong> Windows 10 (21H2+), Windows 11, macOS lub Linux.</li>
-          <li><strong>Konto Google</strong> (darmowe) albo klucz API Gemini.</li>
+          <li><strong>Autoryzacja:</strong> klucz Gemini API albo konto firmowe — szczegóły w sekcji 03.</li>
         </ul>
 
         <h3>1. Instalacja Node.js</h3>
@@ -89,38 +80,53 @@ sudo apt-get install -y nodejs</code></pre>
   <!-- 03 autoryzacja -->
   <section class="sect" aria-labelledby="autoryzacja">
     <div class="container">
-      <SectHead eyebrow="03 / Autoryzacja · Pierwsze uruchomienie" title="Logowanie kontem Google albo klucz API." id="autoryzacja" small />
+      <SectHead eyebrow="03 / Autoryzacja · Pierwsze uruchomienie" title="Klucz API, Vertex AI albo konto Code Assist." id="autoryzacja" small />
       <div class="prose rv">
-        <p>Najprostsza metoda to przeglądarkowy OAuth. Po uruchomieniu <code>gemini</code> wybierz „Login with Google", zaloguj się i potwierdź uprawnienia dla Gemini CLI — gotowe.</p>
-        <ol>
-          <li>Uruchom <code>gemini</code> i wybierz „Login with Google".</li>
-          <li>Otworzy się przeglądarka — zaloguj się kontem Google.</li>
-          <li>Potwierdź uprawnienia dla Gemini CLI.</li>
-          <li>(Code Assist) ustaw zmienną: <code>export GOOGLE_CLOUD_PROJECT="twoj-projekt"</code>.</li>
-        </ol>
-        <div class="callout">
-          <p><strong>Darmowe limity:</strong> dla użytkowników indywidualnych darmowy dostęp przez konto Google zakończył się 18.06.2026 — limity 60 zapytań na minutę i 1000 dziennie nie obowiązują już osób prywatnych. Zostają one dla kont Code Assist Standard/Enterprise oraz płatnych kluczy API. Darmowy onboarding indywidualny przeniósł się do Antigravity CLI. Vertex AI zależy od projektu i konta rozliczeniowego.</p>
-        </div>
-        <h3>Alternatywa: klucz Gemini API</h3>
+        <h3>Klucz Gemini API — podstawowa ścieżka</h3>
         <p>Daje pełną kontrolę nad modelem i rozliczeniami. Klucz pobierzesz z <a href="https://aistudio.google.com/app/apikey">Google AI Studio</a>:</p>
         <pre><code>export GEMINI_API_KEY="XXXX"
 gemini</code></pre>
-        <h3>Alternatywa: Vertex AI</h3>
+        <h3>Vertex AI</h3>
         <p>Scenariusz enterprise z pełnym nadzorem GCP — limity i ceny wynikają z konta rozliczeniowego w Google Cloud:</p>
         <pre><code>export GOOGLE_API_KEY="XXXX"
 export GOOGLE_GENAI_USE_VERTEXAI=true
 gemini</code></pre>
+        <h3>Gemini Code Assist Standard/Enterprise</h3>
+        <p>Subskrybenci logują się bez zmian przez przeglądarkowy OAuth: uruchom <code>gemini</code>, wybierz „Login with Google", potwierdź uprawnienia i wskaż projekt zmienną <code>export GOOGLE_CLOUD_PROJECT="twoj-projekt"</code>. Metodę logowania przełączysz w każdej chwili komendą <code>/auth</code>.</p>
         <div class="callout">
           <p><strong>Izolacja:</strong> flaga <code>--sandbox</code> uruchamia narzędzia w izolowanym środowisku — przydatne, gdy nie chcesz, by agent działał wprost na systemie hosta.</p>
+        </div>
+        <div class="callout">
+          <p><strong>Konto indywidualne?</strong> Dla Ciebie jest sekcja 04 — instalacja Antigravity CLI jedną komendą, logowanie i import dotychczasowej konfiguracji z Gemini CLI.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 04 komendy (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="komendy">
+  <!-- 04 antigravity (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="antigravity">
     <div class="container">
-      <SectHead eyebrow="04 / Komendy · Slash, kontekst, shell" title="Slash, znak małpy i wykrzyknik — trzy tryby pracy." id="komendy" />
+      <SectHead eyebrow="04 / Antigravity CLI · Konta indywidualne" title="Binarka agy — następca dla planów indywidualnych." id="antigravity" />
+      <div class="prose rv">
+        <p>18.06.2026 Gemini CLI przestał obsługiwać użytkowników indywidualnych (darmowych) oraz plany Google AI Pro i Ultra. Następcą dla tych odbiorców jest Antigravity CLI — napisany w Go, bez zależności od Node.js i npm. Binarka nazywa się <code>agy</code>, sama weryfikuje sumę kontrolną SHA512 i sama się aktualizuje.</p>
+        <h3>Instalacja</h3>
+        <p>Linux i macOS (binarka trafia do <code>~/.local/bin/agy</code>):</p>
+        <pre><code>curl -fsSL https://antigravity.google/cli/install.sh | bash</code></pre>
+        <p>Windows (PowerShell):</p>
+        <pre><code>irm https://antigravity.google/cli/install.ps1 | iex</code></pre>
+        <h3>Pierwsze uruchomienie</h3>
+        <p>Kreator przy pierwszym starcie <code>agy</code> pyta o trzy rzeczy: motyw terminala, metodę logowania i — najważniejsze — opcjonalny import konfiguracji z Gemini CLI, więc nie zaczynasz od zera. Logowanie odbywa się przez przeglądarkę, a sesja zapisuje się w systemowym pęku kluczy; przy pracy po SSH narzędzie wypisuje adres autoryzacyjny — otwierasz go w przeglądarce i wklejasz kod z powrotem do terminala. Wylogowanie i wyczyszczenie zapisanych profili: komenda <code>/logout</code>.</p>
+        <div class="callout">
+          <p><strong>Limity:</strong> zamiast dziennego licznika zapytań obowiązuje tygodniowy limit obliczeniowy. Przy intensywnej pracy agentowej potrafi się wyczerpać przed końcem tygodnia — cięższe zadania planuj z głową albo rozważ płatny klucz API i pozostanie przy Gemini CLI.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 komendy -->
+  <section class="sect" aria-labelledby="komendy">
+    <div class="container">
+      <SectHead eyebrow="05 / Komendy · Slash, kontekst, shell" title="Slash, znak małpy i wykrzyknik — trzy tryby pracy." id="komendy" small />
       <div class="prose rv">
         <h3>Komendy slash (/)</h3>
         <p>Zarządzają sesją CLI. Najważniejsze:</p>
@@ -174,12 +180,12 @@ gemini</code></pre>
     </div>
   </section>
 
-  <!-- 05 MCP -->
-  <section class="sect" aria-labelledby="mcp">
+  <!-- 06 MCP (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="mcp">
     <div class="container">
-      <SectHead eyebrow="05 / MCP · Kontrola przeglądarki" title="ChromeDevTools MCP — agent steruje przeglądarką." id="mcp" small />
+      <SectHead eyebrow="06 / MCP · Kontrola przeglądarki" title="ChromeDevTools MCP — agent steruje przeglądarką." id="mcp" />
       <div class="prose rv">
-        <p>Model Context Protocol to otwarty standard stworzony przez Anthropic, który pozwala agentom AI na bezpieczną integrację z narzędziami zewnętrznymi. ChromeDevTools MCP daje Gemini pełną kontrolę przeglądarki Chrome — nawigację po stronach, wypełnianie formularzy, testowanie UI, screenshoty, debugowanie i wykonywanie JavaScript.</p>
+        <p>Model Context Protocol pozwala agentom AI bezpiecznie korzystać z zewnętrznych narzędzi i danych — czym jest i jak działa, rozbieramy w osobnym szkoleniu o <a href="/serwery-mcp">serwerach MCP</a>. Tutaj konkret: ChromeDevTools MCP daje Gemini pełną kontrolę przeglądarki Chrome — nawigację po stronach, wypełnianie formularzy, testowanie UI, screenshoty, debugowanie i wykonywanie JavaScript.</p>
         <h3>Instalacja dla bieżącego projektu</h3>
         <pre><code>gemini mcp add chrome-devtools npx chrome-devtools-mcp&#64;latest</code></pre>
         <h3>Instalacja globalna (wszystkie projekty)</h3>

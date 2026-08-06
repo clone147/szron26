@@ -22,39 +22,69 @@ import RelatedCards from '../components/RelatedCards.astro';
     ['Tylko development', 'nie łącz agenta z produkcją'],
   ]} />
 
-  <!-- 01 treść techniczna -->
+  <!-- 01 czym jest MCP Supabase (jawne) -->
   <section class="sect" aria-labelledby="intro">
     <div class="container">
-      <SectHead eyebrow="01 / MCP · Supabase krok po kroku" title="Bezpieczny dostęp do bazy z naturalnego języka." id="intro" small />
+      <SectHead eyebrow="01 / MCP Supabase · Co to daje" title="Bezpieczny dostęp do bazy z naturalnego języka." id="intro" small />
 
       <div class="prose rv">
-        <p>Supabase to otwarta platforma oparta o PostgreSQL — z autentykacją, REST i GraphQL API, storage, Row Level Security i panelem zarządzania. Serwer MCP Supabase pozwala Claude Code sięgać do tej bazy bezpośrednio z promptu.</p>
+        <p>Supabase to otwarta platforma oparta o PostgreSQL — z autentykacją, REST i GraphQL API, storage, Row Level Security i panelem zarządzania. Serwer MCP Supabase pozwala Claude Code sięgać do tej bazy bezpośrednio z promptu — bez przełączania się między terminalem, panelem i klientem SQL.</p>
 
-        <div class="callout"><p><strong>Uwaga (bezpieczeństwo):</strong> serwer MCP ma realny dostęp do bazy. Używaj go tylko na środowiskach deweloperskich — nie łącz agenta z produkcją. Domyślnie uruchamiaj w trybie read-only i ograniczaj zakres do jednego projektu przez project-ref.</p></div>
+        <p>Dokumentacja MCP Supabase opisuje dziś przede wszystkim serwer zdalny (hosted) — nie stawiasz żadnego lokalnego procesu, a cały zakres uprawnień ustawiasz parametrami w samym adresie serwera: tryb tylko do odczytu, ograniczenie do jednego projektu, wybór grup narzędzi. To ważne, bo bez ograniczenia zakresu serwer widzi wszystkie projekty w organizacji.</p>
 
-        <div class="callout"><p><strong>Aktualizacja:</strong> dokumentacja MCP Supabase opisuje teraz przede wszystkim serwer zdalny (hosted) pod <code>https://mcp.supabase.com/mcp</code> — konfigurujesz go parametrami w samym URL, nie flagami CLI. Zakres ustawiasz przez <code>read_only=true</code>, <code>project_ref=&lt;id&gt;</code> oraz <code>features=&lt;groups&gt;</code>. Bez <code>project_ref</code> serwer widzi wszystkie projekty w organizacji, dlatego scoping i tryb tylko do odczytu warto trzymać włączone domyślnie.</p></div>
-
-        <h2>Wymagania</h2>
+        <h2>Co agent robi na bazie</h2>
         <ul>
-          <li>Serwer zdalny działa po HTTP — przy pierwszym połączeniu logujesz się przez przeglądarkę (OAuth), więc nie musisz ręcznie generować tokenu ani instalować Node.js.</li>
-          <li>Personal access token z panelu Supabase (Settings → Access Tokens → Create new token) przyda się tylko do CI i scenariuszy nieinteraktywnych.</li>
-          <li>Project ref bazy: Settings → General → Reference ID — wstawiasz go do URL jako <code>project_ref</code>.</li>
+          <li>„Pokaż wszystkie tabele w bazie danych" — listowanie schematu.</li>
+          <li>„Sprawdź, czy istnieją duplikaty w tabeli X" — analiza i debugging (tylko odczyt).</li>
+          <li>„Wygeneruj typy TypeScript dla wszystkich tabel" — automatyczne generowanie typów.</li>
+          <li>„Utwórz migrację dodającą kolumnę created_at" — zarządzanie migracjami (poza trybem read-only).</li>
+        </ul>
+
+        <div class="callout"><p><strong>Uwaga (bezpieczeństwo):</strong> serwer MCP ma realny dostęp do bazy. Podpinaj go wyłącznie pod środowiska deweloperskie — jak domyślnie ograniczyć mu uprawnienia, pokazujemy w części o konfiguracji.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 instalacja i podpięcie (jawne, ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="instalacja">
+    <div class="container">
+      <SectHead eyebrow="02 / Instalacja · Serwer zdalny" title="Jedno polecenie i logowanie w przeglądarce." id="instalacja" small />
+
+      <div class="prose rv">
+        <p>Zdalny serwer MCP działa po HTTP — bez lokalnego procesu npx i bez instalowania Node.js. Dodajesz go jednym poleceniem:</p>
+        <pre><code>claude mcp add --transport http supabase https://mcp.supabase.com/mcp</code></pre>
+        <p>Domyślną autoryzacją jest OAuth (dynamic client registration): przy pierwszym połączeniu logujesz się przez przeglądarkę i wybierasz organizację — bez ręcznego generowania tokenu. Stary lokalny serwer stdio (<code>npx @supabase/mcp-server-supabase</code> z flagami <code>--read-only</code> i <code>--project-ref</code>) wciąż istnieje, ale zniknął z oficjalnej instrukcji na rzecz wariantu hosted.</p>
+
+        <h2>Inne drogi podpięcia</h2>
+        <ul>
+          <li>Od lutego 2026 Supabase jest oficjalnym konektorem Claude. W Claude.ai albo Claude Desktop wchodzisz w menu konektorów, wybierasz Supabase i autoryzujesz dostęp do swojej organizacji — bez ręcznego wpisu w pliku konfiguracyjnym. Konektor działa na płatnych planach Claude (Pro, Team, Enterprise, Max).</li>
           <li>Przy lokalnym developmencie z Supabase CLI serwer MCP jest dostępny pod <code>http://localhost:54321/mcp</code> — bez tokenu i project-ref, ale z węższym zestawem narzędzi i bez OAuth.</li>
         </ul>
 
-        <h2>Instalacja serwera</h2>
-        <p>Podstawową metodą w dokumentacji jest zdalny (hosted) serwer MCP — dodajesz go jednym poleceniem, bez lokalnego procesu npx:</p>
-        <pre><code>claude mcp add --transport http supabase https://mcp.supabase.com/mcp</code></pre>
-        <p>Zakres ustawiasz parametrami w URL — to dziś jedyny zalecany sposób konfiguracji. Tryb tylko do odczytu i ograniczenie do jednego projektu trzymaj włączone domyślnie:</p>
+        <h2>Weryfikacja</h2>
+        <p>Sprawdź, czy agent widzi bazę, prostym poleceniem:</p>
+        <pre><code>pokaz mi wszystkie tabele w bazie danych</code></pre>
+        <p>Claude Code powinno wyświetlić listę tabel z Twojego projektu Supabase.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 konfiguracja produkcyjna, read-only, bezpieczeństwo (za bramką) -->
+  <section class="sect" aria-labelledby="bezpieczenstwo">
+    <div class="container">
+      <SectHead eyebrow="03 / Bezpieczeństwo · Konfiguracja produkcyjna" title="Read-only, jeden projekt, mniej narzędzi." id="bezpieczenstwo" small />
+
+      <div class="prose rv">
+        <p>Zakres serwera ustawiasz parametrami w URL — to dziś jedyny zalecany sposób konfiguracji. Tryb tylko do odczytu i ograniczenie do jednego projektu trzymaj włączone domyślnie:</p>
         <pre><code>claude mcp add --transport http supabase \
   "https://mcp.supabase.com/mcp?project_ref=TWOJ_PROJECT_REF&amp;read_only=true"</code></pre>
-        <div class="callout"><p><strong>Aktualizacja:</strong> domyślną autoryzacją serwera zdalnego jest OAuth (dynamic client registration) — przy pierwszym połączeniu logujesz się przez przeglądarkę i wybierasz organizację, bez ręcznego PAT. W CI token podajesz nagłówkiem <code>Authorization: Bearer &lt;SUPABASE_ACCESS_TOKEN&gt;</code> w konfiguracji serwera. Stary lokalny serwer stdio (<code>npx @supabase/mcp-server-supabase</code> z flagami <code>--read-only</code> i <code>--project-ref</code>) wciąż istnieje, ale zniknął z oficjalnej instrukcji na rzecz wariantu hosted.</p></div>
-        <div class="callout"><p><strong>Aktualizacja:</strong> parametrem <code>features</code> ograniczasz zestaw narzędzi udostępnionych agentowi — np. <code>?features=database,docs</code> zostawia tylko zapytania do bazy i wyszukiwanie w dokumentacji. Domyślnie aktywne są grupy <code>account</code>, <code>database</code>, <code>debugging</code>, <code>development</code>, <code>docs</code>, <code>functions</code> i <code>branching</code>; <code>storage</code> jest wyłączone. W trybie <code>read_only=true</code> narzędzia zapisu (m.in. <code>apply_migration</code>, <code>deploy_edge_function</code>) są niedostępne, a <code>execute_sql</code> działa jako użytkownik Postgresa tylko do odczytu.</p></div>
+        <p>Project ref bazy znajdziesz w panelu: Settings → General → Reference ID. W trybie tylko do odczytu narzędzia zapisu (m.in. <code>apply_migration</code> i <code>deploy_edge_function</code>) znikają z listy, a <code>execute_sql</code> działa jako użytkownik Postgresa bez prawa zapisu.</p>
 
-        <div class="callout"><p><strong>Aktualizacja:</strong> od lutego 2026 Supabase jest oficjalnym konektorem Claude. W Claude.ai albo Claude Desktop wchodzisz w menu konektorów, wybierasz Supabase i autoryzujesz dostęp do swojej organizacji przez OAuth — bez ręcznego wpisu w configu. Konektor działa na płatnych planach Claude (Pro, Team, Enterprise, Max). Dla Claude Code w terminalu nadal najszybsze jest <code>claude mcp add --transport http</code> z URL serwera zdalnego.</p></div>
+        <h2>Mniej narzędzi dla agenta</h2>
+        <p>Parametrem <code>features</code> ograniczasz zestaw narzędzi udostępnionych agentowi — np. <code>?features=database,docs</code> zostawia tylko zapytania do bazy i wyszukiwanie w dokumentacji. Domyślnie aktywne są grupy <code>account</code>, <code>database</code>, <code>debugging</code>, <code>development</code>, <code>docs</code>, <code>functions</code> i <code>branching</code>; <code>storage</code> jest wyłączone.</p>
 
-        <h3>Alternatywa — przez Claude Desktop</h3>
-        <p>Możesz też wpisać serwer wprost w pliku konfiguracyjnym (Claude Desktop albo plik MCP Claude Code). Dla wariantu hosted to zwykły wpis HTTP — bez procesu npx (klamry zakodowane encjami, w realnym pliku JSON użyj zwykłych nawiasów):</p>
+        <h2>CI i wpis w pliku konfiguracyjnym</h2>
+        <p>W scenariuszach nieinteraktywnych (np. CI) interaktywne logowanie odpada — personal access token generujesz w panelu Supabase (Settings → Access Tokens → Create new token) i podajesz nagłówkiem <code>Authorization</code>. Wpis w pliku konfiguracyjnym (Claude Desktop albo plik MCP Claude Code) to zwykły serwer HTTP:</p>
         <pre><code>&#123;
   "mcpServers": &#123;
     "supabase": &#123;
@@ -66,33 +96,21 @@ import RelatedCards from '../components/RelatedCards.astro';
     &#125;
   &#125;
 &#125;</code></pre>
-        <p>Nagłówek <code>Authorization</code> jest potrzebny tylko przy nieinteraktywnym uwierzytelnianiu tokenem (np. CI). Przy zwykłej pracy z terminala wystarczy <code>claude mcp add --transport http</code> i logowanie OAuth przy pierwszym połączeniu.</p>
+        <p>Nagłówek <code>Authorization</code> jest potrzebny tylko przy uwierzytelnianiu tokenem — przy zwykłej pracy z terminala wystarczy logowanie przy pierwszym połączeniu.</p>
 
-        <h3>Weryfikacja</h3>
-        <p>Sprawdź, czy agent widzi bazę, prostym poleceniem:</p>
-        <pre><code>pokaz mi wszystkie tabele w bazie danych</code></pre>
-        <p>Claude Code powinno wyświetlić listę tabel z Twojego projektu Supabase.</p>
-
-        <h2>Przykładowe komendy</h2>
-        <ul>
-          <li>„Pokaż wszystkie tabele w bazie danych" — listowanie schematu.</li>
-          <li>„Sprawdź, czy istnieją duplikaty w tabeli X" — analiza i debugging (tylko odczyt).</li>
-          <li>„Wygeneruj typy TypeScript dla wszystkich tabel" — automatyczne generowanie typów.</li>
-          <li>„Utwórz migrację dodającą kolumnę created_at" — zarządzanie migracjami (poza trybem read-only).</li>
-        </ul>
-        <div class="callout"><p><strong>Wskazówka:</strong> operacje zapisu — tworzenie tabel, migracje, modyfikacje danych — wymagają wyłączenia trybu read-only. Włączaj go świadomie i wyłącznie na bazie deweloperskiej.</p></div>
+        <div class="callout"><p><strong>Uwaga:</strong> operacje zapisu — tworzenie tabel, migracje, modyfikacje danych — wymagają wyłączenia trybu read-only. Rób to świadomie i tylko na bazie, którą możesz w każdej chwili odtworzyć.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- 02 powiązane szkolenia (ciemna) -->
+  <!-- 04 powiązane szkolenia (ciemna) -->
   <RelatedCards
     items={[
     { href: '/szkolenie-mysql', title: 'MySQL MCP Server', desc: 'Agent na bazie MySQL: konfiguracja, operacje zapisu, pułapki wersji.' },
     { href: '/serwery-mcp', title: 'Serwery MCP', desc: 'Chrome DevTools MCP i ekosystem serwerów MCP w codziennej pracy.' },
     { href: '/claude-code-bezpieczenstwo', title: 'Claude Code — bezpieczeństwo', desc: 'Praca z AI na kodzie firmowym bez wycieku: VPC, modele lokalne, audit log.' },
   ]}
-    eyebrow="02 / Akademia · Czytaj dalej"
+    eyebrow="04 / Akademia · Czytaj dalej"
     title="Powiązane szkolenia."
     dark
   />

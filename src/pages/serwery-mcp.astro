@@ -22,51 +22,90 @@ import RelatedCards from '../components/RelatedCards.astro';
     ['Node LTS', 'i zainstalowany Google Chrome'],
   ]} />
 
-  <!-- 01 treść techniczna -->
+  <!-- 01 czym jest MCP -->
   <section class="sect" aria-labelledby="intro">
     <div class="container">
-      <SectHead eyebrow="01 / MCP · Czym jest i jak zacząć" title="Model Context Protocol w codziennej pracy." id="intro" small />
+      <SectHead eyebrow="01 / MCP · Czym jest" title="Jeden protokół zamiast dziesiątek integracji." id="intro" small />
 
       <div class="prose rv">
-        <p>Model Context Protocol to standardowy sposób łączenia narzędzi AI z zewnętrznymi systemami i usługami. Serwery MCP działają jako pomosty między agentem a narzędziami — dzięki nim Claude Code może kontrolować przeglądarki, łączyć się z bazami danych, zarządzać plikami i wykonywać zadania wykraczające poza podstawowe możliwości.</p>
+        <p><strong>Model Context Protocol (MCP)</strong> to otwarty standard łączenia AI z zewnętrznymi systemami — bazami danych, API, przeglądarką, narzędziami zespołu. Opublikowany przez Anthropic pod koniec 2024 roku, dziś wspierany przez cały rynek: od Claude Code, przez narzędzia OpenAI i Google, po edytory kodu. Najkrócej: MCP jest dla AI tym, czym USB-C dla sprzętu — jeden port, do którego pasuje wszystko.</p>
+        <p>Zanim powstał, każda para „agent × narzędzie" wymagała osobnej integracji: inna dla przeglądarki, inna dla bazy, inna dla Jiry — i tak dla każdego agenta od nowa. MCP odwraca ten układ: narzędzie wystawia jeden serwer MCP, a korzysta z niego każdy zgodny klient. Piszesz raz, podłączasz wszędzie.</p>
+        <h3>Jak to działa</h3>
+        <dl class="def-rows rv">
+          <div><dt>Serwer MCP</dt><dd>Program-pomost przed konkretnym systemem: wystawia agentowi narzędzia (akcje do wykonania) i zasoby (dane do odczytu). Serwer bazy danych da narzędzia do zapytań, serwer przeglądarki — do klikania i czytania stron.</dd></div>
+          <div><dt>Klient</dt><dd>Aplikacja, w której pracuje agent: Claude Code, aplikacja desktopowa Claude, IDE. Klient łączy się z serwerami i udostępnia ich narzędzia modelowi.</dd></div>
+          <div><dt>Transport</dt><dd>Lokalnie serwer działa jako zwykły proces (stdio), zdalnie — po HTTP. Z perspektywy agenta nie ma różnicy: widzi po prostu listę narzędzi.</dd></div>
+        </dl>
+        <p>Co z tego masz w codziennej pracy:</p>
         <ul>
-          <li><strong>Rozszerzalność.</strong> Dodajesz nowe możliwości do Claude Code.</li>
-          <li><strong>Integracje.</strong> Łączysz agenta z zewnętrznymi narzędziami.</li>
-          <li><strong>Automatyzacja.</strong> Automatyzujesz złożone przepływy pracy.</li>
-          <li><strong>Monitoring.</strong> Śledzisz i debugujesz aplikacje w czasie rzeczywistym.</li>
+          <li><strong>Rozszerzalność.</strong> Dodajesz agentowi nowe możliwości bez czekania na aktualizację samego narzędzia.</li>
+          <li><strong>Integracje.</strong> Łączysz go z systemami, na których naprawdę pracuje Twój zespół.</li>
+          <li><strong>Automatyzacja.</strong> Złożone przepływy — od projektu graficznego po wdrożenie — zamykasz w jednym poleceniu.</li>
+          <li><strong>Monitoring.</strong> Agent śledzi i debuguje aplikacje w czasie rzeczywistym, zamiast zgadywać z opisu.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 ekosystem (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="ekosystem">
+    <div class="container">
+      <SectHead eyebrow="02 / Ekosystem · Przegląd serwerów" title="Od bazy danych po przeglądarkę." id="ekosystem" small />
+
+      <div class="prose rv">
+        <p>Serwerów MCP są dziś tysiące — oficjalnych i społecznościowych. W pracy z zespołami najczęściej sięgamy po kilka grup:</p>
+        <ul>
+          <li><strong>Bazy danych</strong> — agent czyta schemat i sam pisze zapytania. Supabase i MySQL omawiamy w osobnych szkoleniach Akademii.</li>
+          <li><strong>Narzędzia zespołu</strong> — GitHub, Jira, Slack: agent zakłada zadania, komentuje zmiany w kodzie, raportuje postęp.</li>
+          <li><strong>Projektowanie</strong> — serwer Figmy daje agentowi dostęp do projektu graficznego, z którego pisze gotowy komponent.</li>
+          <li><strong>Przeglądarka</strong> — Chrome DevTools MCP i Playwright MCP: agent klika, testuje i mierzy jak człowiek, tylko szybciej.</li>
         </ul>
 
-        <h2>Chrome DevTools MCP</h2>
-        <p>Chrome DevTools MCP daje Claude Code bezpośrednią kontrolę nad przeglądarką Chrome. Agent testuje, debuguje i optymalizuje kod w rzeczywistym środowisku — analizuje błędy, mierzy wydajność i symuluje interakcje użytkownika.</p>
+        <h3>Chrome DevTools MCP — bohater tego szkolenia</h3>
+        <p>Serwer od zespołu Chrome daje Claude Code bezpośrednią kontrolę nad przeglądarką. Agent testuje, debuguje i optymalizuje kod w rzeczywistym środowisku — analizuje błędy, mierzy wydajność i symuluje interakcje użytkownika. Konkretnie:</p>
+        <ul>
+          <li>Interakcja z elementami i wypełnianie formularzy.</li>
+          <li>Zarządzanie oknami i emulacja urządzeń.</li>
+          <li>Monitoring sieci i analiza wydajności.</li>
+          <li>Screenshoty i dostęp do konsoli JavaScript.</li>
+        </ul>
+        <p>Różnicę czuć od pierwszego dnia: zamiast opisywać agentowi błąd z przeglądarki, każesz mu samemu go obejrzeć. Dalej instalacja krok po kroku i zadania, od których warto zacząć.</p>
+      </div>
+    </div>
+  </section>
 
+  <!-- 03 instalacja i praktyka (za bramką) -->
+  <section class="sect" aria-labelledby="instalacja">
+    <div class="container">
+      <SectHead eyebrow="03 / Warsztat · Instalacja i pierwsze zadania" title="Chrome DevTools MCP krok po kroku." id="instalacja" small />
+
+      <div class="prose rv">
         <h3>Wymagania</h3>
         <ul>
           <li>Node.js w aktualnej wersji LTS.</li>
           <li>Zainstalowany Google Chrome (wersja stable lub nowsza).</li>
-          <li>Claude Code — zamknij go przed instalacją serwera.</li>
+          <li>Claude Code.</li>
         </ul>
         <pre><code># weryfikacja wersji Node.js
 node --version</code></pre>
 
-        <h3>Instalacja</h3>
-        <p>Zamknij Claude Code, a następnie uruchom w terminalu:</p>
+        <h3>Instalacja jako plugin (rekomendowana)</h3>
+        <p>Główna ścieżka to plugin z marketplace — w pakiecie z serwerem MCP dostajesz Skills (umiejętności), których sama instalacja przez CLI nie dokłada. W Claude Code:</p>
+        <pre><code>/plugin marketplace add ChromeDevTools/chrome-devtools-mcp
+/plugin install chrome-devtools-mcp@chrome-devtools-plugins</code></pre>
+        <div class="callout"><p><strong>Uwaga:</strong> po instalacji pluginu zrestartuj Claude Code i sprawdź dołączone Skills komendą <code>/skills</code>.</p></div>
+
+        <h3>Alternatywa: instalacja przez CLI</h3>
+        <p>Sam serwer, bez Skills, dodasz też z terminala. Zamknij Claude Code i uruchom:</p>
         <pre><code>claude mcp add chrome-devtools --scope user npx chrome-devtools-mcp@latest</code></pre>
-        <div class="callout"><p><strong>Aktualizacja:</strong> kanoniczna składnia stdio ma separator: <code>claude mcp add [options] &lt;name&gt; -- &lt;command&gt; [args...]</code>. Separator <code>--</code> jest opcjonalny przy prostym <code>npx</code> bez flag, ale <strong>wymagany</strong>, gdy przekazujesz serwerowi flagi z myślnikiem — inaczej trafią one do <code>claude mcp add</code>, a nie do serwera. Wymagane jest aktualne LTS Node.js oraz zainstalowany Chrome.</p></div>
         <p>Aby wyłączyć telemetrię, dołącz flagę serwera:</p>
         <pre><code>claude mcp add chrome-devtools --scope user -- npx chrome-devtools-mcp@latest --no-usage-statistics</code></pre>
-        <div class="callout"><p><strong>Uwaga:</strong> po instalacji uruchom Claude Code ponownie, aby serwer MCP został wczytany.</p></div>
+        <div class="callout"><p><strong>Składnia:</strong> kanoniczny zapis stdio ma separator: <code>claude mcp add [options] &lt;name&gt; -- &lt;command&gt; [args...]</code>. Separator <code>--</code> jest opcjonalny przy prostym <code>npx</code> bez flag, ale <strong>wymagany</strong>, gdy przekazujesz serwerowi flagi z myślnikiem — inaczej trafią one do <code>claude mcp add</code>, a nie do serwera.</p></div>
+        <p>Po instalacji uruchom Claude Code ponownie, aby serwer został wczytany. A jeśli później przejdziesz na plugin — najpierw usuń wpis z CLI, żeby konfiguracje się nie dublowały:</p>
+        <pre><code>claude mcp remove chrome-devtools</code></pre>
 
-        <h3>Instalacja jako plugin (rekomendowana)</h3>
-        <p>Zalecaną drogą jest plugin z marketplace — w pakiecie z serwerem MCP dostajesz Skills (umiejętności), których sama instalacja przez CLI nie dokłada. Jeśli serwer dodałeś wcześniej przez CLI, najpierw go usuń, żeby wpisy się nie dublowały, a potem:</p>
-        <pre><code># jeśli był dodany przez CLI — najpierw usuń
-claude mcp remove chrome-devtools
-
-# w Claude Code:
-/plugin marketplace add ChromeDevTools/chrome-devtools-mcp
-/plugin install chrome-devtools-mcp@chrome-devtools-plugins</code></pre>
-        <div class="callout"><p><strong>Aktualizacja:</strong> po instalacji pluginu zrestartuj Claude Code i sprawdź dołączone Skills komendą <code>/skills</code>. Wymagania bez zmian: Node.js w aktualnej wersji LTS oraz Chrome w wersji stable lub nowszej.</p></div>
-
-        <h2>Przykłady użycia</h2>
+        <h3>Pierwsze zadania dla agenta</h3>
+        <p>Serwer działa — sprawdź go na własnym projekcie. Dobre polecenia na start:</p>
         <ul>
           <li>„Przeanalizuj wydajność strony https://example.com".</li>
           <li>„Sprawdź błędy JavaScript i wygeneruj poprawki".</li>
@@ -74,25 +113,20 @@ claude mcp remove chrome-devtools
           <li>„Zrób screenshot responsywności na różnych urządzeniach".</li>
         </ul>
 
-        <h3>Możliwości Chrome DevTools MCP</h3>
-        <ul>
-          <li>Interakcja z elementami i wypełnianie formularzy.</li>
-          <li>Zarządzanie oknami i emulacja urządzeń.</li>
-          <li>Monitoring sieci i analiza wydajności.</li>
-          <li>Screenshoty i dostęp do konsoli JavaScript.</li>
-        </ul>
+        <h3>Łańcuch serwerów — przykład z naszych wdrożeń</h3>
+        <p>Prawdziwa siła MCP zaczyna się, gdy agent łączy kilka serwerów w jeden przepływ. Scenariusz, który pokazujemy zespołom przy augmentacji: agent czyta projekt graficzny z Figmy, pisze na jego podstawie komponent React, testuje go w przeglądarce przez Playwright, a wynik zapisuje w bazie danych. Programista tylko nadzoruje — formułuje cel i odbiera efekt. To ten sam mechanizm, który właśnie uruchomiłeś: jedna umowa między agentem a narzędziami, dowolnie składana w łańcuchy.</p>
       </div>
     </div>
   </section>
 
-  <!-- 02 powiązane szkolenia (ciemna) -->
+  <!-- 04 powiązane szkolenia (ciemna) -->
   <RelatedCards
     items={[
     { href: '/claude-code', title: 'Claude Code', desc: 'Instalacja, poziomy myślenia i workflow agentowy od podstaw.' },
     { href: '/szkolenie-supabase-mcp', title: 'MCP Supabase', desc: 'Połączenie agenta z bazą Supabase — tryb read-only i bezpieczeństwo.' },
     { href: '/szkolenie-mysql', title: 'MySQL MCP Server', desc: 'Agent na bazie MySQL: konfiguracja, operacje zapisu, pułapki wersji.' },
   ]}
-    eyebrow="02 / Akademia · Czytaj dalej"
+    eyebrow="04 / Akademia · Czytaj dalej"
     title="Powiązane szkolenia."
     dark
   />

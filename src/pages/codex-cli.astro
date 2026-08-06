@@ -13,7 +13,7 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
   eyebrow="Akademia · Narzędzia agentowe"
   updated="2026-06-29"
   heading="OpenAI Codex CLI — autonomiczny agent w terminalu."
-  lead="Codex CLI to open-source agent kodujący napędzany rodziną GPT-5-Codex: buduje projekty od zera, refaktoryzuje, debuguje i integruje się z MCP. Poniżej instalacja, plik konfiguracyjny, tryby zatwierdzania i komendy, które realnie wykorzystujemy."
+  lead="Codex CLI to open-source agent kodujący napędzany rodziną GPT-5.x: buduje projekty od zera, refaktoryzuje, debuguje i integruje się z MCP. Poniżej instalacja, plik konfiguracyjny, tryby zatwierdzania i komendy, które realnie wykorzystujemy."
   heroImage="/img/sub/codex-cli.webp"
   heroAlt="Dłonie na klawiaturze mechanicznej, na monitorze terminal z wyjściem agenta CLI"
 >
@@ -29,7 +29,7 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
     <div class="container">
       <SectHead eyebrow="01 / Wprowadzenie · Czym jest" title="Agent, który prowadzi projekt od zera po produkcję." id="czym" small />
       <div class="prose rv">
-        <p>OpenAI Codex CLI to agent do autonomicznego kodowania w terminalu. Open-source na licencji Apache 2.0, napisany w Rust, działa na macOS, Linux i Windows. Modelu nie musisz wybierać — po zalogowaniu kontem ChatGPT Codex sam sięga po rekomendowany wariant z rodziny GPT-5.x. Stan na połowę 2026: domyślnym punktem startu jest GPT-5.5 (najnowszy model frontier), obok niego GPT-5.4 i szybszy GPT-5.4-mini. Dedykowana linia „-codex" (gpt-5.3-codex, gpt-5.2) została w maju 2026 wycofana z listy wyboru dla logujących się przez ChatGPT. GPT-5-Codex z września 2025 oraz o3 i codex-1 to już zamknięty rozdział.</p>
+        <p>OpenAI Codex CLI to agent do autonomicznego kodowania w terminalu. Open-source na licencji Apache 2.0, napisany w Rust, działa na macOS, Linux i Windows. Modelu nie musisz wybierać — po zalogowaniu kontem ChatGPT Codex sam sięga po rekomendowany wariant z rodziny GPT-5.x. Stan na połowę 2026: domyślnym punktem startu jest GPT-5.5 (najnowszy model frontier), obok niego GPT-5.4 i szybszy GPT-5.4-mini. GPT-5-Codex z września 2025 oraz o3 i codex-1 to już zamknięty rozdział.</p>
         <p>Kluczowe możliwości:</p>
         <ul>
           <li>Budowanie projektów od zera.</li>
@@ -57,7 +57,7 @@ const related = akademia.filter((a) => ['gemini-cli', 'claude-code', 'serwery-mc
           <li><strong>GPT-5.4-mini</strong> — gdy zależy Ci na szybkości i koszcie; nadaje się też pod subagentów.</li>
           <li><strong>GPT-5.3-codex-spark</strong> — tekstowy research preview pod błyskawiczne, niemal natychmiastowe iteracje; dostępny dla kont ChatGPT Pro.</li>
         </ul>
-        <p>Osobna linia „-codex" (gpt-5.3-codex, gpt-5.2) zniknęła z listy wyboru przy logowaniu kontem ChatGPT. Model dynamicznie alokuje czas „myślenia" i dostosowuje zasoby do skomplikowania problemu — od krótkich odpowiedzi po długie sesje nad złożonym zadaniem.</p>
+        <p>Osobna linia „-codex" (gpt-5.3-codex, gpt-5.2) zniknęła w maju 2026 z listy wyboru przy logowaniu kontem ChatGPT; wycofano też starsze <code>codex-mini-latest</code> i <code>o3-mini</code>. Model dynamicznie alokuje czas „myślenia" i dostosowuje zasoby do skomplikowania problemu — od krótkich odpowiedzi po długie sesje nad złożonym zadaniem.</p>
       </div>
     </div>
   </section>
@@ -106,7 +106,7 @@ sudo apt-get install -y nodejs</code></pre>
         <p>Plik konfiguracyjny: <code>~/.codex/config.toml</code>.</p>
         <h3>1. Domyślny model</h3>
         <pre><code>model = "gpt-5.5"  # lub gpt-5.4, gpt-5.4-mini</code></pre>
-        <p>Jeśli klucza <code>model</code> nie ustawisz, Codex sam dobiera rekomendowany wariant. Model ustawia się kluczem najwyższego poziomu — bez tabeli <code>[model]</code>. Linia „-codex" (gpt-5.3-codex, gpt-5.2) oraz starsze <code>codex-mini-latest</code> i <code>o3-mini</code> zostały wycofane.</p>
+        <p>Jeśli klucza <code>model</code> nie ustawisz, Codex sam dobiera rekomendowany wariant. Model ustawia się kluczem najwyższego poziomu — bez tabeli <code>[model]</code>.</p>
         <h3>2. Tryby zatwierdzania i sandbox</h3>
         <pre><code>approval_policy = "on-request"   # "untrusted", "on-request", "never"
 sandbox_mode = "workspace-write" # "read-only", "workspace-write", "danger-full-access"</code></pre>
@@ -165,7 +165,7 @@ codex resume                           # wznowienie sesji</code></pre>
     <div class="container">
       <SectHead eyebrow="06 / MCP · Kontrola przeglądarki" title="ChromeDevTools MCP — Codex steruje Chrome." id="mcp" />
       <div class="prose rv">
-        <p>Model Context Protocol to otwarty standard stworzony przez Anthropic, który pozwala agentom AI na bezpieczną integrację z narzędziami zewnętrznymi. ChromeDevTools MCP daje Codex pełną kontrolę przeglądarki Chrome — nawigację, wypełnianie formularzy, testowanie UI, screenshoty, debugowanie i wykonywanie JavaScript.</p>
+        <p>Czym jest Model Context Protocol i jak działa — opisujemy w szkoleniu <a href="/serwery-mcp">Serwery MCP</a>. ChromeDevTools MCP daje Codeksowi pełną kontrolę nad przeglądarką Chrome: nawigację, wypełnianie formularzy, testowanie UI, screenshoty, debugowanie i wykonywanie JavaScript.</p>
         <h3>Instalacja MCP</h3>
         <pre><code>codex mcp add chrome-devtools -- npx chrome-devtools-mcp&#64;latest</code></pre>
         <p>Konfiguracja zapisze się w <code>~/.codex/config.toml</code>. Alternatywnie dodaj ją ręcznie:</p>

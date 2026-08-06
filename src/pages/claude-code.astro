@@ -10,7 +10,7 @@ import RelatedCards from '../components/RelatedCards.astro';
   description="Praktyczne szkolenie z Claude Code: natywna instalacja (curl/brew/Windows), sterowanie myśleniem przez /effort i ultrathink, subagenci, tryb planowania, hooki i workflow agentowy."
   eyebrow="Akademia · Programowanie agentowe"
   heading="Claude Code — agent kodowania w terminalu, od pierwszej instalacji."
-  lead="Czym jest agent kodowania, jak go zainstalować w aktualny sposób i jak ułożyć z nim codzienny workflow. Uczymy tego, czego sami używamy w pracy z klientami — na realnych komendach, bez teorii dla teorii."
+  lead="Czym jest agent kodowania, jak go zainstalować i jak ułożyć z nim codzienny workflow. Uczymy tego, czego sami używamy w pracy z klientami — na realnych komendach."
   updated="2026-06-29"
   heroImage="/img/sub/claude-code.webp"
   heroAlt="Programista przy biurku z dwoma monitorami, na ekranie terminal z rozmową z agentem AI"
@@ -127,8 +127,15 @@ claude
           </tbody>
         </table>
         <div class="callout">
-          <p><strong>Aktualizacja:</strong> dawniej <code>think</code> / <code>megathink</code> / <code>ultrathink</code> mapowały na sztywne budżety tokenów (~4K / 10K / 32K). Dziś podstawą jest komenda <code>/effort</code>, która trzyma wybrany poziom między turami. Słowa-klucze w prompcie (jak <code>ultrathink</code>) to już tylko jednorazowy zastrzyk na konkretną odpowiedź — nie zmieniają ustawienia sesji i nie są stałym budżetem. Na Opusie 4.8 domyślnym poziomem jest <code>high</code>; głębsze myślenie (<code>xhigh</code>, <code>max</code>) rezerwuj na realnie trudne decyzje: architektura, refactoring na dużą skalę, niejasne błędy. W menu <code>/effort</code> jest też tryb <code>ultracode</code> — łączy najwyższy poziom myślenia (xhigh) ze stałą zgodą na uruchamianie wieloagentowych workflow, dostępny na modelach wspierających xhigh (Fable 5, Opus 4.7/4.8). Sam model dobierasz komendą <code>/model</code> — od najszybszych (Haiku) po najmocniejsze (Opus i Fable).</p>
+          <p><strong>Aktualizacja:</strong> dawniej <code>think</code> / <code>megathink</code> / <code>ultrathink</code> mapowały na sztywne budżety tokenów (~4K / 10K / 32K). Dziś wybrany poziom trzyma między turami komenda <code>/effort</code>, a słowa-klucze w prompcie to tylko jednorazowy zastrzyk — nie zmieniają ustawienia sesji.</p>
         </div>
+        <p>Jak to ustawiać w praktyce:</p>
+        <ul>
+          <li><strong>Domyślnie <code>high</code></strong> — tyle dostajesz na Opusie 4.8 bez żadnej konfiguracji i tyle wystarcza w codziennej pracy.</li>
+          <li><strong><code>xhigh</code> i <code>max</code></strong> rezerwuj na realnie trudne decyzje: architektura, refactoring na dużą skalę, niejasne błędy.</li>
+          <li><strong><code>ultracode</code></strong> (w menu <code>/effort</code>) — najwyższy poziom myślenia plus stała zgoda na wieloagentowe workflow; działa na tych samych modelach, co xhigh.</li>
+          <li><strong>Sam model dobierasz komendą <code>/model</code></strong> — od najszybszych (Haiku) po najmocniejsze (Opus i Fable).</li>
+        </ul>
         <h3>Subagenci — delegowanie i praca równoległa</h3>
         <p>Agent może odpalić <strong>subagenta</strong> do wyodrębnionego zadania — przeszukania kodu, weryfikacji zmiany, researchu — który pracuje w osobnym kontekście. Główna rozmowa się nie zaśmieca, a kilka subagentów może działać równolegle. Możesz definiować własnych: z własnym promptem systemowym i ograniczonym zestawem narzędzi.</p>
         <h3>Skills, komendy i pluginy</h3>
@@ -147,13 +154,12 @@ claude
         <h2 id="ekosystem">Git, MCP i alternatywni agenci.</h2>
         <p>Claude Code to punkt wyjścia. Wokół niego budujemy resztę workflow:</p>
         <ul>
-          <li><strong>Git z agentem</strong> — inteligentne commity, code review i automatyzacja gałęzi prowadzona przez Claude Code.</li>
           <li><strong>Serwery MCP</strong> — łączenie agenta z bazami danych, API, przeglądarką i narzędziami zespołu.</li>
           <li><strong>IDE i aplikacja desktopowa</strong> — ten sam agent w terminalu, w rozszerzeniach do VS Code i JetBrains oraz w apce desktopowej. Pracujesz tam, gdzie ci wygodnie.</li>
           <li><strong>Przegląd kodu wieloma agentami</strong> — wbudowany code review, w którym osobni agenci niezależnie sprawdzają zmiany, zanim trafią do gałęzi.</li>
           <li><strong>Alternatywni agenci</strong> — Codex CLI (OpenAI), Antigravity CLI (Google — następca wygaszonego w czerwcu 2026 Gemini CLI dla użytkowników indywidualnych) oraz modele lokalne, gdy dane nie mogą opuścić firmy. Krajobraz CLI zmienia się szybko — szczegóły trzymamy w osobnych szkoleniach.</li>
-          <li><strong>Bezpieczeństwo</strong> — praca z AI na firmowym kodzie bez wycieku: deny rules, sandbox i hooki.</li>
         </ul>
+        <p>Git z agentem i bezpieczeństwo firmowego kodu mają osobne szkolenia — znajdziesz je poniżej.</p>
       </div>
     </div>
   </section>

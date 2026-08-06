@@ -22,10 +22,10 @@ import RelatedCards from '../components/RelatedCards.astro';
     ['Konfiguracja przez .env', 'jasne ustawienia uprawnień'],
   ]} />
 
-  <!-- 01 treść techniczna -->
+  <!-- 01 czym jest + instalacja -->
   <section class="sect" aria-labelledby="intro">
     <div class="container">
-      <SectHead eyebrow="01 / MCP · MySQL krok po kroku" title="Bezpośredni dostęp do bazy MySQL z Claude Code." id="intro" small />
+      <SectHead eyebrow="01 / MCP · Czym jest i instalacja" title="Bezpośredni dostęp do bazy MySQL z Claude Code." id="intro" small />
 
       <div class="prose rv">
         <p>MCP-Server-MySQL to serwer Model Context Protocol, który umożliwia Claude Code dostęp do baz MySQL i MariaDB. Pozwala wykonywać zapytania SQL, podglądać i tworzyć tabele oraz zarządzać danymi — z poziomu naturalnego języka.</p>
@@ -33,18 +33,42 @@ import RelatedCards from '../components/RelatedCards.astro';
         <h2>Wymagania</h2>
         <ul>
           <li>Node.js w wersji 20 lub nowszej.</li>
-          <li>Dostęp do bazy MySQL lub MariaDB (host, port, użytkownik, hasło, nazwa bazy).</li>
+          <li>Dane dostępowe do bazy: host, port, użytkownik, hasło, nazwa bazy.</li>
         </ul>
         <pre><code># weryfikacja wersji Node.js
 node --version</code></pre>
 
-        <h2>Instalacja serwera</h2>
-        <p>Repo nie wymaga instalacji globalnej. Najprościej uruchamiać serwer przez <code>npx</code> — pobiera i odpala aktualną wersję bez dbania o ścieżki:</p>
-        <pre><code>npx -y @benborla29/mcp-server-mysql</code></pre>
-        <div class="callout"><p><strong>Aktualizacja:</strong> najnowsze wydanie to v2.0.9 (czerwiec 2026). Zamiast pinować konkretną podwersję czy instalować globalnie przez <code>npm install -g</code>, uruchamiaj serwer przez <code>npx</code> — zawsze sięgnie po aktualne wydanie z npm.</p></div>
+        <h2>Instalacja: jedno polecenie</h2>
+        <p>Serwera nie trzeba instalować osobno. Główna ścieżka to <code>claude mcp add</code> — rejestruje serwer w Claude Code, a <code>npx</code> pobiera i uruchamia go przy każdym starcie, bez dbania o ścieżki:</p>
+        <pre><code>claude mcp add mcp_server_mysql -e MYSQL_HOST=127.0.0.1 -e MYSQL_PORT=3306 -e MYSQL_USER=root -e MYSQL_PASS=... -e MYSQL_DB=... -- npx @benborla29/mcp-server-mysql</code></pre>
+        <p>Po dodaniu sprawdź połączenie prosto w rozmowie z agentem:</p>
+        <pre><code>Pokaz mi wszystkie tabele MySQL z localhost za pomoca MCP</code></pre>
+        <div class="callout"><p><strong>Zwróć uwagę:</strong> w poleceniu nie ma żadnej flagi uprawnień. To celowe — bez nich serwer działa w trybie tylko do odczytu: zapytania odczytają dane, ale niczego nie zmienią. Które flagi odblokowują zapis, kiedy warto je włączyć i jak wygląda pełna konfiguracja — w dalszej części szkolenia.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 operacje, pułapki wersji, konfiguracja (za bramką) -->
+  <section class="sect sect--dark" aria-labelledby="praktyka">
+    <div class="container">
+      <SectHead eyebrow="02 / Praktyka · Operacje i konfiguracja" title="Operacje na bazie, pułapki wersji i pełna konfiguracja." id="praktyka" />
+
+      <div class="prose rv">
+        <h2>Przykłady użycia</h2>
+        <ul>
+          <li>„Załóż tabelę użytkowników z polami: id, email, created_at".</li>
+          <li>„Pokaż strukturę tabeli products".</li>
+          <li>„Znajdź wszystkich użytkowników z domeny gmail.com".</li>
+          <li>„Zoptymalizuj wydajność zapytań na tabeli logs".</li>
+          <li>„Przeanalizuj rozmiar bazy i zaproponuj archiwizację".</li>
+        </ul>
+        <div class="callout"><p><strong>Pro tip:</strong> w pliku CLAUDE.md możesz zapisać instrukcję, by agent korzystał z MCP MySQL dla wszystkich operacji na bazie — np. „Używaj MCP MySQL dla wszystkich operacji na bazie danych".</p></div>
+
+        <h2>Pułapki wersji</h2>
+        <p>Najnowsze wydanie to v2.0.9 (czerwiec 2026). Zamiast pinować konkretną podwersję czy instalować globalnie przez <code>npm install -g</code>, uruchamiaj serwer przez <code>npx</code> — zawsze sięgnie po aktualne wydanie z npm i nie zostawi w systemie przestarzałej kopii. Unikaj też kruchych ścieżek absolutnych do <code>node</code> i <code>dist/index.js</code> w konfiguracji.</p>
 
         <h2>Konfiguracja środowiska (.env)</h2>
-        <p>Utwórz plik .env z danymi połączenia i uprawnieniami:</p>
+        <p>Gdy uruchamiasz serwer poza Claude Code albo wolisz trzymać ustawienia w pliku, utwórz .env z danymi połączenia i uprawnieniami. Bezpieczny domyślny wariant — tylko odczyt:</p>
         <pre><code># Polaczenie
 MYSQL_HOST=localhost
 MYSQL_PORT=3306
@@ -52,15 +76,15 @@ MYSQL_USER=twoj_uzytkownik
 MYSQL_PASS=twoje_haslo
 MYSQL_DB=nazwa_bazy
 
-# Uprawnienia (domyslnie wszystkie wylaczone)
-ALLOW_INSERT_OPERATION=true
-ALLOW_UPDATE_OPERATION=true
-ALLOW_DELETE_OPERATION=true
-ALLOW_DDL_OPERATION=true</code></pre>
-        <div class="callout"><p><strong>Aktualizacja:</strong> wszystkie cztery flagi zapisu są domyślnie <code>false</code> — bez konfiguracji serwer działa w trybie tylko do odczytu. Ustaw <code>ALLOW_INSERT_OPERATION</code>, <code>ALLOW_UPDATE_OPERATION</code> i <code>ALLOW_DELETE_OPERATION</code> na <code>true</code>, żeby pozwolić na modyfikację danych. Operacje DDL (CREATE, ALTER, DROP) to osobna flaga <code>ALLOW_DDL_OPERATION</code> — sam serwer je blokuje, dopóki nie ustawisz jej na <code>true</code>, niezależnie od uprawnień użytkownika po stronie bazy.</p></div>
+# Uprawnienia — bezpieczny default: tylko odczyt
+ALLOW_INSERT_OPERATION=false
+ALLOW_UPDATE_OPERATION=false
+ALLOW_DELETE_OPERATION=false
+ALLOW_DDL_OPERATION=false</code></pre>
+        <div class="callout"><p><strong>Kiedy włączyć zapis:</strong> trzy flagi zapisu (INSERT, UPDATE, DELETE) przestaw na <code>true</code> dopiero wtedy, gdy agent ma faktycznie modyfikować dane — najlepiej na bazie deweloperskiej, nie produkcyjnej. Operacje DDL (CREATE, ALTER, DROP) to osobna, czwarta flaga — serwer blokuje je niezależnie od uprawnień użytkownika po stronie bazy, dopóki sam jej nie włączysz.</p></div>
 
-        <h2>Konfiguracja Claude Desktop</h2>
-        <p>Dodaj wpis serwera do pliku konfiguracyjnego Claude Desktop (klamry zakodowane encjami, w realnym pliku JSON użyj zwykłych nawiasów). Zamiast kruchych ścieżek absolutnych do <code>node</code> i <code>dist/index.js</code> uruchamiaj przez <code>npx</code>:</p>
+        <h2>Ścieżka alternatywna: Claude Desktop</h2>
+        <p>Jeśli pracujesz też w Claude Desktop, dodaj wpis serwera do jego pliku konfiguracyjnego (klamry zakodowane encjami, w realnym pliku JSON użyj zwykłych nawiasów):</p>
         <pre><code>&#123;
   "mcpServers": &#123;
     "mcp_server_mysql": &#123;
@@ -75,46 +99,29 @@ ALLOW_DDL_OPERATION=true</code></pre>
         "MYSQL_USER": "twoj_uzytkownik",
         "MYSQL_PASS": "twoje_haslo",
         "MYSQL_DB": "nazwa_bazy",
-        "ALLOW_INSERT_OPERATION": "true",
-        "ALLOW_UPDATE_OPERATION": "true",
-        "ALLOW_DELETE_OPERATION": "true",
-        "ALLOW_DDL_OPERATION": "true"
+        "ALLOW_INSERT_OPERATION": "false",
+        "ALLOW_UPDATE_OPERATION": "false",
+        "ALLOW_DELETE_OPERATION": "false",
+        "ALLOW_DDL_OPERATION": "false"
       &#125;
     &#125;
   &#125;
 &#125;</code></pre>
-
-        <h2>Test i import do Claude Code</h2>
-        <p>Zrestartuj Claude Desktop i sprawdź połączenie:</p>
-        <pre><code>Pokaz mi wszystkie tabele MySQL z localhost za pomoca MCP</code></pre>
-        <p>Po udanym teście zaimportuj serwer do Claude Code:</p>
+        <p>Zrestartuj Claude Desktop, sprawdź połączenie tym samym promptem testowym co po instalacji, a potem zaimportuj gotowy wpis do Claude Code:</p>
         <pre><code>claude mcp add-from-claude-desktop</code></pre>
-        <p>Możesz też dodać serwer wprost, jednym poleceniem — bez wcześniejszej konfiguracji Claude Desktop:</p>
-        <pre><code>claude mcp add mcp_server_mysql -e MYSQL_HOST=127.0.0.1 -e MYSQL_PORT=3306 -e MYSQL_USER=root -e MYSQL_PASS=... -e MYSQL_DB=... -- npx @benborla29/mcp-server-mysql</code></pre>
-
-        <h2>Przykłady użycia</h2>
-        <ul>
-          <li>„Załóż tabelę użytkowników z polami: id, email, created_at".</li>
-          <li>„Pokaż strukturę tabeli products".</li>
-          <li>„Znajdź wszystkich użytkowników z domeny gmail.com".</li>
-          <li>„Zoptymalizuj wydajność zapytań na tabeli logs".</li>
-          <li>„Przeanalizuj rozmiar bazy i zaproponuj archiwizację".</li>
-        </ul>
-        <div class="callout"><p><strong>Pro tip:</strong> w pliku CLAUDE.md możesz zapisać instrukcję, by agent korzystał z MCP MySQL dla wszystkich operacji na bazie — np. „Używaj MCP MySQL dla wszystkich operacji na bazie danych".</p></div>
       </div>
     </div>
   </section>
 
-  <!-- 02 powiązane szkolenia (ciemna) -->
+  <!-- 03 powiązane szkolenia -->
   <RelatedCards
     items={[
     { href: '/szkolenie-supabase-mcp', title: 'MCP Supabase', desc: 'Połączenie agenta z bazą Supabase — tryb read-only i bezpieczeństwo.' },
     { href: '/serwery-mcp', title: 'Serwery MCP', desc: 'Chrome DevTools MCP i ekosystem serwerów MCP w codziennej pracy.' },
     { href: '/claude-code-bezpieczenstwo', title: 'Claude Code — bezpieczeństwo', desc: 'Praca z AI na kodzie firmowym bez wycieku: VPC, modele lokalne, audit log.' },
   ]}
-    eyebrow="02 / Akademia · Czytaj dalej"
+    eyebrow="03 / Akademia · Czytaj dalej"
     title="Powiązane szkolenia."
-    dark
   />
 
   <!-- kontakt CTA -->
