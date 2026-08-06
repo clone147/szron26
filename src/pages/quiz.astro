@@ -8,8 +8,8 @@ import CtaBand from '../components/CtaBand.astro';
   title="Quiz: gotowość firmy na AI | SZRON"
   description="Odpowiedz na 8 pytań o procesach, narzędziach i zespole, a poznasz orientacyjną ocenę gotowości Twojej firmy na wdrożenie AI. Quiz działa w przeglądarce."
   eyebrow="Narzędzie · 8 pytań, ~3 minuty"
-  heading="AI Readiness Assessment."
-  lead="Osiem pytań o procesach, narzędziach i zespole. Na końcu zobaczysz orientacyjną ocenę gotowości Twojej firmy na AI — liczoną od razu w przeglądarce. To punkt wyjścia do rozmowy, nie wyrok."
+  heading="Czy Wasza firma jest gotowa na AI?"
+  lead="Osiem pytań o procesach, narzędziach i zespole. Wynik procentowy zobaczysz od razu w przeglądarce; pełny werdykt z rekomendacją pierwszego kroku odblokujesz, zostawiając e-mail. To punkt wyjścia do rozmowy, nie wyrok."
 >
   <!-- quiz -->
   <section class="sect" aria-labelledby="quiz">
@@ -39,14 +39,36 @@ import CtaBand from '../components/CtaBand.astro';
         <div id="quiz-result" hidden>
           <p class="eyebrow" id="quiz-band-label">Wynik</p>
           <h3 class="quiz__score" id="quiz-score">—</h3>
-          <p class="quiz__verdict" id="quiz-verdict">—</p>
-          <table class="results-table" id="quiz-breakdown"></table>
+
+          <!-- pełny werdykt odblokowywany e-mailem -->
+          <div id="quiz-unlock">
+            <p class="quiz__verdict">Pełny werdykt z rozbiciem na obszary (procesy, narzędzia, zespół) i rekomendacją pierwszego kroku wyślemy Ci razem z wynikiem. Zostaw e-mail — bez newslettera, bez dzwonienia.</p>
+            <form id="quiz-email-form" class="quiz__unlock-form">
+              <input type="email" id="quiz-email" name="email" placeholder="Twój e-mail firmowy" autocomplete="email" required />
+              <button type="submit" class="btn btn--accent">Pokaż pełny werdykt</button>
+            </form>
+            <p class="quiz__hint" style="text-align:left">Wysyłając akceptujesz przetwarzanie danych zgodnie z <a href="/privacy-policy">polityką prywatności</a>.</p>
+          </div>
+
+          <div id="quiz-full" hidden>
+            <p class="quiz__verdict" id="quiz-verdict">—</p>
+            <table class="results-table" id="quiz-breakdown"></table>
+          </div>
+
           <div class="quiz__nav" style="margin-top:var(--space-2xl)">
             <button type="button" class="btn btn--ghost btn--dark-on-light" id="quiz-restart">Wypełnij ponownie</button>
             <BtnArrow href="/umow-rozmowe">Omów wynik z nami</BtnArrow>
           </div>
         </div>
       </div>
+
+      <!-- statyczna definicja formularza dla detekcji Netlify Forms (submit idzie AJAX-em) -->
+      <form name="quiz-wynik" data-netlify="true" netlify-honeypot="bot-field" hidden aria-hidden="true">
+        <input type="email" name="email" />
+        <input type="text" name="wynik" />
+        <input type="text" name="poziom" />
+        <input name="bot-field" />
+      </form>
     </div>
   </section>
 
@@ -111,6 +133,13 @@ import CtaBand from '../components/CtaBand.astro';
     .quiz__hint { margin-top: var(--space-lg); font-size: var(--text-caption); color: var(--color-text-2); text-align: center; }
     .quiz__score { font-family: var(--font-display); font-weight: 600; font-size: var(--text-stat); color: var(--color-accent); margin: var(--space-md) 0; }
     .quiz__verdict { color: var(--color-text-2); max-width: 40rem; margin-bottom: var(--space-2xl); }
+    .quiz__unlock-form { display: flex; flex-wrap: wrap; gap: var(--space-sm); max-width: 32rem; }
+    .quiz__unlock-form input {
+      flex: 1 1 14rem; padding: 0.65em 0.9em; font: inherit; font-size: var(--text-s);
+      border: 2px solid var(--color-line); border-radius: var(--radius-sm);
+      background: var(--color-paper); color: var(--color-text);
+    }
+    .quiz__unlock-form input:focus { border-color: var(--color-accent); outline: none; }
   </style>
 
   <script is:inline>
@@ -153,8 +182,14 @@ import CtaBand from '../components/CtaBand.astro';
         verdict: document.getElementById('quiz-verdict'),
         bandLabel: document.getElementById('quiz-band-label'),
         breakdown: document.getElementById('quiz-breakdown'),
-        restart: document.getElementById('quiz-restart')
+        restart: document.getElementById('quiz-restart'),
+        unlock: document.getElementById('quiz-unlock'),
+        full: document.getElementById('quiz-full'),
+        emailForm: document.getElementById('quiz-email-form'),
+        email: document.getElementById('quiz-email')
       };
+      var unlocked = false;   // e-mail podany raz odblokowuje werdykt także po restarcie
+      var lastResult = { wynik: '', poziom: '' };
 
       function render() {
         var q = questions[current];
@@ -207,6 +242,10 @@ import CtaBand from '../components/CtaBand.astro';
         el.bandLabel.textContent = band.label;
         el.score.textContent = total + ' / ' + max + '  ·  ' + pct + '%';
         el.verdict.textContent = band.verdict;
+        lastResult.wynik = total + '/' + max + ' (' + pct + '%)';
+        lastResult.poziom = band.label;
+        el.unlock.hidden = unlocked;
+        el.full.hidden = !unlocked;
 
         // Rozbicie wg sekcji
         var bySection = {};
@@ -237,6 +276,26 @@ import CtaBand from '../components/CtaBand.astro';
       el.next.addEventListener('click', next);
       el.prev.addEventListener('click', prev);
       el.restart.addEventListener('click', restart);
+
+      // Bramka e-mail: wynik % jest jawny, pełny werdykt po zostawieniu kontaktu.
+      // Submit leci AJAX-em do Netlify Forms; błąd sieci nie blokuje odblokowania.
+      el.emailForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var body = new URLSearchParams({
+          'form-name': 'quiz-wynik',
+          email: el.email.value,
+          wynik: lastResult.wynik,
+          poziom: lastResult.poziom
+        }).toString();
+        fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: body
+        }).catch(function () { /* wynik pokazujemy niezależnie od statusu wysyłki */ });
+        unlocked = true;
+        el.unlock.hidden = true;
+        el.full.hidden = false;
+      });
 
       document.addEventListener('keydown', function (e) {
         if (!el.result.hidden) return;

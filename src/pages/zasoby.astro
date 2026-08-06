@@ -3,13 +3,14 @@ import Interior from '../layouts/Interior.astro';
 import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
+import BtnArrow from '../components/BtnArrow.astro';
 ---
 <Interior
   title="Zasoby — materiały o AI dla zespołów dev | SZRON"
-  description="Materiały na start współpracy: AI Coding Playbook dla enterprise, checklist gotowości na AI i self-assessment dojrzałości AI. Z prawdziwych wdrożeń."
+  description="Materiały na start współpracy: AI Coding Playbook dla enterprise, checklist gotowości na AI i quiz gotowości firmy. Z prawdziwych wdrożeń."
   eyebrow="Zasoby · materiały i narzędzia"
   heading="Materiały, które faktycznie pomagają wdrożyć AI."
-  lead="Zebraliśmy tu rzeczy, które sami dajemy zespołom na starcie współpracy: playbooki, checklisty i narzędzia do samodzielnej oceny. Frameworki, które powstały przy prawdziwych projektach. Po dostęp do materiałów zgłoś się do nas; self-assessment dojrzałości AI zrobisz od ręki."
+  lead="Zebraliśmy tu rzeczy, które sami dajemy zespołom na starcie współpracy: playbooki, checklisty i narzędzia do samodzielnej oceny. Frameworki, które powstały przy prawdziwych projektach. Materiały odsyłamy na maila — bez lejka i bez newslettera; quiz gotowości zrobisz od ręki."
 >
   <!-- proof -->
   <ProofStrip items={[
@@ -27,54 +28,48 @@ import CtaBand from '../components/CtaBand.astro';
           <p class="eyebrow">PDF · 28 stron</p>
           <h3>AI Coding Playbook dla enterprise</h3>
           <p>Powstał po kilkunastu wdrożeniach AI w zespołach dev: od sprawdzenia gotowości, przez wybór narzędzi, po liczenie zwrotu. Porównanie Cursor, Claude Code, Copilot, Codex i Gemini CLI, checklisty dla CTO i Team Leadów oraz szablon CLAUDE.md i project rules.</p>
-          <p style="margin-top:auto;padding-top:var(--space-lg)"><a href="/umow-rozmowe">Poproś o materiał →</a></p>
+          <p style="margin-top:auto;padding-top:var(--space-lg)"><a href="#pobierz">Wyślij mi playbook →</a></p>
         </article>
         <article class="card-tile rv" style="--rv-d:.1s">
           <p class="eyebrow">PDF · 1 strona</p>
           <h3>Checklist: czy Wasz zespół jest gotowy na AI?</h3>
           <p>Jedna strona A4, piętnaście pytań. Po pięciu minutach wiecie, na jakim etapie jesteście i co ma sens robić najpierw — z prostym scoringiem gotowości i rekomendacją dla każdego poziomu.</p>
-          <p style="margin-top:auto;padding-top:var(--space-lg)"><a href="/umow-rozmowe">Poproś o checklistę →</a></p>
+          <p style="margin-top:auto;padding-top:var(--space-lg)"><a href="#pobierz">Wyślij mi checklistę →</a></p>
         </article>
         <article class="card-tile rv" style="--rv-d:.2s">
-          <p class="eyebrow">Interaktywny self-assessment</p>
-          <h3>AI Engineering Maturity — samoocena</h3>
-          <p>Krótka samoocena na skali od „zero AI" do „AI-native": pięć poziomów dojrzałości, spersonalizowane rekomendacje i odniesienie do realiów rynkowych. Logikę oceny dojrzałości opisujemy w naszej metodzie.</p>
-          <p style="margin-top:auto;padding-top:var(--space-lg)"><a href="/metoda">Zobacz logikę oceny →</a></p>
+          <p class="eyebrow">Quiz · 8 pytań, ~3 minuty</p>
+          <h3>Quiz gotowości firmy na AI</h3>
+          <p>Osiem pytań o procesach, narzędziach i zespole — wynik procentowy od razu w przeglądarce, cztery poziomy dojrzałości i rekomendacja pierwszego kroku. Logikę oceny opisujemy w naszej metodzie.</p>
+          <p style="margin-top:auto;padding-top:var(--space-lg)"><a href="/quiz">Zrób quiz teraz →</a></p>
         </article>
       </div>
     </div>
   </section>
 
-  <!-- 02 jak po nie sięgnąć (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="dostep">
+  <!-- 02 pobierz (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="pobierz">
     <div class="container">
-      <SectHead eyebrow="02 / Dostęp · Jak po nie sięgnąć" title="Materiały wysyłamy bezpośrednio. Samoocenę zaczynasz od razu." id="dostep" />
-      <dl class="def-rows rv">
-        <div><dt>Playbook i checklist<small>Wysyłamy na maila</small></dt><dd>Napisz do nas, który materiał Cię interesuje — odeślemy go bezpośrednio. Bez lejka, bez spamu i bez zapisywania na listę, której nie chcesz.</dd></div>
-        <div><dt>Samoocena dojrzałości AI<small>Logika w naszej metodzie</small></dt><dd>Ramę pięciu poziomów dojrzałości i to, jak czytamy wyniki, opisujemy na stronie metody. To samo podejście stosujemy w pierwszej rozmowie i audycie.</dd></div>
-        <div><dt>Narzędzia open source<small>Udostępniane za darmo</small></dt><dd>Narzędzia, które tworzymy przy wdrożeniach AI, oddajemy społeczności. Zaglądnij do sekcji open source, jeśli wolisz zacząć od kodu.</dd></div>
-      </dl>
-    </div>
-  </section>
-
-  <!-- 03 dokąd dalej -->
-  <section class="sect" aria-labelledby="dalej">
-    <div class="container">
-      <SectHead eyebrow="03 / Dalej · Gdzie iść po materiały" title="Wybierz, od czego chcesz zacząć." id="dalej" small />
-      <div class="link-cards rv">
-        <a class="link-card" href="/metoda">
-          <h3>Nasza metoda</h3>
-          <p>Pięć poziomów dojrzałości AI i logika oceny, na której opiera się samoocena. Sprawdź, gdzie na skali jest Wasz zespół.</p>
-        </a>
-        <a class="link-card" href="/open-source">
-          <h3>Open source od SZRON</h3>
-          <p>Narzędzia, które budujemy przy wdrożeniach AI — udostępnione za darmo. Dla tych, którzy wolą zacząć od kodu.</p>
-        </a>
-        <a class="link-card" href="/akademia">
-          <h3>Akademia SZRON</h3>
-          <p>Jeśli zamiast materiałów do samodzielnej lektury wolisz warsztat — tu jest aktualny program szkoleń.</p>
-        </a>
-      </div>
+      <SectHead eyebrow="02 / Dostęp · Zostaw e-mail" title="Podaj e-mail — odsyłamy materiał bezpośrednio." id="pobierz" />
+      <p class="rv">Bez lejka, bez newslettera i bez zapisywania na listę, której nie chcesz. Dwa pola i tyle.</p>
+      <form name="zasoby-materialy" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="rv">
+        <input type="hidden" name="form-name" value="zasoby-materialy" />
+        <p hidden><label>Nie wypełniaj: <input name="bot-field" /></label></p>
+        <p>
+          <label for="z-material">Który materiał?</label>
+          <select id="z-material" name="material" required>
+            <option value="">Wybierz materiał</option>
+            <option>AI Coding Playbook dla enterprise (PDF, 28 stron)</option>
+            <option>Checklist: czy zespół jest gotowy na AI? (PDF, 1 strona)</option>
+            <option>Oba materiały</option>
+          </select>
+        </p>
+        <p>
+          <label for="z-email">E-mail</label>
+          <input type="email" id="z-email" name="email" required />
+        </p>
+        <BtnArrow type="submit">Wyślijcie mi materiał</BtnArrow>
+      </form>
+      <p class="rv"><small>Wysyłając formularz akceptujesz przetwarzanie danych zgodnie z <a href="/privacy-policy">polityką prywatności</a>. Odsyłamy materiał i na tym koniec.</small></p>
     </div>
   </section>
 

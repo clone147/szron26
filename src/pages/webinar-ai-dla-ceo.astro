@@ -3,6 +3,7 @@ import Interior from '../layouts/Interior.astro';
 import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
+import BtnArrow from '../components/BtnArrow.astro';
 ---
 <Interior
   title="Webinar: AI Strategy dla zarządu | SZRON"
@@ -15,9 +16,9 @@ import CtaBand from '../components/CtaBand.astro';
 >
   <!-- proof -->
   <ProofStrip items={[
-    ['45 minut', 'godz. 10:00–10:45, termin wkrótce'],
+    ['45 minut', 'zapis = powiadomienie o terminie'],
     ['Dla C-level', 'CEO, CTO, CFO, zarząd'],
-    ['Bezpłatnie', 'nagranie również dla zapisanych'],
+    ['Bezpłatnie', 'nagranie dla każdego zapisanego'],
   ]} />
 
   <!-- 01 agenda (ciemna) -->
@@ -25,7 +26,7 @@ import CtaBand from '../components/CtaBand.astro';
     <div class="container">
       <SectHead eyebrow="01 / Agenda · Co się wydarzy" title="Agenda webinaru — 45 minut, cztery bloki." id="agenda" />
       <div class="steps">
-        <article class="step rv"><p class="eyebrow">0–10 min · Dlaczego teraz?</p><h3>Co się zmieniło w AI</h3><p>Co się zmieniło w AI w ostatnim roku i dlaczego tempo przyspiesza. Konkretne przykłady z polskiego rynku.</p></article>
+        <article class="step rv"><p class="eyebrow">0–10 min · Dlaczego teraz?</p><h3>Co się zmieniło w AI</h3><p>Co się zmieniło w AI w ostatnim roku — w narzędziach i w prawie (AI Act w praktyce, bez straszenia). Konkretne przykłady z polskiego rynku.</p></article>
         <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">10–25 min · 4 błędy</p><h3>Czego unikać</h3><p>Błędy, które widzę u firm wchodzących w AI. Większość da się uniknąć — jeśli wiesz, na co uważać.</p></article>
         <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">25–40 min · Framework</p><h3>Framework wdrożenia</h3><p>Framework, którego używam z klientami. Prosty, powtarzalny, sprawdzony w polskich firmach.</p></article>
         <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">40–45 min · Q&amp;A</p><h3>Pytania na żywo</h3><p>Odpowiadam na pytania na żywo. Bez filtra — pytaj, o co chcesz.</p></article>
@@ -33,37 +34,33 @@ import CtaBand from '../components/CtaBand.astro';
     </div>
   </section>
 
-  <!-- 02 co wyniesiesz -->
-  <section class="sect" aria-labelledby="korzysci">
+  <!-- 02 zapis -->
+  <section class="sect" aria-labelledby="zapis-webinar">
     <div class="container">
-      <SectHead eyebrow="02 / Korzyści · Co wyniesiesz" title="Co wyniesiesz z webinaru." id="korzysci" small />
-      <div class="grid-cards">
-        <article class="card-tile rv">
-          <p class="eyebrow">01 / Gdzie AI zarabia</p>
-          <h3>A gdzie firmy palą budżety</h3>
-          <p>Dowiesz się, gdzie AI naprawdę zarabia — a gdzie firmy palą budżety.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.06s">
-          <p class="eyebrow">02 / Najczęstsze błędy</p>
-          <h3>I jak ich uniknąć</h3>
-          <p>Zobaczysz najczęstsze błędy — i jak ich uniknąć.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.12s">
-          <p class="eyebrow">03 / Prosty framework</p>
-          <h3>Czy projekt ma sens</h3>
-          <p>Dostaniesz prosty framework do oceny, czy dany projekt AI ma sens.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.18s">
-          <p class="eyebrow">04 / AI Act w praktyce</p>
-          <h3>Co oznacza dla firmy</h3>
-          <p>Powiem, co AI Act oznacza praktycznie dla Twojej firmy.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.24s">
-          <p class="eyebrow">05 / Pytania na żywo</p>
-          <h3>Odpowiadam na wszystko</h3>
-          <p>Możesz zadać mi pytania na żywo — odpowiadam na wszystko.</p>
-        </article>
-      </div>
+      <SectHead eyebrow="02 / Zapis · Termin ogłosimy mailem" title="Zapisz się — dostaniesz termin i nagranie." id="zapis-webinar" small />
+      <p class="rv">Termin najbliższej edycji ogłaszamy zapisanym mailowo. Jeśli nie będziesz mógł dołączyć na żywo — nagranie i tak do Ciebie trafi. Cztery pola, zero newslettera.</p>
+      <form name="webinar-ceo" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="rv">
+        <input type="hidden" name="form-name" value="webinar-ceo" />
+        <p hidden><label>Nie wypełniaj: <input name="bot-field" /></label></p>
+        <p>
+          <label for="w-imie">Imię i nazwisko</label>
+          <input type="text" id="w-imie" name="imie" required />
+        </p>
+        <p>
+          <label for="w-email">E-mail firmowy</label>
+          <input type="email" id="w-email" name="email" required />
+        </p>
+        <p>
+          <label for="w-firma">Firma</label>
+          <input type="text" id="w-firma" name="firma" required />
+        </p>
+        <p>
+          <label for="w-stanowisko">Stanowisko</label>
+          <input type="text" id="w-stanowisko" name="stanowisko" placeholder="np. CEO, CTO, członek zarządu" required />
+        </p>
+        <BtnArrow type="submit">Zapisz mnie na webinar</BtnArrow>
+      </form>
+      <p class="rv"><small>Wysyłając formularz akceptujesz przetwarzanie danych zgodnie z <a href="/privacy-policy">polityką prywatności</a>. Napiszemy tylko w sprawie webinaru.</small></p>
     </div>
   </section>
 

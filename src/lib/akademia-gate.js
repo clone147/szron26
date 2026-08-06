@@ -20,14 +20,17 @@ function buildGateBox() {
           <button type="submit" class="btn" data-agate-login>Zaloguj</button>
         </form>
         <p class="agate__status" data-agate-status role="status"></p>
-        <p class="agate__aux">Hasło zmienisz po zalogowaniu — w menu „Strefa” u góry strony.</p>
+        <p class="agate__aux">Nie masz konta? Zakładamy je przy <a href="/darmowy-audyt">darmowym audycie</a> i na naszych szkoleniach. Hasło zmienisz po zalogowaniu — w menu „Strefa” u góry strony.</p>
       </div>
     </div>`;
   return box;
 }
 
 export async function initGate() {
-  const sections = [...document.querySelectorAll('.page-body--interior section.sect')];
+  // CTA sprzedażowe (CtaBand) i „Powiązane szkolenia" muszą być widoczne także
+  // dla anonimowych — bramka chowa wyłącznie sekcje treści szkolenia.
+  const sections = [...document.querySelectorAll('.page-body--interior section.sect')]
+    .filter((s) => !s.classList.contains('cta-band') && s.getAttribute('aria-labelledby') !== 'powiazane');
   if (sections.length < 2) return;
 
   // pokaż ~połowę (zaokrąglenie w górę), resztę schowaj

@@ -37,7 +37,7 @@ const schema = pageSchema(Astro.url.pathname, { title, description, heading, ima
 
 // Bramka treści: strony szkoleniowe Akademii pokazują niezalogowanym ~połowę sekcji.
 const slug = Astro.url.pathname.replace(/\/+$/, '').replace(/^\/+/, '');
-const gated = akademia.some((a) => a.slug === slug);
+const gated = akademia.some((a) => a.slug === slug && a.gate !== false);
 ---
 <Base title={title} description={description} ogDescription={ogDescription} ogImage={ogImage} schema={schema}>
   <Nav />

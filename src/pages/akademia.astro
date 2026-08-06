@@ -16,6 +16,10 @@ import { akademia } from '../data/akademia.mjs';
   <section class="sect">
     <div class="container">
       <SectHead eyebrow="Wszystkie szkolenia" title={`${akademia.length} ścieżek — od pierwszej instalacji po model na własnym serwerze.`} small />
+      <div class="callout rv">
+        <strong>Połowa każdego szkolenia jest otwarta. Całość — po zalogowaniu.</strong>
+        <p>Konto zakładamy przy <a href="/darmowy-audyt">darmowym audycie</a> i dla uczestników naszych szkoleń. Jedno konto odblokowuje wszystkie ścieżki Akademii.</p>
+      </div>
       <img class="hero-img rv" src="/img/sub/akademia-szkolenie.webp" alt="Tomek prowadzi szkolenie przed dużym ekranem z terminalem, uczestnicy z laptopami" width="1380" height="768" loading="lazy" />
       <div class="link-cards link-cards--num rv">
         {akademia.map((a) => (
