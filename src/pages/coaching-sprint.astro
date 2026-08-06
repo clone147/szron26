@@ -1,0 +1,127 @@
+---
+import Interior from '../layouts/Interior.astro';
+import SectHead from '../components/SectHead.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import BtnArrow from '../components/BtnArrow.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+// FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html)
+const faq = [
+  { q: 'Na czyim kodzie pracujemy podczas sprintu?', a: 'Na waszym — bierzemy realne taski z backlogu i robimy je razem z AI, nie na sztucznych przykładach. Zespół od razu uczy się pracy na własnym projekcie.' },
+  { q: 'Ile czasu mój zespół musi na to poświęcić?', a: 'Pierwszy miesiąc to intensywność — 2 dni szkolenia, setup narzędzi, potem około 2h follow-upu tygodniowo. Później godzina tygodniowo i tyle.' },
+  { q: 'Ile to kosztuje i jak się rozliczacie?', a: 'Program kwartalny: stała opłata i zamknięty zakres — nie rozliczamy się godzinami, więc nie mamy interesu w przedłużaniu. Kwotę dostajecie po diagnozie, mailem w 48h. NDA podpisujemy przed startem.' },
+  { q: 'Czy kod musi wychodzić na zewnątrz?', a: 'Nie musi. Tam, gdzie to ważne, stawiamy lokalne modele AI w waszej serwerowni — pełna kontrola nad danymi, zgodność z NIS2 i wymaganiami branżowymi, a skuteczność porównywalna z modelami w chmurze.' },
+  { q: 'Co to są MCP Tools i po co nam one?', a: 'MCP to standard, który pozwala agentowi AI bezpiecznie sięgać do waszych systemów — repozytorium, bazy danych, przeglądarki. Jak to działa w praktyce i jak to konfigurujemy, opisujemy na stronie <a href="/serwery-mcp">Serwery MCP</a>.' },
+];
+---
+<Interior
+  title="Coaching Sprint AI — wdrożenie AI w zespole dev | SZRON"
+  description="Coaching Sprint AI: wdrożenie AI w zespole dev z coachingiem na waszym kodzie. Program kwartalny ze stałą opłatą, efekty mierzone w repozytoriach, wsparcie do pełnej samodzielności."
+  eyebrow="Coaching Sprint · wdrożenie AI z coachingiem na żywym kodzie"
+  heading="Coaching Sprint AI. Wasz zespół uczy się pracować z agentem."
+  lead="Wchodzimy do waszego repozytorium, bierzemy prawdziwe taski i robimy je razem z agentem AI. Zespół nie pracuje więcej — agent bierze na siebie rutynę, a efekty widać od pierwszego tygodnia. Po programie zostają skonfigurowane narzędzia, dokumentacja i kompetencje w zespole."
+  heroImage="/img/sub/wdrozenia-ai.webp"
+  heroAlt="Zazębiające się oszronione koła zębate z pomarańczową energią"
+>
+  <!-- proof -->
+  <ProofStrip items={[
+    ['Na waszym kodzie', 'prawdziwe taski z Jiry, nie przykłady'],
+    ['+266% tempa pracy', 'pomiar DevLens z realnego wdrożenia'],
+    ['30 dni wsparcia', 'po sprincie — do pełnej samodzielności'],
+  ]} />
+
+  <!-- 01 proces -->
+  <section class="sect" aria-labelledby="proces">
+    <div class="container">
+      <SectHead eyebrow="01 / Proces · Jak działa Coaching Sprint" title="Cztery kroki: diagnoza → narzędzia → coaching → kompetencje." id="proces" />
+      <img class="hero-img rv" src="/img/sub/wdrozenia-ai-warsztat.webp" alt="Inżynier z tabletem z metrykami produkcji w jasnej hali przemysłowej" width="1380" height="768" loading="lazy" />
+      <div class="steps">
+        <article class="step rv"><p class="eyebrow">01 · Diagnoza</p><h3>Sprawdzamy, co was spowalnia</h3><p>Patrzymy na wasze daily, review i pipeline. Pytamy devów, co ich wkurza. Zwykle po jednym dniu wiemy, gdzie jest problem.</p></article>
+        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Dobór narzędzi</p><h3>Testujemy na waszym repozytorium</h3><p>Wdrażamy agentów przez Claude Code i MCP Tools, do tego Cursor czy Copilot tam, gdzie pasują. Wybieramy to, co realnie robi różnicę — setup lokalnych modeli opcjonalnie.</p></article>
+        <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Coaching na kodzie</p><h3>Robimy taski razem</h3><p>Bierzemy wasze prawdziwe taski z Jiry i robimy je razem z AI: Context Engineering, Self-Improving Loops, konfiguracja AGENTS.md. Po kilku dniach ludzie sami zaczynają eksperymentować.</p></article>
+        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Kompetencje zostają</p><h3>U was, nie u nas</h3><p>Zostawiamy skonfigurowane narzędzia, dokumentację, szablony i wewnętrznych championów — plus 30 dni wsparcia. Potem radzicie sobie bez nas.</p></article>
+      </div>
+      <ProofStrip wrap={false} items={[
+        ['2 dni szkolenia', 'na start, potem ok. 2h follow-upu tygodniowo'],
+        ['Program kwartalny', 'stała opłata, zamknięty zakres'],
+        ['Dwie osoby na projekcie', 'Tomek — 25 lat w IT, w tym embedded; Maciej — 18 lat'],
+      ]} />
+    </div>
+  </section>
+
+  <!-- 02 efekty (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="efekty">
+    <div class="container">
+      <SectHead eyebrow="02 / Efekty · Liczby z realnych projektów" title="Konkretne liczby, nie obietnice." id="efekty" />
+      <div class="grid-cards">
+        <article class="card-tile rv">
+          <p class="eyebrow">01 / Pomiar DevLens</p>
+          <h3>+266% tempa pracy</h3>
+          <p>Średni wzrost tempa pracy zespołu po wdrożeniu AI — zmierzony w repozytoriach, nie zadeklarowany w ankiecie.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.08s">
+          <p class="eyebrow">02 / System raportowania</p>
+          <h3>3× szybsze raporty</h3>
+          <p>Python, Pandas i OpenAI API. Tydzień zamiast miesiąca pracy analityka — przyspieszenie całej pracy analitycznej.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.16s">
+          <p class="eyebrow">03 / Integracja API</p>
+          <h3>5–7× szybsze wdrożenie</h3>
+          <p>REST API i webhooki z obsługą błędów, komplet testów jednostkowych i integracyjnych. 2–3 dni zamiast tygodni — gotowe do produkcji.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.24s">
+          <p class="eyebrow">04 / Drukarka RS232 (embedded)</p>
+          <h3>20× szybciej</h3>
+          <p>Rust na ARM Cortex: teksty, grafika BMP i kody QR. 1,5 dnia zamiast miesiąca — w produkcji w kasach POS na Litwie.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 dla kogo -->
+  <section class="sect" aria-labelledby="role">
+    <div class="container">
+      <SectHead eyebrow="03 / Dla kogo · Firma i role" title="Dev potrzebuje czegoś innego niż tech lead." id="role" small />
+      <dl class="def-rows rv">
+        <div><dt>Wasza firma<small>Zespół IT od 30 osób · cała Polska</small></dt><dd>Pracujemy z firmami, które mają zespół IT 30+ osób — falami, zespół po zespole. Spotkania robocze prowadzimy na Teams, więc lokalizacja nie gra roli.</dd></div>
+        <div><dt>Programiści<small>Claude Code, Cursor, Copilot, Codex, Gemini CLI</small></dt><dd>Taski, które zajmowały dzień, idą w godziny. AI pisze testy i dokumentację, łapie bugi zanim trafią na review. Junior po dwóch tygodniach dowozi jak mid, a senior w końcu skupia się na architekturze zamiast klepać boilerplate.</dd></div>
+        <div><dt>Tech leadzi<small>Context Engineering, quality gates AI, asystenci architektury</small></dt><dd>Tech lead nie musi być wąskim gardłem: AI pilnuje standardów, łapie regresje i sprawdza architekturę. Zespół dowozi szybciej, onboarding nowych devów przestaje zjadać seniorów.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 04 modernizacja mobile (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="mobile">
+    <div class="container">
+      <SectHead eyebrow="04 / Modernizacja · Aplikacje mobilne" title="Stara aplikacja mobilna? Modernizujemy ją w tym samym modelu." id="mobile" small />
+      <div class="prose rv">
+        <p>Coaching Sprint działa też wtedy, gdy hamulcem jest stara aplikacja mobilna. Modernizujemy ją razem z waszym zespołem — każdy commit produkcyjny piszą wasi ludzie, my obok, z agentem AI od pierwszego dnia. Tak zrobiliśmy w RegioBus Systems: nowy system biletowy NFC (Kotlin, Java 21, Spring Boot) zamiast sześciomiesięcznego planu wszedł do produkcji po czterech tygodniach.</p>
+      </div>
+      <ProofStrip wrap={false} items={[
+        ['~6× szybciej', '4 tygodnie zamiast 6 miesięcy do produktu'],
+        ['0 odejść', 'z 4 osób przy starym systemie została 1 z asystentem AI'],
+        ['7% → 68%', 'pokrycie testami (unit + integration)'],
+      ]} />
+      <div class="contact__cta rv">
+        <BtnArrow class="btn btn--ghost" href="/case-studies/regiobus">Pełny case: RegioBus Systems</BtnArrow>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 FAQ -->
+  <section class="sect" aria-labelledby="faq-title">
+    <div class="container">
+      <SectHead eyebrow="05 / FAQ · Zanim zaczniemy" title="Pytania, które padają przed sprintem." id="faq-title" small />
+      <Faq items={faq} />
+    </div>
+  </section>
+
+  <!-- kontakt CTA -->
+  <CtaBand
+    eyebrow="Kontakt"
+    heading="30 minut na Teams. Sprawdzimy, czy Coaching Sprint ma u was sens."
+    text="Pogadajmy szczerze — powiemy wprost, co ma sens, a co nie. Jeśli sprint ma sens, po diagnozie dostaniecie kwotę programu i zamknięty zakres na kwartał."
+    btnLabel="Umów Coaching Sprint"
+  />
+</Interior>

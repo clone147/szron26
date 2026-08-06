@@ -1,52 +1,29 @@
 ---
 import Interior from '../layouts/Interior.astro';
 import SectHead from '../components/SectHead.astro';
-import ProofStrip from '../components/ProofStrip.astro';
-import Faq from '../components/Faq.astro';
-import LeadForm from '../components/LeadForm.astro';
-import CallPrep from '../components/CallPrep.astro';
-import { faqRozmowa } from '../data/faq-rozmowa.mjs';
 import BtnArrow from '../components/BtnArrow.astro';
-
 ---
 <Interior
-  title="Kontakt — diagnoza 30 minut, mail, telefon | SZRON"
-  description="Skontaktuj się z SZRON: krótki formularz diagnozy (wracamy w 24h), mail tw@szron.tech albo telefon +48 505 091 200. Konkretne pytania o stos i zespół."
+  title="Kontakt — mail, telefon, adres | SZRON"
+  description="Kontakt z SZRON: mail tw@szron.tech, telefon +48 505 091 200, Rzeszów — pracujemy z firmami z całej Polski. Rozmowę diagnostyczną umówisz na osobnej stronie."
   eyebrow="Kontakt"
   heading="Najprościej: napiszcie albo zadzwońcie."
-  lead="Formularz, mail albo telefon — wybierzcie, co wygodniejsze. Odpowiadamy w 24h w dni robocze. Jeśli chcecie od razu zaplanować 30-minutową diagnozę, użyjcie strony „Umów rozmowę”."
+  lead="Mail albo telefon — odpowiadamy w 24h w dni robocze. A jeśli chcecie od razu zaplanować 30-minutową diagnozę z formularzem i kalendarzem, przejdźcie do „Umów rozmowę”."
   heroImage="/img/sub/kontakt.webp"
   heroAlt="Tomek i Maciej przy stole w jasnym biurze, z laptopami i kawą — gotowi do rozmowy"
 >
-  <!-- proof -->
-  <ProofStrip items={[
-    ['Czas: 30 minut', 'wideo lub telefon'],
-    ['Odpowiedź w 24h', 'w dni robocze'],
-    ['Po stronie SZRON', 'Tomek Wojciechowski, w razie potrzeby Maciej'],
-  ]} />
-
-  <!-- 01 formularz (ciemna) -->
-  <LeadForm name="kontakt" />
-
-  <CallPrep />
-
-  <!-- 04 alternatywy: mail / telefon / adres -->
+  <!-- 01 dane kontaktowe -->
   <section class="sect" aria-labelledby="napisac">
     <div class="container">
-      <SectHead eyebrow="04 / Alternatywa · Mail albo telefon" title="Wolicie napisać albo zadzwonić?" id="napisac" small />
+      <SectHead eyebrow="01 / Dane · Mail, telefon, adres" title="Wybierzcie, co wygodniejsze." id="napisac" small />
       <dl class="def-rows rv">
         <div><dt>Email<small>tw@szron.tech</small></dt><dd>Odpowiadamy w 24h w dni robocze. Załączcie krótki opis aplikacji — odpowiemy już z pierwszymi pytaniami.</dd></div>
-        <div><dt>Telefon<small>+48 505 091 200</small></dt><dd>Wolimy zaplanowaną rozmowę przez formularz — wtedy jesteśmy przygotowani. Awaryjnie dzwońcie pn–pt 9–17.</dd></div>
-        <div><dt>Adres<small>Rzeszów · Polska</small></dt><dd>SZRON Tomek Wojciechowski, ul. Legionistów 12/1/B, 35-317 Rzeszów. Warszawa — spotkania na życzenie.</dd></div>
+        <div><dt>Telefon<small>+48 505 091 200</small></dt><dd>Wolimy zaplanowaną rozmowę — wtedy jesteśmy przygotowani. Awaryjnie dzwońcie pn–pt 9–17.</dd></div>
+        <div><dt>Adres<small>Rzeszów · Polska</small></dt><dd>SZRON Tomek Wojciechowski, ul. Legionistów 12/1/B, 35-317 Rzeszów. Pracujemy z firmami z całej Polski — spotkania na Teams.</dd></div>
       </dl>
-    </div>
-  </section>
-
-  <!-- 05 FAQ -->
-  <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
-    <div class="container">
-      <SectHead eyebrow="05 / FAQ · Przed pierwszą rozmową" title="Pytania, które padają przed pierwszą rozmową." id="faq-title" small />
-      <Faq items={faqRozmowa} />
+      <div class="contact__cta rv" style="margin-top:var(--space-2xl)">
+        <BtnArrow href="/umow-rozmowe">Umów 30-minutową rozmowę</BtnArrow>
+      </div>
     </div>
   </section>
 </Interior>

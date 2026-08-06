@@ -29,7 +29,7 @@
   status = 301
 [[redirects]]
   from = "/benefits"
-  to = "/wdrozenia-ai"
+  to = "/coaching-sprint"
   status = 301
 [[redirects]]
   from = "/ai-transformation"
@@ -37,7 +37,7 @@
   status = 301
 [[redirects]]
   from = "/studia-przypadkow"
-  to = "/wdrozenia-ai"
+  to = "/case-studies"
   status = 301
 [[redirects]]
   from = "/szkolenia"
@@ -45,7 +45,25 @@
   status = 301
 [[redirects]]
   from = "/augmentacja-programistow"
-  to = "/augmentacja-pracownikow"
+  to = "/coaching-sprint"
+  status = 301
+
+# ── 301: konsolidacja treści (audyt 08.2026) — 4 strony scalone/zlikwidowane ──
+[[redirects]]
+  from = "/wdrozenia-ai"
+  to = "/coaching-sprint"
+  status = 301
+[[redirects]]
+  from = "/augmentacja-pracownikow"
+  to = "/coaching-sprint"
+  status = 301
+[[redirects]]
+  from = "/mobile-apps"
+  to = "/coaching-sprint"
+  status = 301
+[[redirects]]
+  from = "/dla-zespolow"
+  to = "/ai-dla-dev-teamow"
   status = 301
 
 # Bezpieczeństwo + cache statyków

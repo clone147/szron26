@@ -19,6 +19,7 @@ const {
   heroImage,            // opcjonalna grafika bohatera (ścieżka /img/sub/...)
   heroAlt = '',
   updated,              // data ostatniej aktualizacji treści (ISO 'YYYY-MM-DD') — widoczna w hero + dateModified w JSON-LD
+  noindex = false,      // strony narzędziowe (np. /gra) — poza indeksem i sitemap (filtr w astro.config.mjs)
 } = Astro.props;
 
 // czytelna data PL z ISO (np. '2026-06-20' → '20 czerwca 2026')
@@ -39,7 +40,7 @@ const schema = pageSchema(Astro.url.pathname, { title, description, heading, ima
 const slug = Astro.url.pathname.replace(/\/+$/, '').replace(/^\/+/, '');
 const gated = akademia.some((a) => a.slug === slug && a.gate !== false);
 ---
-<Base title={title} description={description} ogDescription={ogDescription} ogImage={ogImage} schema={schema}>
+<Base title={title} description={description} ogDescription={ogDescription} ogImage={ogImage} schema={schema} noindex={noindex}>
   <Nav />
   <header class={`page-hero${heroImage ? ' page-hero--media' : ''}`}>
     <div class="container">

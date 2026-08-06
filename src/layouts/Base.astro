@@ -18,6 +18,7 @@ const {
   ogDescription = description,
   ogImage = '/img/og-cover.webp',
   schema = [],
+  noindex = false,
 } = Astro.props;
 
 // Kanoniczny URL + absolutny og:image (względem domeny z astro.config `site`)
@@ -80,6 +81,7 @@ const orgSchema = {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{title}</title>
   <meta name="description" content={description} />
+  {noindex && <meta name="robots" content="noindex, nofollow" />}
   <link rel="canonical" href={canonical} />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="SZRON" />
