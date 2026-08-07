@@ -1204,11 +1204,10 @@ form [name="bot-field"], form label:has([name="bot-field"]), p.hidden, .hidden-f
 /* ── reveals (scroll) ────────────────────────────────── */
 .rv {
   opacity: 0;
-  transform: translateY(28px);
-  transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
+  transition: opacity var(--dur-2) var(--ease-out);
   transition-delay: var(--rv-d, 0s);
 }
-.rv.is-view { opacity: 1; transform: none; }
+.rv.is-view { opacity: 1; }
 
 /* nagłówki .ws: rv + data-scramble dokłada JS (main.js) */
 
