@@ -1220,7 +1220,9 @@ form [name="bot-field"], form label:has([name="bot-field"]), p.hidden, .hidden-f
 scr-w { position: relative; }
 scr-m, scr-h { visibility: hidden; }
 scr-w.done scr-m { visibility: visible; }
-scr-v { position: absolute; top: 0; left: 0; white-space: pre; }
+/* top:50% + translateY(-50%): centruje line-box warstwy losowanych znaków na
+   content-area słowa — top:0 dawał offset o różnicę half-leadingu (skok przy done) */
+scr-v { position: absolute; top: 50%; left: 0; transform: translateY(-50%); white-space: pre; }
 scr-w.done scr-v { display: none; }
 scr-d { color: var(--color-accent); opacity: 0.85; }
 
