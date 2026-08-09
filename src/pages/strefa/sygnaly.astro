@@ -1,0 +1,62 @@
+---
+import Strefa from '../../layouts/Strefa.astro';
+---
+<Strefa title="Sygnały" active="sygnaly">
+  <div class="strefa-head">
+    <div>
+      <p class="strefa-eyebrow">Strefa zamknięta</p>
+      <h1>Sygnały</h1>
+      <p>Sygnały zakupowe CAIO: oferty pracy embedded/C++/AI i newsy z firm docelowych. Zasilane skanerem (<code>scripts/caio/scan.mjs</code>) — lokalnie lub przez routine.</p>
+    </div>
+  </div>
+
+  <div class="strefa-stats" id="stats" aria-live="polite"></div>
+
+  <div class="strefa-toolbar">
+    <div class="strefa-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input class="strefa-input" id="search" type="search" placeholder="Szukaj firmy, stanowiska, słowa kluczowego…" autocomplete="off" />
+    </div>
+    <select class="strefa-input" id="f-typ" aria-label="Typ sygnału">
+      <option value="">Wszystkie typy</option>
+      <option value="praca">Oferty pracy</option>
+      <option value="news">Newsy</option>
+    </select>
+    <select class="strefa-input" id="f-status" aria-label="Status">
+      <option value="aktywne">Aktywne</option>
+      <option value="nowy">Tylko nowe</option>
+      <option value="odrzucony">Odrzucone</option>
+      <option value="">Wszystkie</option>
+    </select>
+  </div>
+
+  <div id="list" class="sygnaly-list"></div>
+  <div id="empty" class="dgrid-empty" hidden>
+    <p>Brak sygnałów dla wybranych filtrów. Skaner: <code>node scripts/caio/scan.mjs</code> (wymaga <code>CAIO_INGEST_SECRET</code>).</p>
+  </div>
+
+  <div class="strefa-toasts" id="toasts" aria-live="polite"></div>
+
+  <style>
+    .sygnaly-list { display: flex; flex-direction: column; gap: .6rem; }
+    .sygnal { background: var(--color-ink-2); border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); padding: .85rem 1rem; }
+    .sygnal.is-new { border-left: 3px solid var(--color-accent); }
+    .sygnal.is-dismissed { opacity: .55; }
+    .sygnal__top { display: flex; align-items: center; gap: .55rem; flex-wrap: wrap; font-size: var(--text-caption); }
+    .sygnal__waga { padding: .1rem .5rem; border-radius: 99px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+    .sygnal__waga--w3 { background: #7a2e2e; color: #ffd9d9; }
+    .sygnal__waga--w2 { background: #6e5a1e; color: #ffedb0; }
+    .sygnal__waga--w1 { background: var(--color-ink-3); color: var(--color-text-inv-2); }
+    .sygnal__typ, .sygnal__tier { color: var(--color-text-inv-3); text-transform: uppercase; letter-spacing: .06em; }
+    .sygnal__firma { color: var(--color-text-inv); }
+    .sygnal__date { margin-left: auto; color: var(--color-text-inv-3); }
+    .sygnal__tytul { display: inline-block; margin-top: .35rem; color: var(--color-text-inv); font-weight: 500; text-decoration: none; }
+    .sygnal__tytul:hover { text-decoration: underline; }
+    .sygnal__opis { margin: .25rem 0 0; color: var(--color-text-inv-3); font-size: var(--text-caption); }
+    .sygnal__actions { display: flex; gap: .4rem; margin-top: .55rem; }
+  </style>
+
+  <script>
+    import '../../lib/strefa-sygnaly.js';
+  </script>
+</Strefa>
