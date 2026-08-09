@@ -1,18 +1,34 @@
 // Aplikacja „Sygnały" strefy zamkniętej SZRON — sygnały zakupowe CAIO (oferty pracy + newsy)
-// zbierane przez skaner scripts/caio/scan.mjs → Edge Function caio-ingest → strefa.caio_signals.
-// Widok: firmy jako zwijane karty (wzorzec .strefa-tr ze Szkoleń), w środku wiersze sygnałów.
+// + pipeline kontaktu: statusy firm (caio_companies), log dotyków (caio_touches),
+// generator spersonalizowanych sekwencji outbound (szablony z planu CAIO, kopiowanie do schowka).
+// Zasada twarda planu: nic nie wysyła się automatycznie — tylko teksty do skopiowania.
 import { getClient, getTeamUser } from './supabase.js';
-import { $, esc, toast, fmtDate } from './strefa-ui.js';
+import { $, esc, toast, fmtDate, openModal, closeModal } from './strefa-ui.js';
 
 const sb = getClient();
 
 let signals = [];
+const companies = new Map(); // firma -> {status, notatka, tier}
+const touches = new Map();   // firma -> [touch, ...] (najnowszy pierwszy)
 let query = '';
 let fTyp = '';           // '' | 'praca' | 'news'
 let fStatus = 'aktywne'; // 'aktywne' (nowy+przeczytany) | 'nowy' | 'odrzucony' | ''
 const openFirms = new Set();
 
 const WAGA_LABEL = { 3: 'Gorący', 2: 'Ciepły', 1: 'Info' };
+const PIPE = [
+  ['nowy', 'Nowy'], ['dotkniety', 'Dotknięty'], ['rozmowa', 'Rozmowa'],
+  ['propozycja', 'Propozycja'], ['klient', 'Klient'], ['odpadl', 'Odpadł'],
+];
+const TOUCH_LABEL = { zaproszenie: 'Zaproszenie LI', wiadomosc: 'Wiadomość LI', email: 'E-mail', call: 'Call' };
+// Sekwencja z planu: zaproszenie (d0) → follow-up (d3–4) → e-mail (d7) → break-up (d21).
+// next: [kolejny krok, dni od poprzedniego dotyku]
+const NEXT_STEP = {
+  null: ['zaproszenie', 0, 'Nota zaproszenia LI'],
+  zaproszenie: ['wiadomosc', 3, 'Follow-up po akceptacji'],
+  wiadomosc: ['email', 3, 'E-mail do CTO/VP Eng'],
+  email: ['wiadomosc', 14, 'Break-up'],
+};
 
 const ICO = {
   chev: '<svg class="strefa-tr__chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>',
@@ -22,16 +38,99 @@ const ICO = {
   x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
   undo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>',
   ext: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>',
+  copy: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+  send: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>',
 };
 
+/* ── dane ── */
 async function load() {
-  const { data, error } = await sb.from('caio_signals').select('*').order('created_at', { ascending: false });
-  if (error) { toast('Błąd wczytywania', error.message, 'err'); return; }
-  signals = data ?? [];
+  const [sig, comp, tch] = await Promise.all([
+    sb.from('caio_signals').select('*').order('created_at', { ascending: false }),
+    sb.from('caio_companies').select('*'),
+    sb.from('caio_touches').select('*').order('created_at', { ascending: false }),
+  ]);
+  const err = sig.error || comp.error || tch.error;
+  if (err) { toast('Błąd wczytywania', err.message, 'err'); return; }
+  signals = sig.data ?? [];
+  companies.clear();
+  for (const c of comp.data ?? []) companies.set(c.firma, c);
+  touches.clear();
+  for (const t of tch.data ?? []) {
+    if (!touches.has(t.firma)) touches.set(t.firma, []);
+    touches.get(t.firma).push(t);
+  }
   render();
 }
 
-/* opis skanera = "Dopasowane: c++, embedded · Warszawa" → chipy + lokalizacja */
+function companyOf(firma) {
+  return companies.get(firma) ?? { firma, status: 'nowy', notatka: null };
+}
+async function saveCompany(firma, patch) {
+  const cur = companyOf(firma);
+  const row = { firma, tier: signals.find((s) => s.firma === firma && s.tier)?.tier ?? cur.tier ?? null, status: cur.status, notatka: cur.notatka, ...patch, updated_at: new Date().toISOString() };
+  const { error } = await sb.from('caio_companies').upsert(row, { onConflict: 'firma' });
+  if (error) { toast('Błąd zapisu', error.message, 'err'); return false; }
+  companies.set(firma, row);
+  return true;
+}
+async function addTouch(firma, typ, wynik, tresc = null) {
+  const { data, error } = await sb.from('caio_touches').insert({ firma, typ, wynik: wynik || null, tresc }).select().single();
+  if (error) { toast('Błąd zapisu dotyku', error.message, 'err'); return false; }
+  if (!touches.has(firma)) touches.set(firma, []);
+  touches.get(firma).unshift(data);
+  if (companyOf(firma).status === 'nowy') await saveCompany(firma, { status: 'dotkniety' });
+  return true;
+}
+
+/* ── sekwencja / terminy ── */
+function nextStepFor(firma) {
+  const hist = touches.get(firma) ?? [];
+  const st = companyOf(firma).status;
+  if (['klient', 'odpadl', 'propozycja', 'rozmowa'].includes(st)) return null; // sekwencja tylko do momentu rozmowy
+  const last = hist.find((t) => t.typ !== 'call');
+  const key = hist.length >= 4 ? null : (last?.typ ?? null);
+  const step = NEXT_STEP[key];
+  if (!step) return null;
+  const [typ, days, label] = step;
+  const due = last ? new Date(new Date(last.created_at).getTime() + days * 864e5) : new Date();
+  return { typ, label, due, overdue: due <= new Date() };
+}
+
+function bestSignal(firma) {
+  const list = signals.filter((s) => s.firma === firma && s.status !== 'odrzucony');
+  return list.sort((a, b) => b.waga - a.waga || new Date(b.created_at) - new Date(a.created_at))[0] ?? null;
+}
+function techOf(firma) {
+  const s = signals.find((x) => x.firma === firma && x.typ === 'praca');
+  const m = /^Dopasowane:\s*([^·]+)/.exec(s?.opis ?? '');
+  return m ? m[1].trim() : 'embedded/C++';
+}
+function nextRegDate() {
+  const today = new Date();
+  for (const [d, label] of [['2026-09-11', 'CRA (11.09)'], ['2026-10-03', 'NIS2 (3.10)']]) {
+    if (new Date(d) > today) return label;
+  }
+  return 'najbliższy termin regulacyjny';
+}
+
+/* Szablony z planu CAIO (C.7), personalizowane firmą, techem i najgorętszym sygnałem. */
+function sequenceTexts(firma) {
+  const tech = techOf(firma);
+  const sig = bestSignal(firma);
+  const hak = sig ? `${sig.typ === 'praca' ? 'rekrutujecie' : 'głośno o Was'}: ${sig.tytul}` : '';
+  return [
+    { typ: 'zaproszenie', title: 'Nota zaproszenia LI (≤300 znaków, dzień 0)',
+      text: `Dzień dobry, widziałem że ${firma} rekrutuje do zespołu firmware/embedded (${tech}). Pomagam producentom sprzętu wdrażać AI w rozwoju oprogramowania — bez hype'u, z naciskiem na legacy C++ i gotowość na CRA. Chętnie połączę się i podzielę konkretem.` },
+    { typ: 'wiadomosc', title: 'Follow-up po akceptacji (dzień 3–4)',
+      text: `Dziękuję za przyjęcie zaproszenia. Skoro budujecie własny firmware, może się przydać krótki, darmowy AI-Readiness Assessment dla zespołów embedded — 10 pytań, wynik od ręki: [link]. Jeśli coś w wyniku będzie zaskakujące, chętnie omówię 20 min.` },
+    { typ: 'email', title: 'E-mail do CTO/VP Eng (dzień 7)',
+      text: `Temat: ${firma} a CRA 11.09 — 24h na zgłoszenie podatności w firmware\n\nDzień dobry [Imię],\n\nod 11 września 2026 CRA nakłada obowiązek zgłaszania aktywnie wykorzystywanych podatności w 24h (kaskada 24/72h/14 dni), także dla produktów już na rynku. Dla zespołów firmware w C++ to głównie kwestia procesu i widoczności kodu.${sig ? `\n\n(Sygnał: ${hak})` : ''}\n\nRobię 1-dniowy warsztat + krótki audyt gotowości łączący to z AI-augmented review. Znajdziemy 20 min w tym tygodniu? Kalendarz: [link].` },
+    { typ: 'wiadomosc', title: 'Break-up (dzień 21)',
+      text: `Dzień dobry [Imię], rozumiem że teraz nie priorytet — zamykam wątek z mojej strony. Zostawiam [link do assetu/posta o CRA]; gdyby temat gotowości firmware wrócił przed ${nextRegDate()}, jestem pod ręką. Powodzenia!` },
+  ];
+}
+
+/* ── widok ── */
 function parseOpis(opis) {
   const m = /^Dopasowane:\s*([^·]+?)(?:\s*·\s*(.+))?$/.exec(opis ?? '');
   if (!m) return { kws: [], extra: opis ?? '' };
@@ -52,12 +151,22 @@ function visible() {
 function renderStats() {
   const nowe = signals.filter((s) => s.status === 'nowy').length;
   const gorace = signals.filter((s) => s.waga === 3 && s.status !== 'odrzucony').length;
-  const firmy = new Set(signals.filter((s) => s.status !== 'odrzucony').map((s) => s.firma)).size;
+  const wToku = [...companies.values()].filter((c) => !['nowy', 'odpadl'].includes(c.status)).length;
   const last = signals[0]?.created_at;
   $('#stats').innerHTML = [
-    ['Nowe sygnały', nowe], ['Gorące (waga 3)', gorace], ['Firmy z sygnałem', firmy],
+    ['Nowe sygnały', nowe], ['Gorące (waga 3)', gorace], ['Firmy w pipeline', wToku],
     ['Ostatni skan', last ? fmtDate(last) : '—'],
   ].map(([l, n]) => `<div class="strefa-stat"><div class="strefa-stat__num">${n}</div><div class="strefa-stat__lbl">${l}</div></div>`).join('');
+}
+
+function renderDue(firms) {
+  const due = firms
+    .map((f) => ({ firma: f, step: nextStepFor(f) }))
+    .filter((d) => d.step && d.step.overdue && (touches.get(d.firma)?.length || companyOf(d.firma).status !== 'nowy' || bestSignal(d.firma)?.waga >= 2));
+  $('#due').innerHTML = !due.length ? '' : `<div class="syg-due">
+    <span class="syg-due__lbl">${ICO.send} Do dotknięcia dziś:</span>
+    ${due.map((d) => `<button class="syg-due__item" data-seq="${esc(d.firma)}">${esc(d.firma)} <em>· ${esc(d.step.label)}</em></button>`).join('')}
+  </div>`;
 }
 
 function row(s) {
@@ -84,6 +193,14 @@ function row(s) {
   </div>`;
 }
 
+function touchRow(t) {
+  return `<div class="syg-touch">
+    <span class="syg-touch__typ">${TOUCH_LABEL[t.typ] ?? t.typ}</span>
+    <span class="syg-touch__date">${fmtDate(t.created_at)}</span>
+    ${t.wynik ? `<span class="syg-touch__wynik">${esc(t.wynik)}</span>` : ''}
+  </div>`;
+}
+
 function firmCard(firma, items) {
   const open = openFirms.has(firma);
   const maxWaga = Math.max(...items.map((s) => s.waga));
@@ -91,6 +208,9 @@ function firmCard(firma, items) {
   const prace = items.filter((s) => s.typ === 'praca').length;
   const newsy = items.length - prace;
   const tier = items.find((s) => s.tier)?.tier;
+  const comp = companyOf(firma);
+  const hist = touches.get(firma) ?? [];
+  const step = nextStepFor(firma);
   const heat = maxWaga === 3 ? '<span class="strefa-chip strefa-chip--error">Gorący</span>'
     : maxWaga === 2 ? '<span class="strefa-chip strefa-chip--pending">Ciepły</span>' : '';
   return `<section class="strefa-tr ${open ? 'is-open' : ''}" data-firma="${esc(firma)}">
@@ -99,18 +219,25 @@ function firmCard(firma, items) {
       <div class="strefa-tr__grow">
         <div class="strefa-tr__name">${esc(firma)} ${tier ? `<span class="syg-tier">Tier ${tier}</span>` : ''}</div>
         <div class="strefa-tr__meta">
-          ${prace ? `<span>${prace} ${prace === 1 ? 'oferta' : 'oferty/ofert'} pracy</span>` : ''}
-          ${newsy ? `<span>${newsy} news${newsy === 1 ? '' : 'y/ów'}</span>` : ''}
-          <span>ostatni: ${fmtDate(items[0].posted_at || items[0].created_at)}</span>
+          ${prace ? `<span>${prace} of. pracy</span>` : ''}
+          ${newsy ? `<span>${newsy} news.</span>` : ''}
+          ${hist.length ? `<span>${hist.length} dot., ost. ${fmtDate(hist[0].created_at)}</span>` : ''}
+          ${step ? `<span class="${step.overdue ? 'syg-overdue' : ''}">następny: ${esc(step.label)} ${step.overdue ? '— dziś' : fmtDate(step.due)}</span>` : ''}
         </div>
       </div>
       <div class="strefa-tr__counts">
         ${heat}
         ${nowe ? `<span class="strefa-chip strefa-chip--ok">${nowe} nowe</span>` : ''}
-        <span class="strefa-chip strefa-chip--count">${items.length}</span>
+        <select class="strefa-input syg-status syg-status--${comp.status}" data-status aria-label="Status ${esc(firma)}">
+          ${PIPE.map(([v, l]) => `<option value="${v}" ${comp.status === v ? 'selected' : ''}>${l}</option>`).join('')}
+        </select>
+        <button class="strefa-btn strefa-btn--accent strefa-btn--sm" data-seq="${esc(firma)}">Sekwencja</button>
       </div>
     </div>
-    ${open ? `<div class="strefa-tr__body syg-body">${items.map(row).join('')}</div>` : ''}
+    ${open ? `<div class="strefa-tr__body syg-body">
+      ${items.map(row).join('')}
+      ${hist.length ? `<div class="syg-touches"><div class="syg-touches__lbl">Dotyki</div>${hist.map(touchRow).join('')}</div>` : ''}
+    </div>` : ''}
   </section>`;
 }
 
@@ -127,26 +254,79 @@ function render() {
     if (wb !== wa) return wb - wa;
     return new Date(b[1][0].created_at) - new Date(a[1][0].created_at);
   });
+  renderDue(firms.map(([f]) => f));
   $('#list').innerHTML = firms.map(([f, items]) => firmCard(f, items)).join('');
   $('#empty').hidden = firms.length > 0;
 }
 
-async function setStatus(id, status) {
-  const { error } = await sb.from('caio_signals').update({ status }).eq('id', id);
-  if (error) { toast('Błąd zapisu', error.message, 'err'); return; }
-  const s = signals.find((x) => x.id === id);
-  if (s) s.status = status;
-  render();
+/* ── modal sekwencji ── */
+function openSequence(firma) {
+  const texts = sequenceTexts(firma);
+  const step = nextStepFor(firma);
+  const box = openModal(`<div class="strefa-modal__body">
+    <h2 style="margin:0 0 .2rem">Sekwencja — ${esc(firma)}</h2>
+    <p style="margin:0 0 var(--space-md);color:var(--color-text-inv-3);font-size:var(--text-caption)">
+      Kopiujesz i wysyłasz ręcznie (LinkedIn/e-mail). „Kopiuj + zaloguj dotyk" od razu dopisuje wpis do historii.
+      ${step ? `Następny krok wg sekwencji: <strong>${esc(step.label)}</strong>.` : ''}
+    </p>
+    ${texts.map((t, i) => `<div class="syg-seq ${step && i === texts.findIndex((x) => x.title.startsWith(step.label)) ? 'is-next' : ''}">
+      <div class="syg-seq__head">
+        <strong>${esc(t.title)}</strong>
+        <span style="flex:1"></span>
+        <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" data-copy="${i}">${ICO.copy} Kopiuj</button>
+        <button class="strefa-btn strefa-btn--accent strefa-btn--sm" data-copylog="${i}">${ICO.copy} Kopiuj + zaloguj dotyk</button>
+      </div>
+      <textarea class="strefa-input syg-seq__text" data-text="${i}" rows="${Math.min(8, t.text.split('\n').length + 2)}">${esc(t.text)}</textarea>
+    </div>`).join('')}
+    <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--ghost" data-close-seq>Zamknij</button></div>
+  </div>`);
+  const copy = async (i, log) => {
+    const txt = box.querySelector(`[data-text="${i}"]`).value;
+    await navigator.clipboard.writeText(txt).catch(() => {});
+    if (log) {
+      await addTouch(firma, texts[i].typ, texts[i].title, txt);
+      toast('Skopiowano i zalogowano dotyk', texts[i].title);
+      render();
+    } else toast('Skopiowano do schowka', texts[i].title);
+  };
+  box.addEventListener('click', (e) => {
+    const c = e.target.closest('[data-copy]'); if (c) return copy(+c.dataset.copy, false);
+    const cl = e.target.closest('[data-copylog]'); if (cl) return copy(+cl.dataset.copylog, true);
+    if (e.target.closest('[data-close-seq]')) closeModal();
+  });
 }
 
+/* ── init ── */
 async function init() {
   if (!(await getTeamUser())) return; // layout przekieruje na login
   $('#search').addEventListener('input', (e) => { query = e.target.value; render(); });
   $('#f-typ').addEventListener('change', (e) => { fTyp = e.target.value; render(); });
   $('#f-status').addEventListener('change', (e) => { fStatus = e.target.value; render(); });
+  $('#due').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-seq]');
+    if (b) openSequence(b.dataset.seq);
+  });
+  $('#list').addEventListener('change', (e) => {
+    if (e.target.matches('[data-status]')) {
+      const firma = e.target.closest('.strefa-tr').dataset.firma;
+      saveCompany(firma, { status: e.target.value }).then((ok) => ok && render());
+    }
+  });
   $('#list').addEventListener('click', (e) => {
+    if (e.target.closest('[data-status]')) return;
+    const seq = e.target.closest('[data-seq]');
+    if (seq) { openSequence(seq.dataset.seq); return; }
     const btn = e.target.closest('[data-act]');
-    if (btn) { setStatus(btn.closest('.syg-row').dataset.id, btn.dataset.act); return; }
+    if (btn) {
+      const id = btn.closest('.syg-row').dataset.id;
+      sb.from('caio_signals').update({ status: btn.dataset.act }).eq('id', id).then(({ error }) => {
+        if (error) { toast('Błąd zapisu', error.message, 'err'); return; }
+        const s = signals.find((x) => x.id === id);
+        if (s) s.status = btn.dataset.act;
+        render();
+      });
+      return;
+    }
     if (e.target.closest('a')) return;
     const head = e.target.closest('.strefa-tr__head');
     if (head) {
@@ -161,7 +341,6 @@ async function init() {
     }
   });
   await load();
-  // pierwsza firma otwarta na start, żeby widok nie był pustą listą nagłówków
   const first = $('#list .strefa-tr');
   if (first && !openFirms.size) { openFirms.add(first.dataset.firma); render(); }
 }
