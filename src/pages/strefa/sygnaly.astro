@@ -36,9 +36,11 @@ import Strefa from '../../layouts/Strefa.astro';
     <p>Brak sygnałów dla wybranych filtrów. Skaner: <code>node scripts/caio/scan.mjs</code> (wymaga <code>CAIO_INGEST_SECRET</code>).</p>
   </div>
 
+  <div id="modal-root"></div>
   <div class="strefa-toasts" id="toasts" aria-live="polite"></div>
 
   <style is:global>
+    .syg-toggle { display: flex; align-items: center; gap: var(--space-md); flex: 1 1 auto; min-width: 0; background: transparent; border: 0; padding: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
     .syg-tier { font-size: .68rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--color-text-inv-3); border: 1px solid var(--color-line-dark); border-radius: 999px; padding: .1rem .45rem; vertical-align: 2px; margin-left: .35rem; }
     .syg-body { display: flex; flex-direction: column; gap: 0; padding: .25rem .6rem; }
     .syg-row { display: flex; align-items: center; gap: .65rem; padding: .6rem .4rem; border-radius: var(--radius-sm); }

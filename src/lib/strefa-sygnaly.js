@@ -214,7 +214,8 @@ function firmCard(firma, items) {
   const heat = maxWaga === 3 ? '<span class="strefa-chip strefa-chip--error">Gorący</span>'
     : maxWaga === 2 ? '<span class="strefa-chip strefa-chip--pending">Ciepły</span>' : '';
   return `<section class="strefa-tr ${open ? 'is-open' : ''}" data-firma="${esc(firma)}">
-    <div class="strefa-tr__head" role="button" tabindex="0" aria-expanded="${open}">
+    <div class="strefa-tr__head">
+      <button type="button" class="syg-toggle" aria-expanded="${open}">
       ${ICO.chev}
       <div class="strefa-tr__grow">
         <div class="strefa-tr__name">${esc(firma)} ${tier ? `<span class="syg-tier">Tier ${tier}</span>` : ''}</div>
@@ -225,6 +226,7 @@ function firmCard(firma, items) {
           ${step ? `<span class="${step.overdue ? 'syg-overdue' : ''}">następny: ${esc(step.label)} ${step.overdue ? '— dziś' : fmtDate(step.due)}</span>` : ''}
         </div>
       </div>
+      </button>
       <div class="strefa-tr__counts">
         ${heat}
         ${nowe ? `<span class="strefa-chip strefa-chip--ok">${nowe} nowe</span>` : ''}
@@ -328,16 +330,11 @@ async function init() {
       return;
     }
     if (e.target.closest('a')) return;
-    const head = e.target.closest('.strefa-tr__head');
-    if (head) {
-      const f = head.closest('.strefa-tr').dataset.firma;
+    const tog = e.target.closest('.syg-toggle');
+    if (tog) {
+      const f = tog.closest('.strefa-tr').dataset.firma;
       openFirms.has(f) ? openFirms.delete(f) : openFirms.add(f);
       render();
-    }
-  });
-  $('#list').addEventListener('keydown', (e) => {
-    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('strefa-tr__head')) {
-      e.preventDefault(); e.target.click();
     }
   });
   await load();
