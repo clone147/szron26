@@ -30,30 +30,37 @@ import Strefa from '../../layouts/Strefa.astro';
     </select>
   </div>
 
-  <div id="list" class="sygnaly-list"></div>
+  <div id="list" class="strefa-trainings"></div>
   <div id="empty" class="dgrid-empty" hidden>
     <p>Brak sygnałów dla wybranych filtrów. Skaner: <code>node scripts/caio/scan.mjs</code> (wymaga <code>CAIO_INGEST_SECRET</code>).</p>
   </div>
 
   <div class="strefa-toasts" id="toasts" aria-live="polite"></div>
 
-  <style>
-    .sygnaly-list { display: flex; flex-direction: column; gap: .6rem; }
-    .sygnal { background: var(--color-ink-2); border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); padding: .85rem 1rem; }
-    .sygnal.is-new { border-left: 3px solid var(--color-accent); }
-    .sygnal.is-dismissed { opacity: .55; }
-    .sygnal__top { display: flex; align-items: center; gap: .55rem; flex-wrap: wrap; font-size: var(--text-caption); }
-    .sygnal__waga { padding: .1rem .5rem; border-radius: 99px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
-    .sygnal__waga--w3 { background: #7a2e2e; color: #ffd9d9; }
-    .sygnal__waga--w2 { background: #6e5a1e; color: #ffedb0; }
-    .sygnal__waga--w1 { background: var(--color-ink-3); color: var(--color-text-inv-2); }
-    .sygnal__typ, .sygnal__tier { color: var(--color-text-inv-3); text-transform: uppercase; letter-spacing: .06em; }
-    .sygnal__firma { color: var(--color-text-inv); }
-    .sygnal__date { margin-left: auto; color: var(--color-text-inv-3); }
-    .sygnal__tytul { display: inline-block; margin-top: .35rem; color: var(--color-text-inv); font-weight: 500; text-decoration: none; }
-    .sygnal__tytul:hover { text-decoration: underline; }
-    .sygnal__opis { margin: .25rem 0 0; color: var(--color-text-inv-3); font-size: var(--text-caption); }
-    .sygnal__actions { display: flex; gap: .4rem; margin-top: .55rem; }
+  <style is:global>
+    .syg-tier { font-size: .68rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--color-text-inv-3); border: 1px solid var(--color-line-dark); border-radius: 999px; padding: .1rem .45rem; vertical-align: 2px; margin-left: .35rem; }
+    .syg-body { display: flex; flex-direction: column; gap: 0; padding: .25rem .6rem; }
+    .syg-row { display: flex; align-items: center; gap: .65rem; padding: .6rem .4rem; border-radius: var(--radius-sm); }
+    .syg-row + .syg-row { border-top: 1px solid color-mix(in oklch, var(--color-line-dark) 55%, transparent); }
+    .syg-row:hover { background: color-mix(in oklch, var(--color-ink-3) 55%, transparent); }
+    .syg-row.is-dismissed { opacity: .5; }
+    .syg-row.is-dismissed .syg-row__tytul { text-decoration: line-through; }
+    .syg-row__waga { flex: none; width: 9px; height: 9px; border-radius: 50%; }
+    .syg-row__waga--3 { background: oklch(60% 0.2 25); box-shadow: 0 0 0 3px color-mix(in oklch, oklch(60% 0.2 25) 22%, transparent); }
+    .syg-row__waga--2 { background: oklch(72% 0.14 60); box-shadow: 0 0 0 3px color-mix(in oklch, oklch(72% 0.14 60) 22%, transparent); }
+    .syg-row__waga--1 { background: var(--color-text-inv-3); }
+    .syg-row__typ { flex: none; color: var(--color-text-inv-3); display: grid; place-content: center; }
+    .syg-row__typ svg { width: 16px; height: 16px; }
+    .syg-row__main { flex: 1 1 auto; min-width: 0; }
+    .syg-row__tytul { color: var(--color-text-inv); font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: .3rem; }
+    .syg-row__tytul svg { width: 12px; height: 12px; color: var(--color-text-inv-3); opacity: 0; transition: opacity var(--dur-1); }
+    .syg-row:hover .syg-row__tytul svg { opacity: 1; }
+    .syg-row__tytul:hover { color: var(--color-accent); }
+    .syg-row__meta { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin-top: .25rem; color: var(--color-text-inv-3); font-size: var(--text-caption); }
+    .syg-kw { font-size: .68rem; font-weight: 600; padding: .08rem .4rem; border-radius: 999px; background: var(--color-ink-3); color: var(--color-text-inv-2); }
+    .syg-row__actions { flex: none; display: flex; gap: .2rem; opacity: 0; transition: opacity var(--dur-1); }
+    .syg-row:hover .syg-row__actions, .syg-row:focus-within .syg-row__actions { opacity: 1; }
+    @media (hover: none) { .syg-row__actions { opacity: 1; } }
   </style>
 
   <script>
