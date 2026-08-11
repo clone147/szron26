@@ -1,0 +1,419 @@
+---
+import Strefa from '../../layouts/Strefa.astro';
+import { COMPANIES } from '../../../scripts/caio/companies.mjs';
+// Kokpit planu „5 klientów do 31.12.2026" — treść z notatek (Strategia H2 2026 — 5 klientów CTrO).
+// Zadania są zaszyte w HTML (data-key), stan odhaczeń żyje w strefa.plan_items.
+const firmCount = COMPANIES.length;
+---
+<Strefa title="Plan wzrostu" active="plan">
+  <div class="strefa-head">
+    <div>
+      <p class="strefa-eyebrow">Strefa zamknięta</p>
+      <h1>Plan wzrostu</h1>
+      <p>Kokpit planu <strong>„5 klientów do 31.12.2026"</strong>. Cel, terminy, arsenał i backlog w jednym miejscu — odhaczasz tutaj, stan zapisuje się w bazie. Pipeline firm prowadzisz w Sygnałach.</p>
+    </div>
+    <div>
+      <a class="strefa-btn strefa-btn--accent strefa-btn--sm" href="/strefa/sygnaly">Sygnały i pipeline</a>
+    </div>
+  </div>
+
+  <!-- ── Cel + terminy ── -->
+  <section class="plan-hero" aria-label="Cel i terminy">
+    <div class="plan-goal">
+      <div class="plan-goal__num"><span id="goal-now">–</span><span class="plan-goal__of">/ 5</span></div>
+      <div class="plan-goal__lbl">płacących klientów<br />do 31.12.2026</div>
+    </div>
+    <div class="plan-hero__mid">
+      <div class="plan-funnel" id="funnel" data-firms={firmCount}></div>
+      <div class="plan-window">
+        <div class="plan-window__bar"><i id="window-fill"></i></div>
+        <p id="window-lbl"></p>
+      </div>
+    </div>
+    <div class="plan-dates" id="dates"></div>
+  </section>
+
+  <!-- ── Teraz ── -->
+  <section class="plan-now" aria-label="Co teraz">
+    <div class="plan-now__head">
+      <h2>Teraz</h2>
+      <p id="now-phase"></p>
+    </div>
+    <ol class="plan-now__top" id="now-top"></ol>
+  </section>
+
+  <!-- ── Arsenał sierpniowy ── -->
+  <section class="plan-group" data-group="arsenal">
+    <header>
+      <h2>Arsenał sierpniowy</h2>
+      <span class="plan-progress"><i></i></span><span class="plan-progress__lbl"></span>
+      <p>Sierpień = budowa aktywów, bez sprzedaży (urlopy decydentów). Bez pozycji 1–4 fala wrześniowa nie ma czym strzelać.</p>
+    </header>
+    <ul class="plan-list">
+      <li class="plan-item" data-key="ars-demo">
+        <label><input type="checkbox" /></label>
+        <div class="plan-item__main">
+          <p class="plan-item__title">Nagrania demo 2–3 szt. <span class="plan-h">10 h</span><span class="plan-tag plan-tag--hot">najwyższy lewar</span></p>
+          <p class="plan-item__desc">3-min agent piszący firmware na realnym krzemie: wariant embedded / regulowany / legacy. Mail #1 z nagraniem ≈ 25% odpowiedzi, bez nagrania ≈ 4%.</p>
+        </div>
+        <span class="plan-item__when"></span>
+      </li>
+      <li class="plan-item" data-key="ars-lista70">
+        <label><input type="checkbox" /></label>
+        <div class="plan-item__main">
+          <p class="plan-item__title">Lista 70 firm <span class="plan-h">12 h</span><span class="plan-tag plan-tag--hot">ryzyko nr 1</span></p>
+          <p class="plan-item__desc">Jest {firmCount} w silniku — brakuje ~{70 - firmCount}. Dobierz segmenty: medyczne (IEC 62304), automotive tier 2/3 (ISO 26262), telco, energetyka / smart metering, urządzenia laboratoryjne. Per firma: dyrektor R&amp;D, mail, LinkedIn, sygnał.</p>
+        </div>
+        <span class="plan-item__when"></span>
+      </li>
+      <li class="plan-item" data-key="ars-case-rg">
+        <label><input type="checkbox" /></label>
+        <div class="plan-item__main">
+          <p class="plan-item__title">Case study R&amp;G z nazwą i liczbami <span class="plan-h">4 h</span></p>
+          <p class="plan-item__desc">1 strona + wersja LinkedIn. Jedyna referencja z nazwą — bez niej mail #2 „dowód" nie ma dokąd linkować (case'y na stronie są anonimowe). Liczby z DevLens: opisy commitów 226–752 znaków vs 0–13 bez AI.</p>
+        </div>
+        <span class="plan-item__when"></span>
+      </li>
+      <li class="plan-item" data-key="ars-linkedin">
+        <label><input type="checkbox" /></label>
+        <div class="plan-item__main">
+          <p class="plan-item__title">Profil LinkedIn <span class="plan-h">4 h</span></p>
+          <p class="plan-item__desc">Nagłówek CTrO, „o mnie" z case R&amp;G, 3 posty (gotowe od czerwca). Dziś: 0 postów, 40 obserwujących. Warunek outboundu — i odblokowuje followy 63+97 zebranych kontaktów.</p>
+        </div>
+        <span class="plan-item__when"></span>
+      </li>
+      <li class="plan-item" data-key="ars-szablony">
+        <label><input type="checkbox" /></label>
+        <div class="plan-item__main">
+          <p class="plan-item__title">Szablony sekwencji — dokończyć <span class="plan-h">5 h</span></p>
+          <p class="plan-item__desc">Wariant maila #1 z linkiem do nagrania, krok telefoniczny d12 (nie istnieje w silniku), realne linki zamiast placeholderów, szablon raportu z audytu 90 min.</p>
+        </div>
+        <span class="plan-item__when"></span>
+      </li>
+      <li class="plan-item" data-key="ars-strona">
+        <label><input type="checkbox" /></label>
+        <div class="plan-item__main">
+          <p class="plan-item__title">Strona pod rolę CTrO <span class="plan-h">6 h</span></p>
+          <p class="plan-item__desc"><a href="/transformacja-ai">/transformacja-ai</a> — landing zewnętrznego Chief Transformation Officera. Zrobione 11.08.</p>
+        </div>
+        <span class="plan-item__when"></span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ── Kalendarz ── -->
+  <section class="plan-phases" aria-label="Kalendarz do końca roku">
+    <h2>Kalendarz do 31.12</h2>
+    <ol id="phases">
+      <li data-from="2026-08-01" data-to="2026-08-31">
+        <b>Sierpień</b><span>arsenał — bez sprzedaży</span>
+        <p>Zamknąć 6 pozycji arsenału (~41 h). Decydenci na urlopach.</p>
+      </li>
+      <li data-from="2026-09-01" data-to="2026-09-14">
+        <b>1–15.09 · Fala 1</b><span>25 firm · hak CRA (11.09)</span>
+        <p>Start od 5 średnich Tier 1: Sonel, Lumel, Creotech, Satel, Apator. Demo otwiera (mail #1), CRA daje deadline (mail #2). 8–10 nowych sekwencji / tydzień.</p>
+      </li>
+      <li data-from="2026-09-15" data-to="2026-09-30">
+        <b>15–30.09 · Fala 2</b><span>25 firm · hak uKSC/NIS2 (3.10)</span>
+        <p>Do 30.09 minimum 6 odbytych audytów — inaczej zmiana haka z regulacyjnego na ROI.</p>
+      </li>
+      <li data-from="2026-10-01" data-to="2026-10-31">
+        <b>Październik · Fala 3</b><span>20 firm · 2 domknięcia</span>
+        <p>Cel na koniec X: 12 audytów łącznie, 2 płacących klientów.</p>
+      </li>
+      <li data-from="2026-11-01" data-to="2026-11-30">
+        <b>Listopad</b><span>domykanie · 4 płacących</span>
+        <p>Cel na koniec XI: 18 audytów łącznie, 4 klientów.</p>
+      </li>
+      <li data-from="2026-12-01" data-to="2026-12-15">
+        <b>1–15.12 · Finisz</b><span>5. klient + oferty CTrO na 2027</span>
+        <p>Ostatnie podpisy — od połowy grudnia nikt nie decyduje.</p>
+      </li>
+      <li data-from="2026-12-16" data-to="2026-12-31">
+        <b>16–31.12</b><span>zero sprzedaży</span>
+        <p>Podsumowanie, plan 2027, odblokowanie rezerw (YouTube, LinkedIn content, baza 2023).</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ── Backlog ── -->
+  <div class="plan-cols">
+    <section class="plan-group" data-group="quick">
+      <header>
+        <h2>Szybkie wygrane</h2>
+        <span class="plan-progress"><i></i></span><span class="plan-progress__lbl"></span>
+        <p>Każda pozycja ≤ 1 dzień, a odblokowuje coś większego.</p>
+      </header>
+      <ul class="plan-list">
+        <li class="plan-item" data-key="bl-film1">
+          <label><input type="checkbox" /></label>
+          <div class="plan-item__main">
+            <p class="plan-item__title">Nagrać Film 1 „Pierwszy dzień inżyniera"</p>
+            <p class="plan-item__desc">Scenariusz gotowy od 7.08 (9 scen, ~10 min). Cel: live przed 1.09 — fala 1 kliknie w profil. Wycinek 3 min = demo do maili.</p>
+          </div>
+          <span class="plan-item__when"></span>
+        </li>
+        <li class="plan-item" data-key="bl-posty-li">
+          <label><input type="checkbox" /></label>
+          <div class="plan-item__main">
+            <p class="plan-item__title">Opublikować 3 gotowe posty LinkedIn</p>
+            <p class="plan-item__desc">Leżą od 23–30.06. Publikacja = część pozycji „Profil LinkedIn" z arsenału.</p>
+          </div>
+          <span class="plan-item__when"></span>
+        </li>
+        <li class="plan-item" data-key="bl-rg-opinie">
+          <label><input type="checkbox" /></label>
+          <div class="plan-item__main">
+            <p class="plan-item__title">Poprosić R&amp;G o opinie i intro</p>
+            <p class="plan-item__desc">Opinie na Google (profil ma 0!) i LinkedIn + 2–3 intro do znajomych firm. Zadowolony klient, 49 kont Akademii — a żadnego systemu poleceń.</p>
+          </div>
+          <span class="plan-item__when"></span>
+        </li>
+        <li class="plan-item" data-key="bl-siec">
+          <label><input type="checkbox" /></label>
+          <div class="plan-item__main">
+            <p class="plan-item__title">Ruszyć sieć osobistą</p>
+            <p class="plan-item__desc">Konrad Bielecki (fly parki / magazyny — kandydat na pilot vision), Bartek Świetlik (Orlen Transport), Michał Olejko. Realne popyty czekają w notatkach.</p>
+          </div>
+          <span class="plan-item__when"></span>
+        </li>
+        <li class="plan-item" data-key="bl-kfs">
+          <label><input type="checkbox" /></label>
+          <div class="plan-item__main">
+            <p class="plan-item__title">Sprawdzić KFS 2026/2027</p>
+            <p class="plan-item__desc">Dofinansowanie szkoleń potrafi obniżyć próg decyzji do „podpisuję bez zarządu". Dane z v7 niezweryfikowane.</p>
+          </div>
+          <span class="plan-item__when"></span>
+        </li>
+        <li class="plan-item" data-key="bl-ceny">
+          <label><input type="checkbox" /></label>
+          <div class="plan-item__main">
+            <p class="plan-item__title">Potwierdzić widełki cen</p>
+            <p class="plan-item__desc">Warsztat 7,5–15 tys. / program 30–60 tys. / retainer 10–20 tys. (rekomendacja: podnieść do 15–30 przy konwersji &gt;40%). Poniżej 7,5 tys. = sygnał „szkolenie z katalogu".</p>
+          </div>
+          <span class="plan-item__when"></span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="plan-group" data-group="engine">
+      <header>
+        <h2>Silnik i domykanie</h2>
+        <span class="plan-progress"><i></i></span><span class="plan-progress__lbl"></span>
+        <p>Rozbudowa Sygnałów + proces od audytu do podpisu.</p>
+      </header>
+      <ul class="plan-list">
+        <li class="plan-item" data-key="bl-dossier">
+          <label><input type="checkbox" /></label>
+          <div class="plan-item__main">
+            <p class="plan-item__title">Dossier firm fali 1</p>
+            <p class="plan-item__desc">Tryb „chemia" w Sygnałach: research + kontakty decydentów dla 25 firm pierwszej fali.</p>
+          </div>
+          <span class="plan-item__when"></span>
+        </li>
+        <li class="plan-item" data-key="bl-calendly">
+          <label><input type="checkbox" /></label>
+          <div class="plan-item__main">
+            <p class="plan-item__title">Kalendarz samoobsługowy pod /umow-rozmowe</p>
+            <p class="plan-item__desc">Dziś: formularz z odpowiedzią w 24 h — tarcie w najważniejszym punkcie konwersji sekwencji.</p>
+          </div>
+          <span class="plan-item__when"></span>
+        </li>
+        <li class="plan-item" data-key="bl-po-audycie">
+          <label><input type="checkbox" /></label>
+          <div class="plan-item__main">
+            <p class="plan-item__title">Proces po audycie</p>
+            <p class="plan-item__desc">Szablon oferty, wzór umowy, follow-up po ofercie. Dziś proces kończy się na raporcie — dalej nie ma nic.</p>
+          </div>
+          <span class="plan-item__when"></span>
+        </li>
+        <li class="plan-item" data-key="bl-quiz-d3">
+          <label><input type="checkbox" /></label>
+          <div class="plan-item__main">
+            <p class="plan-item__title">Podpiąć /quiz do kroku d3</p>
+            <p class="plan-item__desc">Follow-up po akceptacji zaproszenia linkuje assessment (lead capture za e-mail).</p>
+          </div>
+          <span class="plan-item__when"></span>
+        </li>
+        <li class="plan-item" data-key="bl-roi">
+          <label><input type="checkbox" /></label>
+          <div class="plan-item__main">
+            <p class="plan-item__title">ROI Calculator</p>
+            <p class="plan-item__desc">Liczba devów × stawka × % czasu automatyzowalnego → oszczędność zł/rok + payback. Hak ROI = plan B, gdy regulacyjny nie zagra.</p>
+          </div>
+          <span class="plan-item__when"></span>
+        </li>
+        <li class="plan-item" data-key="bl-film2">
+          <label><input type="checkbox" /></label>
+          <div class="plan-item__main">
+            <p class="plan-item__title">Film 2 „Legacy" — decyzja repo + nagranie</p>
+            <p class="plan-item__desc">Rekomendacja: libnodave (Siemens S7, 2002, ~33 tys. linii C). Finał w kadrze: 1-stronicowy raport ryzyk dla zarządu = próbka usługi.</p>
+          </div>
+          <span class="plan-item__when"></span>
+        </li>
+        <li class="plan-item" data-key="bl-porzadki">
+          <label><input type="checkbox" /></label>
+          <div class="plan-item__main">
+            <p class="plan-item__title">Porządki na stronie</p>
+            <p class="plan-item__desc">Sieroty bez linków (/blog z 6 wpisami, /webinar-ai-dla-ceo, /ai-dla-przemyslu…), scalić /darmowy-audyt z /umow-rozmowe (301), GBP: opinie/wpisy/zdjęcia + schema LocalBusiness.</p>
+          </div>
+          <span class="plan-item__when"></span>
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <!-- ── Ściąga ── -->
+  <h2 class="plan-ref-h">Ściąga — zasady gry</h2>
+  <div class="plan-ref">
+    <article class="plan-card">
+      <h3>Drabina produktów</h3>
+      <table class="plan-table">
+        <tbody>
+          <tr><td>0</td><td>Nagranie demo 3 min <em>na ich sprzęcie</em></td><td>0 zł</td></tr>
+          <tr><td>1</td><td>Audyt 90 min + pisemny raport</td><td>0 zł</td></tr>
+          <tr><td>2</td><td>Warsztat 1–2 dni <em>na ich kodzie</em></td><td>7,5–15 tys.</td></tr>
+          <tr><td>3</td><td>Program transformacji, 3 mies.</td><td>30–60 tys.</td></tr>
+          <tr><td>4</td><td>CTrO — retainer, X dni/mies.</td><td>10–20 tys./mies.</td></tr>
+        </tbody>
+      </table>
+      <p class="plan-note">W pierwszym kontakcie sprzedajesz <strong>audyt</strong>, nie warsztat. Szkolenie to koń trojański, nie produkt. Cen nie ma na stronie.</p>
+    </article>
+
+    <article class="plan-card">
+      <h3>Sekwencja na firmę (~3 tyg.)</h3>
+      <ol class="plan-seq">
+        <li><b>d0</b> LinkedIn — zaproszenie do dyr. R&amp;D + 1 zdanie, bez oferty</li>
+        <li><b>d2</b> mail #1 — zdanie o nich + <strong>link do nagrania</strong> + jedno pytanie</li>
+        <li><b>d7</b> mail #2 — dowód: case R&amp;G z nazwą i liczbami</li>
+        <li><b>d12</b> telefon (także do sekretariatu)</li>
+        <li><b>d20</b> break-up — „odezwę się w styczniu" (najskuteczniejszy krok)</li>
+      </ol>
+      <p class="plan-note">Po sekwencji <strong>koniec</strong> — żadnego ciągnięcia milczących. Kupujący: dyrektor R&amp;D / VP Eng / CTO, <strong>nigdy HR</strong>.</p>
+    </article>
+
+    <article class="plan-card">
+      <h3>Metryki tygodniowe i progi</h3>
+      <ul class="plan-bullets">
+        <li>Nowe sekwencje: <b>8–10/tydz.</b> we wrześniu, potem 5</li>
+        <li>Audyty odbyte: <b>6 / 12 / 18</b> na koniec IX / X / XI</li>
+        <li>Klienci: <b>2 / 4 / 5</b> na koniec X / XI / XII</li>
+      </ul>
+      <ul class="plan-bullets plan-bullets--warn">
+        <li>&lt;10% odpowiedzi po 4 tyg. → wymień otwieracz, nie zwiększaj wolumenu</li>
+        <li>Akcept LI &lt;25% → przepisz notę pod konkretny sygnał</li>
+        <li>&lt;6 audytów do 30.09 → hak ROI zamiast regulacyjnego</li>
+        <li>Konwersja warsztat→program &gt;40% → podnieś stawki (retainer 15–30 tys.)</li>
+      </ul>
+    </article>
+
+    <article class="plan-card">
+      <h3>Czego NIE robimy do 31.12</h3>
+      <ul class="plan-bullets plan-bullets--no">
+        <li>YouTube jako kanał pozyskania (wyjątek: nagrania demo)</li>
+        <li>Kampania contentowa na LinkedIn</li>
+        <li>Masowy outbound 300+ maili</li>
+        <li>Stara lista ARM 2023 jako kanał główny</li>
+        <li>Nowe produkty (DevLens, SzronApp) jako wejście</li>
+        <li>GEO / SEO (skala kwartałów)</li>
+      </ul>
+      <p class="plan-note">Lejek: 70 firm → ~110 kontaktów → 28 odpowiedzi (25%) → 18 audytów → <b>5 klientów</b>. Budżet czasu 150 h: outbound 60, audyty 45, domykanie 25, arsenał 20.</p>
+    </article>
+  </div>
+
+  <div id="modal-root"></div>
+  <div class="strefa-toasts" id="toasts" aria-live="polite"></div>
+
+  <style is:global>
+    /* hero: cel + lejek + terminy */
+    .plan-hero { display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-lg); align-items: center; padding: var(--space-md) var(--space-lg); border: 1px solid var(--color-line-dark); border-radius: var(--radius-md); background: color-mix(in oklch, var(--color-ink-2) 70%, transparent); margin-bottom: var(--space-lg); }
+    .plan-goal { display: flex; align-items: center; gap: var(--space-md); padding-right: var(--space-lg); border-right: 1px solid var(--color-line-dark); }
+    .plan-goal__num { font-size: 2.6rem; font-weight: 700; color: var(--color-accent); line-height: 1; white-space: nowrap; }
+    .plan-goal__of { font-size: 1.2rem; color: var(--color-text-inv-3); font-weight: 600; margin-left: .15rem; }
+    .plan-goal__lbl { font-size: var(--text-caption); color: var(--color-text-inv-2); line-height: 1.35; }
+    .plan-hero__mid { display: flex; flex-direction: column; gap: .6rem; min-width: 0; }
+    .plan-funnel { display: flex; gap: .4rem; flex-wrap: wrap; }
+    .plan-funnel .strefa-chip { cursor: default; }
+    .plan-window__bar { height: 7px; border-radius: 999px; background: var(--color-ink-3); overflow: hidden; }
+    .plan-window__bar i { display: block; height: 100%; width: 0; border-radius: 999px; background: var(--color-accent); transition: width .6s ease; }
+    .plan-window p { margin: .3rem 0 0; font-size: var(--text-caption); color: var(--color-text-inv-3); }
+    .plan-dates { display: grid; gap: .35rem; padding-left: var(--space-lg); border-left: 1px solid var(--color-line-dark); }
+    .plan-date { display: flex; align-items: baseline; gap: .5rem; font-size: var(--text-caption); white-space: nowrap; }
+    .plan-date b { color: var(--color-text-inv); font-weight: 600; }
+    .plan-date em { font-style: normal; color: var(--color-text-inv-3); }
+    .plan-date--soon em { color: var(--color-accent); font-weight: 600; }
+    .plan-date--past { opacity: .45; }
+    .plan-date--past em { text-decoration: line-through; }
+    @media (max-width: 900px) {
+      .plan-hero { grid-template-columns: 1fr; }
+      .plan-goal { border-right: 0; padding-right: 0; }
+      .plan-dates { border-left: 0; padding-left: 0; grid-template-columns: 1fr 1fr; }
+    }
+    /* teraz */
+    .plan-now { margin-bottom: var(--space-lg); padding: var(--space-md) var(--space-lg); border: 1px solid color-mix(in oklch, var(--color-accent) 35%, var(--color-line-dark)); border-radius: var(--radius-md); background: color-mix(in oklch, var(--color-accent) 6%, transparent); }
+    .plan-now__head { display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap; }
+    .plan-now h2 { margin: 0; font-size: var(--text-m); color: var(--color-accent); }
+    .plan-now__head p { margin: 0; color: var(--color-text-inv-2); font-size: var(--text-caption); }
+    .plan-now__top { margin: .5rem 0 0; padding: 0 0 0 1.2rem; display: grid; gap: .25rem; }
+    .plan-now__top a { color: var(--color-text-inv); text-decoration: none; border-bottom: 1px dashed var(--color-line-dark); }
+    .plan-now__top a:hover { color: var(--color-accent); border-color: var(--color-accent); }
+    /* grupy checklist */
+    .plan-cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); align-items: start; }
+    @media (max-width: 900px) { .plan-cols { grid-template-columns: 1fr; } }
+    .plan-group { margin-bottom: var(--space-lg); }
+    .plan-group header { display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: .6rem; margin-bottom: .5rem; }
+    .plan-group h2 { margin: 0; font-size: var(--text-m); }
+    .plan-group header p { grid-column: 1 / -1; margin: .15rem 0 0; color: var(--color-text-inv-3); font-size: var(--text-caption); }
+    .plan-progress { width: 90px; height: 6px; border-radius: 999px; background: var(--color-ink-3); overflow: hidden; }
+    .plan-progress i { display: block; height: 100%; width: 0; background: var(--color-accent); border-radius: 999px; transition: width .4s ease; }
+    .plan-progress__lbl { font-size: var(--text-caption); color: var(--color-text-inv-3); font-variant-numeric: tabular-nums; }
+    .plan-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .45rem; }
+    .plan-item { display: flex; gap: .7rem; align-items: flex-start; padding: .6rem .75rem; border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); background: color-mix(in oklch, var(--color-ink-2) 60%, transparent); scroll-margin-top: 90px; }
+    .plan-item label { flex: none; display: grid; place-content: center; padding-top: .15rem; cursor: pointer; }
+    .plan-item input { width: 17px; height: 17px; accent-color: var(--color-accent); cursor: pointer; }
+    .plan-item__main { min-width: 0; flex: 1 1 auto; }
+    .plan-item__title { margin: 0; font-weight: 600; color: var(--color-text-inv); }
+    .plan-item__desc { margin: .2rem 0 0; font-size: var(--text-caption); color: var(--color-text-inv-2); line-height: 1.5; }
+    .plan-item__desc a { color: var(--color-accent); }
+    .plan-item__when { flex: none; font-size: .7rem; color: var(--color-text-inv-3); padding-top: .3rem; white-space: nowrap; }
+    .plan-item.is-done { opacity: .55; }
+    .plan-item.is-done .plan-item__title { text-decoration: line-through; text-decoration-thickness: 1px; }
+    .plan-h { font-size: .68rem; font-weight: 600; color: var(--color-text-inv-3); border: 1px solid var(--color-line-dark); border-radius: 999px; padding: .06rem .4rem; margin-left: .4rem; vertical-align: 1px; }
+    .plan-tag { font-size: .68rem; font-weight: 600; border-radius: 999px; padding: .06rem .45rem; margin-left: .3rem; vertical-align: 1px; }
+    .plan-tag--hot { color: oklch(60% 0.2 25); border: 1px solid color-mix(in oklch, oklch(60% 0.2 25) 45%, transparent); }
+    /* fazy */
+    .plan-phases { margin-bottom: var(--space-lg); }
+    .plan-phases h2 { font-size: var(--text-m); margin: 0 0 .5rem; }
+    .plan-phases ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: .45rem; }
+    @media (max-width: 1100px) { .plan-phases ol { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 700px) { .plan-phases ol { grid-template-columns: 1fr 1fr; } }
+    .plan-phases li { border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); padding: .55rem .65rem; background: color-mix(in oklch, var(--color-ink-2) 60%, transparent); }
+    .plan-phases li b { display: block; font-size: var(--text-caption); color: var(--color-text-inv); }
+    .plan-phases li span { display: block; font-size: .7rem; color: var(--color-text-inv-3); margin-top: .1rem; }
+    .plan-phases li p { margin: .35rem 0 0; font-size: .72rem; line-height: 1.45; color: var(--color-text-inv-2); }
+    .plan-phases li.is-past { opacity: .45; }
+    .plan-phases li.is-now { border-color: var(--color-accent); background: color-mix(in oklch, var(--color-accent) 8%, transparent); }
+    .plan-phases li.is-now b { color: var(--color-accent); }
+    /* ściąga */
+    .plan-ref-h { font-size: var(--text-m); margin: 0 0 .5rem; }
+    .plan-ref { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-xl); }
+    .plan-card { border: 1px solid var(--color-line-dark); border-radius: var(--radius-md); padding: var(--space-md); background: color-mix(in oklch, var(--color-ink-2) 60%, transparent); }
+    .plan-card h3 { margin: 0 0 .5rem; font-size: var(--text-s); color: var(--color-text-inv); }
+    .plan-table { width: 100%; border-collapse: collapse; font-size: var(--text-caption); }
+    .plan-table td { padding: .3rem .35rem; border-top: 1px solid color-mix(in oklch, var(--color-line-dark) 55%, transparent); color: var(--color-text-inv-2); }
+    .plan-table td:first-child { color: var(--color-text-inv-3); width: 1.2rem; }
+    .plan-table td:last-child { text-align: right; white-space: nowrap; color: var(--color-text-inv); font-weight: 600; }
+    .plan-table em { font-style: normal; color: var(--color-text-inv-3); }
+    .plan-seq { margin: 0; padding: 0 0 0 1.1rem; display: grid; gap: .3rem; font-size: var(--text-caption); color: var(--color-text-inv-2); }
+    .plan-seq b { color: var(--color-accent); font-variant-numeric: tabular-nums; margin-right: .2rem; }
+    .plan-bullets { margin: 0; padding: 0 0 0 1.1rem; display: grid; gap: .25rem; font-size: var(--text-caption); color: var(--color-text-inv-2); }
+    .plan-bullets + .plan-bullets { margin-top: .6rem; padding-top: .6rem; border-top: 1px dashed var(--color-line-dark); }
+    .plan-bullets--no li::marker { content: '✕  '; color: oklch(60% 0.2 25); }
+    .plan-bullets--warn li::marker { content: '⚠ '; }
+    .plan-note { margin: .6rem 0 0; font-size: var(--text-caption); color: var(--color-text-inv-3); line-height: 1.5; }
+  </style>
+
+  <script>
+    import '../../lib/strefa-plan.js';
+  </script>
+</Strefa>

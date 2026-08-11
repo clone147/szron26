@@ -35,6 +35,7 @@ const { title = 'Strefa SZRON', active = '' } = Astro.props;
         <nav class="strefa-top__nav" aria-label="Nawigacja strefy">
           <a href="/strefa" class="strefa-top__tag">Strefa</a>
           <a href="/strefa" class={active === 'pulpit' ? 'is-active' : ''}>Pulpit</a>
+          <a href="/strefa/plan" class={active === 'plan' ? 'is-active' : ''}>Plan</a>
           <a href="/strefa/szkolenia" class={active === 'szkolenia' ? 'is-active' : ''}>Szkolenia</a>
           <a href="/strefa/programisci" class={active === 'programisci' ? 'is-active' : ''}>Programiści</a>
           <a href="/strefa/diagramy" class={active === 'diagramy' ? 'is-active' : ''}>Diagramy</a>
