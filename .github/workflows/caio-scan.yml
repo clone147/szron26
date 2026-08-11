@@ -1,5 +1,6 @@
-# Codzienny skan sygnałów CAIO (JustJoin.it / NoFluffJobs / Google News)
-# → Supabase Edge Function caio-ingest (upsert po URL, duplikaty bezpieczne).
+# Codzienna rutyna CAIO: skan sygnałów → kwalifikacja odkrytych firm (LLM z web search)
+# → poranny digest e-mail (Resend przez EF caio-agent). Digest idzie ZAWSZE (if: always())
+# i raportuje awarie poprzednich kroków — brak maila rano = sygnał, że coś padło.
 # Zastępuje routine Claude Code (sandbox chmurowy nie miał egressu do skanowanych stron).
 name: CAIO scan
 on:
@@ -20,3 +21,42 @@ jobs:
         env:
           CAIO_INGEST_SECRET: ${{ secrets.CAIO_INGEST_SECRET }}
         run: node scripts/caio/scan.mjs
+
+  qualify:
+    needs: scan
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      info: ${{ steps.q.outputs.info }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Kwalifikacja odkrytych firm
+        id: q
+        env:
+          CAIO_INGEST_SECRET: ${{ secrets.CAIO_INGEST_SECRET }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/caio/qualify.mjs --limit 8
+
+  digest:
+    needs: [scan, qualify]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Poranny digest
+        env:
+          CAIO_INGEST_SECRET: ${{ secrets.CAIO_INGEST_SECRET }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          SCAN_RESULT: ${{ needs.scan.result }}
+          QUALIFY_RESULT: ${{ needs.qualify.result }}
+          QUALIFY_INFO: ${{ needs.qualify.outputs.info }}
+        run: node scripts/caio/digest.mjs

@@ -263,7 +263,8 @@ function firmCard(firma, items) {
       <button type="button" class="syg-toggle" aria-expanded="${open}">
       ${ICO.chev}
       <div class="strefa-tr__grow">
-        <div class="strefa-tr__name">${esc(firma)} ${tier === 4 ? '<span class="syg-tier syg-tier--new">odkryta</span>' : tier ? `<span class="syg-tier">Tier ${tier}</span>` : ''}</div>
+        <div class="strefa-tr__name">${esc(firma)} ${tier === 4 ? '<span class="syg-tier syg-tier--new">odkryta</span>' : tier ? `<span class="syg-tier">Tier ${tier}</span>` : ''}${comp.werdykt ? `<span class="syg-tier syg-w--${comp.werdykt}">${esc(comp.werdykt)}</span>` : ''}</div>
+        ${comp.kwalifikacja ? `<div class="strefa-tr__meta syg-kwal">${comp.www ? `<a href="${esc(comp.www)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">www</a> · ` : ''}${esc(comp.kwalifikacja)}</div>` : ''}
         <div class="strefa-tr__meta">
           ${prace ? `<span>${prace} of. pracy</span>` : ''}
           ${newsy ? `<span>${newsy} news.</span>` : ''}
