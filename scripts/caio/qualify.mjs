@@ -1,14 +1,16 @@
-// Kwalifikacja odkrytych firm (tier 4) — research LLM z web searchem.
-// Model: anthropic/claude-opus-5 przez OpenRouter (+ plugin web); fallback: Gemini (darmowy tier).
+// Kwalifikacja odkrytych firm (tier 4) — research przez Claude Code headless (subskrypcja Max,
+// NIE API per token). Auth: CLAUDE_CODE_OAUTH_TOKEN (z `claude setup-token`) w env / GH secrets;
+// lokalnie wystarczy zalogowany Claude Code. Research: wbudowane WebSearch + WebFetch.
 // Wyniki (werdykt produkt/uslugi/agencja + hak + decydenci) zapisuje EF caio-agent.
 //
-// Uruchomienie: CAIO_INGEST_SECRET=... OPENROUTER_API_KEY=... [GEMINI_API_KEY=...] node scripts/caio/qualify.mjs [--limit N]
+// Uruchomienie: CAIO_INGEST_SECRET=... node scripts/caio/qualify.mjs [--limit N]
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+const run = promisify(execFile);
+
 const AGENT_URL = 'https://sttluvcbucpxzbcsuigw.supabase.co/functions/v1/caio-agent';
 const SECRET = process.env.CAIO_INGEST_SECRET;
-const OR_KEY = process.env.OPENROUTER_API_KEY;
-const GEMINI_KEY = process.env.GEMINI_API_KEY;
 if (!SECRET) { console.error('Brak CAIO_INGEST_SECRET'); process.exit(1); }
-if (!OR_KEY && !GEMINI_KEY) { console.error('Brak OPENROUTER_API_KEY i GEMINI_API_KEY'); process.exit(1); }
 const limIx = process.argv.indexOf('--limit');
 const LIMIT = limIx > -1 ? +process.argv[limIx + 1] : 8;
 
@@ -30,9 +32,9 @@ function prompt(firma, signals) {
 Zakwalifikuj firmę "${firma}". Znaleźliśmy jej oferty pracy:
 ${signals.map((s) => `- ${s.tytul} (${s.zrodlo}; ${s.opis ?? ''}) ${s.url}`).join('\n')}
 
-Zbadaj w internecie: co firma naprawdę robi (własny produkt? jaki?), gdzie ma siedzibę, jaka jest skala (zatrudnienie), kto nią kieruje (zarząd z KRS/rejestr.io, CTO/Head of R&D z LinkedIn — tylko dane publiczne).
+Zbadaj w internecie (WebSearch, w razie potrzeby WebFetch na stronę firmy / rejestr.io): co firma naprawdę robi (własny produkt? jaki?), gdzie ma siedzibę, jaka jest skala (zatrudnienie), kto nią kieruje (zarząd z KRS/rejestr.io, CTO/Head of R&D z LinkedIn — tylko dane publiczne).
 
-Zwróć WYŁĄCZNIE poprawny JSON (bez markdown):
+Na końcu wypisz WYŁĄCZNIE poprawny JSON (bez markdown, bez komentarzy):
 {
   "werdykt": "produkt" | "uslugi" | "agencja" | "nieustalone",
   "kwalifikacja": "1-2 zdania po polsku: co robi firma, skala, siedziba",
@@ -51,37 +53,20 @@ function parseJSON(text) {
   return JSON.parse(m[0]);
 }
 
-async function askOpenRouter(firma, signals) {
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${OR_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'anthropic/claude-opus-5',
-      plugins: [{ id: 'web', max_results: 5 }],
-      reasoning: { effort: 'medium' },
-      messages: [{ role: 'user', content: prompt(firma, signals) }],
-    }),
-    signal: AbortSignal.timeout(180000),
-  });
-  const out = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(`OpenRouter HTTP ${res.status}: ${out?.error?.message ?? ''}`);
-  return parseJSON(out.choices?.[0]?.message?.content ?? '');
-}
-
-async function askGemini(firma, signals) {
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt(firma, signals) }] }],
-      tools: [{ google_search: {} }],
-    }),
-    signal: AbortSignal.timeout(120000),
-  });
-  const out = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(`Gemini HTTP ${res.status}: ${out?.error?.message ?? ''}`);
-  const text = (out.candidates?.[0]?.content?.parts ?? []).map((p) => p.text ?? '').join('');
-  return parseJSON(text);
+// Jedno wywołanie Claude Code headless na firmę: tylko research webowy, bez dostępu do dysku.
+async function askClaude(firma, signals) {
+  const args = [
+    '-p', prompt(firma, signals),
+    '--model', 'opus',
+    '--output-format', 'json',
+    '--allowedTools', 'WebSearch WebFetch',
+    '--disallowedTools', 'Bash Edit Write Read Glob Grep',
+    '--max-turns', '25',
+  ];
+  const { stdout } = await run('claude', args, { timeout: 420000, maxBuffer: 16 * 1024 * 1024 });
+  const out = JSON.parse(stdout);
+  if (out.is_error) throw new Error(`claude: ${String(out.result).slice(0, 200)}`);
+  return parseJSON(out.result ?? '');
 }
 
 const { firms, pending_total } = await agent({ action: 'pending', limit: LIMIT });
@@ -89,13 +74,7 @@ console.log(`Do kwalifikacji: ${firms.length} (w kolejce łącznie: ${pending_to
 let ok = 0; const fails = [];
 for (const { firma, signals } of firms) {
   try {
-    let v;
-    try { v = OR_KEY ? await askOpenRouter(firma, signals) : await askGemini(firma, signals); }
-    catch (e) {
-      if (!GEMINI_KEY || !OR_KEY) throw e;
-      console.error(`  ${firma}: OpenRouter padł (${e.message}) — próbuję Gemini`);
-      v = await askGemini(firma, signals);
-    }
+    const v = await askClaude(firma, signals);
     await agent({
       action: 'qualify', firma,
       werdykt: v.werdykt,

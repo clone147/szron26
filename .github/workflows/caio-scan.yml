@@ -34,12 +34,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Kwalifikacja odkrytych firm
+      - name: Zainstaluj Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Kwalifikacja odkrytych firm (Claude Code headless, subskrypcja)
         id: q
         env:
           CAIO_INGEST_SECRET: ${{ secrets.CAIO_INGEST_SECRET }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: node scripts/caio/qualify.mjs --limit 8
 
   digest:
@@ -55,7 +56,6 @@ jobs:
       - name: Poranny digest
         env:
           CAIO_INGEST_SECRET: ${{ secrets.CAIO_INGEST_SECRET }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           SCAN_RESULT: ${{ needs.scan.result }}
           QUALIFY_RESULT: ${{ needs.qualify.result }}
           QUALIFY_INFO: ${{ needs.qualify.outputs.info }}
