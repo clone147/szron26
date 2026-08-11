@@ -1,12 +1,12 @@
 ---
 import Strefa from '../../layouts/Strefa.astro';
 ---
-<Strefa title="Programiści" active="programisci">
+<Strefa title="Ludzie" active="programisci">
   <div class="strefa-head">
     <div>
       <p class="strefa-eyebrow">Strefa zamknięta</p>
-      <h1>Programiści</h1>
-      <p>Kokpit prowadzenia programistów ku autonomicznemu programowaniu intencyjnemu. Lista po firmach, etapy dojrzałości, umiejętności, notatki, spotkania, zadania, prompty i maile. Tabelę edytujesz z klawiatury.</p>
+      <h1>Ludzie</h1>
+      <p>Kokpit prowadzenia ludzi — programistów i handlowców — ku autonomicznej pracy z AI. Lista po firmach i zespołach, etapy dojrzałości, umiejętności, notatki, spotkania, zadania, prompty i maile. Tabelę edytujesz z klawiatury.</p>
     </div>
     <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center">
       <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-history" title="Historia zmian i notatek (per miesiąc)">
@@ -21,7 +21,7 @@ import Strefa from '../../layouts/Strefa.astro';
       <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-import-file">Wgraj JSON</button>
       <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-export">Eksport JSON</button>
       <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-add-company">+ Firma</button>
-      <button class="strefa-btn strefa-btn--accent" id="btn-add-dev">+ Programista</button>
+      <button class="strefa-btn strefa-btn--accent" id="btn-add-dev">+ Osoba</button>
     </div>
   </div>
 
@@ -30,7 +30,7 @@ import Strefa from '../../layouts/Strefa.astro';
   <div class="strefa-toolbar">
     <div class="strefa-search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-      <input class="strefa-input" id="search" type="search" placeholder="Szukaj programisty, firmy, e-maila, projektu…" autocomplete="off" />
+      <input class="strefa-input" id="search" type="search" placeholder="Szukaj osoby, firmy, e-maila, projektu…" autocomplete="off" />
     </div>
     <div class="strefa-bulkbar" id="bulkbar" hidden>
       <span class="strefa-bulkbar__count" id="bulk-count">0 zaznaczonych</span>
@@ -48,7 +48,7 @@ import Strefa from '../../layouts/Strefa.astro';
 
   <div id="companies" class="strefa-trainings"></div>
   <div id="empty" class="dgrid-empty" hidden>
-    <p>Brak programistów. Dodaj firmę przyciskiem <strong>+ Firma</strong>, programistę przyciskiem <strong>+ Programista</strong> lub zaimportuj dane z poprzedniej wersji.</p>
+    <p>Brak osób. Dodaj firmę przyciskiem <strong>+ Firma</strong>, osobę przyciskiem <strong>+ Osoba</strong> lub zaimportuj dane z poprzedniej wersji.</p>
   </div>
 
   <input type="file" id="file-input" accept="application/json,.json" hidden />
