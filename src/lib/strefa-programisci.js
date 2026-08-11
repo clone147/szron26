@@ -1148,6 +1148,33 @@ function openScheduleMeetingModal() {
   });
 }
 
+/* ── grupowa notatka — ta sama treść dla wszystkich zaznaczonych programistów ── */
+function bulkNoteModal(devs) {
+  const plural = (n) => n === 1 ? 'programisty' : 'programistów';
+  const box = openModal(`
+    <div class="strefa-modal__head"><div><h2>Notatka grupowa</h2><p>Ta sama treść zapisze się w profilu ${devs.length} ${plural(devs.length)}</p></div><button class="strefa-iconbtn" data-close-x>${ICO.x}</button></div>
+    <div class="strefa-modal__body">
+      <div class="strefa-field"><label>Programiści</label>
+        <div style="display:flex;flex-wrap:wrap;gap:.3rem">${devs.map((d) => `<span class="strefa-chip strefa-chip--count">${esc(d.first_name || '')} ${esc(d.last_name || '')}</span>`).join('')}</div></div>
+      <div class="strefa-field" style="margin-top:var(--space-sm)"><label>Treść notatki</label>
+        <textarea class="strefa-textarea" id="bn-note" placeholder="np. warsztaty zespołowe, wspólne ustalenia, obserwacja o całym zespole…"></textarea></div>
+      <div class="strefa-actions-row"><button class="strefa-btn strefa-btn--ghost" data-close-x>Anuluj</button>
+        <button class="strefa-btn strefa-btn--accent" id="bn-save">Dodaj notatkę (${devs.length})</button></div>
+    </div>`);
+  box.querySelectorAll('[data-close-x]').forEach((b) => b.addEventListener('click', closeModal));
+  $('#bn-note', box).focus();
+  let busy = false;
+  $('#bn-save', box).addEventListener('click', async () => {
+    if (busy) return;
+    const note = $('#bn-note', box).value.trim(); if (!note) return toast('Pusto', 'Wpisz treść notatki', 'err');
+    busy = true; const btn = $('#bn-save', box); btn.disabled = true; btn.textContent = 'Zapisuję…';
+    const { error } = await sb.from('dev_notes').insert(devs.map((d) => ({ developer_id: d.id, note })));
+    if (error) { toast('Błąd', error.message, 'err'); busy = false; btn.disabled = false; btn.textContent = `Dodaj notatkę (${devs.length})`; return; }
+    closeModal();
+    toast('Dodano', `Notatka zapisana u ${devs.length} ${plural(devs.length)}`, 'ok');
+  });
+}
+
 /* ── ciche auto-odświeżanie listy (realtime — wspólny startRealtime w ./supabase.js) ── */
 async function pollRefresh() {
   if (polling || gridNav.editing || pollBlocked('companies')) return; // m.in. dialog/drawer otwarty
@@ -1200,6 +1227,10 @@ async function init() {
   $('#bulk-mail')?.addEventListener('click', () => {
     const devs = [...selectedIds].map((id) => devMap.get(id)).filter(Boolean);
     if (devs.length) composeEmailModal(devs);
+  });
+  $('#bulk-note')?.addEventListener('click', () => {
+    const devs = [...selectedIds].map((id) => devMap.get(id)).filter(Boolean);
+    if (devs.length) bulkNoteModal(devs);
   });
   $('#btn-export').addEventListener('click', exportJSON);
   bindFileImport('#btn-import-file', '#file-input', importFile);
