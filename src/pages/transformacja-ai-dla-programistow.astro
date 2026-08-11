@@ -11,7 +11,7 @@ const faq = [
   { q: 'Czy AI zastąpi moich programistów?', a: 'Nie. AI to narzędzie, które wzmacnia programistów, a nie ich zastępuje. Najlepsi devowie z AI są jeszcze lepsi. Słabi nadal będą słabi — AI nie da im umiejętności, których nie mają.' },
   { q: 'Jak długo trwa szkolenie zespołu?', a: 'Podstawowe szkolenie to 1–2 dni. Pełna transformacja z transferem wiedzy zajmuje 1–3 miesiące, w zależności od wielkości zespołu.' },
   { q: 'Czy dane naszego kodu są bezpieczne?', a: 'Możemy pracować z lokalnymi modelami (LM Studio, Llama), które nie wysyłają kodu na zewnątrz. Dla enterprise oferujemy rozwiązania self-hosted.' },
-  { q: 'Ile to kosztuje?', a: 'Programy kwartalne — stała opłata i zamknięty zakres ustalone przed startem. Po rozmowie diagnostycznej dostajecie kwotę mailem w 48 godzin, a po kwartale twarde dane, żeby zdecydować o kontynuacji.' },
+  { q: 'Ile to kosztuje?', a: 'Programy kwartalne — stała opłata i zamknięty zakres ustalone przed startem. Po audycie 90 minut dostajecie kwotę mailem w 48 godzin, a po kwartale twarde dane, żeby zdecydować o kontynuacji.' },
 ];
 ---
 <Interior
@@ -83,6 +83,12 @@ const faq = [
           <tr><td>Cursor / Copilot</td><td>Wsparcie w IDE: autouzupełnianie i szybkie edycje w trakcie pisania</td></tr>
         </tbody>
       </table>
+      <dl class="def-rows rv" style="margin-top:var(--space-2xl)">
+        <div><dt>Backend i frontend<small>API, bazy danych, interfejsy</small></dt><dd>Agenci przejmują refactoring, testy i przegląd kodu — programista prowadzi pracę, zamiast wykonywać ją ręcznie.</dd></div>
+        <div><dt>Mobile<small>iOS i Android</small></dt><dd>Jedna baza kodu na obie platformy i automatyzacja publikacji w sklepach.</dd></div>
+        <div><dt>Embedded<small>C/C++, urządzenia przemysłowe</small></dt><dd>Agent pracuje także ze starszymi środowiskami — sterowniki i komunikacja z urządzeniami powstają w dniach, nie tygodniach.</dd></div>
+        <div><dt>Legacy<small>PHP, Qt, stare monolity</small></dt><dd>Modernizacja bez zatrzymywania rozwoju — stary system działa, nowy kod wchodzi obok.</dd></div>
+      </dl>
     </div>
   </section>
 
@@ -106,10 +112,29 @@ const faq = [
     </div>
   </section>
 
-  <!-- 04 dlaczego SZRON (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="dlaczego">
+  <!-- 04 korzyści wg skali (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="skala">
     <div class="container">
-      <SectHead eyebrow="04 / Dlaczego SZRON · Co nas wyróżnia" title="Transfer wiedzy, nie uzależnienie." id="dlaczego" />
+      <SectHead eyebrow="04 / Skala · Korzyści wg wielkości zespołu" title="Inne podejście dla 2–5 devów, inne dla 5+ devów." id="skala" small />
+      <div class="grid-cards">
+        <article class="card-tile rv">
+          <p class="eyebrow">Mały zespół · 2–5 devów</p>
+          <h3>Szybkie efekty na waszym repo</h3>
+          <p>Pracujemy na waszym repozytorium — efekty widać od pierwszego dnia, a umiejętności po programie zostają u Waszych ludzi.</p>
+        </article>
+        <article class="card-tile rv" style="--rv-d:.1s">
+          <p class="eyebrow">Duży zespół · 5+ devów</p>
+          <h3>Standard i samodzielność</h3>
+          <p>Budowanie samodzielności i wyłanianie liderów AI w zespole. Jeden standard narzędzi AI we wszystkich działach oraz twarde KPI i dokumentacja, z którą pójdziecie do zarządu.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 dlaczego SZRON -->
+  <section class="sect" aria-labelledby="dlaczego">
+    <div class="container">
+      <SectHead eyebrow="05 / Dlaczego SZRON · Co nas wyróżnia" title="Transfer wiedzy, nie uzależnienie." id="dlaczego" />
       <dl class="def-rows rv">
         <div><dt>Transfer wiedzy, nie uzależnienie<small>Niezależni po 1–3 miesiącach</small></dt><dd>Po 1–3 miesiącach Wasz zespół pewnie pracuje z AI. Wracamy co kwartał z aktualizacją narzędzi i strategii.</dd></div>
         <div><dt>Praktyczne doświadczenie<small>25 lat w IT · 40+ łącznie</small></dt><dd>Tomek — 25 lat w IT (w tym embedded: STM32, C++, Qt), Maciej — 18. Efekty wdrożeń pokazujemy na pomiarach z DevLens, nie na deklaracjach.</dd></div>
@@ -118,10 +143,24 @@ const faq = [
     </div>
   </section>
 
-  <!-- 05 FAQ -->
+  <!-- 06 Self-Improving Loops (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="loops">
+    <div class="container">
+      <SectHead eyebrow="06 / Pętla · Self-Improving Loops" title="Agent, który sam sprawdza, poprawia i iteruje — aż kod działa." id="loops" />
+      <div class="prose rv">
+        <p>Agent uruchamia kod i testy, naprawia błędy i iteruje bez udziału człowieka, aż osiągnie cel. Pełną mechanikę pętli — krok po kroku, z przykładami — opisujemy w Akademii: <a href="/petle">Self-Improving Loops</a>.</p>
+      </div>
+      <dl class="def-rows rv">
+        <div><dt>Optymalizacja JavaScript<small>„Ten mechanizm działa wolno. Spraw, żeby przyspieszył."</small></dt><dd>5x przyspieszenie w 3 minuty, z profilowaniem wydajności w przeglądarce.</dd></div>
+        <div><dt>Drukarka RS232 (embedded)<small>„Potrzebujemy komunikacji z drukarką przez RS232."</small></dt><dd>1,5 dnia zamiast miesiąca, na Rust + STM32.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 07 FAQ -->
   <section class="sect" aria-labelledby="faq-title">
     <div class="container">
-      <SectHead eyebrow="05 / FAQ · Najczęstsze pytania" title="Pytania, które padają najczęściej." id="faq-title" small />
+      <SectHead eyebrow="07 / FAQ · Najczęstsze pytania" title="Pytania, które padają najczęściej." id="faq-title" small />
       <Faq items={faq} />
     </div>
   </section>

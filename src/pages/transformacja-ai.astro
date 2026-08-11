@@ -7,32 +7,32 @@ import CtaBand from '../components/CtaBand.astro';
 
 // FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html)
 const faq = [
-  { q: 'Jakie narzędzia AI wdrażacie?', a: 'Zestaw dobieramy do Waszego stacku: asystenci w edytorze, agenci pracujący samodzielnie i integracje z Waszymi systemami. Pełną listę narzędzi z zastosowaniami znajdziecie na <a href="/transformacja-ai-dla-programistow">stronie dla CTO i tech leadów</a>.' },
-  { q: 'Czy AI działa z moim stackiem (PHP, C++, React, embedded)?', a: 'Tak — AI działa z każdym stackiem. Przykłady: migracja PHP 5.6 do 8.2 w 2 tygodnie, komunikacja z drukarką RS232 na STM32 w 1,5 dnia, system raportowania w Pythonie w tydzień. Wymóg: repozytorium Git i README z instrukcją setupu.' },
-  { q: 'Jak wygląda model współpracy?', a: 'Programy kwartalne — stała opłata i zamknięty zakres ustalone przed startem. Po audycie dostajecie kwotę mailem w 48 godzin. Po kwartale macie twarde dane, żeby zdecydować o kontynuacji.' },
-  { q: 'Jak wygląda droga od pierwszego kontaktu do startu?', a: 'Audyt 90 minut (poznajemy biznes, use case\'y, zespół i stack), oferta z timeline\'em, umowa, a potem kickoff w pierwszym tygodniu: analiza workflow, mapowanie zadań, dobór narzędzi. Zwykle 2–3 tygodnie od kontaktu do szkolenia, w trybie pilnym szybciej.' },
+  { q: 'Czym rola CTrO różni się od programu kwartalnego?', a: 'Program kwartalny to zamknięty projekt: zakres, stała opłata, pomiar przed i po. Rola CTrO to stała odpowiedzialność za zmianę — priorytety, standardy, kolejne zespoły, raportowanie zarządowi. W praktyce program często jest pierwszym kwartałem roli: najpierw dowozimy mierzalny efekt, potem prowadzimy zmianę dalej.' },
+  { q: 'Ile czasu zajmuje ta rola i czy zastępuje CTO?', a: 'Kilka dni w miesiącu, zakres ustalany kwartalnie. Nie zastępujemy CTO ani dyrektora R&D — pracujemy obok: oni odpowiadają za produkt i zespół, my za to, żeby zmiana sposobu pracy naprawdę zaszła i była policzalna.' },
+  { q: 'Czy AI działa z naszym stackiem (PHP, C++, React, embedded)?', a: 'Tak — AI działa z każdym stackiem. Przykłady: migracja PHP 5.6 do 8.2 w 2 tygodnie, komunikacja z drukarką RS232 na STM32 w 1,5 dnia, system raportowania w Pythonie w tydzień. Szczegóły narzędzi i konfiguracji — na <a href="/transformacja-ai-dla-programistow">stronie dla CTO i tech leadów</a>.' },
+  { q: 'Jak wygląda droga od pierwszego kontaktu do startu?', a: 'Audyt 90 minut (poznajemy biznes, use case\'y, zespół i stack — z pisemnym raportem), potem oferta z timeline\'em i kwota mailem w 48 godzin, umowa i kickoff. Zwykle 2–3 tygodnie od kontaktu do pierwszych działań, w trybie pilnym szybciej. NDA przed startem.' },
 ];
 ---
 <Interior
-  title="Transformacja AI — zespół 2–4× szybszy w dwa kwartały | SZRON"
-  description="Kwartalny program transformacji AI dla firm z własnym zespołem IT: zespół 2–4× szybszy w dwa kwartały, pomiar przed i po, stała opłata i zamknięty zakres. Docelowo rola zewnętrznego Chief Transformation Officera."
-  eyebrow="Program kwartalny · stała opłata, zamknięty zakres"
-  heading="Zespół 2–4× szybszy w dwa kwartały."
-  lead="Program dla firm z własnym zespołem IT: dobieramy narzędzia, uczymy Waszych programistów na ich codziennych zadaniach i mierzymy efekt. Bez wymiany ludzi i bez zatrzymywania roadmapy."
+  title="Zewnętrzny Chief Transformation Officer — transformacja AI | SZRON"
+  description="Zewnętrzny Chief Transformation Officer dla firm z własnym zespołem IT: prowadzi transformację AI od środka — priorytety, standardy, pomiar efektu. Wejście od bezpłatnego audytu 90 minut z pisemnym raportem."
+  eyebrow="Rola · Zewnętrzny Chief Transformation Officer"
+  heading="Transformacja ma właściciela. Nie musi być na etacie."
+  lead="Dla firm, które mają transformację w PowerPoincie: licencje kupione, strategia ogłoszona, a zespoły pracują po staremu. Wchodzimy w rolę zewnętrznego Chief Transformation Officera — prowadzimy zmianę sposobu pracy od środka i mierzymy efekt. AI jest tu narzędziem, nie nagłówkiem."
   heroImage="/img/sub/transformacja-ai.webp"
   heroAlt="Pęknięty lód przechodzący w świecącą kratę kryształów"
 >
   <!-- proof -->
   <ProofStrip items={[
-    ['Na waszym repo', 'efekty od pierwszego dnia'],
-    ['Pomiar przed i po', 'baseline w pierwszym tygodniu'],
-    ['Niezależni po 30 dniach', 'zespół przejmuje stery'],
+    ['Rola, nie projekt', 'kilka dni w miesiącu, stała odpowiedzialność'],
+    ['Pomiar przed i po', 'DevLens: liczby dla zarządu, nie deklaracje'],
+    ['Wejście bez ryzyka', 'bezpłatny audyt 90 minut z pisemnym raportem'],
   ]} />
 
-  <!-- 01 cytat -->
+  <!-- 01 punkt wyjścia -->
   <section class="sect" aria-labelledby="punkt">
     <div class="container">
-      <SectHead eyebrow="01 / Punkt wyjścia · Skala efektu" title="Prawda jest gdzieś pośrodku — ale bliżej optymistycznych szacunków." id="punkt" small />
+      <SectHead eyebrow="01 / Punkt wyjścia · Dlaczego to się nie dzieje samo" title="Licencje są. Strategia jest. Delivery stoi w miejscu." id="punkt" small />
       <img class="hero-img rv" src="/img/sub/transformacja-ai-praca.webp" alt="Programowanie w parze z panelem asystenta AI widocznym na szerokim monitorze" width="1380" height="768" loading="lazy" />
       <div class="grid-cards">
         <figure class="quote-card rv">
@@ -40,61 +40,56 @@ const faq = [
           <figcaption><strong>The New York Times</strong> — maj 2025</figcaption>
         </figure>
         <article class="card-tile rv" style="--rv-d:.1s">
-          <p class="eyebrow">Jak to sprawdzicie</p>
-          <h3>Decyzja na danych, nie na wrażeniach.</h3>
-          <p>Baseline w pierwszym tygodniu, te same wskaźniki po dwóch kwartałach. O kontynuacji decydujecie, widząc liczby z własnego zespołu.</p>
+          <p class="eyebrow">Paradoks produktywności AI</p>
+          <h3>Licencja wpięta w stary proces daje stare wyniki.</h3>
+          <p>84% programistów już używa AI, a delivery stoi — bo zmieniło się narzędzie, nie sposób pracy. Firmy, które przeprojektowały workflow, wyciągają ROI 2,5–3,5×. Dokładnie za tę różnicę odpowiada CTrO.</p>
         </article>
       </div>
     </div>
   </section>
 
-  <!-- 02 proces (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="proces">
+  <!-- 02 zakres roli (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="rola">
     <div class="container">
-      <SectHead eyebrow="02 / Proces · Jak wygląda transformacja AI" title="Cztery kroki. Każdy buduje umiejętności u Waszych ludzi." id="proces" />
-      <div class="steps">
-        <article class="step rv"><p class="eyebrow">01 · Audyt</p><h3>Audyt technologiczny</h3><p>Zaczynamy od <a href="/darmowy-audyt">bezpłatnego audytu</a>: przychodzimy, patrzymy jak działacie, rozmawiamy z ludźmi. Szukamy miejsc, gdzie tracicie czas i pieniądze i gdzie AI da największy efekt.</p></article>
-        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Strategia</p><h3>Strategia AI</h3><p>Razem ustalamy, co robimy najpierw, co potem, a co pomijamy. Konkretny plan z kolejnością, projekty z najszybszym zwrotem i przeprowadzenie zespołu przez zmianę. Nie każdy proces potrzebuje AI — mówimy to wprost.</p></article>
-        <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Optymalizacja</p><h3>Optymalizacja procesów</h3><p>Wchodzimy w wasze workflow i szukamy miejsc, gdzie AI skróci robotę. Dopasowanie do procesów, wpięcie w istniejące systemy, przyspieszenie codziennej pracy i ciągłe mierzenie.</p></article>
-        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Transfer</p><h3>Zespół przejmuje stery</h3><p>Uczymy waszych ludzi tak, żeby po miesiącu pewnie pracowali z AI na co dzień. Wyłaniamy liderów AI, pracujemy na waszym kodzie, zostawiamy dokumentację. A wracamy co kwartał z nowymi narzędziami.</p></article>
-      </div>
-    </div>
-  </section>
-
-  <!-- 03 setup pod stack -->
-  <section class="sect" aria-labelledby="narzedzia">
-    <div class="container">
-      <SectHead eyebrow="03 / Setup · Pod Wasz stack" title="Każdy zespół dostaje setup pod swoją technologię — i konkretny efekt." id="narzedzia" />
+      <SectHead eyebrow="02 / Zakres · Co bierze na siebie zewnętrzny CTrO" title="Odpowiedzialność za zmianę sposobu pracy. Nie za slajdy o AI." id="rola" />
       <dl class="def-rows rv">
-        <div><dt>Backend i frontend<small>API, bazy danych, interfejsy</small></dt><dd>Agenci przejmują refactoring, testy i przegląd kodu — programista prowadzi pracę, zamiast wykonywać ją ręcznie.</dd></div>
-        <div><dt>Mobile<small>iOS i Android</small></dt><dd>Jedna baza kodu na obie platformy i automatyzacja publikacji w sklepach.</dd></div>
-        <div><dt>Embedded<small>C/C++, urządzenia przemysłowe</small></dt><dd>Agent pracuje także ze starszymi środowiskami — sterowniki i komunikacja z urządzeniami powstają w dniach, nie tygodniach.</dd></div>
-        <div><dt>Legacy<small>PHP, Qt, stare monolity</small></dt><dd>Modernizacja bez zatrzymywania rozwoju — stary system działa, nowy kod wchodzi obok.</dd></div>
+        <div><dt>Priorytety i plan<small>co najpierw, co potem, czego nie robić</small></dt><dd>Plan kwartalny z kolejnością i projektami o najszybszym zwrocie. Nie każdy proces potrzebuje AI — mówimy to wprost i skreślamy z listy.</dd></div>
+        <div><dt>Standardy i workflow<small>sposób pracy, nie narzędzie</small></dt><dd>Definicje zadań, review z agentami, standardy repo i CLAUDE.md jako konstytucja zespołu — żeby zmiana przetrwała bez nas.</dd></div>
+        <div><dt>Narzędzia bez lojalności wobec dostawcy<small>dobór pod stack i budżet</small></dt><dd>Dobieramy pod Wasz stack, nie pod prowizję. Gdy kod nie może wyjść z firmy — modele lokalne i rozwiązania self-hosted.</dd></div>
+        <div><dt>Pomiar i raportowanie zarządowi<small>DevLens · KPI przed i po</small></dt><dd>Baseline na starcie, te same wskaźniki co kwartał. Zarząd dostaje liczby z własnego zespołu, nie wrażenia z prezentacji.</dd></div>
+        <div><dt>Ludzie i kompetencje<small>liderzy AI, szkolenia falami</small></dt><dd>Wyłaniamy championów, szkolimy zespołami na Waszym kodzie, opór rozbrajamy na liczbach — wartość programisty prowadzącego agenta rośnie, nie maleje.</dd></div>
+        <div><dt>Governance i regulacje<small>AI Act art. 4 · CRA dla firm z firmware</small></dt><dd>Obowiązek AI literacy i wymogi CRA zamieniamy na proces i szkolenia, nie na panikę. Szczególnie dla firm budujących własny sprzęt i oprogramowanie.</dd></div>
       </dl>
-      <p class="rv" style="margin-top:var(--space-lg);color:var(--color-text-2);font-size:var(--text-s,.875rem)">Pełna lista narzędzi i konfiguracji — na stronie <a href="/transformacja-ai-dla-programistow">dla CTO i tech leadów</a>.</p>
     </div>
   </section>
 
-  <!-- 04 korzyści wg skali (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="korzysci">
+  <!-- 03 proces -->
+  <section class="sect" aria-labelledby="proces">
     <div class="container">
-      <SectHead eyebrow="04 / Skala · Korzyści wg wielkości zespołu" title="Inne podejście dla 2–5 devów, inne dla 5+ devów." id="korzysci" small />
-      <div class="grid-cards">
-        <article class="card-tile rv">
-          <p class="eyebrow">Mały zespół · 2–5 devów</p>
-          <h3>Szybkie efekty na waszym repo</h3>
-          <p>Pracujemy na waszym repozytorium — efekty widać od pierwszego dnia, a umiejętności po programie zostają u Waszych ludzi.</p>
-        </article>
-        <article class="card-tile rv" style="--rv-d:.1s">
-          <p class="eyebrow">Duży zespół · 5+ devów</p>
-          <h3>Standard i samodzielność</h3>
-          <p>Budowanie samodzielności i wyłanianie liderów AI w zespole. Jeden standard narzędzi AI we wszystkich działach oraz twarde KPI i dokumentacja, z którą pójdziecie do zarządu.</p>
-        </article>
+      <SectHead eyebrow="03 / Proces · Jak prowadzimy zmianę" title="Cztery kroki. Każdy buduje umiejętności u Waszych ludzi." id="proces" />
+      <div class="steps">
+        <article class="step rv"><p class="eyebrow">01 · Audyt</p><h3>Audyt technologiczny</h3><p>Zaczynamy od <a href="/umow-rozmowe">bezpłatnego audytu</a>: przychodzimy, patrzymy jak działacie, rozmawiamy z ludźmi. Szukamy miejsc, gdzie tracicie czas i pieniądze i gdzie AI da największy efekt.</p></article>
+        <article class="step rv" style="--rv-d:.08s"><p class="eyebrow">02 · Strategia</p><h3>Strategia AI</h3><p>Razem ustalamy, co robimy najpierw, co potem, a co pomijamy. Konkretny plan z kolejnością, projekty z najszybszym zwrotem i przeprowadzenie zespołu przez zmianę.</p></article>
+        <article class="step rv" style="--rv-d:.16s"><p class="eyebrow">03 · Optymalizacja</p><h3>Optymalizacja procesów</h3><p>Wchodzimy w wasze workflow i szukamy miejsc, gdzie AI skróci robotę. Dopasowanie do procesów, wpięcie w istniejące systemy, przyspieszenie codziennej pracy i ciągłe mierzenie.</p></article>
+        <article class="step rv" style="--rv-d:.24s"><p class="eyebrow">04 · Transfer</p><h3>Zespół przejmuje stery</h3><p>Uczymy waszych ludzi tak, żeby po miesiącu pewnie pracowali z AI na co dzień. Wyłaniamy liderów AI, pracujemy na waszym kodzie, zostawiamy dokumentację.</p></article>
       </div>
     </div>
   </section>
 
-  <!-- 05 ROI / wpływ na biznes -->
+  <!-- 04 drabina współpracy (ciemna) -->
+  <section class="sect sect--dark" aria-labelledby="drabina">
+    <div class="container">
+      <SectHead eyebrow="04 / Model współpracy · Od audytu do stałej roli" title="Każdy szczebel dowozi wartość. Żaden nie zobowiązuje do następnego." id="drabina" />
+      <dl class="def-rows rv">
+        <div><dt>Audyt 90 minut<small>bezpłatny · pisemny raport</small></dt><dd>Rozmowa o stacku, zespole i procesie. Wychodzicie z raportem: gdzie AI da u Was największy efekt i co stoi na przeszkodzie. <a href="/umow-rozmowe">Umów audyt</a>.</dd></div>
+        <div><dt>Warsztat 1–2 dni<small>na Waszym kodzie</small></dt><dd>Zespół pracuje z agentami na własnych, codziennych zadaniach — nie na przykładach z prezentacji. Pierwsze efekty i wiedza, co realnie zadziała u Was.</dd></div>
+        <div><dt>Program kwartalny<small>zespół 2–4× szybszy · pomiar przed i po</small></dt><dd>Zamknięty zakres, stała opłata, baseline w pierwszym tygodniu. Szczegóły procesu — na stronie <a href="/metoda">Metoda</a>.</dd></div>
+        <div><dt>Rola stała: zewnętrzny CTrO<small>kilka dni w miesiącu</small></dt><dd>Prowadzenie zmiany dalej: kolejne zespoły, standardy, narzędzia, kwartalne raporty dla zarządu. Odpowiedzialność bez etatu i bez rekrutacji.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 05 pomiar / ROI -->
   <section class="sect" aria-labelledby="roi">
     <div class="container">
       <SectHead eyebrow="05 / Zwrot · Wpływ na biznes" title="Podajemy konserwatywne szacunki. Rzeczywiste wyniki często są lepsze." id="roi" small />
@@ -114,42 +109,10 @@ const faq = [
     </div>
   </section>
 
-  <!-- 06 Self-Improving Loops (ciemna) -->
-  <section class="sect sect--dark" aria-labelledby="loops">
-    <div class="container">
-      <SectHead eyebrow="06 / Pętla · Self-Improving Loops" title="Agent, który sam sprawdza, poprawia i iteruje — aż kod działa." id="loops" />
-      <div class="prose rv">
-        <p>Agent uruchamia kod i testy, naprawia błędy i iteruje bez udziału człowieka, aż osiągnie cel. Pełną mechanikę pętli — krok po kroku, z przykładami — opisujemy w Akademii: <a href="/petle">Self-Improving Loops</a>.</p>
-      </div>
-      <dl class="def-rows rv">
-        <div><dt>Optymalizacja JavaScript<small>„Ten mechanizm działa wolno. Spraw, żeby przyspieszył."</small></dt><dd>5x przyspieszenie w 3 minuty, z profilowaniem wydajności w przeglądarce.</dd></div>
-        <div><dt>Drukarka RS232 (embedded)<small>„Potrzebujemy komunikacji z drukarką przez RS232."</small></dt><dd>1,5 dnia zamiast miesiąca, na Rust + STM32.</dd></div>
-      </dl>
-    </div>
-  </section>
-
-  <!-- 07 rola CTrO -->
-  <section class="sect" aria-labelledby="ctro">
-    <div class="container">
-      <SectHead eyebrow="07 / Rola · Zewnętrzny Chief Transformation Officer" title="Transformacja ma właściciela. Nie musi być na etacie." id="ctro" />
-      <div class="grid-cards">
-        <figure class="quote-card rv">
-          <blockquote>„Zewnętrzny Chief Transformation Officer dla firm, które mają transformację w PowerPoincie."</blockquote>
-          <figcaption><strong>Tomek Wojciechowski</strong> — SZRON</figcaption>
-        </figure>
-        <article class="card-tile rv" style="--rv-d:.1s">
-          <p class="eyebrow">Jak to działa</p>
-          <h3>Stała rola, kilka dni w miesiącu.</h3>
-          <p>Program kwartalny to początek — po nim zmianę trzeba prowadzić dalej: priorytety, standardy, kolejne zespoły, rozmowy z zarządem. Tomek wchodzi wtedy w rolę zewnętrznego Chief Transformation Officera: człowieka odpowiedzialnego za zmianę sposobu pracy, nie za slajdy o AI. Pierwszy krok jest zawsze ten sam — <a href="/umow-rozmowe">audyt 90 minut</a> z pisemnym raportem.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- 08 FAQ -->
+  <!-- 06 FAQ -->
   <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
     <div class="container">
-      <SectHead eyebrow="08 / FAQ · Czego się spodziewać" title="Pytania o transformację AI." id="faq-title" small />
+      <SectHead eyebrow="06 / FAQ · Czego się spodziewać" title="Pytania o rolę i model współpracy." id="faq-title" small />
       <Faq items={faq} />
     </div>
   </section>
@@ -157,7 +120,7 @@ const faq = [
   <!-- kontakt CTA -->
   <CtaBand
     eyebrow="Kontakt"
-    heading="Sprawdź bez ryzyka. Zacznij od rozmowy."
+    heading="Sprawdź bez ryzyka. Zacznij od audytu."
     text="Powiemy wprost, co jest realne dla waszej firmy, a co to tylko hype. Po audycie dostaniecie pisemny raport, konkretny plan i kwotę mailem w 48 godzin. NDA przed startem."
     btnLabel="Umów bezpłatny audyt"
   />
