@@ -174,9 +174,10 @@ function renderStats() {
   const nowe = signals.filter((s) => s.status === 'nowy').length;
   const gorace = signals.filter((s) => s.waga === 3 && s.status !== 'odrzucony').length;
   const wToku = [...companies.values()].filter((c) => !['nowy', 'odpadl'].includes(c.status)).length;
+  const odkryte = new Set(signals.filter((s) => s.tier === 4 && s.status !== 'odrzucony').map((s) => s.firma)).size;
   const last = signals[0]?.created_at;
   $('#stats').innerHTML = [
-    ['Nowe sygnały', nowe], ['Gorące (waga 3)', gorace], ['Firmy w pipeline', wToku],
+    ['Nowe sygnały', nowe], ['Gorące (waga 3)', gorace], ['Odkryte firmy', odkryte], ['Firmy w pipeline', wToku],
     ['Ostatni skan', last ? fmtDate(last) : '—'],
   ].map(([l, n]) => `<div class="strefa-stat"><div class="strefa-stat__num">${n}</div><div class="strefa-stat__lbl">${l}</div></div>`).join('');
 }
@@ -262,7 +263,7 @@ function firmCard(firma, items) {
       <button type="button" class="syg-toggle" aria-expanded="${open}">
       ${ICO.chev}
       <div class="strefa-tr__grow">
-        <div class="strefa-tr__name">${esc(firma)} ${tier ? `<span class="syg-tier">Tier ${tier}</span>` : ''}</div>
+        <div class="strefa-tr__name">${esc(firma)} ${tier === 4 ? '<span class="syg-tier syg-tier--new">odkryta</span>' : tier ? `<span class="syg-tier">Tier ${tier}</span>` : ''}</div>
         <div class="strefa-tr__meta">
           ${prace ? `<span>${prace} of. pracy</span>` : ''}
           ${newsy ? `<span>${newsy} news.</span>` : ''}
