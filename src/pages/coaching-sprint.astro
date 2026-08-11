@@ -10,7 +10,7 @@ import CtaBand from '../components/CtaBand.astro';
 const faq = [
   { q: 'Na czyim kodzie pracujemy podczas sprintu?', a: 'Na waszym — bierzemy realne taski z backlogu i robimy je razem z AI, nie na sztucznych przykładach. Zespół od razu uczy się pracy na własnym projekcie.' },
   { q: 'Ile czasu mój zespół musi na to poświęcić?', a: 'Pierwszy miesiąc to intensywność — 2 dni szkolenia, setup narzędzi, potem około 2h follow-upu tygodniowo. Później godzina tygodniowo i tyle.' },
-  { q: 'Ile to kosztuje i jak się rozliczacie?', a: 'Program kwartalny: stała opłata i zamknięty zakres — nie rozliczamy się godzinami, więc nie mamy interesu w przedłużaniu. Kwotę dostajecie po diagnozie, mailem w 48h. NDA podpisujemy przed startem.' },
+  { q: 'Ile to kosztuje i jak się rozliczacie?', a: 'Program kwartalny: stała opłata i zamknięty zakres — nie rozliczamy się godzinami, więc nie mamy interesu w przedłużaniu. Kwotę dostajecie po audycie, mailem w 48h. NDA podpisujemy przed startem.' },
   { q: 'Czy kod musi wychodzić na zewnątrz?', a: 'Nie musi. Tam, gdzie to ważne, stawiamy lokalne modele AI w waszej serwerowni — pełna kontrola nad danymi, zgodność z NIS2 i wymaganiami branżowymi, a skuteczność porównywalna z modelami w chmurze.' },
   { q: 'Co to są MCP Tools i po co nam one?', a: 'MCP to standard, który pozwala agentowi AI bezpiecznie sięgać do waszych systemów — repozytorium, bazy danych, przeglądarki. Jak to działa w praktyce i jak to konfigurujemy, opisujemy na stronie <a href="/serwery-mcp">Serwery MCP</a>.' },
 ];
@@ -34,7 +34,7 @@ const faq = [
   <!-- 01 proces -->
   <section class="sect" aria-labelledby="proces">
     <div class="container">
-      <SectHead eyebrow="01 / Proces · Jak działa Coaching Sprint" title="Cztery kroki: diagnoza → narzędzia → coaching → kompetencje." id="proces" />
+      <SectHead eyebrow="01 / Proces · Jak działa Coaching Sprint" title="Cztery kroki: audyt → narzędzia → coaching → kompetencje." id="proces" />
       <img class="hero-img rv" src="/img/sub/wdrozenia-ai-warsztat.webp" alt="Inżynier z tabletem z metrykami produkcji w jasnej hali przemysłowej" width="1380" height="768" loading="lazy" />
       <div class="steps">
         <article class="step rv"><p class="eyebrow">01 · Diagnoza</p><h3>Sprawdzamy, co was spowalnia</h3><p>Patrzymy na wasze daily, review i pipeline. Pytamy devów, co ich wkurza. Zwykle po jednym dniu wiemy, gdzie jest problem.</p></article>
@@ -120,8 +120,8 @@ const faq = [
   <!-- kontakt CTA -->
   <CtaBand
     eyebrow="Kontakt"
-    heading="30 minut na Teams. Sprawdzimy, czy Coaching Sprint ma u was sens."
-    text="Pogadajmy szczerze — powiemy wprost, co ma sens, a co nie. Jeśli sprint ma sens, po diagnozie dostaniecie kwotę programu i zamknięty zakres na kwartał."
+    heading="90 minut na Teams. Sprawdzimy, czy Coaching Sprint ma u was sens."
+    text="Pogadajmy szczerze — powiemy wprost, co ma sens, a co nie. Jeśli sprint ma sens, po audycie dostaniecie kwotę programu i zamknięty zakres na kwartał."
     btnLabel="Umów Coaching Sprint"
   />
 </Interior>

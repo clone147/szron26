@@ -9,13 +9,13 @@ import CtaBand from '../components/CtaBand.astro';
 const faq = [
   { q: 'Jakie narzędzia AI wdrażacie?', a: 'Zestaw dobieramy do Waszego stacku: asystenci w edytorze, agenci pracujący samodzielnie i integracje z Waszymi systemami. Pełną listę narzędzi z zastosowaniami znajdziecie na <a href="/transformacja-ai-dla-programistow">stronie dla CTO i tech leadów</a>.' },
   { q: 'Czy AI działa z moim stackiem (PHP, C++, React, embedded)?', a: 'Tak — AI działa z każdym stackiem. Przykłady: migracja PHP 5.6 do 8.2 w 2 tygodnie, komunikacja z drukarką RS232 na STM32 w 1,5 dnia, system raportowania w Pythonie w tydzień. Wymóg: repozytorium Git i README z instrukcją setupu.' },
-  { q: 'Jak wygląda model współpracy?', a: 'Programy kwartalne — stała opłata i zamknięty zakres ustalone przed startem. Po rozmowie diagnostycznej dostajecie kwotę mailem w 48 godzin. Po kwartale macie twarde dane, żeby zdecydować o kontynuacji.' },
-  { q: 'Jak wygląda droga od pierwszego kontaktu do startu?', a: 'Rozmowa diagnostyczna (poznajemy biznes, use case\'y, zespół i stack), oferta z timeline\'em, umowa, a potem kickoff w pierwszym tygodniu: analiza workflow, mapowanie zadań, dobór narzędzi. Zwykle 2–3 tygodnie od kontaktu do szkolenia, w trybie pilnym szybciej.' },
+  { q: 'Jak wygląda model współpracy?', a: 'Programy kwartalne — stała opłata i zamknięty zakres ustalone przed startem. Po audycie dostajecie kwotę mailem w 48 godzin. Po kwartale macie twarde dane, żeby zdecydować o kontynuacji.' },
+  { q: 'Jak wygląda droga od pierwszego kontaktu do startu?', a: 'Audyt 90 minut (poznajemy biznes, use case\'y, zespół i stack), oferta z timeline\'em, umowa, a potem kickoff w pierwszym tygodniu: analiza workflow, mapowanie zadań, dobór narzędzi. Zwykle 2–3 tygodnie od kontaktu do szkolenia, w trybie pilnym szybciej.' },
 ];
 ---
 <Interior
   title="Transformacja AI — zespół 2–4× szybszy w dwa kwartały | SZRON"
-  description="Kwartalny program transformacji AI dla firm z własnym zespołem IT: zespół 2–4× szybszy w dwa kwartały, pomiar przed i po, stała opłata i zamknięty zakres."
+  description="Kwartalny program transformacji AI dla firm z własnym zespołem IT: zespół 2–4× szybszy w dwa kwartały, pomiar przed i po, stała opłata i zamknięty zakres. Docelowo rola zewnętrznego Chief Transformation Officera."
   eyebrow="Program kwartalny · stała opłata, zamknięty zakres"
   heading="Zespół 2–4× szybszy w dwa kwartały."
   lead="Program dla firm z własnym zespołem IT: dobieramy narzędzia, uczymy Waszych programistów na ich codziennych zadaniach i mierzymy efekt. Bez wymiany ludzi i bez zatrzymywania roadmapy."
@@ -128,10 +128,28 @@ const faq = [
     </div>
   </section>
 
-  <!-- 07 FAQ -->
-  <section class="sect" aria-labelledby="faq-title">
+  <!-- 07 rola CTrO -->
+  <section class="sect" aria-labelledby="ctro">
     <div class="container">
-      <SectHead eyebrow="07 / FAQ · Czego się spodziewać" title="Pytania o transformację AI." id="faq-title" small />
+      <SectHead eyebrow="07 / Rola · Zewnętrzny Chief Transformation Officer" title="Transformacja ma właściciela. Nie musi być na etacie." id="ctro" />
+      <div class="grid-cards">
+        <figure class="quote-card rv">
+          <blockquote>„Zewnętrzny Chief Transformation Officer dla firm, które mają transformację w PowerPoincie."</blockquote>
+          <figcaption><strong>Tomek Wojciechowski</strong> — SZRON</figcaption>
+        </figure>
+        <article class="card-tile rv" style="--rv-d:.1s">
+          <p class="eyebrow">Jak to działa</p>
+          <h3>Stała rola, kilka dni w miesiącu.</h3>
+          <p>Program kwartalny to początek — po nim zmianę trzeba prowadzić dalej: priorytety, standardy, kolejne zespoły, rozmowy z zarządem. Tomek wchodzi wtedy w rolę zewnętrznego Chief Transformation Officera: człowieka odpowiedzialnego za zmianę sposobu pracy, nie za slajdy o AI. Pierwszy krok jest zawsze ten sam — <a href="/umow-rozmowe">audyt 90 minut</a> z pisemnym raportem.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 FAQ -->
+  <section class="sect" aria-labelledby="faq-title" style="padding-top:0">
+    <div class="container">
+      <SectHead eyebrow="08 / FAQ · Czego się spodziewać" title="Pytania o transformację AI." id="faq-title" small />
       <Faq items={faq} />
     </div>
   </section>
@@ -140,7 +158,7 @@ const faq = [
   <CtaBand
     eyebrow="Kontakt"
     heading="Sprawdź bez ryzyka. Zacznij od rozmowy."
-    text="Powiemy wprost, co jest realne dla waszej firmy, a co to tylko hype. Po rozmowie dostaniecie konkretny plan i kwotę mailem w 48 godzin. NDA przed startem."
-    btnLabel="Umów bezpłatną konsultację"
+    text="Powiemy wprost, co jest realne dla waszej firmy, a co to tylko hype. Po audycie dostaniecie pisemny raport, konkretny plan i kwotę mailem w 48 godzin. NDA przed startem."
+    btnLabel="Umów bezpłatny audyt"
   />
 </Interior>

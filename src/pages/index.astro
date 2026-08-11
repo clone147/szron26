@@ -9,13 +9,13 @@ import BtnArrow from '../components/BtnArrow.astro';
 // FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html), stąd np. T&amp;M
 const faq = [
   { q: 'Co z bezpieczeństwem naszych danych?', a: 'Wasz kod nie idzie do publicznych modeli. Dla branż regulowanych — Bedrock w AWS, dane w Waszej VPC. Dla obronności i wrażliwego embedded — lokalne modele (Ollama, vLLM) na Waszych serwerach. Audit log każdej interakcji z AI. NDA podpisujemy przed pierwszą rozmową.' },
-  { q: 'Co jeśli zespół nie kupi tej zmiany?', a: 'Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny”. Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.' },
+  { q: 'Co jeśli zespół nie kupi tej zmiany?', a: 'Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny”. Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do audytu. Bez wstydu, bez kar.' },
   { q: 'Jak zmierzymy efekt?', a: 'DORA metrics jako baseline w tygodniu 1: czas od ticketu do PR, czas merge, bug escape rate, pokrycie testami. Mierzymy ponownie w tygodniu 12. Raport ROI dla zarządu — dashboard z twardymi liczbami.' },
   { q: 'Rynek AI zmienia się co kwartał. Skąd pewność, że wybierzecie narzędzia, które się utrzymają?', a: 'Dobór technologii to nasz zawód od 25 lat — widzieliśmy, które wybory firmy spłacały latami. Koszt prób i błędów z agentami ponieśliśmy u siebie, nie u klientów. A program kończymy tak, żeby zespół sam umiał ocenić i przyjąć kolejne narzędzie — przewaga zostaje u Was, nie w naszym cenniku.' },
-  { q: 'Ile to kosztuje?', a: 'Programy kwartalne nie są dla każdej firmy. Stała opłata kwartalna, zamknięty zakres, bez T&amp;M. Kwotę ustalamy po diagnozie i podajemy mailem w 48h.' },
+  { q: 'Ile to kosztuje?', a: 'Programy kwartalne nie są dla każdej firmy. Stała opłata kwartalna, zamknięty zakres, bez T&amp;M. Kwotę ustalamy po audycie i podajemy mailem w 48h.' },
   { q: 'Czy stara aplikacja będzie działać w trakcie pilota?', a: 'Tak. Pilot wchodzi obok: dwa systemy równolegle, moduł po module, testy regresyjne na danych z produkcji. Wasza baza danych zostaje bez zmian.' },
   { q: 'Czy to działa przy zespole 50+ osób?', a: 'Tak — falami. Nie szkolimy 50 osób naraz. Zaczynamy od jednego zespołu (5–10 osób) i pilota, wzorce zapisujemy w CLAUDE.md i standardach repo, a przeszkoleni programiści zostają championami kolejnych fal. Druga fala kosztuje mniej niż pierwsza, trzecia mniej niż druga.' },
-  { q: 'Kto będzie pracował przy naszym projekcie?', a: 'Dwóch ludzi: Tomek Wojciechowski i Maciej Stopa. Te same dwie osoby od diagnozy do przekazania. Bez wymiany konsultantów, bez ekspertów-fantomów w ofercie, których potem nie widać. Tomek prowadzi AI workflow i strategię, Maciej — backend, mobile i frontend. Każdy poważny PR przechodzi przez dwie pary oczu.' },
+  { q: 'Kto będzie pracował przy naszym projekcie?', a: 'Dwóch ludzi: Tomek Wojciechowski i Maciej Stopa. Te same dwie osoby od audytu do przekazania. Bez wymiany konsultantów, bez ekspertów-fantomów w ofercie, których potem nie widać. Tomek prowadzi AI workflow i strategię, Maciej — backend, mobile i frontend. Każdy poważny PR przechodzi przez dwie pary oczu.' },
 ];
 ---
 <Base>
@@ -27,7 +27,7 @@ const faq = [
     <h1 class="hero__title ws" style="margin-top: var(--space-lg)">Wasz zespół IT. 2–4&nbsp;razy szybszy. W&nbsp;dwa kwartały.</h1>
     <p class="hero__lead rv" style="--rv-d:.15s">Wdrażamy programowanie agentowe w zespołach IT dużych firm — szkolenie i wdrożenie na Waszym kodzie. Dowodem jest pilot: jeden moduł zmodernizowany do nowoczesnego stosu, z wynikiem zmierzonym na produkcji.</p>
     <div class="hero__cta rv" style="--rv-d:.25s">
-      <BtnArrow href="#kontakt">Umów 30-minutową rozmowę</BtnArrow>
+      <BtnArrow href="#kontakt">Umów audyt 90 minut</BtnArrow>
       <a class="btn btn--ghost" href="#metoda">Zobacz, jak pracujemy</a>
     </div>
     <div class="hero__grid">
@@ -346,7 +346,7 @@ const faq = [
   <!-- ── 08 ZESPÓŁ ──────────────────────────────────── -->
   <section class="sect" id="zespol" aria-labelledby="zespol-title" style="padding-top: 0">
     <div class="container">
-      <SectHead eyebrow="08 / Zespół · Dwa nazwiska, jeden numer telefonu" title="Ci sami dwaj ludzie prowadzą diagnozę, wdrożenie i przekazanie." id="zespol-title" small>
+      <SectHead eyebrow="08 / Zespół · Dwa nazwiska, jeden numer telefonu" title="Ci sami dwaj ludzie prowadzą audyt, wdrożenie i przekazanie." id="zespol-title" small>
         <p class="sect-lead rv">Bez account managerów. Bez wymiany konsultantów co kwartał. Wszystko, co robimy u Was, robi jeden z nas — i każdy wie, co robi drugi.</p>
       </SectHead>
       <div class="team">
@@ -358,7 +358,7 @@ const faq = [
               <p class="person__role">Założyciel · 25 lat w IT</p>
             </div>
           </div>
-          <p>Od C++ Builder, WinAPI i PHP, przez C# i Node. Były CTO firmy produktowej — przez 20 lat budował jeden z najlepszych w branży systemów Digital Signage, od serwera po własne komputery ARM. Prowadzi diagnozy, AI workflow i rozmowy z zarządami. Specjalizacja: Autonomiczne Programowanie Intencyjne</p>
+          <p>Od C++ Builder, WinAPI i PHP, przez C# i Node. Były CTO firmy produktowej — przez 20 lat budował jeden z najlepszych w branży systemów Digital Signage, od serwera po własne komputery ARM. Prowadzi audyty, AI workflow i rozmowy z zarządami — u klientów w roli zewnętrznego Chief Transformation Officera. Specjalizacja: Autonomiczne Programowanie Intencyjne</p>
         </article>
         <article class="person rv" style="--rv-d:.1s">
           <div class="person__head">
@@ -384,7 +384,7 @@ const faq = [
       <SectHead eyebrow="09 / FAQ · Pytania zarządu" title="Pytania, które zwykle padają na pierwszym spotkaniu." id="faq-title" small />
       <Faq items={faq} />
       <div class="faq-cta rv">
-        <p>Pełne odpowiedzi — z uwzględnieniem Waszego stacku, branży i compliance — na pierwszej, 30-minutowej rozmowie diagnostycznej.</p>
+        <p>Pełne odpowiedzi — z uwzględnieniem Waszego stacku, branży i compliance — podczas pierwszego audytu — 90 minut, z pisemnym raportem.</p>
         <BtnArrow class="btn btn--dark" href="#kontakt">Umów rozmowę</BtnArrow>
       </div>
     </div>
@@ -396,7 +396,7 @@ const faq = [
       <div class="contact__grid">
         <div>
           <p class="eyebrow rv" data-scramble>Kontakt</p>
-          <h2 class="sect-title sect-title--s ws" id="kontakt-title" style="margin-top: var(--space-lg)">30 minut. Pokażemy, gdzie Wasz zespół IT traci tempo.</h2>
+          <h2 class="sect-title sect-title--s ws" id="kontakt-title" style="margin-top: var(--space-lg)">Audyt 90 minut. Pokażemy, gdzie Wasz zespół IT traci tempo.</h2>
           <p class="sect-lead rv">Po dwóch kwartałach Wasz zespół dostarcza 2–4 razy szybciej i sam obejmuje wzorcem resztę systemu.</p>
           <div class="contact__note rv">
             <p class="eyebrow">Pracujemy z firmami, których zespół IT liczy 30+ osób</p>
@@ -406,8 +406,8 @@ const faq = [
         <div class="contact__panel rv" style="--rv-d:.1s">
           <dl class="contact__facts">
             <div><dt>Format</dt><dd>NDA przed pierwszą rozmową</dd></div>
-            <div><dt>Wycena</dt><dd>Stała opłata, mailem w 48h po diagnozie</dd></div>
-            <div><dt>Odpowiedzialność</dt><dd>Dwie osoby z imienia, od diagnozy do przekazania</dd></div>
+            <div><dt>Wycena</dt><dd>Stała opłata, mailem w 48h po audycie</dd></div>
+            <div><dt>Odpowiedzialność</dt><dd>Dwie osoby z imienia, od audytu do przekazania</dd></div>
           </dl>
           <div class="contact__cta">
             <BtnArrow href="/umow-rozmowe">Zarezerwuj termin</BtnArrow>

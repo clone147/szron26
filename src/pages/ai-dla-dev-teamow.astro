@@ -8,7 +8,7 @@ import CtaBand from '../components/CtaBand.astro';
 // FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html)
 const faq = [
   { q: 'Co z bezpieczeństwem naszych danych?', a: 'Wasz kod nie idzie do publicznych modeli. Dla branż regulowanych — Bedrock w AWS, dane w Waszej VPC. Dla obronności i wrażliwego embedded — lokalne modele (Ollama, vLLM) na Waszych serwerach. Audit log każdej interakcji z AI. NDA podpisujemy przed pierwszą rozmową.' },
-  { q: 'Co jeśli zespół nie kupi tej zmiany?', a: 'Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny”. Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do diagnozy. Bez wstydu, bez kar.' },
+  { q: 'Co jeśli zespół nie kupi tej zmiany?', a: 'Najczęstszy opór to nie technologia, tylko obawa: „jak się zautomatyzuję, będę niepotrzebny”. Rozbrajamy ją na liczbach — programista prowadzący agenta dostarcza kilka razy więcej, więc jego wartość rośnie, nie maleje. Trening prowadzimy na ich kodzie, pierwsze dostawy w drugim tygodniu. A jeśli zespół się nie przekonuje — wstrzymujemy modernizację i wracamy do audytu. Bez wstydu, bez kar.' },
   { q: 'Czy stara aplikacja będzie działać w trakcie?', a: 'Tak. Pilot wchodzi obok: dwa systemy równolegle, moduł po module, testy regresyjne na danych z produkcji. Wasza baza danych zostaje bez zmian.' },
 ];
 ---
@@ -136,7 +136,7 @@ const faq = [
   <CtaBand
     eyebrow="Kontakt"
     heading="Zobaczcie ten workflow na własnym kodzie."
-    text="30 minut rozmowy. Powiemy, czy i gdzie agent da Waszemu zespołowi realny zwrot — i jak go zmierzymy od pierwszego tygodnia."
-    btnLabel="Umów diagnozę"
+    text="Audyt 90 minut. Powiemy, czy i gdzie agent da Waszemu zespołowi realny zwrot — i jak go zmierzymy od pierwszego tygodnia."
+    btnLabel="Umów audyt"
   />
 </Interior>
