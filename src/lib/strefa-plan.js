@@ -156,12 +156,27 @@ document.addEventListener('change', async (e) => {
   }
 });
 
+function setOpen(li, open) {
+  const more = li.querySelector('.plan-item__more');
+  if (!more) return;
+  more.hidden = !open;
+  li.classList.toggle('is-open', open);
+  li.querySelector('.plan-item__head')?.setAttribute('aria-expanded', String(open));
+}
+
 document.addEventListener('click', (e) => {
   const link = e.target.closest('[data-goto]');
-  if (!link) return;
-  e.preventDefault();
-  const li = document.querySelector(`.plan-item[data-key="${link.dataset.goto}"]`);
-  li?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  if (link) {
+    e.preventDefault();
+    const li = document.querySelector(`.plan-item[data-key="${link.dataset.goto}"]`);
+    if (li) { setOpen(li, true); li.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    return;
+  }
+  const head = e.target.closest('.plan-item__head');
+  if (head && !e.target.closest('a')) {
+    const li = head.closest('.plan-item');
+    setOpen(li, li.querySelector('.plan-item__more')?.hidden ?? false);
+  }
 });
 
 /* ── start ── */
