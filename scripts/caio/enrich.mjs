@@ -1,0 +1,83 @@
+// E-maile decydentów firm-produkt — Prospeo enrich-person (LinkedIn URL albo imię+domena).
+// Plan FREE: 100 kredytów/mies. (naliczane tylko za trafienia), ostry rate limit → odstępy i retry.
+// Zapis przez EF caio-agent (contact_email); digest pokazuje świeże adresy.
+//
+// Uruchomienie: CAIO_INGEST_SECRET=... PROSPEO_API_KEY=... node scripts/caio/enrich.mjs [--limit N]
+const AGENT_URL = 'https://sttluvcbucpxzbcsuigw.supabase.co/functions/v1/caio-agent';
+const SECRET = process.env.CAIO_INGEST_SECRET;
+const PROSPEO = process.env.PROSPEO_API_KEY;
+if (!SECRET) { console.error('Brak CAIO_INGEST_SECRET'); process.exit(1); }
+if (!PROSPEO) { console.error('Brak PROSPEO_API_KEY'); process.exit(1); }
+const limIx = process.argv.indexOf('--limit');
+const LIMIT = limIx > -1 ? +process.argv[limIx + 1] : 8;
+const RESERVE = 10; // zostaw kredyty na ręczne akcje
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function agent(body) {
+  const res = await fetch(AGENT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-caio-secret': SECRET },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(30000),
+  });
+  const out = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(`caio-agent ${body.action}: HTTP ${res.status} ${out?.error ?? ''}`);
+  return out;
+}
+async function prospeo(path, body) {
+  const res = await fetch(`https://api.prospeo.io/${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-KEY': PROSPEO },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(60000),
+  });
+  return res.json().catch(() => ({ error: true, error_code: `HTTP ${res.status}` }));
+}
+const domainOf = (www) => { try { return new URL(www).hostname.replace(/^www\./, ''); } catch { return null; } };
+
+async function findEmail(k) {
+  const [first, ...rest] = k.imie.trim().split(/\s+/);
+  const data = k.linkedin_url
+    ? { linkedin_url: k.linkedin_url }
+    : { first_name: first, last_name: rest.at(-1), company_website: domainOf(k.www) };
+  if (!k.linkedin_url && !data.company_website) throw new Error('brak domeny');
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const out = await prospeo('enrich-person', { only_verified_email: false, data });
+    if (!out.error) {
+      const em = out.person?.email ?? out.response?.email ?? null;
+      return em?.email ? { email: em.email, status: em.status ?? '?' } : null;
+    }
+    if (out.error_code === 'NO_MATCH') return null;
+    if (String(out.error_code).toLowerCase().includes('rate')) { await sleep(20000 * attempt); continue; }
+    throw new Error(out.error_code ?? 'Prospeo error');
+  }
+  throw new Error('rate limit (3 próby)');
+}
+
+// saldo — nie schodzimy poniżej rezerwy
+const acc = await fetch('https://api.prospeo.io/account-information', { headers: { 'X-KEY': PROSPEO }, signal: AbortSignal.timeout(15000) }).then((r) => r.json()).catch(() => null);
+let credits = acc?.response?.remaining_credits ?? null;
+console.log(`Prospeo: plan ${acc?.response?.current_plan ?? '?'}, kredyty ${credits ?? '?'}`);
+
+const { contacts, pending_total } = await agent({ action: 'contacts_pending', limit: LIMIT });
+console.log(`Do wzbogacenia: ${contacts.length} (w kolejce łącznie: ${pending_total})`);
+let found = 0, misses = 0; const fails = [];
+for (const k of contacts) {
+  if (typeof credits === 'number' && credits <= RESERVE) { console.log(`Stop: kredyty przy rezerwie (${credits})`); break; }
+  try {
+    const em = await findEmail(k);
+    if (em) {
+      await agent({ action: 'contact_email', firma: k.firma, imie: k.imie, email: em.email });
+      found++; if (typeof credits === 'number') credits--;
+      console.log(`  ✔ ${k.firma}: ${k.imie} — ${em.email} (${em.status})`);
+    } else { misses++; console.log(`  ∅ ${k.firma}: ${k.imie} — brak w Prospeo`); }
+  } catch (e) { fails.push(`${k.firma}/${k.imie}: ${e.message}`); console.error(`  ✖ ${k.firma}: ${k.imie} — ${e.message}`); }
+  await sleep(12000); // rate limit planu FREE
+}
+console.log(`Znaleziono ${found}, brak dopasowania ${misses}, błędy ${fails.length}`);
+if (process.env.GITHUB_OUTPUT) {
+  const fs = await import('node:fs');
+  fs.appendFileSync(process.env.GITHUB_OUTPUT, `info=${found} nowych, ${misses} bez dopasowania, kolejka ${pending_total}\n`);
+  if (typeof credits === 'number') fs.appendFileSync(process.env.GITHUB_OUTPUT, `credits=${credits}\n`);
+}
+if (contacts.length && !found && fails.length === contacts.length) process.exit(1); // wszystko padło
