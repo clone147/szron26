@@ -1,0 +1,59 @@
+---
+import Strefa from '../../layouts/Strefa.astro';
+---
+<Strefa title="Decydenci" active="decydenci">
+  <div class="strefa-head">
+    <div>
+      <p class="strefa-eyebrow">Strefa zamknięta</p>
+      <h1>Decydenci</h1>
+      <p>Osoby decyzyjne w firmach-celach CAIO: kto, gdzie, z jakim hakiem i na jaki adres. Każda karta ma „Brief dla LLM" — kompletny kontekst do wklejenia w sesję z modelem, który pisze e-mail.</p>
+    </div>
+    <button class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="btn-zasady" title="Zasady pisania e-maili — dołączane do każdego briefu">Zasady pisania (LLM)</button>
+  </div>
+
+  <div class="strefa-stats" id="stats" aria-live="polite"></div>
+
+  <div class="strefa-toolbar">
+    <div class="strefa-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input class="strefa-input" id="search" type="search" placeholder="Szukaj osoby, firmy, stanowiska…" autocomplete="off" />
+    </div>
+    <select class="strefa-input" id="f-werdykt" aria-label="Typ firmy">
+      <option value="produkt">Firmy-produkt</option>
+      <option value="">Wszystkie firmy</option>
+    </select>
+    <label class="dec-check"><input type="checkbox" id="f-email" /> tylko z e-mailem</label>
+  </div>
+
+  <div id="list" class="dec-grid"></div>
+  <div id="empty" class="dgrid-empty" hidden>
+    <p>Brak decydentów dla wybranych filtrów. Kontakty zbiera codzienna rutyna CAIO (kwalifikacja + Prospeo) — zobacz <a href="/strefa/sygnaly">Sygnały</a>.</p>
+  </div>
+
+  <div id="modal-root"></div>
+  <div class="strefa-toasts" id="toasts" aria-live="polite"></div>
+
+  <style is:global>
+    .syg-tier { font-size: .68rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--color-text-inv-3); border: 1px solid var(--color-line-dark); border-radius: 999px; padding: .1rem .45rem; vertical-align: 2px; }
+    .syg-w--produkt { color: oklch(80% 0.15 150); border-color: color-mix(in oklch, oklch(62% 0.16 150) 45%, transparent); }
+    .dec-check { display: inline-flex; align-items: center; gap: .4rem; font-size: var(--text-s); color: var(--color-text-inv-2); white-space: nowrap; }
+    .dec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: var(--space-sm); }
+    .dec-card { background: var(--color-ink-2); border: 1px solid var(--color-line-dark); border-radius: var(--radius-card); padding: var(--space-sm) var(--space-md); display: flex; flex-direction: column; gap: .45rem; }
+    .dec-card__who { display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
+    .dec-card__name { font-weight: 700; font-size: var(--text-m); }
+    .dec-card__firma { color: var(--color-accent); font-weight: 600; font-size: var(--text-s); }
+    .dec-card__pos { color: var(--color-text-inv-3); font-size: var(--text-caption); }
+    .dec-card__kwal { color: var(--color-text-inv-2); font-size: var(--text-s); }
+    .dec-card__hak { font-size: var(--text-s); border-left: 3px solid var(--color-accent); padding: .2rem 0 .2rem .6rem; color: var(--color-text-inv-1); }
+    .dec-card__links { display: flex; gap: .8rem; flex-wrap: wrap; font-size: var(--text-s); align-items: center; }
+    .dec-card__links a { color: var(--color-accent); display: inline-flex; gap: .25rem; align-items: center; }
+    .dec-card__meta { color: var(--color-text-inv-3); font-size: var(--text-caption); }
+    .dec-card__actions { display: flex; gap: .4rem; margin-top: auto; padding-top: .35rem; flex-wrap: wrap; }
+    .dec-noemail { color: var(--color-text-inv-3); font-size: var(--text-s); font-style: italic; }
+    .dec-brief { white-space: pre-wrap; font-family: var(--font-mono, monospace); font-size: .78rem; line-height: 1.5; background: var(--color-ink-3); border-radius: var(--radius-btn); padding: var(--space-sm); max-height: 55vh; overflow: auto; }
+  </style>
+
+  <script>
+    import '../../lib/strefa-decydenci.js';
+  </script>
+</Strefa>
