@@ -54,6 +54,8 @@ function parseJSON(text) {
 }
 
 // Jedno wywołanie Claude Code headless na firmę: tylko research webowy, bez dostępu do dysku.
+// Dwie próby — mało znane firmy potrafią wymagać długiego researchu (13.08: 7-minutowy
+// timeout uciął kwalifikację tuż przed końcem).
 async function askClaude(firma, signals) {
   const args = [
     '-p', prompt(firma, signals),
@@ -63,10 +65,19 @@ async function askClaude(firma, signals) {
     '--disallowedTools', 'Bash Edit Write Read Glob Grep',
     '--max-turns', '25',
   ];
-  const { stdout } = await run('claude', args, { timeout: 420000, maxBuffer: 16 * 1024 * 1024 });
-  const out = JSON.parse(stdout);
-  if (out.is_error) throw new Error(`claude: ${String(out.result).slice(0, 200)}`);
-  return parseJSON(out.result ?? '');
+  let lastErr;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const { stdout } = await run('claude', args, { timeout: 660000, maxBuffer: 16 * 1024 * 1024 });
+      const out = JSON.parse(stdout);
+      if (out.is_error) throw new Error(`claude: ${String(out.result).slice(0, 200)}`);
+      return parseJSON(out.result ?? '');
+    } catch (e) {
+      lastErr = new Error(String(e.message).slice(0, 200));
+      if (attempt === 1) console.error(`  ↻ ${firma}: próba 1 padła (${lastErr.message.slice(0, 80)}…) — ponawiam`);
+    }
+  }
+  throw lastErr;
 }
 
 const { firms, pending_total } = await agent({ action: 'pending', limit: LIMIT });
