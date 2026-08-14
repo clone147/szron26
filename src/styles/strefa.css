@@ -785,6 +785,14 @@ body:has(#diag-editor:not([hidden])) .strefa-top { display: none; }
   display: grid; grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr));
   gap: var(--space-lg); margin-top: var(--space-lg);
 }
+/* nagłówki sekcji galerii (Filmy / Diagramy) — pełna szerokość gridu */
+.diag-grid__h {
+  grid-column: 1 / -1; margin: var(--space-sm) 0 calc(-1 * var(--space-sm));
+  font-size: var(--text-m); display: flex; align-items: baseline; gap: .6rem;
+}
+.diag-grid__h:first-child { margin-top: 0; }
+.diag-grid__hsub { font-size: var(--text-caption); font-weight: 400; color: var(--color-text-inv-3); }
+.diag-card--film .diag-card__date { color: var(--color-accent); }
 .diag-card {
   display: flex; flex-direction: column; gap: .45rem; padding: 0;
   background: none; border: 0; cursor: pointer; text-align: center;

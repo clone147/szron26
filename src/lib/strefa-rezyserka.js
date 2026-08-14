@@ -8,7 +8,7 @@ import {
   STATUSY, RODZAJE_SCEN, UJECIA, RODZAJE_NAKLADEK, POZYCJE, uid,
   round1, czasBitu, czasNarracji, czasSceny, startyScen, czasWariantu, mmss,
   sekcja, brakujaceSekcje, uzupelnijKregoslup, nowyFilm, normalizujFilm, sprawdz,
-  filmDoShapes, shapesDoScen, projekcjaScen,
+  filmDoShapes, shapesDoScen, projekcjaScen, projekcjaShapesFilmu,
 } from './rezyserka-model.js';
 
 const sb = getClient();
@@ -60,8 +60,44 @@ async function saveNow() {
   current.updated_at = stamp;
   setZapis('zapisane');
   if (pendingDiagCheck) { pendingDiagCheck = false; checkLinkedDiagrams(); }
+  autoDiagramSync(); // film → diagramy scenopisu, automatycznie po każdym zapisie
 }
 window.addEventListener('beforeunload', () => { if (dirty) saveNow(); });
+
+// Auto-eksport: każdy zapis filmu odświeża powiązane diagramy scenopisu (bez ręcznego przycisku).
+// Guard pętli: projekcjaShapesFilmu pomija eksport bez zmian, a link.stamp = updated_at diagramu
+// sprawia, że checkLinkedDiagrams uzna nasz własny zapis za już zaimportowany.
+let syncingDiag = false;
+async function autoDiagramSync() {
+  if (!current || syncingDiag) return;
+  syncingDiag = true;
+  try {
+    const film = current.film;
+    let metaZmiana = false;
+    for (const w of ['long', 'short']) {
+      const link = film.diagramy?.[w];
+      if (!link?.id) continue;
+      const { data: row } = await sb.from('diagrams').select('id, data').eq('id', link.id).maybeSingle();
+      if (!current || current.film !== film) return; // user zmienił film w trakcie fetch
+      if (!row) { delete film.diagramy[w]; metaZmiana = true; continue; }
+      const stare = Array.isArray(row.data?.shapes) ? row.data.shapes : [];
+      const shapes = filmDoShapes(film, w, stare);
+      if (projekcjaShapesFilmu(shapes) === projekcjaShapesFilmu(stare)) continue;
+      const stamp = new Date().toISOString();
+      const { error } = await sb.from('diagrams')
+        .update({ data: { ...row.data, shapes, film: { id: current.id, wariant: w } }, updated_at: stamp })
+        .eq('id', link.id);
+      if (error) continue;
+      link.stamp = stamp;
+      metaZmiana = true;
+    }
+    if (metaZmiana && current && !dirty) {
+      const stamp = new Date().toISOString();
+      const { error } = await sb.from('filmy').update({ data: filmData(current.film), updated_at: stamp }).eq('id', current.id);
+      if (!error) current.updated_at = stamp;
+    }
+  } finally { syncingDiag = false; }
+}
 
 function lintuj() {
   if (!current) return;

@@ -7,11 +7,13 @@
 import { getClient, getTeamUser } from './supabase.js';
 import { $, esc, fmtDateTime, toast, confirmDialog, openModal, closeModal } from './strefa-ui.js';
 import { searchProvider, providerKeys, materialize, PROVIDER_LIST } from './diagram-image-search.js';
+import { shapesDoScen, filmDoShapes, normalizujFilm, projekcjaScen } from './rezyserka-model.js';
 
 const sb = getClient();
 
 /* ── stan ── */
 let diagrams = [];          // [{id,title,updated_at,data}]
+let filmyLib = [];          // [{id,title,updated_at,data}] z Reżyserki — sekcja „Filmy" w galerii
 let current = null;         // otwarty diagram
 let shapes = [];
 let tool = 'select';
@@ -1788,19 +1790,62 @@ async function saveNow() {
   if (!current || !dirty) return;
   dirty = false;
   current.data = buildData();
+  const stamp = new Date().toISOString();
   const { error } = await sb.from('diagrams')
-    .update({ data: current.data, updated_at: new Date().toISOString() })
+    .update({ data: current.data, updated_at: stamp })
     .eq('id', current.id);
-  if (error) { toast('Błąd zapisu', error.message, 'err'); dirty = true; }
-  else setStatus('Zapisano');
+  if (error) { toast('Błąd zapisu', error.message, 'err'); dirty = true; return; }
+  setStatus('Zapisano');
+  syncDiagramToFilm(stamp); // scenopis → film w Reżyserce, od razu (bez otwartej Reżyserki)
+}
+
+// Diagram scenopisu jest edytowalnym widokiem filmu: każdy zapis diagramu od razu
+// aktualizuje sceny wariantu w strefa.filmy. Stamp diagramu ląduje w film.diagramy[w].stamp,
+// więc otwarta Reżyserka uzna zmianę za już zaimportowaną (checkLinkedDiagrams → skip, zero pętli).
+async function syncDiagramToFilm(stamp) {
+  const meta = current?.data?.film;
+  if (!meta?.id) return;
+  const w = meta.wariant === 'short' ? 'short' : 'long';
+  const { data: row } = await sb.from('filmy').select('id, title, data').eq('id', meta.id).maybeSingle();
+  if (!row) return;
+  const data = normalizujFilm(row.data);
+  const nowe = shapesDoScen(Array.isArray(current.data.shapes) ? current.data.shapes : [], data, w);
+  const link = data.diagramy?.[w];
+  if (projekcjaScen(nowe) === projekcjaScen(data[w].sceny) && link?.id === current.id && link?.stamp === stamp) return;
+  data[w] = { ...data[w], sceny: nowe };
+  data.diagramy = { ...data.diagramy, [w]: { id: current.id, stamp } };
+  const { error } = await sb.from('filmy').update({ data, updated_at: new Date().toISOString() }).eq('id', meta.id);
+  if (error) toast('Reżyserka nie zapisana', error.message, 'err');
+}
+
+// Karta „film bez diagramu" w sekcji Filmy → zakłada diagram scenopisu (sceny wchodzą z filmu)
+// i od razu otwiera edytor. Wariant: long, chyba że film jest short-only.
+async function diagramZFilmu(f) {
+  if (!f) return;
+  const data = normalizujFilm(f.data);
+  const w = data.long.sceny.length || !data.short.sceny.length ? 'long' : 'short';
+  const film = { tytul: f.title, ...data };
+  const shapes0 = filmDoShapes(film, w, []);
+  const { data: row, error } = await sb.from('diagrams')
+    .insert({ title: `${f.title} — scenopis ${w}`, data: { shapes: shapes0, film: { id: f.id, wariant: w } } })
+    .select().single();
+  if (error) { toast('Błąd', error.message, 'err'); return; }
+  data.diagramy = { ...data.diagramy, [w]: { id: row.id, stamp: row.updated_at } };
+  await sb.from('filmy').update({ data }).eq('id', f.id);
+  toast('Diagram scenopisu założony', `${film[w].sceny.length ? film[w].sceny.length + ' scen z Reżyserki.' : 'Film nie ma jeszcze scen — rysuj prostokąty, staną się scenami.'}`);
+  openEditor(row.id);
 }
 window.addEventListener('beforeunload', () => { if (dirty) saveNow(); });
 
 /* ── galeria z miniaturami ── */
 async function loadList() {
-  const { data, error } = await sb.from('diagrams').select('id, title, updated_at, data').order('updated_at', { ascending: false });
-  if (error) { toast('Błąd', error.message, 'err'); return; }
-  diagrams = data || [];
+  const [d, f] = await Promise.all([
+    sb.from('diagrams').select('id, title, updated_at, data').order('updated_at', { ascending: false }),
+    sb.from('filmy').select('id, title, updated_at, data').order('updated_at', { ascending: false }),
+  ]);
+  if (d.error) { toast('Błąd', d.error.message, 'err'); return; }
+  diagrams = d.data || [];
+  filmyLib = f.data || [];
 }
 
 // Miniatura: kształty diagramu wpasowane w mały canvas (ta sama „ołówkowa" kreska).
@@ -1836,18 +1881,36 @@ function drawThumb(cv, shs) {
 
 function renderGallery() {
   const grid = $('#diag-grid');
-  grid.innerHTML = `
+  const karta = (d) => `
+    <button class="diag-card" type="button" data-id="${d.id}">
+      <span class="diag-card__thumb"><canvas></canvas>${d.data?.film ? '<span class="diag-card__badge" title="Diagram scenopisu — dwustronny sync z filmem w Reżyserce: edycja tutaj od razu zmienia film, zapis filmu odświeża diagram">scenopis</span>' : ''}<span class="diag-card__del" role="button" aria-label="Usuń diagram" title="Usuń diagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></span></span>
+      <span class="diag-card__title">${esc(d.title)}</span>
+      <span class="diag-card__date">${fmtDateTime(d.updated_at)}</span>
+    </button>`;
+  const scenopisy = diagrams.filter((d) => d.data?.film);
+  const zwykle = diagrams.filter((d) => !d.data?.film);
+  // filmy z Reżyserki bez żywego diagramu scenopisu — karta „załóż diagram"
+  const majaDiagram = new Set(scenopisy.map((d) => d.data.film.id));
+  const bezDiagramu = filmyLib.filter((f) => !majaDiagram.has(f.id));
+  const sekcjaFilmy = (scenopisy.length || bezDiagramu.length) ? `
+    <h2 class="diag-grid__h">🎬 Filmy <span class="diag-grid__hsub">scenopisy z Reżyserki — sync w obie strony</span></h2>` +
+    scenopisy.map(karta).join('') +
+    bezDiagramu.map((f) => `
+    <button class="diag-card diag-card--film" type="button" data-film="${f.id}" title="Załóż diagram scenopisu tego filmu (sceny wchodzą automatycznie)">
+      <span class="diag-card__thumb diag-card__thumb--new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+      <span class="diag-card__title">${esc(f.title)}</span>
+      <span class="diag-card__date">film bez diagramu — kliknij, aby założyć</span>
+    </button>`).join('') : '';
+  grid.innerHTML = sekcjaFilmy + `
+    <h2 class="diag-grid__h">Diagramy</h2>
     <button class="diag-card diag-card--new" id="card-new" type="button">
       <span class="diag-card__thumb diag-card__thumb--new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
       <span class="diag-card__title">Nowy diagram</span>
-    </button>` +
-    diagrams.map((d) => `
-    <button class="diag-card" type="button" data-id="${d.id}">
-      <span class="diag-card__thumb"><canvas></canvas>${d.data?.film ? '<span class="diag-card__badge" title="Diagram scenopisu — powiązany z filmem w Reżyserce, zmiany wracają tam na żywo">scenopis</span>' : ''}<span class="diag-card__del" role="button" aria-label="Usuń diagram" title="Usuń diagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></span></span>
-      <span class="diag-card__title">${esc(d.title)}</span>
-      <span class="diag-card__date">${fmtDateTime(d.updated_at)}</span>
-    </button>`).join('');
+    </button>` + zwykle.map(karta).join('');
   $('#card-new').addEventListener('click', () => createDiagram());
+  for (const card of grid.querySelectorAll('.diag-card[data-film]')) {
+    card.addEventListener('click', () => diagramZFilmu(filmyLib.find((f) => f.id === card.dataset.film)));
+  }
   for (const card of grid.querySelectorAll('.diag-card[data-id]')) {
     const d = diagrams.find((x) => x.id === card.dataset.id);
     card.addEventListener('click', () => openEditor(d.id));

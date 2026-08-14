@@ -360,3 +360,10 @@ export function shapesDoScen(shapes, film, ktory) {
 export const projekcjaScen = (sceny) => JSON.stringify(sceny.map((s) => [
   s.id, s.tytul, round1(s.dur), s.bity.map((b) => b.tekst), s.nakladki.map((n) => [n.id, n.tekst]),
 ]));
+
+// Kanoniczna projekcja tego, co FILM wnosi do diagramu (bez łączników — te są regenerowane
+// z nowymi id przy każdym eksporcie) — do taniego porównania „czy eksport coś zmieni".
+export const projekcjaShapesFilmu = (shapes) => JSON.stringify(shapes
+  .filter((s) => s.film && typeof s.film === 'object' && s.film.rola !== 'lacznik')
+  .map((s) => [s.film.rola, s.film.scena ?? '', s.film.nak ?? '', s.text ?? ''])
+  .sort((a, b) => String(a).localeCompare(String(b))));
