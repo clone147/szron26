@@ -1062,6 +1062,13 @@ input.rez-ghost[type="number"] { font-variant-numeric: tabular-nums; text-align:
 .rez-karta__gora { display: flex; align-items: center; gap: .5rem; padding-right: 1.6rem; }
 .rez-karta__nr { font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; line-height: 1; color: var(--color-accent); font-variant-numeric: tabular-nums; }
 .rez-karta__tytul { font-family: var(--font-display); font-size: 1rem; font-weight: 500; line-height: 1.25; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rez-karty__h { grid-column: 1 / -1; margin: var(--space-sm) 0 calc(-1 * var(--space-xs)); font-size: var(--text-m); display: flex; align-items: baseline; gap: .5rem; }
+.rez-karty__h:first-child { margin-top: 0; }
+.rez-karty__hn { color: var(--color-accent); font-variant-numeric: tabular-nums; font-size: var(--text-s); }
+.rez-karty__hsub { font-size: var(--text-caption); font-weight: 400; color: var(--color-text-inv-3); }
+.rez-karta__opis { margin: 0; font-size: var(--text-s); line-height: 1.45; color: var(--color-text-inv-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.rez-karta__opis--brak { color: var(--color-text-inv-3); font-style: italic; }
+.rez-karta__kotwica { margin: 0; font-size: var(--text-caption); line-height: 1.4; color: var(--color-text-inv-3); border-left: 2px solid color-mix(in oklch, var(--color-accent) 55%, transparent); padding-left: .5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .rez-karta__meta { display: flex; align-items: center; justify-content: space-between; gap: .5rem; color: var(--color-text-inv-3); font-size: var(--text-caption); font-variant-numeric: tabular-nums; }
 .rez-mini { display: flex; gap: 1px; height: 6px; border-radius: 3px; overflow: hidden; background: color-mix(in oklch, var(--color-text-inv) 8%, transparent); }
 .rez-mini > i { display: block; height: 100%; }

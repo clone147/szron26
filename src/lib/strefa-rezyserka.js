@@ -139,26 +139,41 @@ function renderLib() {
   const karty = filmy
     .map((r) => ({ r, f: { id: r.id, tytul: r.title, ...normalizujFilm(r.data) } }))
     .sort((a, b) => (a.f.nr ?? 999) - (b.f.nr ?? 999) || (a.r.updated_at < b.r.updated_at ? 1 : -1));
-  grid.innerHTML = karty.map(({ r, f }) => {
-    const lSec = czasWariantu(f.long), sSec = czasWariantu(f.short);
+  // short-only = brak scen w longu przy rozpisanym shorcie (np. samodzielne shorty 101+)
+  const jestShortOnly = ({ f }) => !f.long.sceny.length && f.short.sceny.length > 0;
+  const karta = ({ r, f }) => {
+    const shortOnly = jestShortOnly({ f });
+    const w = shortOnly ? f.short : f.long;
+    const sec = czasWariantu(w);
+    const b = f.brief || {};
+    const opis = b.teza || b.hook || '';
+    const tytul = shortOnly ? f.tytul.replace(/^Short:\s*/i, '') : f.tytul;
     return `
     <button class="rez-karta" type="button" data-id="${r.id}">
       <span class="rez-karta__del" role="button" title="Usuń film" aria-label="Usuń film"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
       <div class="rez-karta__gora">
         ${f.nr !== undefined ? `<span class="rez-karta__nr">${String(f.nr).padStart(2, '0')}</span>` : ''}
-        <h3 class="rez-karta__tytul">${esc(f.tytul)}</h3>
+        <h3 class="rez-karta__tytul">${esc(tytul)}</h3>
       </div>
-      ${miniHtml(f.long.sceny, f.long.wpm)}
-      <div class="rez-karta__meta">
-        <span>long ${mmss(lSec)} / ${mmss(f.long.targetSec)}</span>
-        <span>short ${f.short.sceny.length ? mmss(sSec) : '<em>brak</em>'}</span>
-      </div>
+      ${opis ? `<p class="rez-karta__opis"${b.hook && b.teza ? ` title="Hook: ${esc(b.hook)}"` : ''}>${esc(opis)}</p>` : '<p class="rez-karta__opis rez-karta__opis--brak">Brak briefu — otwórz film i wypełnij tezę.</p>'}
+      ${b.kotwica ? `<p class="rez-karta__kotwica" title="Kotwica — moment zapowiedziany w hooku, spłacany na końcu">🪝 ${esc(b.kotwica)}</p>` : ''}
+      ${miniHtml(w.sceny, w.wpm)}
       <div class="rez-karta__meta">
         <span class="rez-chip" data-status="${esc(f.status)}">${esc(f.status)}</span>
-        <span>${f.long.sceny.length} scen · ${esc(fmtDateTime(r.updated_at))}</span>
+        <span>${shortOnly
+          ? `short ${mmss(sec)} / ${mmss(f.short.targetSec)}`
+          : `long ${mmss(sec)} / ${mmss(f.long.targetSec)}${f.short.sceny.length ? ` · short ${mmss(czasWariantu(f.short))}` : ''}`}
+          · ${w.sceny.length} scen</span>
       </div>
     </button>`;
-  }).join('') || '<p class="rez-pusto">Jeszcze nic nie jest w produkcji. Załóż pierwszy film albo zaimportuj scenopis z Diagramów.</p>';
+  };
+  const longi = karty.filter((k) => !jestShortOnly(k));
+  const shorty = karty.filter(jestShortOnly);
+  const sekcja = (tytul, sub, items) => items.length
+    ? `<h2 class="rez-karty__h">${tytul} <span class="rez-karty__hn">${items.length}</span> <span class="rez-karty__hsub">${sub}</span></h2>` + items.map(karta).join('')
+    : '';
+  grid.innerHTML = (sekcja('🎬 Longi', '8–10 min · 16:9', longi) + sekcja('⚡ Shorty', 'do 30 s · 9:16', shorty))
+    || '<p class="rez-pusto">Jeszcze nic nie jest w produkcji. Załóż pierwszy film albo zaimportuj scenopis z Diagramów.</p>';
 
   for (const karta of grid.querySelectorAll('.rez-karta')) {
     karta.addEventListener('click', () => { location.hash = `/film/${encodeURIComponent(karta.dataset.id)}`; });
