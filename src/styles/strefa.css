@@ -1051,6 +1051,11 @@ input.rez-ghost[type="number"] { font-variant-numeric: tabular-nums; text-align:
   transition: border-color var(--dur-1), transform var(--dur-1);
 }
 .rez-karta:hover { border-color: color-mix(in oklch, var(--color-accent) 55%, var(--color-line-dark)); transform: translateY(-2px); }
+/* drag&drop kolejności filmów */
+.rez-karta { cursor: grab; touch-action: pan-y; }
+.rez-karta--ghost { cursor: grabbing; transform: rotate(2deg) scale(1.03) !important; box-shadow: 0 18px 44px rgba(0, 0, 0, .5); opacity: .96; transition: none; }
+.rez-karta--placeholder { border: 1.5px dashed color-mix(in oklch, var(--color-accent) 55%, transparent); background: color-mix(in oklch, var(--color-accent) 7%, transparent); border-radius: var(--radius-card, 10px); }
+body.rez-dnd { user-select: none; -webkit-user-select: none; cursor: grabbing; }
 .rez-karta__del {
   position: absolute; top: 8px; right: 8px; display: grid; place-content: center;
   width: 26px; height: 26px; border-radius: 7px; color: var(--color-text-inv-3);

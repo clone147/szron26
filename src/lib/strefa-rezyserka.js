@@ -133,8 +133,101 @@ function miniHtml(sceny, wpm) {
     `<i style="flex:${czasSceny(s, wpm) / total};background:var(--sc-${esc(s.rodzaj)})"></i>`).join('')}</div>`;
 }
 
+/* ── drag&drop kolejności filmów (karta idzie za kursorem; sekcje long/short osobno) ── */
+let dndSuppressClick = false; // stłum click po zakończonym dragu
+let dndActive = false;        // realtime nie przerysowuje listy w trakcie przeciągania
+function bindDnD() {
+  const grid = $('#rez-grid');
+  let st = null; // { karta, ph, dx, dy, x0, y0, started, id }
+  // FLIP: karty płynnie dojeżdżają na nowe miejsca po przestawieniu placeholdera
+  const flip = (fn) => {
+    const karty = [...grid.querySelectorAll('.rez-karta:not(.rez-karta--ghost)')];
+    const przed = new Map(karty.map((k) => [k, k.getBoundingClientRect()]));
+    fn();
+    for (const k of karty) {
+      const a = przed.get(k), b = k.getBoundingClientRect();
+      if (!a) continue;
+      const dx = a.left - b.left, dy = a.top - b.top;
+      if (dx || dy) k.animate([{ transform: `translate(${dx}px,${dy}px)` }, { transform: 'none' }], { duration: 180, easing: 'ease' });
+    }
+  };
+  grid.addEventListener('pointerdown', (e) => {
+    const karta = e.target.closest('.rez-karta');
+    if (!karta || e.button !== 0 || e.target.closest('.rez-karta__del')) return;
+    st = { karta, x0: e.clientX, y0: e.clientY, started: false, id: e.pointerId };
+  });
+  window.addEventListener('pointermove', (e) => {
+    if (!st || e.pointerId !== st.id) return;
+    if (!st.started) {
+      if (Math.hypot(e.clientX - st.x0, e.clientY - st.y0) < 6) return; // to jeszcze klik
+      st.started = true; dndSuppressClick = true; dndActive = true;
+      const r = st.karta.getBoundingClientRect();
+      st.dx = e.clientX - r.left; st.dy = e.clientY - r.top;
+      st.ph = document.createElement('div');
+      st.ph.className = 'rez-karta rez-karta--placeholder';
+      st.ph.style.height = `${r.height}px`;
+      st.karta.before(st.ph);
+      Object.assign(st.karta.style, { position: 'fixed', width: `${r.width}px`, left: `${r.left}px`, top: `${r.top}px`, zIndex: 100, margin: 0 });
+      st.karta.classList.add('rez-karta--ghost');
+      document.body.classList.add('rez-dnd');
+    }
+    st.karta.style.left = `${e.clientX - st.dx}px`;
+    st.karta.style.top = `${e.clientY - st.dy}px`;
+    st.karta.style.pointerEvents = 'none';
+    const pod = document.elementFromPoint(e.clientX, e.clientY)?.closest('.rez-karta:not(.rez-karta--ghost):not(.rez-karta--placeholder)');
+    st.karta.style.pointerEvents = '';
+    if (pod && pod.dataset.sekcja === st.karta.dataset.sekcja) {
+      const r = pod.getBoundingClientRect();
+      const przed = e.clientY < r.top + r.height / 2 || (e.clientY < r.bottom && e.clientX < r.left + r.width / 2);
+      if ((przed && pod.previousElementSibling !== st.ph) || (!przed && pod.nextElementSibling !== st.ph)) {
+        flip(() => (przed ? pod.before(st.ph) : pod.after(st.ph)));
+      }
+    }
+  });
+  async function koniec(commit) {
+    if (!st) return;
+    const { karta, ph, started } = st;
+    st = null;
+    if (!started) return;
+    dndActive = false;
+    setTimeout(() => { dndSuppressClick = false; }, 0);
+    document.body.classList.remove('rez-dnd');
+    // płynne dokowanie do placeholdera, potem podmiana
+    const a = karta.getBoundingClientRect(), b = ph.getBoundingClientRect();
+    karta.classList.remove('rez-karta--ghost');
+    karta.removeAttribute('style');
+    ph.replaceWith(karta);
+    karta.animate([{ transform: `translate(${a.left - b.left}px,${a.top - b.top}px)` }, { transform: 'none' }], { duration: 150, easing: 'ease' });
+    if (commit) await zapiszKolejnosc();
+    else renderLib(); // Escape/anulowanie → wróć do porządku z danych
+  }
+  window.addEventListener('pointerup', (e) => { if (st && e.pointerId === st.id) koniec(true); });
+  window.addEventListener('pointercancel', () => koniec(false));
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') koniec(false); });
+}
+
+// Kolejność w DOM → numeracja: longi od 1, shorty od 101. Zapis tylko zmienionych.
+async function zapiszKolejnosc() {
+  const grid = $('#rez-grid');
+  const zmiany = [];
+  for (const [sek, baza] of [['long', 1], ['short', 101]]) {
+    [...grid.querySelectorAll(`.rez-karta[data-sekcja="${sek}"]`)].forEach((k, i) => {
+      const r = filmy.find((x) => x.id === k.dataset.id);
+      const nowyNr = baza + i;
+      if (r && r.data?.nr !== nowyNr) { r.data = { ...r.data, nr: nowyNr }; zmiany.push(r); }
+    });
+  }
+  if (!zmiany.length) return;
+  const stamp = new Date().toISOString();
+  const wyniki = await Promise.all(zmiany.map((r) => sb.from('filmy').update({ data: r.data, updated_at: stamp }).eq('id', r.id)));
+  const zly = wyniki.find((w) => w.error);
+  if (zly) { toast('Błąd zapisu kolejności', zly.error.message, 'err'); await loadList(); }
+  else toast('Kolejność zapisana', `Przenumerowane filmy: ${zmiany.length}.`);
+  renderLib();
+}
+
 function renderLib() {
-  if (modalOtwarty()) return; // nie wyrywaj listy spod otwartego okna
+  if (modalOtwarty() || dndActive) return; // nie wyrywaj listy spod okna ani spod przeciąganej karty
   const grid = $('#rez-grid');
   const karty = filmy
     .map((r) => ({ r, f: { id: r.id, tytul: r.title, ...normalizujFilm(r.data) } }))
@@ -149,7 +242,7 @@ function renderLib() {
     const opis = b.teza || b.hook || '';
     const tytul = shortOnly ? f.tytul.replace(/^Short:\s*/i, '') : f.tytul;
     return `
-    <button class="rez-karta" type="button" data-id="${r.id}">
+    <button class="rez-karta" type="button" data-id="${r.id}" data-sekcja="${shortOnly ? 'short' : 'long'}">
       <span class="rez-karta__del" role="button" title="Usuń film" aria-label="Usuń film"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
       <div class="rez-karta__gora">
         ${f.nr !== undefined ? `<span class="rez-karta__nr">${String(f.nr).padStart(2, '0')}</span>` : ''}
@@ -176,7 +269,7 @@ function renderLib() {
     || '<p class="rez-pusto">Jeszcze nic nie jest w produkcji. Załóż pierwszy film albo zaimportuj scenopis z Diagramów.</p>';
 
   for (const karta of grid.querySelectorAll('.rez-karta')) {
-    karta.addEventListener('click', () => { location.hash = `/film/${encodeURIComponent(karta.dataset.id)}`; });
+    karta.addEventListener('click', () => { if (dndSuppressClick) return; location.hash = `/film/${encodeURIComponent(karta.dataset.id)}`; });
     karta.querySelector('.rez-karta__del').addEventListener('click', async (e) => {
       e.stopPropagation();
       const r = filmy.find((x) => x.id === karta.dataset.id);
@@ -724,6 +817,7 @@ filmEl.addEventListener('click', async (e) => {
   if (!(await getTeamUser())) return; // layout przekieruje na login
   $('#btn-nowy-film').addEventListener('click', zalozFilm);
   $('#btn-z-diagramu').addEventListener('click', filmZDiagramu);
+  bindDnD();
   route();
   // realtime: filmy (lista + otwarty projekt) i diagramy (żywy import scenopisu)
   startRealtime(sb, 'strefa-rezyserka', ['filmy', 'diagrams'], () => {
