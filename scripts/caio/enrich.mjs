@@ -62,7 +62,21 @@ function zastosujWzorzec(nazwa, domena, imie) {
   }[nazwa];
   return local ? `${local}@${domena}` : null;
 }
+// Gdy nie znamy żadnego adresu w domenie — domain-search (1 kredyt/firmę, cache per run)
+// daje przykładowe adresy osobowe, z których czytamy wzorzec.
+const dsCache = new Map();
+async function domainKnown(domena) {
+  if (!domena) return [];
+  if (dsCache.has(domena)) return dsCache.get(domena);
+  const out = await prospeo('domain-search', { company: domena, limit: 20 });
+  const pary = out.error ? [] : (out.response?.email_list ?? [])
+    .filter((e) => e.email && e.first_name && e.last_name)
+    .map((e) => ({ imie: `${e.first_name} ${e.last_name}`, email: e.email }));
+  dsCache.set(domena, pary);
+  return pary;
+}
 async function guessEmail(k, znane) {
+  if (!znane?.length) znane = await domainKnown(domainOf(k.www));
   for (const kn of znane ?? []) {
     const w = wykryjWzorzec(kn.imie, kn.email);
     if (!w) continue;
