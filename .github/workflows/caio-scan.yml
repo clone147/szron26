@@ -61,7 +61,7 @@ jobs:
         env:
           CAIO_INGEST_SECRET: ${{ secrets.CAIO_INGEST_SECRET }}
           PROSPEO_API_KEY: ${{ secrets.PROSPEO_API_KEY }}
-        run: node scripts/caio/enrich.mjs --limit 8
+        run: node scripts/caio/enrich.mjs --limit 12
 
   digest:
     needs: [scan, qualify, kontakty]

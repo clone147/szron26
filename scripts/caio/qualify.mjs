@@ -34,6 +34,11 @@ ${signals.map((s) => `- ${s.tytul} (${s.zrodlo}; ${s.opis ?? ''}) ${s.url}`).joi
 
 Zbadaj w internecie (WebSearch, w razie potrzeby WebFetch na stronę firmy / rejestr.io): co firma naprawdę robi (własny produkt? jaki?), gdzie ma siedzibę, jaka jest skala (zatrudnienie), kto nią kieruje (zarząd z KRS/rejestr.io, CTO/Head of R&D z LinkedIn — tylko dane publiczne).
 
+Zasady werdyktu:
+- Oddział/spółka-córka GLOBALNEJ korporacji, której decyzje budżetowe zapadają poza Polską (np. centrum R&D amerykańskiego koncernu) → werdykt "uslugi" (nie-klient), NAWET jeśli rozwija własny produkt.
+- Firma czysto software'owa bez sprzętu i bez zespołu embedded → oceń szczerze: jeśli nie ma haka embedded, ale jest polskim producentem produktu cyfrowego z zespołem R&D w Polsce, może zostać "produkt" z hakiem niesprzętowym.
+Do listy decydenci dołóż — obok zarządu — także 1–2 osoby ŚREDNIEGO szczebla technicznego z LinkedIn (Head of Firmware / Engineering Manager / R&D Manager / Team Lead embedded), jeśli są publicznie widoczne: to oni najczęściej odpowiadają na pierwszy kontakt.
+
 Na końcu wypisz WYŁĄCZNIE poprawny JSON (bez markdown, bez komentarzy):
 {
   "werdykt": "produkt" | "uslugi" | "agencja" | "nieustalone",

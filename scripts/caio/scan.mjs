@@ -1,5 +1,7 @@
-// Skaner sygnałów CAIO — oferty pracy (JustJoin.it, RocketJobs, NoFluffJobs) + newsy
-// (Google News RSS, branżowe RSS elektroniki/automatyki) dla firm z companies.mjs.
+// Skaner sygnałów CAIO — oferty pracy (JustJoin.it, RocketJobs, NoFluffJobs, Bulldogjob)
+// + newsy (Google News RSS, branżowe RSS elektroniki/automatyki) dla firm z companies.mjs
+// ORAZ firm-produkt zakwalifikowanych w bazie (akcja `targets` w EF caio-agent) — odkrycia
+// wchodzą do stałego monitoringu zamiast znikać po kwalifikacji.
 // Dodatkowo ODKRYWA nowe firmy: oferta embedded od firmy spoza listy → sygnał tier 4.
 // Wyniki POST-uje do Edge Function caio-ingest (upsert po URL), skąd trafiają na /strefa/sygnaly.
 //
@@ -18,9 +20,36 @@ if (!DRY && !SECRET) { console.error('Brak CAIO_INGEST_SECRET w env'); process.e
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36';
 const MAX_DISCOVERY = 60; // limit odkryć na jeden run — nadmiar logowany, nie gubiony po cichu
 
+// Monitorowane firmy = seed z companies.mjs + zakwalifikowane firmy-PRODUKT z bazy.
+// Uzupełniane w loadTargets() przed skanami; przy --dry bez sekretu zostaje sam seed.
+let ALL_COMPANIES = [...COMPANIES];
+async function loadTargets() {
+  if (!SECRET) { console.log('targets: brak sekretu — monitoruję tylko seed'); return; }
+  try {
+    const res = await fetch(INGEST_URL.replace('caio-ingest', 'caio-agent'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-caio-secret': SECRET },
+      body: JSON.stringify({ action: 'targets' }),
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const { targets } = await res.json();
+    const znane = new Set(ALL_COMPANIES.flatMap((c) => [c.name.toLowerCase(), ...c.aliases]));
+    let dodane = 0;
+    for (const t of targets ?? []) {
+      const alias = String(t.firma).toLowerCase();
+      if (znane.has(alias)) continue;
+      ALL_COMPANIES.push({ name: t.firma, tier: t.tier ?? 4, aliases: [alias] });
+      znane.add(alias);
+      dodane++;
+    }
+    console.log(`targets: +${dodane} firm-produkt z bazy (monitoring łącznie: ${ALL_COMPANIES.length})`);
+  } catch (e) { console.error(`targets: ${e.message} — monitoruję tylko seed`); }
+}
+
 function matchCompany(text) {
   const t = ` ${String(text).toLowerCase()} `;
-  return COMPANIES.find((c) => c.aliases.some((a) => t.includes(a)));
+  return ALL_COMPANIES.find((c) => c.aliases.some((a) => t.includes(a)));
 }
 // Dopasowanie keywordów z granicami słów — substring łapał np. 'rtos' w „Bartoszyce"
 // czy 'ai' w „maintenance". Granica: nie-litera/nie-cyfra po obu stronach ('c++' OK).
@@ -116,6 +145,34 @@ async function scanNoFluff(signals, discovered) {
   }
 }
 
+/* --- Bulldogjob: publiczny GraphQL, pełny skan stron --- */
+async function scanBulldog(signals, discovered) {
+  for (let page = 1; page <= 20; page++) {
+    const res = await fetch('https://bulldogjob.pl/graphql', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'User-Agent': UA },
+      body: JSON.stringify({ query: `query { searchJobs(country: "PL", language: pl, page: ${page}, perPage: 100) { totalCount nodes { id position company { name } technologyTags publishedAt } } }` }),
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!res.ok) throw new Error(`bulldogjob -> HTTP ${res.status}`);
+    const out = await res.json();
+    const nodes = out?.data?.searchJobs?.nodes ?? [];
+    if (!nodes.length) break;
+    for (const j of nodes) {
+      matchOffer({
+        companyName: j.company?.name ?? '',
+        hay: `${j.position} ${(j.technologyTags ?? []).join(' ')}`,
+        tytul: j.position,
+        url: `https://bulldogjob.pl/companies/jobs/${j.id}`,
+        zrodlo: 'bulldogjob.pl',
+        extra: '',
+        posted_at: j.publishedAt ? new Date(j.publishedAt).toISOString() : null,
+      }, signals, discovered);
+    }
+    if (page * 100 >= (out?.data?.searchJobs?.totalCount ?? 0)) break;
+  }
+}
+
 /* — wspólne dopasowanie oferty: znana firma → sygnał; nieznana → kandydat na odkrycie — */
 function matchOffer(o, signals, discovered) {
   const company = matchCompany(o.companyName);
@@ -156,7 +213,7 @@ function parseRSS(xml, maxItems = 300) {
 
 /* --- Google News RSS per firma (okno 7 dni) --- */
 async function scanNews(signals) {
-  for (const c of COMPANIES) {
+  for (const c of ALL_COMPANIES) {
     const q = encodeURIComponent(`"${c.aliases[0]}" when:7d`);
     const url = `https://news.google.com/rss/search?q=${q}&hl=pl&gl=PL&ceid=PL:pl`;
     let xml;
@@ -205,10 +262,12 @@ async function scanBranchRSS(signals) {
 const signals = [];
 const discovered = [];
 const errors = [];
+await loadTargets();
 if (!process.argv.includes('--no-jobs')) {
   await scanJJLike('https://api.justjoin.it', 'https://justjoin.it/job-offer', 'justjoin.it', signals, discovered).catch((e) => errors.push(`justjoin: ${e.message}`));
   await scanJJLike('https://api.rocketjobs.pl', 'https://rocketjobs.pl/oferty-pracy', 'rocketjobs.pl', signals, discovered).catch((e) => errors.push(`rocketjobs: ${e.message}`));
   await scanNoFluff(signals, discovered).catch((e) => errors.push(`nofluff: ${e.message}`));
+  await scanBulldog(signals, discovered).catch((e) => errors.push(`bulldogjob: ${e.message}`));
 }
 if (!process.argv.includes('--no-news')) {
   await scanNews(signals);
@@ -244,4 +303,4 @@ if (!DRY && signals.length) {
   if (!res.ok) { console.error('Ingest błąd:', res.status, out); process.exit(1); }
   console.log(`Wysłano do strefy: received=${out.received}, nowych=${out.inserted}`);
 }
-if (errors.length === 3 && !process.argv.includes('--no-jobs')) process.exit(1); // wszystkie job-źródła padły
+if (errors.length >= 4 && !process.argv.includes('--no-jobs')) process.exit(1); // wszystkie job-źródła padły

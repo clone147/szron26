@@ -26,6 +26,26 @@ export const COMPANIES = [
   { name: 'Pozyton', tier: 3, aliases: ['pozyton'] },
   { name: 'Astor', tier: 3, aliases: ['astor'] },
   { name: 'Elmark', tier: 3, aliases: ['elmark'] },
+  // — rozszerzenie 2026-08-16: firmy z notatek (Baza kontaktów / segmenty strategii) —
+  { name: 'POLON-ALFA', tier: 1, aliases: ['polon-alfa', 'polon alfa'] },
+  { name: 'PREVAC', tier: 1, aliases: ['prevac'] },
+  { name: 'VIGO Photonics', tier: 1, aliases: ['vigo photonics', 'vigo system'] },
+  { name: 'Ekoenergetyka', tier: 1, aliases: ['ekoenergetyka'] },
+  { name: 'Elzab', tier: 2, aliases: ['elzab'] },
+  { name: 'Hitachi Energy', tier: 2, aliases: ['hitachi energy'] },
+  { name: 'Mera Systemy', tier: 2, aliases: ['mera systemy'] },
+  { name: 'Unicard', tier: 2, aliases: ['unicard'] },
+  { name: 'Orbitvu', tier: 2, aliases: ['orbitvu'] },
+  { name: 'ASD Systems', tier: 2, aliases: ['asd systems'] },
+  { name: 'ML System', tier: 2, aliases: ['ml system'] },
+  { name: 'F&F Filipowski', tier: 2, aliases: ['f&f filipowski', 'f&amp;f'] },
+  { name: 'Telbud', tier: 3, aliases: ['telbud'] },
+  { name: 'DASL Systems', tier: 3, aliases: ['dasl'] },
+  { name: 'GISS', tier: 3, aliases: ['giss sp'] },
+  { name: 'SKK', tier: 3, aliases: ['skk s.a'] },
+  { name: 'Exorigo-Upos', tier: 3, aliases: ['exorigo'] },
+  { name: 'Fideltronik', tier: 3, aliases: ['fideltronik'] },
+  { name: 'Introl', tier: 3, aliases: ['introl'] },
 ];
 
 // Słowa kluczowe sygnału zakupowego w ofertach pracy (lowercase).
@@ -34,6 +54,8 @@ export const EMB_KEYWORDS = [
   'embedded', 'c++', 'firmware', 'stm32', 'qt', 'rtos', 'freertos', 'zephyr',
   'yocto', 'mikrokontroler', 'microcontroller', 'bare metal', 'bare-metal',
   'esp32', 'nrf52', 'cortex-m', 'fpga', 'vhdl', 'kicad', 'altium', 'modbus',
+  'embedded linux', 'buildroot', 'autosar', 'misra', 'canopen', 'can bus',
+  'verilog', 'iso 26262', 'iec 62304', 'iec 61508', 'bootloader',
 ];
 // '*' na końcu = rdzeń (dopasuje też odmiany: sztuczn* → „sztucznej inteligencji").
 export const AI_KEYWORDS = ['ai', 'machine learning', ' ml ', 'computer vision', 'sztuczn*', 'llm'];
@@ -44,7 +66,10 @@ export const JOB_KEYWORDS = [...EMB_KEYWORDS, ...AI_KEYWORDS];
 export const DISCOVERY_CORE = [
   'embedded', 'firmware', 'stm32', 'mikrokontroler', 'microcontroller', 'rtos',
   'freertos', 'zephyr', 'yocto', 'bare metal', 'bare-metal', 'embedded linux',
-  'esp32', 'nrf52', 'cortex-m', 'fpga', 'vhdl',
+  'esp32', 'nrf52', 'cortex-m', 'fpga', 'vhdl', 'verilog',
+  // konstruktor hardware = niemal na pewno producent elektroniki; normy = regulowany produkt
+  'altium', 'kicad', 'autosar', 'misra', 'canopen', 'iso 26262', 'iec 62304',
+  'iec 61508', 'bootloader', 'buildroot', 'embedded c',
 ];
 
 // Firmy pomijane przy odkrywaniu (regex, word boundary, lowercase):
@@ -75,7 +100,7 @@ export const DISCOVERY_EXCLUDE = [
 
 // Keywords wag dla newsów: 3 = regulacje, 2 = inwestycje/AI/R&D.
 export const NEWS_W3 = ['cra', 'cyber resilience', 'nis2', 'ai act', 'podatnoś*', 'cyberbezpiecz*'];
-export const NEWS_W2 = ['sztuczn*', ' ai ', 'r&d', 'inwestyc*', 'rekrutuj*', 'cto', 'automatyzac*', 'modernizac*'];
+export const NEWS_W2 = ['sztuczn*', ' ai ', 'r&d', 'inwestyc*', 'rekrutuj*', 'cto', 'automatyzac*', 'modernizac*', 'dofinansowan*', 'dotacj*', 'grant*', 'kontrakt*', 'certyfikac*', 'zatrudni*'];
 
 // Branżowe RSS (portale AVT o polskiej elektronice/automatyce) — dopasowanie do znanych firm.
 export const BRANCH_RSS = [
