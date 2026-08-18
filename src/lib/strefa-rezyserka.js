@@ -153,7 +153,7 @@ function bindDnD() {
   };
   grid.addEventListener('pointerdown', (e) => {
     const karta = e.target.closest('.rez-karta');
-    if (!karta || e.button !== 0 || e.target.closest('.rez-karta__del')) return;
+    if (!karta || e.button !== 0 || e.target.closest('.rez-karta__del') || e.target.closest('[data-lib]')) return;
     st = { karta, x0: e.clientX, y0: e.clientY, started: false, id: e.pointerId };
   });
   window.addEventListener('pointermove', (e) => {
@@ -229,27 +229,29 @@ async function zapiszKolejnosc() {
 function renderLib() {
   if (modalOtwarty() || dndActive) return; // nie wyrywaj listy spod okna ani spod przeciąganej karty
   const grid = $('#rez-grid');
+  if (document.activeElement && grid.contains(document.activeElement)) return; // ktoś edytuje pole na karcie
   const karty = filmy
     .map((r) => ({ r, f: { id: r.id, tytul: r.title, ...normalizujFilm(r.data) } }))
     .sort((a, b) => (a.f.nr ?? 999) - (b.f.nr ?? 999) || (a.r.updated_at < b.r.updated_at ? 1 : -1));
   // short-only = brak scen w longu przy rozpisanym shorcie (np. samodzielne shorty 101+)
   const jestShortOnly = ({ f }) => !f.long.sceny.length && f.short.sceny.length > 0;
+  // Karta = <div> (nie <button>): w środku są edytowalne pola (tytuł/teza/hook/kotwica),
+  // widoczne w całości i zapisywane inline — klik poza polami otwiera film.
   const karta = ({ r, f }) => {
     const shortOnly = jestShortOnly({ f });
     const w = shortOnly ? f.short : f.long;
     const sec = czasWariantu(w);
     const b = f.brief || {};
-    const opis = b.teza || b.hook || '';
-    const tytul = shortOnly ? f.tytul.replace(/^Short:\s*/i, '') : f.tytul;
     return `
-    <button class="rez-karta" type="button" data-id="${r.id}" data-sekcja="${shortOnly ? 'short' : 'long'}">
+    <div class="rez-karta" data-id="${r.id}" data-sekcja="${shortOnly ? 'short' : 'long'}">
       <span class="rez-karta__del" role="button" title="Usuń film" aria-label="Usuń film"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
       <div class="rez-karta__gora">
         ${f.nr !== undefined ? `<span class="rez-karta__nr">${String(f.nr).padStart(2, '0')}</span>` : ''}
-        <h3 class="rez-karta__tytul">${esc(tytul)}</h3>
+        <textarea class="rez-ghost rez-auto rez-karta__tytul" data-lib="tytul" rows="1" placeholder="Tytuł filmu…" spellcheck="false">${esc(f.tytul)}</textarea>
       </div>
-      ${opis ? `<p class="rez-karta__opis"${b.hook && b.teza ? ` title="Hook: ${esc(b.hook)}"` : ''}>${esc(opis)}</p>` : '<p class="rez-karta__opis rez-karta__opis--brak">Brak briefu — otwórz film i wypełnij tezę.</p>'}
-      ${b.kotwica ? `<p class="rez-karta__kotwica" title="Kotwica — moment zapowiedziany w hooku, spłacany na końcu">🪝 ${esc(b.kotwica)}</p>` : ''}
+      <label class="rez-karta__pole"><b>teza</b><textarea class="rez-ghost rez-auto" data-lib="teza" rows="1" placeholder="o czym naprawdę jest film…">${esc(b.teza || '')}</textarea></label>
+      <label class="rez-karta__pole"><b>hook</b><textarea class="rez-ghost rez-auto" data-lib="hook" rows="1" placeholder="pierwsze zdania…">${esc(b.hook || '')}</textarea></label>
+      <label class="rez-karta__pole"><b>🪝</b><textarea class="rez-ghost rez-auto" data-lib="kotwica" rows="1" placeholder="kotwica — zapowiedziana w hooku, spłacana na końcu…">${esc(b.kotwica || '')}</textarea></label>
       ${miniHtml(w.sceny, w.wpm)}
       <div class="rez-karta__meta">
         <span class="rez-chip" data-status="${esc(f.status)}">${esc(f.status)}</span>
@@ -258,7 +260,7 @@ function renderLib() {
           : `long ${mmss(sec)} / ${mmss(f.long.targetSec)}${f.short.sceny.length ? ` · short ${mmss(czasWariantu(f.short))}` : ''}`}
           · ${w.sceny.length} scen</span>
       </div>
-    </button>`;
+    </div>`;
   };
   const longi = karty.filter((k) => !jestShortOnly(k));
   const shorty = karty.filter(jestShortOnly);
@@ -268,8 +270,12 @@ function renderLib() {
   grid.innerHTML = (sekcja('🎬 Longi', '8–10 min · 16:9', longi) + sekcja('⚡ Shorty', 'do 30 s · 9:16', shorty))
     || '<p class="rez-pusto">Jeszcze nic nie jest w produkcji. Załóż pierwszy film albo zaimportuj scenopis z Diagramów.</p>';
 
+  grid.querySelectorAll('.rez-auto').forEach(autosize);
   for (const karta of grid.querySelectorAll('.rez-karta')) {
-    karta.addEventListener('click', () => { if (dndSuppressClick) return; location.hash = `/film/${encodeURIComponent(karta.dataset.id)}`; });
+    karta.addEventListener('click', (e) => {
+      if (dndSuppressClick || e.target.closest('[data-lib]')) return;
+      location.hash = `/film/${encodeURIComponent(karta.dataset.id)}`;
+    });
     karta.querySelector('.rez-karta__del').addEventListener('click', async (e) => {
       e.stopPropagation();
       const r = filmy.find((x) => x.id === karta.dataset.id);
@@ -280,6 +286,29 @@ function renderLib() {
       renderLib();
     });
   }
+}
+
+/* ── edycja inline na kartach biblioteki (tytuł/teza/hook/kotwica) ── */
+const libTimers = new Map();
+function bindLibEdit() {
+  $('#rez-grid').addEventListener('input', (e) => {
+    const t = e.target;
+    if (!t.dataset.lib) return;
+    autosize(t);
+    const id = t.closest('.rez-karta')?.dataset.id;
+    const r = filmy.find((x) => x.id === id);
+    if (!r) return;
+    const v = t.value.trim();
+    if (t.dataset.lib === 'tytul') { if (v) r.title = v; }
+    else r.data = { ...r.data, brief: { ...(r.data?.brief || {}), [t.dataset.lib]: v || undefined } };
+    clearTimeout(libTimers.get(id));
+    libTimers.set(id, setTimeout(async () => {
+      const stamp = new Date().toISOString();
+      const { error } = await sb.from('filmy').update({ title: r.title, data: r.data, updated_at: stamp }).eq('id', r.id);
+      if (error) { toast('Błąd zapisu', error.message, 'err'); return; }
+      r.updated_at = stamp;
+    }, 600));
+  });
 }
 
 async function showLib() {
@@ -818,6 +847,7 @@ filmEl.addEventListener('click', async (e) => {
   $('#btn-nowy-film').addEventListener('click', zalozFilm);
   $('#btn-z-diagramu').addEventListener('click', filmZDiagramu);
   bindDnD();
+  bindLibEdit();
   route();
   // realtime: filmy (lista + otwarty projekt) i diagramy (żywy import scenopisu)
   startRealtime(sb, 'strefa-rezyserka', ['filmy', 'diagrams'], () => {
