@@ -99,6 +99,7 @@ function card(k, i) {
     ${k.stanowisko ? `<div class="dec-card__pos">${esc(k.stanowisko)}</div>` : ''}
     ${c.kwalifikacja ? `<div class="dec-card__kwal">${esc(opisOf(c).slice(0, 220))}${opisOf(c).length > 220 ? '…' : ''}</div>` : ''}
     ${hak ? `<div class="dec-card__hak">🎯 ${esc(hak)}</div>` : ''}
+    ${c.pitch ? `<div class="dec-card__pitch">🎬 ${esc(c.pitch)}</div>` : ''}
     <div class="dec-card__links">
       ${k.email ? `<a href="mailto:${esc(k.email)}">${ICO.mail} ${esc(k.email)}</a>` : '<span class="dec-noemail">e-mail w drodze (Prospeo)…</span>'}
       ${k.linkedin_url ? `<a href="${esc(k.linkedin_url)}" target="_blank" rel="noopener">LinkedIn ${ICO.ext}</a>` : ''}
@@ -136,6 +137,7 @@ ${inni.length ? `- Inne osoby w firmie: ${inni.map((x) => `${x.imie}${x.stanowis
 - ${k.firma}${c.www ? ` — ${c.www}` : ''}${c.werdykt ? ` · werdykt: ${c.werdykt}` : ''}${c.status ? ` · status pipeline: ${c.status}` : ''}
 - ${opisOf(c) || 'brak opisu'}
 ${hakOf(c) ? `- HAK (użyj jako oś maila): ${hakOf(c)}` : ''}
+${c.pitch ? `- CO ICH MOŻE ZAINTERESOWAĆ I KTÓRY FILM POKAZAĆ: ${c.pitch}` : ''}
 
 ${c.dossier ? `## Dossier\n${c.dossier}\n` : ''}
 ## Świeże sygnały (dowód, że to nie masówka)

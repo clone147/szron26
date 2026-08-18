@@ -26,7 +26,11 @@ async function agent(body) {
   return out;
 }
 
-function prompt(firma, signals) {
+const filmyBlok = (filmy) => filmy?.length
+  ? `\nFilmy Tomka na YouTube (tytuł — teza), do doboru w polu "pitch":\n${filmy.map((f) => `- ${f.title} — ${f.teza}`).join('\n')}\n`
+  : '';
+
+function prompt(firma, signals, filmy) {
   return `Jesteś researcherem B2B pracującym dla SZRON (szron.tech) — jednoosobowej firmy Tomasza Wojciechowskiego z Rzeszowa, która wdraża programowanie agentowe AI (Claude Code) w polskich firmach tworzących urządzenia elektroniczne z własnym firmware (embedded). Klient idealny: polski PRODUCENT sprzętu z własnym zespołem embedded/firmware. NIE-klienci: software house'y / outsourcing / body-leasing (sami sprzedają programistów), agencje rekrutacyjne, oddziały globalnych korporacji.
 
 Zakwalifikuj firmę "${firma}". Znaleźliśmy jej oferty pracy:
@@ -37,6 +41,7 @@ Zbadaj w internecie (WebSearch, w razie potrzeby WebFetch na stronę firmy / rej
 Zasady werdyktu:
 - Oddział/spółka-córka GLOBALNEJ korporacji, której decyzje budżetowe zapadają poza Polską (np. centrum R&D amerykańskiego koncernu) → werdykt "uslugi" (nie-klient), NAWET jeśli rozwija własny produkt.
 - Firma czysto software'owa bez sprzętu i bez zespołu embedded → oceń szczerze: jeśli nie ma haka embedded, ale jest polskim producentem produktu cyfrowego z zespołem R&D w Polsce, może zostać "produkt" z hakiem niesprzętowym.
+${filmyBlok(filmy)}
 Do listy decydenci dołóż — obok zarządu — także 1–2 osoby ŚREDNIEGO szczebla technicznego z LinkedIn (Head of Firmware / Engineering Manager / R&D Manager / Team Lead embedded), jeśli są publicznie widoczne: to oni najczęściej odpowiadają na pierwszy kontakt.
 
 Na końcu wypisz WYŁĄCZNIE poprawny JSON (bez markdown, bez komentarzy):
@@ -45,6 +50,7 @@ Na końcu wypisz WYŁĄCZNIE poprawny JSON (bez markdown, bez komentarzy):
   "kwalifikacja": "1-2 zdania po polsku: co robi firma, skala, siedziba",
   "www": "https://... (strona firmowa lub null)",
   "hak": "1 zdanie po polsku — konkretny zaczep do pierwszego kontaktu (np. rekrutacja firmware + termin CRA 11.09)",
+  "pitch": "3-4 zdania po polsku (tylko dla werdyktu produkt, inaczej null): czym ta firma/jej decydenci mogą być realnie zainteresowani w kontekście oferty SZRON i KTÓRY film z listy powyżej najlepiej pokazać im w mailu zaczepiającym (podaj tytuł) — z krótkim uzasadnieniem, co konkretnie na tym filmie odpowiada ich problemowi",
   "decydenci": [{"imie": "Imię Nazwisko", "stanowisko": "...", "linkedin_url": "... lub null"}],
   "pewnosc": 1-5,
   "dossier": "krótki markdown (## Produkty, ## Zespół embedded, ## Hak: ..., ## Ryzyka) — max 1500 znaków"
@@ -61,9 +67,9 @@ function parseJSON(text) {
 // Jedno wywołanie Claude Code headless na firmę: tylko research webowy, bez dostępu do dysku.
 // Dwie próby — mało znane firmy potrafią wymagać długiego researchu (13.08: 7-minutowy
 // timeout uciął kwalifikację tuż przed końcem).
-async function askClaude(firma, signals) {
+async function askClaude(firma, signals, filmy) {
   const args = [
-    '-p', prompt(firma, signals),
+    '-p', prompt(firma, signals, filmy),
     '--model', 'opus',
     '--output-format', 'json',
     '--allowedTools', 'WebSearch WebFetch',
@@ -85,16 +91,17 @@ async function askClaude(firma, signals) {
   throw lastErr;
 }
 
-const { firms, pending_total } = await agent({ action: 'pending', limit: LIMIT });
+const { firms, pending_total, filmy } = await agent({ action: 'pending', limit: LIMIT });
 console.log(`Do kwalifikacji: ${firms.length} (w kolejce łącznie: ${pending_total})`);
 let ok = 0; const fails = [];
 for (const { firma, signals } of firms) {
   try {
-    const v = await askClaude(firma, signals);
+    const v = await askClaude(firma, signals, filmy);
     await agent({
       action: 'qualify', firma,
       werdykt: v.werdykt,
       kwalifikacja: [v.kwalifikacja, v.hak ? `Hak: ${v.hak}` : ''].filter(Boolean).join(' · '),
+      pitch: v.pitch || null,
       www: v.www || null,
       dossier: v.dossier || null,
       kontakty: Array.isArray(v.decydenci) ? v.decydenci : [],
