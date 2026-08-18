@@ -30,6 +30,12 @@ import Strefa from '../../layouts/Strefa.astro';
     <p>Brak decydentów dla wybranych filtrów. Kontakty zbiera codzienna rutyna CAIO (kwalifikacja + Prospeo) — zobacz <a href="/strefa/sygnaly">Sygnały</a>.</p>
   </div>
 
+  <section id="filmy-rank" class="frank" hidden>
+    <h2>🎬 Które filmy nakręcić najpierw</h2>
+    <p class="frank__intro">Ranking liczony na żywo z pitchów firm-produkt: im więcej firm-celów wskazuje dany film jako najlepszy zaczep w mailu, tym wyżej — i tym bardziej opłaca się nakręcić go jako pierwszy.</p>
+    <ol id="filmy-rank-list"></ol>
+  </section>
+
   <div id="modal-root"></div>
   <div class="strefa-toasts" id="toasts" aria-live="polite"></div>
 
@@ -51,6 +57,15 @@ import Strefa from '../../layouts/Strefa.astro';
     .dec-card__meta { color: var(--color-text-inv-3); font-size: var(--text-caption); }
     .dec-card__actions { display: flex; gap: .4rem; margin-top: auto; padding-top: .35rem; flex-wrap: wrap; }
     .dec-noemail { color: var(--color-text-inv-3); font-size: var(--text-s); font-style: italic; }
+    .frank { margin-top: var(--space-lg); border-top: 1px solid var(--color-line-dark); padding-top: var(--space-md); }
+    .frank h2 { font-size: var(--text-l); margin: 0 0 .3rem; }
+    .frank__intro { color: var(--color-text-inv-3); font-size: var(--text-s); margin: 0 0 var(--space-sm); max-width: 70ch; }
+    .frank ol { display: grid; gap: var(--space-sm); padding-left: 1.4rem; margin: 0; }
+    .frank li { background: var(--color-ink-2); border: 1px solid var(--color-line-dark); border-radius: var(--radius-card); padding: var(--space-sm) var(--space-md); }
+    .frank__head { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; justify-content: space-between; }
+    .frank__count { color: oklch(80% 0.15 150); font-size: var(--text-s); font-weight: 600; white-space: nowrap; }
+    .frank__teza { color: var(--color-text-inv-2); font-size: var(--text-s); margin-top: .25rem; }
+    .frank__firmy { color: var(--color-text-inv-3); font-size: var(--text-caption); margin-top: .35rem; }
     .dec-brief { white-space: pre-wrap; font-family: var(--font-mono, monospace); font-size: .78rem; line-height: 1.5; background: var(--color-ink-3); border-radius: var(--radius-btn); padding: var(--space-sm); max-height: 55vh; overflow: auto; }
   </style>
 

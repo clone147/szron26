@@ -6,7 +6,7 @@ import { $, $$, esc, toast, openModal, closeModal, fmtDate, bindSearch } from '.
 
 const sb = getClient();
 
-let contacts = [], companies = new Map(), signalsBy = new Map(), touchesBy = new Map();
+let contacts = [], companies = new Map(), signalsBy = new Map(), touchesBy = new Map(), filmyKat = [];
 let query = '', fWerdykt = 'produkt', fEmail = false;
 
 /* ── kanon SZRON — dołączany do każdego briefu ── */
@@ -31,11 +31,12 @@ Kontekst regulacyjny: CRA — od 11.09.2026 obowiązek zgłaszania aktywnie wyko
 
 /* ── dane ── */
 async function load() {
-  const [cnt, comp, sig, tch] = await Promise.all([
+  const [cnt, comp, sig, tch, flm] = await Promise.all([
     sb.from('caio_contacts').select('*').order('firma'),
     sb.from('caio_companies').select('*'),
     sb.from('caio_signals').select('firma,typ,tytul,url,zrodlo,waga,posted_at,created_at,status').neq('status', 'odrzucony').order('created_at', { ascending: false }),
     sb.from('caio_touches').select('firma,typ,wynik,created_at').order('created_at', { ascending: false }),
+    sb.from('filmy').select('title,data'),
   ]);
   const err = cnt.error || comp.error || sig.error || tch.error;
   if (err) { toast('Błąd wczytywania', err.message, 'err'); return; }
@@ -44,7 +45,9 @@ async function load() {
   signalsBy = new Map(); touchesBy = new Map();
   for (const s of sig.data ?? []) { if (!signalsBy.has(s.firma)) signalsBy.set(s.firma, []); signalsBy.get(s.firma).push(s); }
   for (const t of tch.data ?? []) { if (!touchesBy.has(t.firma)) touchesBy.set(t.firma, []); touchesBy.get(t.firma).push(t); }
+  filmyKat = (flm.data ?? []).map((f) => ({ title: f.title, teza: f.data?.brief?.teza ?? '' }));
   render();
+  renderFilmyRank();
 }
 
 /* ── hak z kwalifikacji („… · Hak: xxx") ── */
@@ -101,7 +104,7 @@ function card(k, i) {
     ${hak ? `<div class="dec-card__hak">🎯 ${esc(hak)}</div>` : ''}
     ${c.pitch ? `<div class="dec-card__pitch">🎬 ${esc(c.pitch)}</div>` : ''}
     <div class="dec-card__links">
-      ${k.email ? `<a href="mailto:${esc(k.email)}">${ICO.mail} ${esc(k.email)}</a>` : '<span class="dec-noemail">e-mail w drodze (Prospeo)…</span>'}
+      ${k.email ? `<a href="mailto:${esc(k.email)}">${ICO.mail} ${esc(k.email)}</a>` : k.email_probe_at ? `<span class="dec-noemail">nie znaleziono e-maila (Prospeo ${fmtDate(k.email_probe_at)}, ponowi za ~2 tyg.)</span>` : '<span class="dec-noemail">e-mail w drodze (Prospeo)…</span>'}
       ${k.linkedin_url ? `<a href="${esc(k.linkedin_url)}" target="_blank" rel="noopener">LinkedIn ${ICO.ext}</a>` : ''}
       ${c.www ? `<a href="${esc(c.www)}" target="_blank" rel="noopener">www ${ICO.ext}</a>` : ''}
     </div>
@@ -174,6 +177,27 @@ function zasadyModal() {
     <button class="strefa-btn strefa-btn--accent" id="z-copy">${ICO.copy} Kopiuj</button></div></div>`);
   box.querySelectorAll('[data-close-x]').forEach((b) => b.addEventListener('click', closeModal));
   $('#z-copy', box).addEventListener('click', () => copy(KANON, 'Kanon pisania'));
+}
+
+/* ── ranking filmów: które nakręcić najpierw (z pitchów firm-produkt) ── */
+function renderFilmyRank() {
+  const box = $('#filmy-rank'); if (!box) return;
+  const prod = [...companies.values()].filter((c) => c.werdykt === 'produkt' && c.status !== 'odpadl' && c.pitch);
+  const norm = (s) => String(s).toLowerCase().replace(/[„”"'’]/g, '').replace(/\s+/g, ' ');
+  const rank = filmyKat
+    .map((f) => {
+      const t = norm(f.title.replace(/^short:\s*/i, '')).replace(/\.$/, '');
+      const firmy = prod.filter((c) => norm(c.pitch).includes(t));
+      return { ...f, firmy };
+    })
+    .filter((f) => f.firmy.length)
+    .sort((a, b) => b.firmy.length - a.firmy.length || a.title.localeCompare(b.title, 'pl'));
+  box.hidden = !rank.length;
+  $('#filmy-rank-list').innerHTML = rank.map((f) => `<li>
+    <div class="frank__head"><strong>${esc(f.title)}</strong><span class="frank__count">${f.firmy.length} ${f.firmy.length === 1 ? 'firma czeka' : f.firmy.length < 5 ? 'firmy czekają' : 'firm czeka'}</span></div>
+    ${f.teza ? `<div class="frank__teza">${esc(f.teza)}</div>` : ''}
+    <div class="frank__firmy">${f.firmy.map((c) => esc(c.firma)).join(' · ')}</div>
+  </li>`).join('');
 }
 
 function render() {

@@ -127,7 +127,11 @@ for (const k of contacts) {
       await agent({ action: 'contact_email', firma: k.firma, imie: k.imie, email: em.email });
       found++; if (typeof credits === 'number') credits--;
       console.log(`  ✔ ${k.firma}: ${k.imie} — ${em.email} (${em.status})`);
-    } else { misses++; console.log(`  ∅ ${k.firma}: ${k.imie} — brak w Prospeo i brak wzorca`); }
+    } else {
+      misses++;
+      await agent({ action: 'contact_probe', firma: k.firma, imie: k.imie }); // rotacja: nie próbuj znów przez 14 dni
+      console.log(`  ∅ ${k.firma}: ${k.imie} — brak w Prospeo i brak wzorca`);
+    }
   } catch (e) { fails.push(`${k.firma}/${k.imie}: ${e.message}`); console.error(`  ✖ ${k.firma}: ${k.imie} — ${e.message}`); }
   await sleep(12000); // rate limit planu FREE
 }
