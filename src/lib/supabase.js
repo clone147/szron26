@@ -35,7 +35,20 @@ export function getClient() {
     },
     db: { schema: 'strefa' },
   });
+  watchSession(_client);
   return _client;
+}
+
+// Wygaśnięcie sesji w długo otwartej karcie (np. po uśpieniu laptopa refresh token pada):
+// supabase-js emituje SIGNED_OUT, a bez sesji klient wysyła zapytania jako anon i RLS
+// odpowiada „permission denied for table …". Zamiast cichych błędów — powrót na login.
+function toLogin() {
+  const p = window.location.pathname;
+  if (!p.startsWith('/strefa') || p.startsWith('/strefa/login') || p.startsWith('/strefa/auth')) return;
+  window.location.replace(`/strefa/login?next=${encodeURIComponent(p + window.location.search)}`);
+}
+function watchSession(client) {
+  client.auth.onAuthStateChange((event) => { if (event === 'SIGNED_OUT') toLogin(); });
 }
 
 export function isAllowed(email) {
@@ -181,5 +194,11 @@ export async function startRealtime(sb, channelName, tables, refresh, handlersBy
   }
   ch.subscribe((status) => { if (status === 'SUBSCRIBED') refresh(); });
   setInterval(refresh, 60000);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+  document.addEventListener('visibilitychange', async () => {
+    if (document.hidden) return;
+    // powrót do zakładki: najpierw sprawdź, czy sesja żyje — bez niej refresh() zwróci ciche błędy RLS
+    const { data } = await sb.auth.getSession();
+    if (!data?.session) { toLogin(); return; }
+    refresh();
+  });
 }
