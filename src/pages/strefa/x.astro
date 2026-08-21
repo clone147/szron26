@@ -1,0 +1,41 @@
+---
+import Strefa from '../../layouts/Strefa.astro';
+---
+<Strefa title="X Growth" active="x">
+  <div class="strefa-head">
+    <div>
+      <p class="strefa-eyebrow">Strefa zamknięta</p>
+      <h1>X Growth</h1>
+      <p>Kolejka postów na X — drafty generuje Claude Code (<code>/x-growth-szron</code>), tu zatwierdzasz, edytujesz i publikujesz. Cel: followersi zgodni z targetem Szronu → klienci.</p>
+    </div>
+  </div>
+
+  <div class="strefa-toolbar" id="x-tabs"></div>
+  <div id="x-list" class="x-list"></div>
+
+  <div id="modal-root"></div>
+  <div class="strefa-toasts" id="toasts" aria-live="polite"></div>
+
+  <style is:global>
+    .x-list { display: grid; gap: var(--space-md); }
+    .x-card { border: 1px solid var(--color-line-dark); border-radius: var(--radius-sm); background: var(--color-ink-2); padding: var(--space-md); display: grid; gap: .6rem; }
+    .x-card__meta { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; font-size: var(--text-caption); }
+    .x-card__date { color: var(--color-text-inv-3); margin-left: auto; }
+    .x-badge { font-size: .68rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--color-text-inv-3); border: 1px solid var(--color-line-dark); border-radius: 999px; padding: .1rem .5rem; }
+    .x-badge--kind { color: var(--color-accent); border-color: color-mix(in oklch, var(--color-accent) 45%, transparent); }
+    .x-content { margin: 0; white-space: pre-wrap; color: var(--color-text-inv); line-height: 1.55; }
+    .x-thread { margin: 0; padding-left: 1.2rem; display: grid; gap: .45rem; color: var(--color-text-inv); line-height: 1.5; }
+    .x-notes { margin: 0; color: var(--color-text-inv-3); font-size: var(--text-caption); font-style: italic; }
+    .x-reply-to { color: var(--color-accent); font-size: var(--text-caption); text-decoration: none; overflow-wrap: anywhere; }
+    .x-reply-to:hover { text-decoration: underline; }
+    .x-card__actions { display: flex; gap: .4rem; flex-wrap: wrap; }
+    .x-handle { color: var(--color-accent); font-weight: 600; text-decoration: none; }
+    .x-handle:hover { text-decoration: underline; }
+    .x-count { font-size: var(--text-caption); color: var(--color-text-inv-3); margin: .3rem 0 var(--space-md); }
+    .x-count.is-over { color: oklch(60% 0.2 25); font-weight: 600; }
+  </style>
+
+  <script>
+    import '../../lib/strefa-x.js';
+  </script>
+</Strefa>
