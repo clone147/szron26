@@ -138,8 +138,14 @@ function postCard(p) {
     actions.push(`<button class="strefa-btn strefa-btn--ghost" data-act="edit">Edytuj</button>`);
     actions.push(`<button class="strefa-btn strefa-btn--ghost" data-act="reject">Odrzuć</button>`);
   } else if (p.status === 'approved') {
-    actions.push(`<button class="strefa-btn strefa-btn--accent" data-act="publish"${publishing === p.id ? ' disabled' : ''}>${publishing === p.id ? 'Publikuję…' : 'Publikuj na X'}</button>`);
-    actions.push(`<button class="strefa-btn strefa-btn--ghost" data-act="copy">Kopiuj</button>`);
+    if (p.kind === 'reply') {
+      // X API nie pozwala odpowiadać pod cudze posty — reply publikuje się ręcznie
+      actions.push(`<button class="strefa-btn strefa-btn--accent" data-act="copy">Kopiuj treść</button>`);
+        if (p.reply_to_url) actions.push(`<a class="strefa-btn strefa-btn--ghost" href="${esc(p.reply_to_url)}" target="_blank" rel="noreferrer">Otwórz tweet</a>`);
+    } else {
+      actions.push(`<button class="strefa-btn strefa-btn--accent" data-act="publish"${publishing === p.id ? ' disabled' : ''}>${publishing === p.id ? 'Publikuję…' : 'Publikuj na X'}</button>`);
+      actions.push(`<button class="strefa-btn strefa-btn--ghost" data-act="copy">Kopiuj</button>`);
+    }
     actions.push(`<button class="strefa-btn strefa-btn--ghost" data-act="edit">Edytuj</button>`);
     actions.push(`<button class="strefa-btn strefa-btn--ghost" data-act="undraft">Cofnij</button>`);
     actions.push(`<button class="strefa-btn strefa-btn--ghost" data-act="mark-posted" title="Bez wysyłki przez API — gdy wklejasz ręcznie">Oznacz jako opublikowany</button>`);
