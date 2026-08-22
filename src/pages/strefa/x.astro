@@ -1,12 +1,12 @@
 ---
 import Strefa from '../../layouts/Strefa.astro';
 ---
-<Strefa title="X Growth" active="x">
+<Strefa title="X + LinkedIn Growth" active="x">
   <div class="strefa-head">
     <div>
       <p class="strefa-eyebrow">Strefa zamknięta</p>
-      <h1>X Growth</h1>
-      <p>Kolejka postów na X — drafty generuje Claude Code (<code>/x-growth-szron</code>), tu zatwierdzasz, edytujesz i publikujesz. Cel: followersi zgodni z targetem Szronu → klienci.</p>
+      <h1>X + LinkedIn Growth</h1>
+      <p>Kolejka postów na X i LinkedIn — drafty generuje Claude Code (<code>/x-growth-szron</code>, <code>/x-growth-szron linkedin</code>), tu zatwierdzasz, edytujesz i publikujesz. X: posty przez API, odpowiedzi ręcznie. LinkedIn: kopiuj + otwórz edytor. Cel: followersi zgodni z targetem Szronu → klienci.</p>
     </div>
   </div>
 
@@ -22,6 +22,9 @@ import Strefa from '../../layouts/Strefa.astro';
     .x-card__meta { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; font-size: var(--text-caption); }
     .x-card__date { color: var(--color-text-inv-3); margin-left: auto; }
     .x-badge { font-size: .68rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--color-text-inv-3); border: 1px solid var(--color-line-dark); border-radius: 999px; padding: .1rem .5rem; }
+    .x-badge--plat-linkedin { color: oklch(70% 0.12 240); border-color: oklch(70% 0.12 240 / .5); }
+    .x-badge--over { color: oklch(70% 0.18 25); border-color: oklch(70% 0.18 25 / .5); }
+    .x-plat-switch { display: inline-flex; gap: .3rem; margin-left: auto; }
     .x-badge--kind { color: var(--color-accent); border-color: color-mix(in oklch, var(--color-accent) 45%, transparent); }
     .x-content { margin: 0; white-space: pre-wrap; color: var(--color-text-inv); line-height: 1.55; }
     .x-thread { margin: 0; padding-left: 1.2rem; display: grid; gap: .45rem; color: var(--color-text-inv); line-height: 1.5; }

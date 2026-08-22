@@ -1,7 +1,8 @@
-// Aplikacja „X Growth" strefy zamkniętej SZRON — kolejka postów na X (Twitter).
-// Drafty generuje skill Claude Code (/x-growth-szron) → tabele strefa.x_posts / strefa.x_targets.
-// Tu: zatwierdzanie, edycja, odrzucanie, publikacja przez edge function post-to-x
-// (wymaga secrets X_API_* w Supabase; bez nich fallback = kopiuj i wklej ręcznie).
+// Aplikacja „X + LinkedIn Growth" strefy zamkniętej SZRON — kolejka postów na X i LinkedIn.
+// Drafty generuje skill Claude Code (/x-growth-szron [linkedin]) → tabele strefa.x_posts / strefa.x_targets
+// (kolumna platform: x|linkedin). Tu: zatwierdzanie, edycja, odrzucanie, publikacja.
+// X: posty/wątki przez edge function post-to-x (secrets X_API_*), reply ręcznie (API blokuje odpowiedzi pod cudze posty).
+// LinkedIn: brak API dla konta osobistego — „Kopiuj" + „Otwórz LinkedIn" (prefill edytora) + „Oznacz jako opublikowany".
 import { getClient } from './supabase.js';
 import { $, esc, toast, fmtDateTime, openModal, closeModal } from './strefa-ui.js';
 
@@ -10,9 +11,22 @@ const sb = getClient();
 let posts = [];
 let targets = [];
 let tab = 'draft';
+let platform = 'all';
 let publishing = null;
 
 const KIND_LABEL = { post: 'Post', thread: 'Wątek', reply: 'Odpowiedź' };
+const KIND_LABEL_LI = { post: 'Post', reply: 'Komentarz' };
+const PLATFORMS = [['all', 'Wszystko'], ['x', 'X'], ['linkedin', 'LinkedIn']];
+// Limity znaków: post/wątek = limit platformy; reply = celowo krótko (skill: X ≤180, LinkedIn ≤300).
+const LIMITS = {
+  x: { post: 280, thread: 280, reply: 180 },
+  linkedin: { post: 3000, reply: 300 },
+};
+const LI_FOLD = 200; // ile znaków LinkedIn pokazuje przed „…zobacz więcej"
+const plat = (p) => p.platform || 'x';
+const kindLabel = (p) => (plat(p) === 'linkedin' ? KIND_LABEL_LI[p.kind] : KIND_LABEL[p.kind]) || p.kind;
+const limitFor = (p) => LIMITS[plat(p)]?.[p.kind] ?? 280;
+const profileUrl = (t) => (t.platform === 'linkedin' ? `https://www.linkedin.com/in/${t.handle}` : `https://x.com/${t.handle}`);
 const TABS = [
   ['draft', 'Do zatwierdzenia'],
   ['approved', 'Zatwierdzone'],
@@ -49,7 +63,15 @@ function postText(p) {
 
 async function copyPost(p) {
   await navigator.clipboard.writeText(postText(p));
-  toast('Skopiowano', 'Treść w schowku — wklej na x.com');
+  toast('Skopiowano', `Treść w schowku — wklej na ${plat(p) === 'linkedin' ? 'linkedin.com' : 'x.com'}`);
+}
+
+// LinkedIn: otwiera edytor nowego posta z wklejoną treścią (shareActive + text).
+function openLinkedIn(p) {
+  const url = p.kind === 'reply' && p.reply_to_url
+    ? p.reply_to_url
+    : `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(postText(p))}`;
+  window.open(url, '_blank', 'noreferrer');
 }
 
 async function publish(p) {
@@ -76,10 +98,11 @@ async function publish(p) {
 
 function editPost(p) {
   const isThread = p.kind === 'thread';
+  const limit = limitFor(p);
   const val = isThread && Array.isArray(p.thread) ? p.thread.join('\n---\n') : p.content;
   const box = openModal(`
     <div class="strefa-modal__body">
-      <h3 style="margin-top:0">Edycja: ${esc(KIND_LABEL[p.kind] || p.kind)}${isThread ? ' <small>(tweety rozdzielaj linią „---”)</small>' : ''}</h3>
+      <h3 style="margin-top:0">Edycja: ${esc(kindLabel(p))} <small>(${plat(p) === 'linkedin' ? 'LinkedIn' : 'X'})</small>${isThread ? ' <small>(tweety rozdzielaj linią „---”)</small>' : ''}</h3>
       <textarea class="strefa-input" id="x-edit" rows="12" style="width:100%;font:inherit;line-height:1.5;resize:vertical">${esc(val)}</textarea>
       <p class="x-count" id="x-count"></p>
       <div class="strefa-actions-row">
@@ -92,12 +115,16 @@ function editPost(p) {
   const refreshCount = () => {
     if (isThread) {
       const parts = ta.value.split(/\n---\n/).map((s) => s.trim()).filter(Boolean);
-      const over = parts.filter((s) => s.length > 280).length;
-      count.textContent = `${parts.length} tweetów${over ? ` — ${over} przekracza 280 znaków!` : ''}`;
+      const over = parts.filter((s) => s.length > limit).length;
+      count.textContent = `${parts.length} tweetów${over ? ` — ${over} przekracza ${limit} znaków!` : ''}`;
       count.classList.toggle('is-over', over > 0);
     } else {
-      count.textContent = `${ta.value.length}/280 znaków`;
-      count.classList.toggle('is-over', ta.value.length > 280);
+      const len = ta.value.length;
+      let txt = `${len}/${limit} znaków`;
+      if (p.kind === 'reply') txt += ' (krótko: jedna myśl, bez wstępu)';
+      else if (plat(p) === 'linkedin') txt += ` · przed „zobacz więcej” widać ~${LI_FOLD}: „${ta.value.slice(0, LI_FOLD).replace(/\s+/g, ' ').trim().slice(-40)}”`;
+      count.textContent = txt;
+      count.classList.toggle('is-over', len > limit);
     }
   };
   refreshCount();
@@ -138,7 +165,11 @@ function postCard(p) {
     actions.push(`<button class="strefa-btn strefa-btn--ghost" data-act="edit">Edytuj</button>`);
     actions.push(`<button class="strefa-btn strefa-btn--ghost" data-act="reject">Odrzuć</button>`);
   } else if (p.status === 'approved') {
-    if (p.kind === 'reply') {
+    if (plat(p) === 'linkedin') {
+      // LinkedIn nie daje API dla konta osobistego — publikacja ręczna
+      actions.push(`<button class="strefa-btn strefa-btn--accent" data-act="copy">Kopiuj treść</button>`);
+      actions.push(`<button class="strefa-btn strefa-btn--ghost" data-act="open-li">${p.kind === 'reply' ? 'Otwórz post' : 'Otwórz LinkedIn'}</button>`);
+    } else if (p.kind === 'reply') {
       // X API nie pozwala odpowiadać pod cudze posty — reply publikuje się ręcznie
       actions.push(`<button class="strefa-btn strefa-btn--accent" data-act="copy">Kopiuj treść</button>`);
         if (p.reply_to_url) actions.push(`<a class="strefa-btn strefa-btn--ghost" href="${esc(p.reply_to_url)}" target="_blank" rel="noreferrer">Otwórz tweet</a>`);
@@ -150,14 +181,22 @@ function postCard(p) {
     actions.push(`<button class="strefa-btn strefa-btn--ghost" data-act="undraft">Cofnij</button>`);
     actions.push(`<button class="strefa-btn strefa-btn--ghost" data-act="mark-posted" title="Bez wysyłki przez API — gdy wklejasz ręcznie">Oznacz jako opublikowany</button>`);
   } else if (p.status === 'posted') {
-    if (p.tweet_id) actions.push(`<a class="strefa-btn strefa-btn--ghost" href="https://x.com/i/status/${esc(p.tweet_id)}" target="_blank" rel="noreferrer">Zobacz na X</a>`);
+    if (plat(p) === 'linkedin' && p.reply_to_url) actions.push(`<a class="strefa-btn strefa-btn--ghost" href="${esc(p.reply_to_url)}" target="_blank" rel="noreferrer">Zobacz na LinkedIn</a>`);
+    else if (p.tweet_id) actions.push(`<a class="strefa-btn strefa-btn--ghost" href="https://x.com/i/status/${esc(p.tweet_id)}" target="_blank" rel="noreferrer">Zobacz na X</a>`);
     else actions.push(`<button class="strefa-btn strefa-btn--ghost" data-act="copy">Kopiuj</button>`);
   } else if (p.status === 'rejected') {
     actions.push(`<button class="strefa-btn strefa-btn--ghost" data-act="undraft">Przywróć</button>`);
   }
-  return `<article class="x-card" data-id="${p.id}">
+  const len = postText(p).length;
+  const limit = limitFor(p);
+  const over = p.kind === 'thread'
+    ? (p.thread || []).some((t) => t.length > limit)
+    : len > limit;
+  return `<article class="x-card x-card--${plat(p)}" data-id="${p.id}">
     <div class="x-card__meta">
-      ${badge(KIND_LABEL[p.kind] || p.kind, 'x-badge--kind')}
+      ${badge(plat(p) === 'linkedin' ? 'LinkedIn' : 'X', `x-badge--plat x-badge--plat-${plat(p)}`)}
+      ${badge(kindLabel(p), 'x-badge--kind')}
+      ${over ? badge(`za długie: ${len}/${limit}`, 'x-badge--over') : ''}
       ${p.hook_type ? badge(`huk: ${p.hook_type}`) : ''}
       ${p.target_segment ? badge(p.target_segment) : ''}
       <span class="x-card__date">${esc(fmtDateTime(p.created_at))}</span>
@@ -173,7 +212,8 @@ function targetRow(t) {
   const btn = (s, label) => `<button class="strefa-btn ${t.status === s ? 'strefa-btn--accent' : 'strefa-btn--ghost'}" data-tact="${s}">${label}</button>`;
   return `<article class="x-card x-card--target" data-tid="${t.id}">
     <div class="x-card__meta">
-      <a class="x-handle" href="https://x.com/${esc(t.handle)}" target="_blank" rel="noreferrer">@${esc(t.handle)}</a>
+      ${badge(t.platform === 'linkedin' ? 'LinkedIn' : 'X', `x-badge--plat x-badge--plat-${t.platform || 'x'}`)}
+      <a class="x-handle" href="${esc(profileUrl(t))}" target="_blank" rel="noreferrer">${t.platform === 'linkedin' ? '' : '@'}${esc(t.handle)}</a>
       ${t.name ? `<span>${esc(t.name)}</span>` : ''}
       ${t.segment ? badge(t.segment) : ''}
       ${Number.isFinite(t.followers) ? `<span class="x-card__date">${Number(t.followers).toLocaleString('pl-PL')} obs.</span>` : ''}
@@ -186,17 +226,22 @@ function targetRow(t) {
 function render() {
   const tabsEl = $('#x-tabs');
   const listEl = $('#x-list');
-  const counts = { targets: targets.length };
-  for (const p of posts) counts[p.status] = (counts[p.status] || 0) + 1;
+  const onPlat = (x) => platform === 'all' || (x.platform || 'x') === platform;
+  const vPosts = posts.filter(onPlat);
+  const vTargets = targets.filter(onPlat);
+  const counts = { targets: vTargets.length };
+  for (const p of vPosts) counts[p.status] = (counts[p.status] || 0) + 1;
   tabsEl.innerHTML = TABS.map(([key, label]) =>
     `<button class="strefa-btn ${tab === key ? 'strefa-btn--accent' : 'strefa-btn--ghost'}" data-tab="${key}">${label} (${counts[key] || 0})</button>`
-  ).join('');
+  ).join('') + `<span class="x-plat-switch">${PLATFORMS.map(([key, label]) =>
+    `<button class="strefa-btn ${platform === key ? 'strefa-btn--accent' : 'strefa-btn--ghost'}" data-plat="${key}">${label}</button>`
+  ).join('')}</span>`;
   if (tab === 'targets') {
-    listEl.innerHTML = targets.length
-      ? targets.map(targetRow).join('')
-      : `<div class="dgrid-empty"><p>Brak targetów. Skill <code>/x-growth-szron</code> dodaje tu konta z X pasujące do targetu Szronu.</p></div>`;
+    listEl.innerHTML = vTargets.length
+      ? vTargets.map(targetRow).join('')
+      : `<div class="dgrid-empty"><p>Brak targetów. Skill <code>/x-growth-szron</code> (lub <code>/x-growth-szron linkedin</code>) dodaje tu konta pasujące do targetu Szronu.</p></div>`;
   } else {
-    const items = posts.filter((p) => p.status === tab);
+    const items = vPosts.filter((p) => p.status === tab);
     listEl.innerHTML = items.length
       ? items.map(postCard).join('')
       : `<div class="dgrid-empty"><p>Brak wpisów. Uruchom <code>/x-growth-szron</code> w Claude Code, żeby wygenerować drafty.</p></div>`;
@@ -207,6 +252,8 @@ function render() {
 document.addEventListener('click', (e) => {
   const tabBtn = e.target.closest('[data-tab]');
   if (tabBtn) { tab = tabBtn.dataset.tab; render(); return; }
+  const platBtn = e.target.closest('[data-plat]');
+  if (platBtn) { platform = platBtn.dataset.plat; render(); return; }
   const actBtn = e.target.closest('[data-act]');
   if (actBtn) {
     const id = actBtn.closest('[data-id]')?.dataset.id;
@@ -220,6 +267,7 @@ document.addEventListener('click', (e) => {
     else if (act === 'edit') editPost(p);
     else if (act === 'copy') copyPost(p);
     else if (act === 'publish') publish(p);
+    else if (act === 'open-li') openLinkedIn(p);
     return;
   }
   const tactBtn = e.target.closest('[data-tact]');
