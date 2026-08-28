@@ -1,0 +1,23 @@
+---
+import Strefa from '../../layouts/Strefa.astro';
+---
+<Strefa title="Prompter" active="rezyserka">
+  <div id="pr-lista" hidden>
+    <div class="strefa-head">
+      <div>
+        <p class="strefa-eyebrow">Strefa zamknięta · Reżyserka</p>
+        <h1>Prompter</h1>
+        <p>Wybierz film i wariant. Dostaniesz scenariusz do czytania (co mówić / co na ekranie) i pełnoekranowy teleprompter z odliczaniem — do odpalenia na drugim laptopie.</p>
+      </div>
+    </div>
+    <div id="pr-filmy"></div>
+  </div>
+
+  <div id="pr-scenariusz" hidden></div>
+  <div id="pr-teleprompter" hidden></div>
+
+  <div class="strefa-toasts" id="toasts" aria-live="polite"></div>
+  <script>
+    import '../../lib/strefa-prompter.js';
+  </script>
+</Strefa>

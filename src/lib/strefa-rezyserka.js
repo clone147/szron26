@@ -562,6 +562,7 @@ function renderPasek() {
       <button data-akcja="wariant" data-w="short" aria-pressed="${ktory === 'short'}">Short</button>
     </div>
     <span class="rez-czas${zle ? ' rez-czas--zle' : ''}" id="rez-suma">${mmss(suma)} <span>/ ${mmss(w.targetSec)}</span></span>
+    <a class="strefa-btn strefa-btn--sm strefa-btn--ghost" href="/strefa/prompter#/film/${esc(current.id)}/${ktory}" target="_blank" rel="noopener" title="Scenariusz do czytania (co mówić / co na ekranie) + tryb telepromptera na drugi laptop">🎬 Prompter ↗</a>
     <button class="strefa-btn strefa-btn--sm strefa-btn--accent" data-akcja="do-diagramu" title="Wynik pracy: diagram scenopisu w /strefa/diagramy (aktualizuje istniejący)">${link ? '⇪ Odśwież diagram' : '⇪ Do diagramu'}</button>
     ${link ? `<a class="strefa-btn strefa-btn--sm strefa-btn--ghost" href="/strefa/diagramy?open=${esc(link.id)}" target="_blank" rel="noopener" title="Otwórz diagram scenopisu w nowej karcie — edycje tam wracają tu na żywo">Otwórz ↗</a>` : ''}`;
 }
