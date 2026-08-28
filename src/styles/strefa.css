@@ -1217,6 +1217,19 @@ textarea.rez-karta__tytul { font-family: var(--font-display); font-size: 1rem; f
 .rez-dodaj { align-self: center; }
 @media (max-width: 720px) { .rez-sk__wiersz, .rez-sk__stopka { padding-left: 0; } }
 
+/* ── Tryb „Aa" — edycja samego tekstu: karty scen pokazują tylko zdania ── */
+.rez--tekst .rez-sk__wiersz--obraz,
+.rez--tekst .rez-sk__wiersz--nak,
+.rez--tekst .rez-sk__tresc .rez-sk__rez,
+.rez--tekst .rez-sk__stopka button[data-akcja="add-obraz"],
+.rez--tekst .rez-sk__stopka button[data-akcja="add-nak"],
+.rez--tekst .rez-sk__glowa select,
+.rez--tekst .rez-sk__dur,
+.rez--tekst .rez-sk__sekcja,
+.rez--tekst .rez-sk__notka { display: none; }
+.rez--tekst .rez-sk__akcje { display: none; }
+.rez--tekst .rez-sk textarea[data-pole="bit-tekst"] { font-size: 1.05rem; line-height: 1.6; }
+
 /* ── Prompter: scenariusz (czarno na białym) ───────────────────── */
 #pr-scenariusz { background: #fff; color: #111; border-radius: var(--radius-card); padding: 1rem 1.25rem 2rem; }
 .pr-pasek { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; padding: .5rem 0 1rem; border-bottom: 2px solid #111; }

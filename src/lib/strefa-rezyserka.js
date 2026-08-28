@@ -22,6 +22,7 @@ let dirty = false, saveTimer = null, lintTimer = null;
 let pokazBrief = false, pokazUwagi = false;
 let pokazArchiwum = false; // biblioteka: czy sekcja zarchiwizowanych filmów jest rozwinięta
 let pendingDiagCheck = false; // realtime diagramu przyszedł w trakcie edycji — sprawdzimy po zapisie
+let trybTekst = localStorage.getItem('rez-tryb-tekst') === '1'; // „Aa": widok samych zdań, bez maszynerii
 
 const libEl = $('#rez-lib');
 const filmEl = $('#rez-film');
@@ -535,6 +536,7 @@ async function reloadCurrent() {
 /* ── render widoku filmu ── */
 function renderFilm() {
   if (!current) return;
+  filmEl.classList.toggle('rez--tekst', trybTekst);
   renderPasek();
   renderBrief();
   renderUwagi();
@@ -560,6 +562,9 @@ function renderPasek() {
     <div class="rez-przelacznik" role="tablist">
       <button data-akcja="wariant" data-w="long" aria-pressed="${ktory === 'long'}">Long</button>
       <button data-akcja="wariant" data-w="short" aria-pressed="${ktory === 'short'}">Short</button>
+    </div>
+    <div class="rez-przelacznik">
+      <button data-akcja="tryb-tekst" aria-pressed="${trybTekst}" title="Tryb tekstu — tylko to, co mówisz; reszta scenopisu schowana">Aa</button>
     </div>
     <span class="rez-czas${zle ? ' rez-czas--zle' : ''}" id="rez-suma">${mmss(suma)} <span>/ ${mmss(w.targetSec)}</span></span>
     <a class="strefa-btn strefa-btn--sm strefa-btn--ghost" href="/strefa/prompter#/film/${esc(current.id)}/${ktory}" target="_blank" rel="noopener" title="Scenariusz do czytania (co mówić / co na ekranie) + tryb telepromptera na drugi laptop">🎬 Prompter ↗</a>
@@ -826,6 +831,12 @@ filmEl.addEventListener('click', async (e) => {
       renderFilm();
       break;
     case 'do-diagramu': btn.disabled = true; await doDiagramu(); break;
+    case 'tryb-tekst':
+      trybTekst = !trybTekst;
+      localStorage.setItem('rez-tryb-tekst', trybTekst ? '1' : '0');
+      filmEl.classList.toggle('rez--tekst', trybTekst);
+      renderPasek();
+      break;
     case 'brief-toggle': pokazBrief = !pokazBrief; renderBrief(); break;
     case 'uwagi-toggle': pokazUwagi = !pokazUwagi; renderUwagi(); break;
     case 'kreg': current.film[ktory] = uzupelnijKregoslup(w, ktory); struktura(); break;
