@@ -32,8 +32,10 @@ function zbudujOs(w) {
       const ekran = s.obraz.filter((o) => (o.t ?? 0) < z && (o.t ?? 0) + (o.dur ?? 0) > a);
       const nak = (s.nakladki || []).filter((n) => (n.t ?? 0) >= a && (n.t ?? 0) < z);
       out.push({
+        nr: out.length + 1,
         tekst: b.tekst, rezyseria: b.rezyseria || '', dur, start: sStart + a,
         scena: s.tytul, sekcja: (s.sekcja || s.rodzaj || '').toUpperCase(),
+        scenaStart: sStart, scenaKoniec: sStart + dl,
         ekran, nakladki: nak, pierwszyWScenie: bi === 0,
       });
       t = z;
@@ -44,7 +46,7 @@ function zbudujOs(w) {
 
 const ekranHtml = (b) => {
   const o = b.ekran.map((o) => `<span class="pr-uj">[${esc(o.ujecie || 'ekran')}]</span> ${esc(o.opis || '')}`).join('<br>');
-  const n = b.nakladki.map((x) => `<span class="pr-uj pr-uj--nak">[nakładka]</span> ${esc(x.opis || x.tekst || '')}`).join('<br>');
+  const n = b.nakladki.map((x) => `<span class="pr-uj pr-uj--nak">[nakładka]</span> ${esc(x.tekst || x.opis || '')}`).join('<br>');
   return [o, n].filter(Boolean).join('<br>') || '<span class="pr-brak">— bez zmian —</span>';
 };
 
@@ -66,11 +68,11 @@ function renderScenariusz() {
     <div class="pr-arkusz">
       <div class="pr-naglowek"><span>czas</span><span>mówisz</span><span>na ekranie widza</span></div>`;
   for (const b of bity) {
-    if (b.pierwszyWScenie) html += `<div class="pr-scena"><span>${esc(b.sekcja)}</span> ${esc(b.scena)} <em>${mmss(b.start)}–${mmss(b.start + czasSceny(film.dane[ktory].sceny.find((s) => s.tytul === b.scena) || { bity: [], dur: 0 }, film.dane[ktory].wpm))}</em></div>`;
+    if (b.pierwszyWScenie) html += `<div class="pr-scena"><span>${esc(b.sekcja)}</span> ${esc(b.scena)} <em>${mmss(b.scenaStart)}–${mmss(b.scenaKoniec)}</em></div>`;
     html += `
       <div class="pr-bit">
-        <div class="pr-t">${mmss(b.start)}<small>${Math.round(b.dur)} s</small></div>
-        <div class="pr-mow">${esc(b.tekst)}${b.rezyseria ? `<div class="pr-rez">🎬 ${esc(b.rezyseria)}</div>` : ''}</div>
+        <div class="pr-t"><b>${b.nr}</b>${mmss(b.start)}<small>${Math.round(b.dur)} s</small></div>
+        <div class="pr-mow"><span class="pr-mow__label">mówisz</span>${esc(b.tekst)}${b.rezyseria ? `<div class="pr-rez">🎬 ${esc(b.rezyseria)}</div>` : ''}</div>
         <div class="pr-ekr">${ekranHtml(b)}</div>
       </div>`;
   }
@@ -210,9 +212,16 @@ function stopPrompterCicho() {
   document.body.classList.remove('pr-full');
   const tp = $('#pr-teleprompter'); if (tp) { tp.hidden = true; tp.innerHTML = ''; }
 }
-window.addEventListener('hashchange', route);
+function pokazBlad(err) {
+  const el = $('#pr-scenariusz') || document.body;
+  el.hidden = false;
+  el.innerHTML = `<div style="padding:2rem;color:#b91c1c;background:#fff;border-radius:12px"><b>Błąd promptera:</b><br><code>${esc(String(err?.stack || err))}</code></div>`;
+}
+window.addEventListener('error', (e) => pokazBlad(e.error || e.message));
+window.addEventListener('unhandledrejection', (e) => pokazBlad(e.reason));
+window.addEventListener('hashchange', () => route().catch(pokazBlad));
 
 (async () => {
   if (!(await getTeamUser())) return; // layout przekieruje na login
-  route();
-})();
+  await route();
+})().catch(pokazBlad);

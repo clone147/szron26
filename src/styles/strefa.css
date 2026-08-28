@@ -1242,6 +1242,7 @@ textarea.rez-karta__tytul { font-family: var(--font-display); font-size: 1rem; f
 
 /* ── Teleprompter (pełny ekran) ────────────────────────────────── */
 body.pr-full { overflow: hidden; }
+#pr-teleprompter[hidden] { display: none; }
 #pr-teleprompter { position: fixed; inset: 0; z-index: 1000; background: #0b0e14; color: #fff; display: flex; flex-direction: column; cursor: none; }
 #pr-teleprompter:hover { cursor: default; }
 .tp-top { display: flex; align-items: center; gap: 1.5rem; padding: 1rem 1.5rem; font-size: 1rem; color: #8b93a7; }
@@ -1262,3 +1263,10 @@ body.pr-full { overflow: hidden; }
 .tp-ekran { color: #9fc1ff; }
 .tp-rez { color: #ffb46e; }
 .tp-help { color: #566076; font-size: .8rem; }
+
+/* Prompter — czytelność: dominuje kolumna MÓWISZ */
+.pr-naglowek { position: sticky; top: 0; background: #fff; z-index: 2; border-bottom: 1px solid #ddd; }
+.pr-t b { font-size: .8rem; background: #111; color: #fff; border-radius: 999px; width: 1.6rem; height: 1.6rem; display: grid; place-items: center; margin-bottom: .25rem; }
+.pr-mow { position: relative; padding: .2rem 0 .2rem 1rem; border-left: 6px solid #ff7a59; font-size: 1.5rem; color: #000; }
+.pr-mow__label { display: block; font-size: .62rem; text-transform: uppercase; letter-spacing: .1em; color: #ff7a59; font-weight: 700; margin-bottom: .2rem; }
+.pr-ekr { opacity: .85; }
