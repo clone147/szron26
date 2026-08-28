@@ -20,6 +20,7 @@ let ktory = 'long';
 let uwagi = [];
 let dirty = false, saveTimer = null, lintTimer = null;
 let pokazBrief = false, pokazUwagi = false;
+let pokazArchiwum = false; // biblioteka: czy sekcja zarchiwizowanych filmów jest rozwinięta
 let pendingDiagCheck = false; // realtime diagramu przyszedł w trakcie edycji — sprawdzimy po zapisie
 
 const libEl = $('#rez-lib');
@@ -153,7 +154,7 @@ function bindDnD() {
   };
   grid.addEventListener('pointerdown', (e) => {
     const karta = e.target.closest('.rez-karta');
-    if (!karta || e.button !== 0 || e.target.closest('.rez-karta__del') || e.target.closest('[data-lib]')) return;
+    if (!karta || e.button !== 0 || e.target.closest('.rez-karta__del') || e.target.closest('[data-lib]') || e.target.closest('[data-arch]')) return;
     st = { karta, x0: e.clientX, y0: e.clientY, started: false, id: e.pointerId };
   });
   window.addEventListener('pointermove', (e) => {
@@ -230,20 +231,24 @@ function renderLib() {
   if (modalOtwarty() || dndActive) return; // nie wyrywaj listy spod okna ani spod przeciąganej karty
   const grid = $('#rez-grid');
   if (document.activeElement && grid.contains(document.activeElement)) return; // ktoś edytuje pole na karcie
-  const karty = filmy
+  const wszystkie = filmy
     .map((r) => ({ r, f: { id: r.id, tytul: r.title, ...normalizujFilm(r.data) } }))
     .sort((a, b) => (a.f.nr ?? 999) - (b.f.nr ?? 999) || (a.r.updated_at < b.r.updated_at ? 1 : -1));
+  const jestArch = ({ r }) => r.data?.archiwum === true;
+  const karty = wszystkie.filter((k) => !jestArch(k));
+  const archiwalne = wszystkie.filter(jestArch);
   // short-only = brak scen w longu przy rozpisanym shorcie (np. samodzielne shorty 101+)
   const jestShortOnly = ({ f }) => !f.long.sceny.length && f.short.sceny.length > 0;
   // Karta = <div> (nie <button>): w środku są edytowalne pola (tytuł/teza/hook/kotwica),
   // widoczne w całości i zapisywane inline — klik poza polami otwiera film.
   const karta = ({ r, f }) => {
     const shortOnly = jestShortOnly({ f });
+    const arch = jestArch({ r });
     const w = shortOnly ? f.short : f.long;
     const sec = czasWariantu(w);
     const b = f.brief || {};
     return `
-    <div class="rez-karta" data-id="${r.id}" data-sekcja="${shortOnly ? 'short' : 'long'}">
+    <div class="rez-karta${arch ? ' rez-karta--arch' : ''}" data-id="${r.id}" data-sekcja="${arch ? 'arch' : shortOnly ? 'short' : 'long'}">
       <span class="rez-karta__del" role="button" title="Usuń film" aria-label="Usuń film"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
       <div class="rez-karta__gora">
         ${f.nr !== undefined ? `<span class="rez-karta__nr">${String(f.nr).padStart(2, '0')}</span>` : ''}
@@ -259,6 +264,9 @@ function renderLib() {
           ? `short ${mmss(sec)} / ${mmss(f.short.targetSec)}`
           : `long ${mmss(sec)} / ${mmss(f.long.targetSec)}${f.short.sceny.length ? ` · short ${mmss(czasWariantu(f.short))}` : ''}`}
           · ${w.sceny.length} scen</span>
+        <label class="rez-karta__arch" data-arch title="${arch ? 'Odznacz, żeby przywrócić film do biblioteki' : 'Zaznacz, żeby przenieść film do archiwum'}">
+          <input type="checkbox" ${arch ? 'checked' : ''} /> archiwum
+        </label>
       </div>
     </div>`;
   };
@@ -267,14 +275,37 @@ function renderLib() {
   const sekcja = (tytul, sub, items) => items.length
     ? `<h2 class="rez-karty__h">${tytul} <span class="rez-karty__hn">${items.length}</span> <span class="rez-karty__hsub">${sub}</span></h2>` + items.map(karta).join('')
     : '';
-  grid.innerHTML = (sekcja('🎬 Longi', '8–10 min · 16:9', longi) + sekcja('⚡ Shorty', 'do 30 s · 9:16', shorty))
-    || '<p class="rez-pusto">Jeszcze nic nie jest w produkcji. Załóż pierwszy film albo zaimportuj scenopis z Diagramów.</p>';
+  grid.innerHTML = ((sekcja('🎬 Longi', '8–10 min · 16:9', longi) + sekcja('⚡ Shorty', 'do 30 s · 9:16', shorty))
+    || '<p class="rez-pusto">Jeszcze nic nie jest w produkcji. Załóż pierwszy film albo zaimportuj scenopis z Diagramów.</p>')
+    + (pokazArchiwum ? sekcja('🗄️ Archiwum', 'ukryte z biblioteki — odznacz „archiwum", żeby przywrócić', archiwalne) : '');
+
+  // przycisk archiwum w nagłówku: widoczny tylko, gdy coś w archiwum jest
+  const btnArch = $('#btn-archiwum');
+  if (btnArch) {
+    btnArch.hidden = !archiwalne.length;
+    btnArch.textContent = pokazArchiwum ? 'Ukryj archiwum' : `Archiwum (${archiwalne.length})`;
+    if (!archiwalne.length) pokazArchiwum = false;
+  }
 
   grid.querySelectorAll('.rez-auto').forEach(autosize);
   for (const karta of grid.querySelectorAll('.rez-karta')) {
     karta.addEventListener('click', (e) => {
-      if (dndSuppressClick || e.target.closest('[data-lib]')) return;
+      if (dndSuppressClick || e.target.closest('[data-lib]') || e.target.closest('[data-arch]')) return;
       location.hash = `/film/${encodeURIComponent(karta.dataset.id)}`;
+    });
+    karta.querySelector('[data-arch] input')?.addEventListener('change', async (e) => {
+      e.stopPropagation();
+      const r = filmy.find((x) => x.id === karta.dataset.id);
+      if (!r) return;
+      const doArch = e.target.checked;
+      r.data = { ...r.data, archiwum: doArch || undefined };
+      const stamp = new Date().toISOString();
+      const { error } = await sb.from('filmy').update({ data: r.data, updated_at: stamp }).eq('id', r.id);
+      if (error) { toast('Błąd', error.message, 'err'); e.target.checked = !doArch; return; }
+      r.updated_at = stamp;
+      toast(doArch ? 'Przeniesiony do archiwum' : 'Przywrócony z archiwum', r.title);
+      e.target.blur(); // renderLib nie przerysowuje listy, gdy fokus jest w gridzie
+      renderLib();
     });
     karta.querySelector('.rez-karta__del').addEventListener('click', async (e) => {
       e.stopPropagation();
@@ -846,6 +877,7 @@ filmEl.addEventListener('click', async (e) => {
   if (!(await getTeamUser())) return; // layout przekieruje na login
   $('#btn-nowy-film').addEventListener('click', zalozFilm);
   $('#btn-z-diagramu').addEventListener('click', filmZDiagramu);
+  $('#btn-archiwum')?.addEventListener('click', () => { pokazArchiwum = !pokazArchiwum; renderLib(); });
   bindDnD();
   bindLibEdit();
   route();

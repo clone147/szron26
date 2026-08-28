@@ -1076,6 +1076,10 @@ textarea.rez-karta__tytul { font-family: var(--font-display); font-size: 1rem; f
 .rez-karty__hn { color: var(--color-accent); font-variant-numeric: tabular-nums; font-size: var(--text-s); }
 .rez-karty__hsub { font-size: var(--text-caption); font-weight: 400; color: var(--color-text-inv-3); }
 .rez-karta__meta { display: flex; align-items: center; justify-content: space-between; gap: .5rem; color: var(--color-text-inv-3); font-size: var(--text-caption); font-variant-numeric: tabular-nums; }
+.rez-karta__arch { display: inline-flex; align-items: center; gap: .35rem; cursor: pointer; color: var(--color-text-inv-3); text-transform: uppercase; letter-spacing: var(--tracking-label); font-size: .7em; user-select: none; }
+.rez-karta__arch input { accent-color: var(--color-accent); cursor: pointer; margin: 0; }
+.rez-karta--arch { opacity: .55; filter: saturate(.6); }
+.rez-karta--arch:hover { opacity: .85; }
 .rez-mini { display: flex; gap: 1px; height: 6px; border-radius: 3px; overflow: hidden; background: color-mix(in oklch, var(--color-text-inv) 8%, transparent); }
 .rez-mini > i { display: block; height: 100%; }
 .rez-mini--pusty { background: repeating-linear-gradient(90deg, color-mix(in oklch, var(--color-text-inv) 9%, transparent) 0 6px, transparent 6px 12px); }
