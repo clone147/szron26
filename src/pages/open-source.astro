@@ -3,6 +3,7 @@ import Interior from '../layouts/Interior.astro';
 import SectHead from '../components/SectHead.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import CtaBand from '../components/CtaBand.astro';
+import ShotGallery from '../components/ShotGallery.astro';
 
 // Narzędzia open source SZRON — treść wg starej strony (OpenSource.tsx)
 const tools = [
@@ -17,6 +18,10 @@ const tools = [
     ],
     install: '/plugin marketplace add clone147/frostie\n/plugin install frostie@frostie',
     github: 'https://github.com/clone147/frostie',
+    shots: [
+      { src: '/img/opensource/frostie-studio-appstore.webp', alt: 'Studio frostie — mockup strony produktu App Store z panelem Design', caption: 'Studio: widok App Store' },
+      { src: '/img/opensource/frostie-studio-play.webp', alt: 'Studio frostie — mockup listy Google Play z feature graphic i panelem Design', caption: 'Studio: widok Google Play' },
+    ],
   },
   {
     name: 'szron-db2-mcp',
@@ -137,6 +142,7 @@ const grouped = categories
                 <ul class="features">
                   {t.features.map((f) => <li>{f}</li>)}
                 </ul>
+                {t.shots && <div class="tool-shots"><ShotGallery items={t.shots} cols={2} /></div>}
                 <div class="install">
                   <code>{t.install}</code>
                   <button type="button" class="install__btn" data-copy={t.install} aria-label={`Kopiuj komendę instalacji ${t.name}`}>Kopiuj</button>
@@ -170,6 +176,12 @@ const grouped = categories
     ghostExternal={true}
     padTop={false}
   />
+
+  <style>
+    /* miniatury w karcie narzędzia — ciaśniej niż domyślna galeria sekcji */
+    .tool-shots :global(.shot-grid) { margin-top: var(--space-md); gap: var(--space-sm); }
+    .tool-shots :global(.shot figcaption) { font-size: 0.75rem; }
+  </style>
 
   <script is:inline>
     document.querySelectorAll('.install__btn').forEach((btn) => {
