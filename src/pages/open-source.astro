@@ -7,6 +7,18 @@ import CtaBand from '../components/CtaBand.astro';
 // Narzędzia open source SZRON — treść wg starej strony (OpenSource.tsx)
 const tools = [
   {
+    name: 'frostie',
+    badges: [{ label: 'Claude Code Plugin' }, { label: 'NEW', kind: 'new' }],
+    desc: 'Assety do App Store i Google Play w jednym przebiegu. Plugin eksploruje appkę na symulatorze, nagrywa flow, renderuje oprawione screenshoty i wideo preview, a do tego warstwę Google Play: screenshoty 1080×1920 i obowiązkowy feature graphic 1024×500 — z jednego configu i jednego designu.',
+    features: [
+      'Studio live dla OBU sklepów naraz — zmiany renderują się w ~1 s',
+      'Google Play: feature graphic, checklista reguł, eksport ZIP',
+      'Kompatybilny z projektami goldie (config i design bez zmian)',
+    ],
+    install: '/plugin marketplace add clone147/frostie',
+    github: 'https://github.com/clone147/frostie',
+  },
+  {
     name: 'szron-db2-mcp',
     badges: [{ label: 'MCP Server' }, { label: 'NEW', kind: 'new' }],
     desc: 'Serwer MCP, który podłącza agenta AI do bazy IBM DB2. Pytasz o dane zwykłym językiem — agent sam ułoży zapytanie, zaktualizuje rekord, w razie potrzeby stworzy tabelę. Bez otwierania konsoli DB2.',
