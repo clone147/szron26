@@ -6,6 +6,13 @@ import SectHead from '../components/SectHead.astro';
 import Faq from '../components/Faq.astro';
 import BtnArrow from '../components/BtnArrow.astro';
 
+// Dekoracyjna „fala" w panelu hero — deterministyczne wysokości słupków (bez losowości między buildami)
+const waveBars = Array.from({ length: 48 }, (_, i) => {
+  const env = 0.5 + 0.5 * Math.sin(i / 3.1);          // wolna obwiednia
+  const jit = 0.55 + 0.45 * (((i * 7) % 5) / 4);      // „szum" o stałym wzorze
+  return Math.round(5 + 29 * env * jit);
+});
+
 // FAQ — numeracja 01…NN generowana w <Faq />; pole a = surowy HTML (set:html), stąd np. T&amp;M
 const faq = [
   { q: 'Co z bezpieczeństwem naszych danych?', a: 'Wasz kod nie idzie do publicznych modeli. Dla branż regulowanych — Bedrock w AWS, dane w Waszej VPC. Dla obronności i wrażliwego embedded — lokalne modele (Ollama, vLLM) na Waszych serwerach. Audit log każdej interakcji z AI. NDA podpisujemy przed pierwszą rozmową.' },
@@ -22,34 +29,45 @@ const faq = [
   <Nav />
 <!-- ── HERO ─────────────────────────────────────────── -->
 <section class="hero" aria-label="Wprowadzenie">
-  <div class="container">
-    <p class="eyebrow rv" data-scramble>Dla zarządów dużych firm</p>
-    <h1 class="hero__title ws" style="margin-top: var(--space-lg)">Wasz zespół IT. 2–4&nbsp;razy szybszy. W&nbsp;dwa kwartały.</h1>
-    <p class="hero__lead rv" style="--rv-d:.15s">Wdrażamy programowanie agentowe w zespołach IT dużych firm — szkolenie i wdrożenie na Waszym kodzie. Dowodem jest pilot: jeden moduł zmodernizowany do nowoczesnego stosu, z wynikiem zmierzonym na produkcji.</p>
-    <div class="hero__cta rv" style="--rv-d:.25s">
-      <BtnArrow href="#kontakt">Umów audyt 90 minut</BtnArrow>
-      <a class="btn btn--ghost" href="#metoda">Zobacz, jak pracujemy</a>
-    </div>
+  <div class="container hero__inner">
+    <p class="eyebrow hero__tag rv" data-scramble>Dla zarządów dużych firm // programowanie agentowe // efekt w dwa kwartały</p>
+    <h1 class="hero__title ws">Wasz zespół IT. 2&#8288;–&#8288;4&nbsp;razy szybszy. W&nbsp;dwa kwartały.</h1>
     <div class="hero__grid">
-      <div class="hero__panel rv">
+      <div class="hero__aside">
+        <p class="hero__lead rv" style="--rv-d:.15s">Wdrażamy programowanie agentowe w zespołach IT dużych firm — szkolenie i wdrożenie na Waszym kodzie. Dowodem jest pilot: jeden moduł zmodernizowany do nowoczesnego stosu, z wynikiem zmierzonym na produkcji.</p>
+        <div class="hero__cta rv" style="--rv-d:.25s">
+          <BtnArrow href="#kontakt">Umów audyt 90 minut</BtnArrow>
+          <a class="btn btn--ghost" href="#metoda">Zobacz, jak pracujemy</a>
+        </div>
+      </div>
+      <div class="hero__panel rv" style="--rv-d:.2s">
         <img src="/img/hero-panel.webp" alt="" loading="eager" fetchpriority="high" onload="this.parentElement.classList.add('has-img')" onerror="this.remove()">
+        <p class="hero__panel-led" aria-hidden="true">Pilot // moduł 01 // wynik z produkcji</p>
         <p class="hero__panel-num" aria-hidden="true">2–4<em>×</em></p>
         <p class="hero__panel-cap">szybsze dostarczanie po dwóch kwartałach — ci sami ludzie, ten sam kod, nowy sposób pracy</p>
-      </div>
-      <div class="hero__aside rv" style="--rv-d:.1s">
-        <p class="eyebrow">Pracujemy z firmami, których zespół IT liczy 30+ osób</p>
-        <div class="hero__proof">
-          <div><strong>40+ lat</strong> <span>łącznie (Tomek 25 · Maciej 18)</span></div>
-          <div><strong>3 lata</strong> <span>z LLM-ami w produkcji, od premiery Claude Code</span></div>
-          <div><strong>2 osoby</strong> <span>na każdym projekcie, bez wyjątku</span></div>
-          <div><strong>2 kwartały</strong> <span>do zmierzonego wyniku na produkcji</span></div>
-        </div>
+        <svg class="hero__wave" viewBox="0 0 320 36" preserveAspectRatio="none" aria-hidden="true">
+          {waveBars.map((h, i) => <rect x={i * 6.7} y={36 - h} width="3.4" height={h} rx="0.8" />)}
+          <line x1="0" y1="0" x2="0" y2="36" />
+        </svg>
       </div>
     </div>
   </div>
 </section>
 
 <div class="page-body">
+
+  <!-- ── PAS DOWODÓW ────────────────────────────────── -->
+  <section class="proof-band" aria-label="Wyróżniki">
+    <div class="container">
+      <p class="eyebrow rv" data-scramble>Pracujemy z firmami, których zespół IT liczy 30+ osób</p>
+      <div class="hero__proof rv" style="--rv-d:.1s">
+        <div><strong>40+ lat</strong> <span>łącznie (Tomek 25 · Maciej 18)</span></div>
+        <div><strong>3 lata</strong> <span>z LLM-ami w produkcji, od premiery Claude Code</span></div>
+        <div><strong>2 osoby</strong> <span>na każdym projekcie, bez wyjątku</span></div>
+        <div><strong>2 kwartały</strong> <span>do zmierzonego wyniku na produkcji</span></div>
+      </div>
+    </div>
+  </section>
 
   <!-- ── 01 PROBLEM ─────────────────────────────────── -->
   <section class="sect" id="problem" aria-labelledby="problem-title">

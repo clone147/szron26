@@ -7,6 +7,10 @@
 
 @import url("strefa-core.css");
 
+/* Strona publiczna mapuje --color-paper na ciemne tło; w strefie paper = JASNA powierzchnia
+   kontrastowa (hover przycisku accent, przycisk Google). Jasny motyw niżej nadpisuje ją z powrotem. */
+.strefa-body { --color-paper: oklch(97% 0.004 240); }
+
 /* ── motyw jasny strefy: remap tokenów pod data-theme="light" na <body> ──
    Cały interfejs strefy stoi na tokenach „ciemnych" (ink, text-inv, line-dark),
    a --color-paper pełni rolę powierzchni kontrastowej — dlatego jasny motyw

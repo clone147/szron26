@@ -1,55 +1,75 @@
-/* Hallmark · macrostructure: Marquee Hero · theme: studied-DNA (source: https://phenomenonstudio.com)
- * paper oklch(100% 0 0) · ink oklch(17% 0.01 240) · accent oklch(70.5% 0.187 45) (orange)
- * display: Space Grotesk (440/600) · body: Albert Sans · label: uppercase grotesque
- * nav: N1-slim (logo + center links + CTA) · footer: Ft3-index + giant wordmark
- * studied: yes · DNA-source: url · rhythm: verified via browser pass
- * Hallmark · pre-emit critique: P4 H5 E4 S4 R4 V4
+/* SZRON · design tokens v2 („Szron" — ciemny, lodowy)
+ * ground oklch(12% 0.012 250) · surface oklch(15.5%) · accent: lodowy cyjan oklch(82% 0.115 210)
+ * display: Space Grotesk (400) · body: Albert Sans · led: Doto (etykiety, liczby)
+ * nav: logo + pigułka linków + biały CTA · footer: LED-index + obrys wordmarka
+ *
+ * Semantyka tokenów (WAŻNE dla strefy, która importuje main.css):
+ *  - ink / ink-2 / ink-3, line-dark, text-inv-* — powierzchnie i tekst CIEMNEGO motywu (bez zmian nazw)
+ *  - paper / paper-2 / paper-3, line, text / text-2 — na stronie publicznej to TO SAMO co ink/line-dark/text-inv
+ *    (cała strona publiczna jest ciemna); strefa nadpisuje --color-paper na jasną powierzchnię kontrastową
+ *  - snow — jasna powierzchnia odwrócona (biały przycisk w nawigacji, hover CTA)
  */
 
 :root {
-  /* ── kolory ───────────────────────────────────────── */
-  --color-ink:          oklch(17% 0.01 240);        /* tło sekcji ciemnych */
-  --color-ink-2:        oklch(22.5% 0.012 240);     /* karty na ciemnym */
-  --color-ink-3:        oklch(27% 0.012 240);       /* hover kart na ciemnym */
-  --color-paper:        oklch(100% 0 0);            /* tło strony */
-  --color-paper-2:      oklch(97% 0.001 240);       /* szare karty */
-  --color-paper-3:      oklch(94.5% 0.002 240);     /* hover szarych kart */
-  --color-line:         oklch(90% 0.002 240);       /* hairline na jasnym */
-  --color-line-dark:    oklch(100% 0 0 / 0.16);     /* hairline na ciemnym */
-  --color-text:         oklch(17% 0.01 240);
-  --color-text-2:       oklch(45% 0.008 240);       /* secondary na jasnym */
-  --color-text-inv:     oklch(100% 0 0);
-  --color-text-inv-2:   oklch(100% 0 0 / 0.66);     /* secondary na ciemnym */
-  --color-text-inv-3:   oklch(100% 0 0 / 0.44);     /* muted na ciemnym */
-  --color-accent:       oklch(70.5% 0.187 45);      /* pomarańcz CTA */
-  --color-accent-soft:  oklch(70.5% 0.187 45 / 0.12);
-  --color-accent-glow:  oklch(70.5% 0.187 45 / 0.22); /* poświata panelu hero */
-  --color-focus:        oklch(70.5% 0.187 45);
-  --color-glass:        oklch(17% 0.01 240 / 0.85);  /* tło navu po scrollu */
-  --color-grid-line:    oklch(100% 0 0 / 0.05);      /* siatka panelu hero */
-  --color-scrim:        oklch(17% 0.01 240 / 0.82);  /* przyciemnienie pod tekstem na zdjęciu */
+  /* ── kolory: grunt i powierzchnie ──────────────────── */
+  --color-ink-0:        oklch(8.5% 0.012 255);         /* najgłębsze tło (kod, panele „ekranów") */
+  --color-ink:          oklch(11.5% 0.015 255);        /* tło strony (granatowa czerń) */
+  --color-ink-2:        oklch(15.5% 0.022 258);        /* karty */
+  --color-ink-3:        oklch(19.5% 0.026 258);        /* hover kart */
+  --color-brand-glow:   oklch(52% 0.23 268 / 0.38);    /* poświata elektrycznego błękitu (hero, bandy) */
+  --color-brand-soft:   oklch(52% 0.23 268 / 0.14);
+  --color-paper:        var(--color-ink);
+  --color-paper-2:      var(--color-ink-2);
+  --color-paper-3:      var(--color-ink-3);
+  --color-snow:         oklch(97% 0.004 240);          /* jasna powierzchnia odwrócona */
 
-  /* ── brand (logo [SZRON] — wartość hex z brand booka) ── */
-  --color-brand:        #3c56f4;  /* primary brand blue — brackety logo */
+  /* ── linie ─────────────────────────────────────────── */
+  --color-line-dark:    oklch(100% 0 0 / 0.09);
+  --color-line-strong:  oklch(100% 0 0 / 0.18);
+  --color-line:         var(--color-line-dark);
 
-  /* ── typografia ───────────────────────────────────── */
+  /* ── tekst ─────────────────────────────────────────── */
+  --color-text-inv:     oklch(96.5% 0.004 240);
+  --color-text-inv-2:   oklch(74% 0.012 240);
+  --color-text-inv-3:   oklch(56% 0.012 240);
+  --color-text:         var(--color-text-inv);
+  --color-text-2:       var(--color-text-inv-2);
+  --color-text-3:       var(--color-text-inv-3);
+
+  /* ── akcent: szron (lodowy cyjan) ──────────────────── */
+  --color-accent:       oklch(82% 0.115 210);
+  --color-accent-2:     oklch(68% 0.135 222);          /* głębszy — gradienty, aktywne stany */
+  --color-accent-soft:  oklch(82% 0.115 210 / 0.12);
+  --color-accent-glow:  oklch(78% 0.13 214 / 0.26);    /* poświata paneli */
+  --color-focus:        var(--color-accent);
+  --color-glass:        oklch(12% 0.012 250 / 0.72);   /* tło navu po scrollu */
+  --color-grid-line:    oklch(100% 0 0 / 0.045);       /* siatka paneli */
+  --color-scrim:        oklch(12% 0.012 250 / 0.84);   /* przyciemnienie pod tekstem na zdjęciu */
+
+  /* ── brand (logo [SZRON] — hex z brand booka) ────────── */
+  --color-brand:        #3c56f4;
+
+  /* ── typografia ────────────────────────────────────── */
   --font-display: "Space Grotesk", "Albert Sans", system-ui, sans-serif;
   --font-body:    "Albert Sans", system-ui, sans-serif;
+  --font-led:     "Doto", "Space Grotesk", ui-monospace, monospace;
+  --font-mono:    ui-monospace, "SF Mono", Menlo, monospace;
 
-  --text-display:   clamp(2.375rem, 5.4vw, 4.875rem);  /* hero h1 */
-  --text-h2:        clamp(1.875rem, 4.2vw, 3.75rem);   /* nagłówki sekcji */
-  --text-h2-s:      clamp(1.625rem, 3.2vw, 2.875rem);  /* dłuższe nagłówki */
-  --text-h3:        clamp(1.375rem, 2.2vw, 2rem);      /* tytuły kart dużych */
-  --text-h4:        clamp(1.1875rem, 1.66vw, 1.5rem);  /* tytuły kart małych */
-  --text-lead:      clamp(1.25rem, 2.2vw, 2rem);       /* lead hero */
-  --text-l:         clamp(1.0625rem, 1.6vw, 1.4375rem);
-  --text-body:      clamp(1rem, 1.25vw, 1.125rem);
-  --text-s:         clamp(0.9375rem, 1.1vw, 1rem);
-  --text-caption:   clamp(0.8125rem, 0.97vw, 0.875rem);
-  --text-stat:      clamp(2rem, 3.3vw, 3rem);
-  --text-mark:      clamp(4.5rem, 16vw, 15rem);        /* wordmark w footerze */
+  --text-display:   clamp(2.625rem, 6vw, 5.375rem);   /* hero h1 */
+  --text-h2:        clamp(2rem, 4.4vw, 3.875rem);     /* nagłówki sekcji */
+  --text-h2-s:      clamp(1.75rem, 3.3vw, 3rem);      /* dłuższe nagłówki */
+  --text-h3:        clamp(1.375rem, 2.1vw, 1.875rem); /* tytuły kart dużych */
+  --text-h4:        clamp(1.125rem, 1.5vw, 1.375rem); /* tytuły kart małych */
+  --text-lead:      clamp(1.125rem, 1.7vw, 1.5rem);   /* lead hero */
+  --text-l:         clamp(1.0625rem, 1.4vw, 1.25rem);
+  --text-body:      clamp(1rem, 1.15vw, 1.0625rem);
+  --text-s:         clamp(0.9375rem, 1.05vw, 1rem);
+  --text-caption:   clamp(0.8125rem, 0.95vw, 0.875rem);
+  --text-led:       clamp(0.6875rem, 0.82vw, 0.75rem);
+  --text-stat:      clamp(2.25rem, 3.6vw, 3.5rem);
+  --text-mark:      clamp(4.5rem, 17vw, 16rem);       /* wordmark w footerze */
 
-  /* ── odstępy (skala 4 pt) ─────────────────────────── */
+  /* ── odstępy (skala 4 pt) ──────────────────────────── */
   --space-2xs: 0.25rem;
   --space-xs:  0.5rem;
   --space-sm:  0.75rem;
@@ -59,23 +79,27 @@
   --space-2xl: 3rem;
   --space-3xl: 4rem;
   --space-4xl: clamp(2rem, 4.5vw, 4rem);      /* wewnętrzne bloki sekcji */
-  --space-sect: clamp(3.5rem, 8vw, 7.5rem);   /* padding pionowy sekcji */
+  --space-sect: clamp(4rem, 8.5vw, 8rem);     /* padding pionowy sekcji */
 
-  /* ── promienie ────────────────────────────────────── */
-  --radius-sect: clamp(2rem, 5.5vw, 5rem);    /* zaokrąglenie sekcji ciemnych */
-  --radius-card: 1rem;
+  /* ── promienie ─────────────────────────────────────── */
+  --radius-sect: clamp(1.5rem, 3vw, 2.5rem);  /* górne rogi „kartki" pod hero */
+  --radius-card: 1.125rem;
   --radius-sm:   0.75rem;
-  --radius-btn:  0.5rem;
+  --radius-btn:  0.625rem;
 
-  /* ── motion ───────────────────────────────────────── */
+  /* ── cienie / poświaty ─────────────────────────────── */
+  --shadow-card: 0 1px 0 oklch(100% 0 0 / 0.04) inset, 0 20px 50px -30px oklch(0% 0 0 / 0.8);
+  --shadow-pop:  0 30px 70px -20px oklch(0% 0 0 / 0.75), 0 0 0 1px oklch(100% 0 0 / 0.06);
+
+  /* ── motion ────────────────────────────────────────── */
   --ease-out:    cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-in:     cubic-bezier(0.55, 0.06, 0.68, 0.19);
   --ease-in-out: cubic-bezier(0.65, 0.05, 0.36, 1);
   --dur-1: 0.3s;   /* hovery */
-  --dur-2: 0.7s;   /* reveals */
+  --dur-2: 0.8s;   /* reveals */
 
-  /* ── layout ───────────────────────────────────────── */
-  --container-pad: clamp(1rem, 2.2vw, 2rem);
-  --container-max: 100rem;
+  /* ── layout ────────────────────────────────────────── */
+  --container-pad: clamp(1rem, 2.6vw, 2.5rem);
+  --container-max: 96rem;
   --nav-h: 4.5rem;
 }
