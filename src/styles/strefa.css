@@ -51,15 +51,26 @@
   padding: .3rem .55rem; border-radius: 999px; line-height: 1;
 }
 .strefa-top__nav a.strefa-top__tag:hover { background: var(--color-accent-soft); color: var(--color-accent); }
-.strefa-top__nav { display: flex; gap: var(--space-xs); margin-left: var(--space-md); }
+/* 10 pozycji: nigdy nie łamią się na dwie linie — gdy brakuje miejsca, pasek przewija się poziomo
+   (bez widocznego scrollbara), a blok użytkownika zostaje w całości widoczny */
+.strefa-top__nav {
+  display: flex; align-items: center; gap: var(--space-xs); margin-left: var(--space-md);
+  flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.strefa-top__nav::-webkit-scrollbar { display: none; }
 .strefa-top__nav a {
-  color: var(--color-text-inv-2); text-decoration: none; font-weight: 500;
+  color: var(--color-text-inv-2); text-decoration: none; font-weight: 500; white-space: nowrap; flex: none;
   padding: .4rem .7rem; border-radius: var(--radius-btn); font-size: var(--text-s);
   transition: color var(--dur-1), background var(--dur-1);
 }
+@media (max-width: 90rem) {
+  .strefa-top__inner { gap: var(--space-md); }
+  .strefa-top__nav a { padding: .35rem .55rem; font-size: .875rem; }
+  .strefa-top__email { max-width: 11rem; }
+}
 .strefa-top__nav a:hover { color: var(--color-text-inv); background: var(--color-ink-3); }
 .strefa-top__nav a.is-active { color: var(--color-ink); background: var(--color-accent); }
-.strefa-top__user { margin-left: auto; display: flex; align-items: center; gap: var(--space-sm); }
+.strefa-top__user { margin-left: auto; display: flex; align-items: center; gap: var(--space-sm); flex: none; }
 .strefa-top__email { color: var(--color-text-inv-2); font-size: var(--text-caption); max-width: 16rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ── główny obszar ── */
