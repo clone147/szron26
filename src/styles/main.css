@@ -186,6 +186,12 @@ h1, h2, h3, h4 {
 .logo { display: inline-flex; align-items: center; }
 .logo img { display: block; height: 26px; width: auto; }
 .logo--footer img { height: 30px; }
+/* logo pochodne [NAZWA] (produkty, panele) — nawiasy RYSOWANE do wysokości kapitalików;
+   znaki „[" „]" w Space Grotesk są wyższe od wersalików i wyglądają na obsunięte */
+.logo-text { font-family: var(--font-display); font-weight: 600; line-height: 1; letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; }
+.logo-text::before, .logo-text::after { content: ""; display: inline-block; vertical-align: baseline; box-sizing: border-box; width: .36em; height: .72em; border: .13em solid var(--color-brand); }
+.logo-text::before { border-right: 0; margin-right: .2em; }
+.logo-text::after { border-left: 0; margin-left: .2em; }
 
 .nav__links {
   display: flex;
