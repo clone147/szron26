@@ -1026,6 +1026,43 @@ function onPaste(e) {
   }
 }
 
+/* ── pilot (drugie urządzenie) — Supabase Realtime Broadcast, kanał per szkolenie ── */
+// Prezentacja słucha komend `cmd` (next/prev/go/exit/hello) z /strefa/pilot?t=<id>
+// i po każdej zmianie rozgłasza `state` {idx, step, total}. Bez DB — czysty broadcast.
+let pilotCh = null;
+export const pilotChannelName = (tid) => `slajdy-pilot-${tid}`;
+async function pilotConnect() {
+  if (pilotCh) return;
+  try { const { data } = await sb.auth.getSession(); if (data?.session) sb.realtime.setAuth(data.session.access_token); } catch (_) { /* ignore */ }
+  pilotCh = sb.channel(pilotChannelName(trainingId), { config: { broadcast: { self: false } } });
+  pilotCh.on('broadcast', { event: 'cmd' }, ({ payload }) => {
+    if ($('#stage').hidden) return;
+    const c = payload?.cmd;
+    if (c === 'next') nextStep();
+    else if (c === 'prev') prevStep();
+    else if (c === 'go' && Number.isInteger(payload.idx)) { presentIdx = Math.max(0, Math.min(slides.length - 1, payload.idx)); buildStep = 0; renderStage(true); }
+    else if (c === 'exit') exitPresent();
+    else if (c === 'hello') pilotState();
+  });
+  pilotCh.subscribe((status) => { if (status === 'SUBSCRIBED') pilotState(); });
+}
+function pilotState() {
+  if (!pilotCh || $('#stage').hidden) return;
+  pilotCh.send({ type: 'broadcast', event: 'state', payload: { idx: presentIdx, step: buildStep, total: slides.length, id: slides[presentIdx]?.id || null } }).catch(() => {});
+}
+function pilotDisconnect() {
+  if (!pilotCh) return;
+  try { pilotCh.send({ type: 'broadcast', event: 'state', payload: { idx: -1, step: 0, total: slides.length, id: null } }).catch(() => {}); } catch (_) {}
+  const ch = pilotCh; pilotCh = null;
+  setTimeout(() => sb.removeChannel(ch), 300);
+}
+function pilotUrl() { return `${location.origin}/strefa/pilot?t=${encodeURIComponent(trainingId)}`; }
+async function sharePilot() {
+  const url = pilotUrl();
+  try { await navigator.clipboard.writeText(url); toast('Pilot', 'Link skopiowany — otwórz go na drugim laptopie', 'ok'); }
+  catch (_) { toast('Pilot', url, 'ok'); }
+}
+
 /* ── tryb prezentacji (Fullscreen API) ── */
 let presentIdx = 0, buildStep = 0;
 let presenterWin = null, presenterTimer = null, presentStart = 0;
@@ -1041,6 +1078,7 @@ function startPresent() {
   const req = stage.requestFullscreen || stage.webkitRequestFullscreen;
   if (req) req.call(stage).catch(() => {});
   document.addEventListener('keydown', onPresentKey);
+  pilotConnect();
 }
 function animObjects(content) { return (content.objects || []).filter((o) => o.anim && o.anim !== 'none').sort((a, b) => (a.z || 0) - (b.z || 0)); }
 function applyBuilds(host, content, step) {
@@ -1062,6 +1100,7 @@ function renderStage(animate) {
     <button class="stage-nav stage-next" aria-label="Następny">▶</button>
     <button class="stage-exit" aria-label="Zamknij prezentację">✕</button>
     <button class="stage-presenter" aria-label="Widok prezentera (P)" title="Widok prezentera (P)">▣</button>
+    <button class="stage-presenter stage-pilot" aria-label="Pilot — skopiuj link" title="Pilot na drugie urządzenie — skopiuj link">📱</button>
     <div class="stage-progress">${dots}<span class="stage-count-txt">${presentIdx + 1} / ${total}</span></div>`;
   const host = $('#stage-vp');
   mountSlide(host, s.content, { deckBg: deckBgCss(), observe: false });   // mountSlide sam woła applyScale
@@ -1071,8 +1110,10 @@ function renderStage(animate) {
   stage.querySelector('.stage-next').addEventListener('click', nextStep);
   stage.querySelector('.stage-exit').addEventListener('click', exitPresent);
   stage.querySelector('.stage-presenter').addEventListener('click', openPresenter);
+  stage.querySelector('.stage-pilot').addEventListener('click', sharePilot);
   stage.querySelectorAll('[data-go]').forEach((d) => d.addEventListener('click', () => { presentIdx = +d.dataset.go; buildStep = 0; renderStage(true); }));
   renderPresenter();
+  pilotState();
 }
 function nextStep() {
   const cnt = animObjects(slides[presentIdx].content).length;
@@ -1096,6 +1137,7 @@ function stepBuilds(forward) {
     }
   });
   const prev = $('.stage-prev'); if (prev) prev.disabled = (presentIdx === 0 && buildStep === 0);
+  pilotState();
 }
 function goPresent(d) {
   const ni = Math.max(0, Math.min(slides.length - 1, presentIdx + d));
@@ -1178,6 +1220,7 @@ function closeStage() {
   if (presenterTimer) { clearInterval(presenterTimer); presenterTimer = null; }
   if (presenterWin && !presenterWin.closed) presenterWin.close();
   presenterWin = null;
+  pilotDisconnect();
 }
 // Wyjście z fullscreen zamyka prezentację — CHYBA że to przez otwarcie okna prezentera
 // (window.open odbiera fullscreen); wtedy zostajemy w trybie overlay z aktywnym presenterem.
@@ -1228,6 +1271,7 @@ async function init() {
   window.addEventListener('resize', rescaleAll);
   window.addEventListener('beforeunload', () => { try { flushCurrent(); } catch (_) {} });
   $('#btn-present').addEventListener('click', startPresent);
+  const bp = $('#btn-pilot'); if (bp) bp.href = pilotUrl();
   $('#btn-add-slide').addEventListener('click', addSlide);
   $('#btn-undo')?.addEventListener('click', doUndo);
   $('#btn-redo')?.addEventListener('click', doRedo);

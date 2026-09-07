@@ -1,0 +1,33 @@
+---
+import Strefa from '../../layouts/Strefa.astro';
+---
+<Strefa title="Pilot prezentacji" active="szkolenia">
+  <div class="pilot" id="pilot">
+    <header class="pilot__top">
+      <div class="pilot__meta">
+        <p class="strefa-eyebrow">Pilot prezentacji</p>
+        <h1 class="pilot__title" id="pilot-title">…</h1>
+      </div>
+      <div class="pilot__status" id="pilot-status" aria-live="polite"><span class="pilot__dot"></span><span id="pilot-status-txt">Łączę…</span></div>
+      <a class="strefa-btn strefa-btn--ghost strefa-btn--sm" id="pilot-back" href="/strefa/szkolenia">✕</a>
+    </header>
+
+    <section class="pilot__now" id="pilot-now">
+      <div class="pilot__count" id="pilot-count">— / —</div>
+      <div class="pilot__text" id="pilot-text">Uruchom prezentację na iPadzie (▶ Prezentacja) — pilot podłączy się sam.</div>
+      <div class="pilot__notes" id="pilot-notes" hidden></div>
+      <div class="pilot__next" id="pilot-next" hidden></div>
+    </section>
+
+    <div class="pilot__nav">
+      <button class="pilot__btn pilot__btn--prev" id="pilot-prev" type="button" aria-label="Poprzedni"><span>◀</span><small>Wstecz</small></button>
+      <button class="pilot__btn pilot__btn--next" id="pilot-next-btn" type="button" aria-label="Następny"><span>▶</span><small>Dalej</small></button>
+    </div>
+
+    <div class="pilot__strip" id="pilot-strip" aria-label="Skocz do slajdu"></div>
+  </div>
+  <div class="strefa-toasts" id="toasts" aria-live="polite"></div>
+  <script>
+    import '../../lib/strefa-pilot.js';
+  </script>
+</Strefa>
