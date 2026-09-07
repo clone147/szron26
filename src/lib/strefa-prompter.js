@@ -2,7 +2,7 @@
 // Widok scenariusza: czarno na białym, per bit: timecode | CO MÓWISZ | CO NA EKRANIE.
 // Teleprompter: pełny ekran na drugi laptop — bieżący bit ogromną czcionką,
 // odliczanie czasu bitu (z wpm albo dur ręcznego), auto-przejścia, sterowanie dotykiem i klawiszami.
-import { getClient, getTeamUser } from './supabase.js';
+import { getClient, getTeamUser, startRealtime } from './supabase.js';
 import { $, esc, toast } from './strefa-ui.js';
 import { czasBitu, czasSceny, startyScen, czasWariantu, mmss, normalizujFilm } from './rezyserka-model.js';
 
@@ -12,6 +12,7 @@ let film = null;      // { id, tytul, dane (znormalizowane) }
 let ktory = 'long';
 let bity = [];        // płaska oś czasu: [{tekst, rezyseria, dur, start, scena, sekcja, ekran, nakladki, pierwszyWScenie}]
 let total = 0;
+let routeVersion = 0, refreshVersion = 0, refreshPending = false;
 
 /* ── budowa płaskiej osi czasu ── */
 // Ekran dla bitu = obrazy sceny aktywne w oknie bitu (t względem sceny) + nakładki wchodzące w tym oknie.
@@ -32,7 +33,7 @@ function zbudujOs(w) {
       const ekran = s.obraz.filter((o) => (o.t ?? 0) < z && (o.t ?? 0) + (o.dur ?? 0) > a);
       const nak = (s.nakladki || []).filter((n) => (n.t ?? 0) >= a && (n.t ?? 0) < z);
       out.push({
-        nr: out.length + 1,
+        id: b.id, scenaId: s.id, nr: out.length + 1,
         tekst: b.tekst, rezyseria: b.rezyseria || '', dur, start: sStart + a,
         scena: s.tytul, sekcja: (s.sekcja || s.rodzaj || '').toUpperCase(),
         scenaStart: sStart, scenaKoniec: sStart + dl,
@@ -96,11 +97,12 @@ function startPrompter() {
   const tp = $('#pr-teleprompter');
   tp.hidden = false;
   document.body.classList.add('pr-full');
+  window.getSelection?.()?.removeAllRanges();
   // Przyciski pozostają w DOM podczas odliczania — dotyk i fokus nie giną na ticku.
   tp.innerHTML = `
     <header class="tp-top">
       <div class="tp-heading"><span class="tp-label">Teleprompter</span><span class="tp-sekcja"></span></div>
-      <span class="tp-zegar"><span id="tp-elapsed"></span> <em>/ ${mmss(total)}</em></span>
+      <span class="tp-zegar"><span id="tp-elapsed"></span> <em id="tp-total">/ ${mmss(total)}</em></span>
       <button type="button" class="tp-btn tp-exit" data-tp="exit">Wyjdź <span aria-hidden="true">×</span></button>
     </header>
     <div class="tp-pasek"><i></i></div>
@@ -180,7 +182,7 @@ function tpAction(action) {
   renderTp();
 }
 
-function renderTp() {
+function renderTp(preserveScroll = false) {
   const tp = $('#pr-teleprompter');
   const b = bity[idx];
   const nast = bity[idx + 1];
@@ -196,10 +198,11 @@ function renderTp() {
     tp.querySelector('.tp-nast').textContent = nast ? `Następnie: ${nast.tekst}` : 'Ostatni fragment — trzymaj kadr';
     tp.querySelector('.tp-ekran').innerHTML = ekranHtml(b);
     tp.querySelector('.tp-rez').textContent = b.rezyseria;
-    tp.querySelector('.tp-main').scrollTop = 0;
+    if (!preserveScroll) tp.querySelector('.tp-main').scrollTop = 0;
     renderedIdx = idx;
   }
   $('#tp-elapsed').textContent = mmss(elapsedTotal);
+  $('#tp-total').textContent = `/ ${mmss(total)}`;
   $('#tp-position').textContent = `Fragment ${idx + 1} z ${bity.length}`;
   tp.querySelector('.tp-bitclock').textContent = left;
   tp.querySelector('.tp-bitclock').classList.toggle('tp-bitclock--malo', left <= 3 && running);
@@ -230,6 +233,10 @@ function klawisz(e) {
   else if (e.key === 'f' || e.key === 'F') $('#pr-teleprompter').requestFullscreen?.().catch(() => {});
 }
 window.addEventListener('keydown', klawisz);
+// CSS obsługuje Safari/iPad; zdarzenia blokują też zaznaczanie i menu w innych przeglądarkach.
+for (const event of ['selectstart', 'contextmenu']) {
+  $('#pr-teleprompter').addEventListener(event, (e) => e.preventDefault());
+}
 $('#pr-teleprompter').addEventListener('click', (e) => {
   const button = e.target.closest('[data-tp]');
   if (button) { tpAction(button.dataset.tp); return; }
@@ -252,22 +259,75 @@ async function renderLista() {
     </div>`).join('') || '<p>Brak aktywnych filmów.</p>';
 }
 
+/* ── zmiany z Reżyserki, także podczas pełnoekranowego czytania ── */
+function aktualizujFilm(row) {
+  const dane = normalizujFilm(row.data);
+  if (film?.id === row.id && film.tytul === row.title && JSON.stringify(film.dane) === JSON.stringify(dane)) return;
+  const tpOpen = !$('#pr-teleprompter').hidden;
+  const previous = bity;
+  const currentBit = previous[idx];
+  const wasDone = tpOpen && currentBit && skonczone();
+  film = { id: row.id, tytul: row.title, dane };
+  bity = zbudujOs(dane[ktory]);
+  total = czasWariantu(dane[ktory]);
+  if (tpOpen && bity.length) {
+    const findBit = (bit) => bit ? bity.findIndex(b => b.id === bit.id && b.scenaId === bit.scenaId) : -1;
+    let nextIdx = findBit(currentBit);
+    const sameBit = nextIdx !== -1;
+    if (!sameBit) {
+      // Usunięty fragment: najpierw następny ocalały, potem poprzedni.
+      const nearby = [...previous.slice(idx + 1), ...previous.slice(0, idx).reverse()];
+      nextIdx = nearby.map(findBit).find(i => i !== -1) ?? Math.min(idx, bity.length - 1);
+      clearInterval(timer); timer = null; running = false; countdown = 0; elapsedBit = 0;
+    }
+    idx = nextIdx;
+    elapsedBit = wasDone && sameBit && idx === bity.length - 1 ? bity[idx].dur : Math.min(elapsedBit, bity[idx].dur);
+    renderedIdx = -1; // Odśwież również tekst bieżącego i następnego fragmentu, nawet przy tym samym indeksie.
+    renderTp(sameBit);
+  } else if (tpOpen) {
+    stopPrompter();
+    toast('Scenariusz jest pusty', 'W Reżyserce usunięto wszystkie sceny tego wariantu.');
+  }
+  // Arkusz za pełnym ekranem też musi zawierać najnowszą wersję po wyjściu.
+  renderScenariusz();
+}
+
+async function refreshFilm() {
+  if (document.hidden) return;
+  if (!film) { refreshPending = true; return; }
+  const id = film.id;
+  const routeAtStart = routeVersion;
+  const request = ++refreshVersion;
+  try {
+    const { data, error } = await sb.from('filmy').select('id, title, data').eq('id', id).maybeSingle();
+    if (routeAtStart !== routeVersion || request !== refreshVersion || film?.id !== id) return;
+    if (error) return; // Utrata sieci nie przerywa nagrania; ponów po odzyskaniu połączenia.
+    if (!data) {
+      stopPrompter(); film = null;
+      location.hash = '/';
+      toast('Film został usunięty', 'Wybierz inny scenariusz.');
+      return;
+    }
+    aktualizujFilm(data);
+  } catch { /* Przejściowy błąd sieci — zachowaj ostatni odczytany tekst. */ }
+}
+
 /* ── routing ── */
 async function route() {
+  const version = ++routeVersion;
   stopPrompterCicho();
   const m = location.hash.match(/^#\/film\/([^/]+)\/(long|short)$/);
   $('#pr-lista').hidden = !!m;
   $('#pr-scenariusz').hidden = !m;
+  film = null;
   if (!m) { renderLista(); return; }
   ktory = m[2];
-  if (!film || film.id !== m[1]) {
-    const { data, error } = await sb.from('filmy').select('id, title, data').eq('id', m[1]).single();
-    if (error) { toast('Błąd', error.message, 'err'); return; }
-    film = { id: data.id, tytul: data.title, dane: normalizujFilm(data.data) };
-  }
-  bity = zbudujOs(film.dane[ktory]);
-  total = czasWariantu(film.dane[ktory]);
-  renderScenariusz();
+  // Nie korzystaj z kopii poprzednio otwartego filmu — mogła się zmienić na drugim urządzeniu.
+  const { data, error } = await sb.from('filmy').select('id, title, data').eq('id', m[1]).single();
+  if (version !== routeVersion) return;
+  if (error) { toast('Błąd', error.message, 'err'); return; }
+  aktualizujFilm(data);
+  if (refreshPending) { refreshPending = false; await refreshFilm(); }
 }
 function stopPrompterCicho() {
   clearInterval(timer); timer = null; running = false; countdown = 0; idx = 0; elapsedBit = 0;
@@ -285,5 +345,9 @@ window.addEventListener('hashchange', () => route().catch(pokazBlad));
 
 (async () => {
   if (!(await getTeamUser())) return; // layout przekieruje na login
+  // Nasłuch uruchamiamy przed pierwszym odczytem, żeby nie zgubić zapisu w trakcie otwierania.
+  await startRealtime(sb, 'strefa-prompter', ['filmy'], refreshFilm);
+  window.addEventListener('online', refreshFilm);
+  window.addEventListener('focus', refreshFilm);
   await route();
 })().catch(pokazBlad);
