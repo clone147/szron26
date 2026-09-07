@@ -21,6 +21,7 @@ let uwagi = [];
 let dirty = false, saveTimer = null, lintTimer = null;
 let pokazBrief = false, pokazUwagi = false;
 let pokazArchiwum = false; // biblioteka: czy sekcja zarchiwizowanych filmów jest rozwinięta
+let pendingReload = false;    // realtime filmu przyszedł w trakcie edycji pola — przeładujemy po blur
 let pendingDiagCheck = false; // realtime diagramu przyszedł w trakcie edycji — sprawdzimy po zapisie
 let trybTekst = localStorage.getItem('rez-tryb-tekst') === '1'; // „Aa": widok samych zdań, bez maszynerii
 
@@ -41,6 +42,10 @@ const scenaZ = (id) => current.film[ktory].sceny.find((s) => s.id === id);
 const autosize = (el) => { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; };
 const setZapis = (t) => { const el = $('#rez-zapis'); if (el) el.textContent = t; };
 const modalOtwarty = () => !!$('#modal-root')?.children.length;
+// Stemple czasu porównuj po wartości, nie tekstowo: JS daje „…Z", PostgREST zwraca „…+00:00".
+const tenSamStamp = (a, b) => !!a && !!b && new Date(a).getTime() === new Date(b).getTime();
+// Fokus w polu edycji otwartego filmu — nie wolno przerysowywać (input/textarea/contenteditable).
+const edytujeFilm = () => { const a = document.activeElement; return !!(a && filmEl.contains(a) && (a.matches('input, textarea, select') || a.isContentEditable)); };
 const nrTytul = (f) => `${f.nr !== undefined ? String(f.nr).padStart(2, '0') + '. ' : ''}${f.tytul}`;
 
 /* ── zapis ── */
@@ -486,7 +491,7 @@ async function checkLinkedDiagrams() {
     const { data: row, error } = await sb.from('diagrams').select('id, updated_at, data').eq('id', link.id).maybeSingle();
     if (error) continue;
     if (!row) { delete dg[w]; metaZmiana = true; continue; } // diagram usunięty → zerwij powiązanie
-    if (row.updated_at === link.stamp) continue;             // nic nowego od ostatniego synca
+    if (tenSamStamp(row.updated_at, link.stamp)) continue;   // nic nowego od ostatniego synca
     if (dirty) { pendingDiagCheck = true; return; }          // user zaczął pisać w trakcie fetch
     const nowe = shapesDoScen(Array.isArray(row.data?.shapes) ? row.data.shapes : [], current.film, w);
     if (projekcjaScen(nowe) !== projekcjaScen(current.film[w].sceny)) {
@@ -497,6 +502,7 @@ async function checkLinkedDiagrams() {
     link.stamp = row.updated_at;
     metaZmiana = true;
   }
+  if (zmienione && edytujeFilm()) { pendingReload = true; return; } // poczekaj z przerysowaniem na blur
   if (zmienione) { lintuj(); renderFilm(); }
   if (zmienione || metaZmiana) { dirty = true; await saveNow(); }
 }
@@ -527,7 +533,8 @@ async function reloadCurrent() {
   const { data: row } = await sb.from('filmy').select('*').eq('id', current.id).maybeSingle();
   if (!current || dirty) return;
   if (!row) { toast('Film usunięty', 'Ktoś skasował ten projekt.', 'err'); location.hash = ''; return; }
-  if (row.updated_at === current.updated_at) return;
+  if (tenSamStamp(row.updated_at, current.updated_at)) return;
+  if (edytujeFilm()) { pendingReload = true; return; } // nie wyrywaj pola spod kursora — dociągniemy po blur
   ustawCurrent(row);
   lintujByProjekt();
   renderFilm();
@@ -894,6 +901,7 @@ filmEl.addEventListener('click', async (e) => {
   bindLibEdit();
   route();
   // realtime: filmy (lista + otwarty projekt) i diagramy (żywy import scenopisu)
+  filmEl.addEventListener('focusout', () => { setTimeout(() => { if (pendingReload && !edytujeFilm()) { pendingReload = false; reloadCurrent(); if (current) checkLinkedDiagrams(); } }, 50); });
   startRealtime(sb, 'strefa-rezyserka', ['filmy', 'diagrams'], () => {
     if (!libEl.hidden) loadList().then(renderLib);
     reloadCurrent();
