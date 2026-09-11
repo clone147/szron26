@@ -2,6 +2,7 @@
 // Widok scenariusza: czarno na białym, per bit: timecode | CO MÓWISZ | CO NA EKRANIE.
 // Teleprompter: pełny ekran na drugi laptop — bieżący bit ogromną czcionką,
 // odliczanie czasu bitu (z wpm albo dur ręcznego), auto-przejścia, sterowanie dotykiem i klawiszami.
+// Kilka urządzeń z tym samym filmem synchronizuje się nawzajem (Realtime Broadcast, bez lidera).
 import { getClient, getTeamUser, startRealtime } from './supabase.js';
 import { $, esc, toast } from './strefa-ui.js';
 import { czasBitu, czasSceny, startyScen, czasWariantu, mmss, normalizujFilm } from './rezyserka-model.js';
@@ -88,6 +89,7 @@ function renderScenariusz() {
 /* ── widok: teleprompter ── */
 let idx = 0, elapsedBit = 0, running = false, timer = null, countdown = 0;
 let renderedIdx = -1;
+let controlsIdle = 0;
 
 function startPrompter() {
   if (!bity.length) { toast('Brak tekstu', 'Dodaj sceny do tego wariantu filmu.', 'err'); return; }
@@ -100,40 +102,34 @@ function startPrompter() {
   window.getSelection?.()?.removeAllRanges();
   // Przyciski pozostają w DOM podczas odliczania — dotyk i fokus nie giną na ticku.
   tp.innerHTML = `
+    <div class="tp-pasek" aria-hidden="true"><i></i></div>
     <header class="tp-top">
-      <div class="tp-heading"><span class="tp-label">Teleprompter</span><span class="tp-sekcja"></span></div>
-      <span class="tp-zegar"><span id="tp-elapsed"></span> <em id="tp-total">/ ${mmss(total)}</em></span>
-      <button type="button" class="tp-btn tp-exit" data-tp="exit">Wyjdź <span aria-hidden="true">×</span></button>
+      <span class="tp-zegar"><span id="tp-elapsed"></span> <em id="tp-total">/ ${mmss(total)}</em> <b class="tp-bitclock" title="Do końca fragmentu"></b></span>
+      <span class="tp-peers" role="status"></span>
+      <button type="button" class="tp-btn tp-exit" data-tp="exit" aria-label="Wyjdź z pełnego ekranu" title="Wyjdź (Esc)">×</button>
     </header>
-    <div class="tp-pasek"><i></i></div>
     <div class="tp-stage">
-      <main class="tp-main"><p class="tp-tekst"></p><p class="tp-nast"></p></main>
-      <div class="tp-stan">
-        <div class="tp-ready">
-          <p class="tp-state-title" role="status" aria-live="polite"></p>
-          <p class="tp-state-hint"></p>
-          <button type="button" class="tp-btn tp-btn--primary tp-start" data-tp="toggle"></button>
-        </div>
-      </div>
+      <main class="tp-main" tabindex="-1" aria-label="Tekst promptera"><p class="tp-tekst"></p><p class="tp-nast"></p></main>
+      <div class="tp-stan"><p class="tp-state-title" role="status" aria-live="polite"></p></div>
     </div>
     <footer class="tp-dol">
-      <div class="tp-meta"><span id="tp-position"></span><span>Pozostało w tym fragmencie: <b class="tp-bitclock"></b> s</span></div>
+      <span class="tp-status" role="status"></span>
       <nav class="tp-controls" aria-label="Sterowanie teleprompterem">
-        <button type="button" class="tp-btn" data-tp="prev">← Wstecz</button>
-        <button type="button" class="tp-btn tp-btn--primary" data-tp="toggle" id="tp-toggle"></button>
-        <button type="button" class="tp-btn" data-tp="next">Dalej →</button>
-        <button type="button" class="tp-btn tp-reset" data-tp="reset">↺ Od początku</button>
+        <button type="button" class="tp-btn" data-tp="prev" aria-label="Poprzedni fragment" title="Poprzedni fragment (←)">←</button>
+        <button type="button" class="tp-btn tp-btn--primary" data-tp="toggle" id="tp-toggle" aria-keyshortcuts="Space"></button>
+        <button type="button" class="tp-btn" data-tp="next" aria-label="Następny fragment" title="Następny fragment (→)">→</button>
       </nav>
-      <details class="tp-notes"><summary>Wskazówki do ujęcia</summary><div class="tp-notes-body"><span class="tp-ekran"></span><span class="tp-rez"></span></div></details>
-      <span class="tp-help">Klawiatura: spacja — start/pauza · ← → — fragmenty · R — od początku · Esc — wyjście</span>
     </footer>`;
+  controlsIdle = 0;
   renderTp();
-  tp.querySelector('.tp-start').focus();
+  $('#tp-toggle').focus();
+  syncConnect();
   tp.requestFullscreen?.().catch(() => {}); // Na iPadzie bez API działa widok wypełniający okno.
 }
 
 function stopPrompter() {
   clearInterval(timer); timer = null; running = false; countdown = 0;
+  syncDisconnect();
   document.body.classList.remove('pr-full');
   if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
   $('#pr-teleprompter').hidden = true;
@@ -142,6 +138,7 @@ function stopPrompter() {
 }
 
 function tick() {
+  controlsIdle += 0.1;
   if (countdown > 0) {
     countdown = Math.max(0, countdown - 0.1);
     renderTp();
@@ -161,6 +158,7 @@ const skonczone = () => idx === bity.length - 1 && elapsedBit >= bity[idx].dur;
 
 function tpAction(action) {
   if ($('#pr-teleprompter').hidden) return;
+  controlsIdle = 0;
   if (action === 'exit') { stopPrompter(); return; }
   if (action === 'toggle') {
     if (running || countdown) {
@@ -168,6 +166,7 @@ function tpAction(action) {
     } else {
       if (skonczone()) { idx = 0; elapsedBit = 0; }
       countdown = 3; running = true;
+      $('#pr-teleprompter').querySelector('.tp-main').focus();
       if (!timer) timer = setInterval(tick, 100);
     }
   } else if (action === 'reset') {
@@ -180,6 +179,7 @@ function tpAction(action) {
     else if (idx > 0) { idx -= 1; elapsedBit = 0; }
   }
   renderTp();
+  syncSend();
 }
 
 function renderTp(preserveScroll = false) {
@@ -187,37 +187,38 @@ function renderTp(preserveScroll = false) {
   const b = bity[idx];
   const nast = bity[idx + 1];
   const elapsedTotal = b.start + Math.min(elapsedBit, b.dur);
-  const left = Math.max(0, Math.ceil(b.dur - elapsedBit));
   const done = skonczone();
   const initial = elapsedTotal === 0 && idx === 0;
-  const overlay = countdown > 0 || !running;
-  const label = countdown ? 'Anuluj odliczanie' : running ? 'Ⅱ Pauza' : done ? '↺ Jeszcze raz' : initial ? '▶ Start' : '▶ Wznów';
+  const overlay = countdown > 0;
+  const label = countdown ? 'Anuluj odliczanie' : running ? 'Pauza' : done ? 'Jeszcze raz' : initial ? 'Start' : 'Wznów';
   if (renderedIdx !== idx) {
-    tp.querySelector('.tp-sekcja').textContent = `${b.sekcja} · ${b.scena}`;
     tp.querySelector('.tp-tekst').textContent = b.tekst;
-    tp.querySelector('.tp-nast').textContent = nast ? `Następnie: ${nast.tekst}` : 'Ostatni fragment — trzymaj kadr';
-    tp.querySelector('.tp-ekran').innerHTML = ekranHtml(b);
-    tp.querySelector('.tp-rez').textContent = b.rezyseria;
+    tp.querySelector('.tp-nast').textContent = nast ? nast.tekst : '';
     if (!preserveScroll) tp.querySelector('.tp-main').scrollTop = 0;
     renderedIdx = idx;
   }
   $('#tp-elapsed').textContent = mmss(elapsedTotal);
   $('#tp-total').textContent = `/ ${mmss(total)}`;
-  $('#tp-position').textContent = `Fragment ${idx + 1} z ${bity.length}`;
-  tp.querySelector('.tp-bitclock').textContent = left;
-  tp.querySelector('.tp-bitclock').classList.toggle('tp-bitclock--malo', left <= 3 && running);
+  const left = Math.max(0, Math.ceil(b.dur - elapsedBit));
+  const bitclock = tp.querySelector('.tp-bitclock');
+  bitclock.textContent = done ? '' : `${left} s`;
+  bitclock.classList.toggle('tp-bitclock--malo', left <= 3 && running && !countdown);
   tp.querySelector('.tp-pasek i').style.width = `${Math.min(100, elapsedBit / b.dur * 100)}%`;
+  const peersEl = tp.querySelector('.tp-peers');
+  const peersText = peers > 1 ? `● ${peers} urządzenia` : '';
+  if (peersEl.textContent !== peersText) peersEl.textContent = peersText;
+  tp.classList.toggle('tp-reading', running && !countdown && controlsIdle >= 2.5);
   tp.querySelector('.tp-main').classList.toggle('tp-main--dim', overlay);
-  const state = tp.querySelector('.tp-stan');
-  // Przenieś fokus przed ukryciem środkowego przycisku po odliczaniu.
-  if (!overlay && state.contains(document.activeElement)) $('#tp-toggle').focus();
-  state.hidden = !overlay;
-  const title = countdown ? String(Math.ceil(countdown)) : done ? 'Ujęcie skończone' : initial ? 'Gotowy do nagrania?' : 'Pauza';
+  tp.querySelector('.tp-stan').hidden = !overlay;
+  const title = countdown ? String(Math.ceil(countdown)) : '';
   const titleEl = tp.querySelector('.tp-state-title');
   if (titleEl.textContent !== title) titleEl.textContent = title;
-  titleEl.classList.toggle('tp-countdown', countdown > 0);
-  tp.querySelector('.tp-state-hint').textContent = countdown ? 'Za chwilę zaczynamy' : done ? 'Możesz wrócić do scenariusza lub nagrać kolejne podejście.' : 'Dotknij przycisku. Masz 3 sekundy, żeby spojrzeć w kamerę.';
-  tp.querySelectorAll('[data-tp="toggle"]').forEach(btn => { if (btn.textContent !== label) btn.textContent = label; });
+  const status = done ? 'Koniec ujęcia' : !running && !initial ? 'Pauza' : '';
+  const statusEl = tp.querySelector('.tp-status');
+  if (statusEl.textContent !== status) statusEl.textContent = status;
+  const toggle = $('#tp-toggle');
+  if (toggle.textContent !== label) toggle.textContent = label;
+  toggle.title = `${label} (spacja)`;
   tp.querySelector('[data-tp="prev"]').disabled = countdown > 0 || (idx === 0 && elapsedBit <= 1);
   tp.querySelector('[data-tp="next"]').disabled = countdown > 0 || idx === bity.length - 1;
 }
@@ -233,6 +234,13 @@ function klawisz(e) {
   else if (e.key === 'f' || e.key === 'F') $('#pr-teleprompter').requestFullscreen?.().catch(() => {});
 }
 window.addEventListener('keydown', klawisz);
+function showControls() {
+  controlsIdle = 0;
+  $('#pr-teleprompter').classList.remove('tp-reading');
+}
+for (const event of ['pointermove', 'pointerdown', 'focusin']) {
+  $('#pr-teleprompter').addEventListener(event, showControls);
+}
 // CSS obsługuje Safari/iPad; zdarzenia blokują też zaznaczanie i menu w innych przeglądarkach.
 for (const event of ['selectstart', 'contextmenu']) {
   $('#pr-teleprompter').addEventListener(event, (e) => e.preventDefault());
@@ -245,6 +253,62 @@ $('#pr-teleprompter').addEventListener('click', (e) => {
 document.addEventListener('fullscreenchange', () => {
   if (!document.fullscreenElement && !$('#pr-teleprompter').hidden) stopPrompter();
 });
+
+/* ── synchronizacja między urządzeniami ── */
+// Każdy otwarty teleprompter tego samego filmu i wariantu jest równorzędny — bez pilota i bez lidera.
+// Akcja użytkownika (start, pauza, ←, →, reset) leci broadcastem do pozostałych, które przyjmują
+// dokładnie ten sam stan (fragment po ID, czas, odliczanie). Automatyczne przejścia nie są rozgłaszane:
+// zegary biegną lokalnie od wspólnego punktu, a każda ręczna akcja znów je wyrównuje.
+// Nowe urządzenie po wejściu wysyła `hello` i dołącza do trwającego czytania. Wyjście nie jest synchronizowane.
+let syncCh = null, syncSeq = 0, peers = 1;
+const peerId = Math.random().toString(36).slice(2, 10);
+const syncChannelName = (id, w) => `prompter-${id}-${w}`;
+function syncConnect() {
+  if (syncCh || !film || typeof sb.channel !== 'function') return;
+  const ch = sb.channel(syncChannelName(film.id, ktory), { config: { broadcast: { self: false }, presence: { key: peerId } } });
+  syncCh = ch;
+  ch.on('broadcast', { event: 'state' }, ({ payload }) => syncApply(payload));
+  ch.on('broadcast', { event: 'hello' }, ({ payload }) => { if (payload?.peer !== peerId) syncSend(); });
+  ch.on('presence', { event: 'sync' }, () => {
+    peers = Math.max(1, Object.keys(ch.presenceState?.() || {}).length);
+    if (!$('#pr-teleprompter').hidden && syncCh === ch) renderTp(true);
+  });
+  ch.subscribe(async (status) => {
+    if (status !== 'SUBSCRIBED' || syncCh !== ch) return;
+    try { await ch.track?.({ peer: peerId }); } catch { /* prezencja jest tylko informacyjna */ }
+    ch.send({ type: 'broadcast', event: 'hello', payload: { peer: peerId } }).catch(() => {});
+  });
+}
+// Karta w tle ma dławione zegary; po powrocie prosi resztę o aktualny stan i wyrównuje się do niej.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && syncCh) syncCh.send({ type: 'broadcast', event: 'hello', payload: { peer: peerId } }).catch(() => {});
+});
+function syncDisconnect() {
+  const ch = syncCh; syncCh = null; peers = 1;
+  if (!ch) return;
+  try { ch.untrack?.(); } catch { /* ignore */ }
+  setTimeout(() => sb.removeChannel?.(ch), 300);
+}
+function syncSend() {
+  if (!syncCh || $('#pr-teleprompter').hidden || !bity[idx]) return;
+  const b = bity[idx];
+  syncCh.send({ type: 'broadcast', event: 'state', payload: {
+    peer: peerId, seq: ++syncSeq, bitId: b.id, scenaId: b.scenaId, idx, elapsedBit, running, countdown, at: Date.now(),
+  } }).catch(() => {});
+}
+function syncApply(p) {
+  if (!p || p.peer === peerId || $('#pr-teleprompter').hidden || !bity.length) return;
+  let i = bity.findIndex((b) => b.id === p.bitId && b.scenaId === p.scenaId);
+  if (i === -1) i = Math.max(0, Math.min(bity.length - 1, p.idx | 0)); // scenariusz w trakcie edycji — najbliższy fragment
+  const el = Math.max(0, Math.min(bity[i].dur, +p.elapsedBit || 0));
+  const run = !!p.running, cd = Math.max(0, +p.countdown || 0);
+  // Ten sam stan (np. oba urządzenia zrobiły to samo) — nie przerysowuj i nie zeruj zegara.
+  if (i === idx && run === running && Math.abs(cd - countdown) < 0.3 && Math.abs(el - elapsedBit) < 0.5) return;
+  idx = i; elapsedBit = el; running = run; countdown = cd; controlsIdle = 0;
+  if (running || countdown) { if (!timer) timer = setInterval(tick, 100); }
+  else { clearInterval(timer); timer = null; }
+  renderTp();
+}
 
 /* ── lista filmów ── */
 async function renderLista() {
@@ -331,6 +395,7 @@ async function route() {
 }
 function stopPrompterCicho() {
   clearInterval(timer); timer = null; running = false; countdown = 0; idx = 0; elapsedBit = 0;
+  syncDisconnect();
   document.body.classList.remove('pr-full');
   const tp = $('#pr-teleprompter'); if (tp) { tp.hidden = true; tp.innerHTML = ''; }
 }

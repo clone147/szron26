@@ -12,7 +12,9 @@ function setup() {
     constructor() {
       this.hidden = false; this.textContent = ''; this.style = {}; this.scrollTop = 0;
       this.nodes = new Map(); this.listeners = {}; this.htmlWrites = 0;
-      this.classList = { add() {}, remove() {}, toggle() {} };
+      const classes = new Set();
+      this.classList = { add: name => classes.add(name), remove: name => classes.delete(name),
+        contains: name => classes.has(name), toggle(name, value) { if (value) classes.add(name); else classes.delete(name); } };
     }
     set innerHTML(value) { this.html = value; this.htmlWrites++; }
     get innerHTML() { return this.html; }
@@ -36,14 +38,24 @@ function setup() {
   document = { hidden: false, body: new Element(), activeElement: null, addEventListener() {} };
   const requests = [], timers = new Set();
   const pending = () => new Promise(resolve => requests.push(resolve));
-  const sb = { from: () => ({ select: () => ({ eq: () => ({ maybeSingle: pending, single: pending }) }) }) };
+  const sent = [], handlers = {};
+  const channel = {
+    on(type, opts, fn) { handlers[`${type}:${opts.event}`] = fn; return channel; },
+    subscribe(cb) { channel.status = cb; return channel; },
+    send(msg) { sent.push(msg); return Promise.resolve('ok'); },
+    track: async () => {}, untrack() {}, presenceState: () => ({ a: [], b: [] }),
+    emit: (event, payload) => handlers[`broadcast:${event}`]?.({ payload }),
+  };
+  const sb = { from: () => ({ select: () => ({ eq: () => ({ maybeSingle: pending, single: pending }) }) }),
+    channel: (name) => { channel.name = name; return channel; }, removeChannel() {} };
   const context = vm.createContext({ ...model, document, window: { addEventListener() {} },
     location: { hash: '#/film/f1/long' }, $: get, getClient: () => sb, getTeamUser: async () => null,
     startRealtime: async () => {}, esc: String, toast() {},
     setInterval: fn => { timers.add(fn); return fn; }, clearInterval: fn => timers.delete(fn),
+    setTimeout: fn => fn(), Date, Math,
   });
   vm.runInContext(source, context);
-  return { get, requests, timers,
+  return { get, requests, timers, sent, channel,
     run: code => vm.runInContext(code, context),
     apply(row) { context.row = structuredClone(row); vm.runInContext('aktualizujFilm(row)', context); },
   };
@@ -154,4 +166,87 @@ test('fullscreen text selection and context menus are cancelled without blocking
   }
   tp.listeners.click({ target: { closest: selector => selector === '[data-tp]' ? { dataset: { tp: 'toggle' } } : null } });
   assert.equal(h.run('running'), false);
+});
+
+
+test('reading controls disappear when idle, return on interaction and stay visible on pause', () => {
+  const h = playing(), tp = h.get('#pr-teleprompter');
+  h.run('for (let i = 0; i < 26; i++) tick()');
+  assert.equal(tp.classList.contains('tp-reading'), true);
+  tp.listeners.pointermove();
+  assert.equal(tp.classList.contains('tp-reading'), false);
+  h.run('for (let i = 0; i < 26; i++) tick()');
+  assert.equal(tp.classList.contains('tp-reading'), true);
+  tp.listeners.pointerdown();
+  assert.equal(tp.classList.contains('tp-reading'), false);
+  h.run('tpAction("toggle")');
+  assert.equal(tp.querySelector('.tp-stan').hidden, true);
+  assert.equal(tp.querySelector('.tp-main').classList.contains('tp-main--dim'), false);
+  assert.equal(tp.querySelector('.tp-status').textContent, 'Pauza');
+});
+
+test('only the countdown covers the script; playback restores readable text', () => {
+  const h = setup(); h.apply(row()); h.run('startPrompter()');
+  const tp = h.get('#pr-teleprompter');
+  assert.equal(tp.querySelector('.tp-stan').hidden, true);
+  h.run('tpAction("toggle")');
+  assert.equal(tp.querySelector('.tp-stan').hidden, false);
+  assert.equal(tp.querySelector('.tp-state-title').textContent, '3');
+  h.run('for (let i = 0; i < 31; i++) tick()');
+  assert.equal(tp.querySelector('.tp-stan').hidden, true);
+  assert.equal(tp.querySelector('.tp-main').classList.contains('tp-main--dim'), false);
+});
+
+test('manual actions broadcast state; auto-advance and exit stay local', () => {
+  const h = playing();
+  assert.equal(h.channel.name, 'prompter-f1-long');
+  const states = () => h.sent.filter(m => m.event === 'state');
+  const n = states().length;
+  h.run('elapsedBit = 4.95; tick()'); // automatyczne przejście do drugiego fragmentu
+  assert.equal(h.run('idx'), 1); assert.equal(states().length, n);
+  h.run('tpAction("next")');
+  const last = states().at(-1).payload;
+  assert.equal(states().length, n + 1);
+  assert.deepEqual([last.bitId, last.scenaId, last.idx, last.running], ['c', 's2', 2, true]);
+  h.run('tpAction("exit")');
+  assert.equal(states().length, n + 1);
+  assert.equal(h.run('syncCh'), null);
+});
+
+test('incoming state is adopted by fragment ID, own echoes and identical states are ignored', () => {
+  const h = playing(), tp = h.get('#pr-teleprompter');
+  const own = h.run('peerId');
+  h.channel.emit('state', { peer: own, bitId: 'c', scenaId: 's2', idx: 2, elapsedBit: 0, running: false, countdown: 0 });
+  assert.equal(h.run('idx'), 0);
+  h.channel.emit('state', { peer: 'zz', bitId: 'c', scenaId: 's2', idx: 0, elapsedBit: 1.2, running: false, countdown: 0 });
+  assert.equal(h.run('idx'), 2); assert.equal(h.run('running'), false); assert.equal(h.run('timer'), null);
+  assert.equal(tp.querySelector('.tp-tekst').textContent, 'Koniec');
+  assert.equal(tp.querySelector('.tp-status').textContent, 'Pauza');
+  h.channel.emit('state', { peer: 'zz', bitId: 'a', scenaId: 's1', idx: 0, elapsedBit: 0, running: true, countdown: 3 });
+  assert.equal(h.run('idx'), 0); assert.equal(h.run('countdown'), 3); assert.notEqual(h.run('timer'), null);
+  h.run('countdown = 0; tick(); elapsedBit = 2');
+  const timer = h.run('timer');
+  h.channel.emit('state', { peer: 'zz', bitId: 'a', scenaId: 's1', idx: 0, elapsedBit: 2.2, running: true, countdown: 0 });
+  assert.equal(h.run('elapsedBit'), 2); assert.equal(h.run('timer'), timer);
+});
+
+test('newcomer says hello and running devices reply with their state; peers count shows in header', () => {
+  const h = playing(), tp = h.get('#pr-teleprompter');
+  h.channel.status('SUBSCRIBED');
+  return Promise.resolve().then(() => Promise.resolve()).then(() => {
+    assert.equal(h.sent.some(m => m.event === 'hello'), true);
+    const before = h.sent.filter(m => m.event === 'state').length;
+    h.channel.emit('hello', { peer: 'zz' });
+    assert.equal(h.sent.filter(m => m.event === 'state').length, before + 1);
+    h.run('peers = 2; renderTp()');
+    assert.equal(tp.querySelector('.tp-peers').textContent, '● 2 urządzenia');
+  });
+});
+
+test('progress bar and remaining seconds of the fragment tick during reading', () => {
+  const h = playing(), tp = h.get('#pr-teleprompter');
+  h.run('elapsedBit = 2.5; renderTp()');
+  assert.equal(tp.querySelector('.tp-pasek i').style.width, '50%');
+  assert.equal(tp.querySelector('.tp-bitclock').textContent, '3 s');
+  assert.equal(tp.querySelector('.tp-bitclock').classList.contains('tp-bitclock--malo'), true);
 });
