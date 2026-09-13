@@ -40,6 +40,9 @@ const filmData = (f) => {
 };
 const scenaZ = (id) => current.film[ktory].sceny.find((s) => s.id === id);
 const autosize = (el) => { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; };
+const autosizeAll = () => filmEl.querySelectorAll('.rez-auto').forEach(autosize);
+window.addEventListener('resize', autosizeAll);
+document.fonts?.ready.then(autosizeAll); // po dociągnięciu fontów tekst łamie się inaczej
 const setZapis = (t) => { const el = $('#rez-zapis'); if (el) el.textContent = t; };
 const modalOtwarty = () => !!$('#modal-root')?.children.length;
 // Stemple czasu porównuj po wartości, nie tekstowo: JS daje „…Z", PostgREST zwraca „…+00:00".
@@ -891,6 +894,7 @@ filmEl.addEventListener('click', async (e) => {
       localStorage.setItem('rez-tryb-tekst', trybTekst ? '1' : '0');
       filmEl.classList.toggle('rez--tekst', trybTekst);
       renderPasek();
+      autosizeAll(); // inna czcionka = inna wysokość pól
       break;
     case 'brief-toggle': pokazBrief = !pokazBrief; renderBrief(); break;
     case 'uwagi-toggle': pokazUwagi = !pokazUwagi; renderUwagi(); break;
