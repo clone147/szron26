@@ -23,7 +23,7 @@ let pokazBrief = false, pokazUwagi = false;
 let pokazArchiwum = false; // biblioteka: czy sekcja zarchiwizowanych filmów jest rozwinięta
 let pendingReload = false;    // realtime filmu przyszedł w trakcie edycji pola — przeładujemy po blur
 let pendingDiagCheck = false; // realtime diagramu przyszedł w trakcie edycji — sprawdzimy po zapisie
-let trybTekst = localStorage.getItem('rez-tryb-tekst') === '1'; // „Aa": widok samych zdań, bez maszynerii
+let trybTekst = localStorage.getItem('rez-tryb-tekst') === '1'; // „Aa": czysty dokument — sam tekst mówiony, bez maszynerii
 
 const libEl = $('#rez-lib');
 const filmEl = $('#rez-film');
@@ -571,7 +571,7 @@ function renderPasek() {
       <button data-akcja="wariant" data-w="short" aria-pressed="${ktory === 'short'}">Short</button>
     </div>
     <div class="rez-przelacznik">
-      <button data-akcja="tryb-tekst" aria-pressed="${trybTekst}" title="Tryb tekstu — tylko to, co mówisz; reszta scenopisu schowana">Aa</button>
+      <button data-akcja="tryb-tekst" aria-pressed="${trybTekst}" title="Tryb tekstu — sam tekst, który mówisz. Enter dzieli zdanie, Backspace na początku skleja z poprzednim, ↑↓ chodzą po zdaniach">Aa</button>
     </div>
     <span class="rez-czas${zle ? ' rez-czas--zle' : ''}" id="rez-suma">${mmss(suma)} <span>/ ${mmss(w.targetSec)}</span></span>
     <a class="strefa-btn strefa-btn--sm strefa-btn--ghost" href="/strefa/prompter#/film/${esc(current.id)}/${ktory}" target="_blank" rel="noopener" title="Scenariusz do czytania (co mówić / co na ekranie) + tryb telepromptera na drugi laptop">🎬 Prompter ↗</a>
@@ -792,6 +792,54 @@ filmEl.addEventListener('change', (e) => {
   }
   scheduleSave();
   updateDerived();
+});
+
+/* ── tryb „Aa": pisanie jak w dokumencie — Enter dzieli zdanie, Backspace skleja, strzałki chodzą po zdaniach ── */
+function fokusBit(id, pos) {
+  const ta = filmEl.querySelector(`[data-b="${id}"] textarea[data-pole="bit-tekst"]`);
+  if (!ta) return;
+  ta.focus();
+  const p = pos ?? ta.value.length;
+  ta.setSelectionRange(p, p);
+}
+filmEl.addEventListener('keydown', (e) => {
+  if (!trybTekst || !current) return;
+  const t = e.target;
+  if (!(t instanceof HTMLTextAreaElement) || t.dataset.pole !== 'bit-tekst') return;
+  const s = scenaZ(t.closest('[data-s]')?.dataset.s ?? '');
+  const i = s ? s.bity.findIndex((x) => x.id === t.closest('[data-b]')?.dataset.b) : -1;
+  if (i < 0) return;
+  const bit = s.bity[i];
+  const w = current.film[ktory];
+  const si = w.sceny.indexOf(s);
+  const struktura = () => { scheduleSave(); lintujByProjekt(); renderFilm(); };
+  const kolaps = t.selectionStart === t.selectionEnd;
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+    e.preventDefault();
+    const a = t.value.slice(0, t.selectionStart).trimEnd(), z = t.value.slice(t.selectionEnd).trimStart();
+    bit.tekst = a;
+    const nowy = { id: uid(), tekst: z, dur: bit.dur };
+    s.bity.splice(i + 1, 0, nowy);
+    struktura();
+    fokusBit(nowy.id, 0);
+  } else if (e.key === 'Backspace' && kolaps && t.selectionStart === 0) {
+    const prev = i > 0 ? s.bity[i - 1] : w.sceny[si - 1]?.bity.at(-1);
+    if (!prev && t.value) return;
+    e.preventDefault();
+    if (prev) {
+      const pos = prev.tekst.length;
+      prev.tekst = (prev.tekst + (prev.tekst && t.value ? ' ' : '') + t.value);
+      s.bity.splice(i, 1);
+      struktura();
+      fokusBit(prev.id, pos);
+    } else { s.bity.splice(i, 1); struktura(); }
+  } else if (e.key === 'ArrowUp' && kolaps && t.selectionStart === 0) {
+    const prev = i > 0 ? s.bity[i - 1] : w.sceny[si - 1]?.bity.at(-1);
+    if (prev) { e.preventDefault(); fokusBit(prev.id); }
+  } else if (e.key === 'ArrowDown' && kolaps && t.selectionEnd === t.value.length) {
+    const next = s.bity[i + 1] || w.sceny[si + 1]?.bity[0];
+    if (next) { e.preventDefault(); fokusBit(next.id, 0); }
+  }
 });
 
 filmEl.addEventListener('click', async (e) => {

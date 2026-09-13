@@ -1237,18 +1237,26 @@ textarea.rez-karta__tytul { font-family: var(--font-display); font-size: 1rem; f
 .rez-dodaj { align-self: center; }
 @media (max-width: 720px) { .rez-sk__wiersz, .rez-sk__stopka { padding-left: 0; } }
 
-/* ── Tryb „Aa" — edycja samego tekstu: karty scen pokazują tylko zdania ── */
-.rez--tekst .rez-sk__wiersz--obraz,
-.rez--tekst .rez-sk__wiersz--nak,
-.rez--tekst .rez-sk__tresc .rez-sk__rez,
-.rez--tekst .rez-sk__stopka button[data-akcja="add-obraz"],
-.rez--tekst .rez-sk__stopka button[data-akcja="add-nak"],
-.rez--tekst .rez-sk__glowa select,
-.rez--tekst .rez-sk__dur,
-.rez--tekst .rez-sk__sekcja,
-.rez--tekst .rez-sk__notka { display: none; }
-.rez--tekst .rez-sk__akcje { display: none; }
-.rez--tekst .rez-sk textarea[data-pole="bit-tekst"] { font-size: 1.05rem; line-height: 1.6; }
+/* ── Tryb „Aa" — czysty dokument: tylko tekst, który mówisz. Sceny to ciche nagłówki, zdania to akapity. ── */
+.rez--tekst #rez-brief, .rez--tekst #rez-uwagi, .rez--tekst .rez-przeglad,
+.rez--tekst .rez-pasek select[data-pole="status"], .rez--tekst .rez-pasek [data-akcja="rename"],
+.rez--tekst .rez-pasek [data-akcja="do-diagramu"], .rez--tekst .rez-pasek a[href^="/strefa/diagramy"],
+.rez--tekst .rez-sk__wiersz--obraz, .rez--tekst .rez-sk__wiersz--nak, .rez--tekst .rez-sk__tresc .rez-sk__rez,
+.rez--tekst .rez-sk__stopka button[data-akcja="add-obraz"], .rez--tekst .rez-sk__stopka button[data-akcja="add-nak"],
+.rez--tekst .rez-sk__stopka .rez-sk__notka, .rez--tekst .rez-sk__glowa select, .rez--tekst .rez-sk__glowa .rez-sk__czas,
+.rez--tekst .rez-sk__dur, .rez--tekst .rez-sk__sekcja, .rez--tekst .rez-sk__akcje,
+.rez--tekst .rez-sk__bit time, .rez--tekst .rez-sk__sek, .rez--tekst .rez-sk__x { display: none; }
+.rez--tekst .rez-sb { max-width: 46rem; gap: var(--space-xl); padding-top: var(--space-lg); }
+.rez--tekst .rez-sk { background: transparent; border: 0; border-radius: 0; padding: 0; }
+.rez--tekst .rez-sk__glowa { margin-bottom: .35rem; }
+.rez--tekst .rez-sk__tytul { font-family: var(--font-mono, monospace); font-weight: 500; font-size: var(--text-caption); letter-spacing: .12em; text-transform: uppercase; color: var(--color-text-inv-3); }
+.rez--tekst .rez-sk__bit { padding: 0; }
+.rez--tekst .rez-sk textarea[data-pole="bit-tekst"] { font-size: 1.4rem; line-height: 1.6; letter-spacing: -.01em; padding: .15rem 0; color: var(--color-text-inv); }
+.rez--tekst .rez-sk textarea[data-pole="bit-tekst"]::placeholder { color: var(--color-text-inv-3); }
+.rez--tekst .rez-sk__stopka { padding-left: 0; margin-top: .1rem; opacity: 0; transition: opacity var(--dur-1); }
+.rez--tekst .rez-sk:hover .rez-sk__stopka, .rez--tekst .rez-sk:focus-within .rez-sk__stopka { opacity: 1; }
+.rez--tekst .rez-dodaj { opacity: .5; }
+@media (max-width: 720px) { .rez--tekst .rez-sk textarea[data-pole="bit-tekst"] { font-size: 1.2rem; } }
 
 /* ── Prompter: scenariusz (czarno na białym) ───────────────────── */
 #pr-scenariusz { background: #fff; color: #111; border-radius: var(--radius-card); padding: 1rem 1.25rem 2rem; }
