@@ -28,7 +28,7 @@
 - `strefa*.css` celowo poza DS (zamknięta strefa ≠ publiczny design system).
 
 ## Known render warns
-- (brak — 8/8 czysto, po neutralizacji .rv i poprawce viewportu Nav)
+- Sync v2 (2026-09-15) zrobiony ręcznie przez DesignSync (CLI design-sync niedostępne w sesji): bez render checku i bez odświeżenia _screenshots — sprawdzić karty w UI claude.ai/design.
 
 ## Re-sync risks
 - **Dryf wrapperów**: `ds/src/*.tsx` to ręczna kopia markupu `.astro` — po każdej zmianie
@@ -39,3 +39,12 @@
   zmianach main.css powtórzyć walidację nazw (krok conventions w base skill).
 - Toolchain: node 25, tsc z ds/devDependencies, playwright chromium-headless-shell v1228
   w ~/Library/Caches/ms-playwright.
+
+## Sync v2 „Szron" (2026-09-15)
+- `_ds_bundle.css` = `ds/styles/compiled.css` z tokens v2 + Doto; `fonts/` = 4 pliki (`*-pl` + `doto-*`),
+  stare subsety latin/latin-ext/vietnamese usunięte z projektu.
+- `tokens/*.css` przepisane pod v2 (zachowane aliasy `--surface-*`, motion v1, `--color-success`).
+- Karty `guidelines/colors-*`, `type-*`, `brand-*` przepisane pod ciemny motyw; README/README-brand v2;
+  `ui_kits/szron-website` oznaczony jako archiwum v1 (układ), kolory dziedziczy z tokenów.
+- Footer: domyślne `logoSrc=/img/logo-dark.svg`, `legal='© 2026 SZRON'` (wrapper, jsx, bundle, preview).
+- `_ds_bundle.js`/`_preview/*.js` NIE były rekompilowane (brak CLI) — spatchowane tekstowo; `_ds_needs_recompile` wgrany.

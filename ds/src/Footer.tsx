@@ -20,10 +20,10 @@ const DEFAULT_COLS: FooterCol[] = [
 ];
 
 export function Footer({
-  logoSrc = '/img/logo.svg',
+  logoSrc = '/img/logo-dark.svg',
   tagline = 'Transformacja zespołów IT i programowanie agentowe dla dużych firm.',
   cols = DEFAULT_COLS,
-  legal = '© 2026 SZRON Tomek Wojciechowski.',
+  legal = '© 2026 SZRON',
   mark = 'SZRON',
 }: FooterProps) {
   return (
